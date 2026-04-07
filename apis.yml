@@ -7,8 +7,7 @@ type: Index
 position: Consumer
 access: 3rd-Party
 image: https://kinlane-productions.s3.amazonaws.com/apis-json/apis-json-logo.jpg
-tags:
-  - API
+tags: []
 created: '2025-01-08'
 modified: '2026-03-16'
 url: >-
@@ -21,8 +20,7 @@ apis:
       Roles regulate access to specific resources by having permissions
       configured for them. Currently, this is only a stub.
     humanURL: https://www.openproject.org/docs/api/endpoints/roles/
-    tags:
-      - API
+    tags: []
     properties:
       - type: Documentation
         url: https://www.openproject.org/docs/api/endpoints/roles/
