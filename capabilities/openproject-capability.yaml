@@ -1,0 +1,2618 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: OpenProject API V3 (Stable)
+  description: 'You''re looking at the current **stable** documentation of the OpenProject APIv3. If you''re interested in
+    the current development version, please go to [github.com/opf](https://github.com/opf/openproject/tree/dev/docs/api/apiv3).
+    ## Introduction The documentation for the APIv3 is written according to the [OpenAPI 3.1 Specification](https://swagger.io/specification/).
+    You can either view the static version of this documentation on the [website](https://www.openproject.org/docs/api/introduction/)
+    or the interactive version, rendered with [OpenAPI Explorer](https://github.com/Rhosys/openapi-explor'
+  tags:
+  - Openproject
+  - API
+  created: '2026-05-06'
+  modified: '2026-05-06'
+capability:
+  consumes:
+  - type: http
+    namespace: openproject
+    baseUri: https://qa.openproject-edge.com
+    description: OpenProject API V3 (Stable) HTTP API.
+    authentication:
+      type: basic
+      username: '{{OPENPROJECT_USERNAME}}'
+      password: '{{OPENPROJECT_PASSWORD}}'
+    resources:
+    - name: api-v3
+      path: /api/v3
+      operations:
+      - name: view-root
+        method: GET
+        description: View root
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-actions
+      path: /api/v3/actions
+      operations:
+      - name: list-actions
+        method: GET
+        description: List actions
+        inputParameters:
+        - name: filters
+          in: query
+          type: string
+          description: JSON specifying filter conditions. Accepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)
+            endpoint. Curre
+        - name: sortBy
+          in: query
+          type: string
+          description: JSON specifying sort criteria. Accepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)
+            endpoint. Currently
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-actions-id
+      path: /api/v3/actions/{id}
+      operations:
+      - name: view-action
+        method: GET
+        description: View action
+        inputParameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+          description: action id which is the name of the action
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-activities-id
+      path: /api/v3/activities/{id}
+      operations:
+      - name: get-activity
+        method: GET
+        description: Get an activity
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: Activity id
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: update-activity
+        method: PATCH
+        description: Update activity
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: Activity id
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-activities-id-attachments
+      path: /api/v3/activities/{id}/attachments
+      operations:
+      - name: list-activity-attachments
+        method: GET
+        description: List attachments by activity
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: ID of the activity whose attachments will be listed
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: create-activity-attachment
+        method: POST
+        description: Add attachment to activity
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: ID of the activity to receive the attachment
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-activities-id-emoji-reactions
+      path: /api/v3/activities/{id}/emoji_reactions
+      operations:
+      - name: list-activity-emoji-reactions
+        method: GET
+        description: List emoji reactions by activity
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: ID of the activity whose emoji reactions will be listed
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: toggle-activity-emoji-reaction
+        method: PATCH
+        description: Toggle emoji reaction for an activity
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: ID of the activity to toggle emoji reaction for
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-attachments
+      path: /api/v3/attachments
+      operations:
+      - name: create-attachment
+        method: POST
+        description: Create Attachment
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-attachments-id
+      path: /api/v3/attachments/{id}
+      operations:
+      - name: delete-attachment
+        method: DELETE
+        description: Delete attachment
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: Attachment id
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: view-attachment
+        method: GET
+        description: View attachment
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: Attachment id
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-budgets-id
+      path: /api/v3/budgets/{id}
+      operations:
+      - name: view-budget
+        method: GET
+        description: view Budget
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: Budget id
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-capabilities
+      path: /api/v3/capabilities
+      operations:
+      - name: list-capabilities
+        method: GET
+        description: List capabilities
+        inputParameters:
+        - name: filters
+          in: query
+          type: string
+          description: JSON specifying filter conditions. Accepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)
+            endpoint. + act
+        - name: sortBy
+          in: query
+          type: string
+          description: JSON specifying sort criteria. Accepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)
+            endpoint. Currently
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-capabilities-context-global
+      path: /api/v3/capabilities/context/global
+      operations:
+      - name: view-global-context
+        method: GET
+        description: View global context
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-capabilities-id
+      path: /api/v3/capabilities/{id}
+      operations:
+      - name: view-capabilities
+        method: GET
+        description: View capabilities
+        inputParameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+          description: capability id
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-categories-id
+      path: /api/v3/categories/{id}
+      operations:
+      - name: view-category
+        method: GET
+        description: View Category
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: Category id
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-configuration
+      path: /api/v3/configuration
+      operations:
+      - name: view-configuration
+        method: GET
+        description: View configuration
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-custom-actions-id
+      path: /api/v3/custom_actions/{id}
+      operations:
+      - name: get-custom-action
+        method: GET
+        description: Get a custom action
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: The id of the custom action to fetch
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-custom-actions-id-execute
+      path: /api/v3/custom_actions/{id}/execute
+      operations:
+      - name: execute-custom-action
+        method: POST
+        description: Execute custom action
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: The id of the custom action to execute
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-custom-fields-id-items
+      path: /api/v3/custom_fields/{id}/items
+      operations:
+      - name: get-custom-field-items
+        method: GET
+        description: Get the custom field hierarchy items
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: The custom field's unique identifier
+        - name: parent
+          in: query
+          type: integer
+          description: The identifier of the parent hierarchy item
+        - name: depth
+          in: query
+          type: integer
+          description: The level of hierarchy depth
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-custom-field-items-id
+      path: /api/v3/custom_field_items/{id}
+      operations:
+      - name: get-custom-field-item
+        method: GET
+        description: Get a custom field hierarchy item
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: The custom field item's unique identifier
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-custom-field-items-id-branch
+      path: /api/v3/custom_field_items/{id}/branch
+      operations:
+      - name: get-custom-field-item-branch
+        method: GET
+        description: Get a custom field hierarchy item's branch
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: The custom field item's unique identifier
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-custom-options-id
+      path: /api/v3/custom_options/{id}
+      operations:
+      - name: view-custom-option
+        method: GET
+        description: View Custom Option
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: The custom option's identifier
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-days-non-working
+      path: /api/v3/days/non_working
+      operations:
+      - name: list-non-working-days
+        method: GET
+        description: Lists all non working days
+        inputParameters:
+        - name: filters
+          in: query
+          type: string
+          description: JSON specifying filter conditions. Accepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)
+            endpoint. Curre
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: create-non-working-day
+        method: POST
+        description: Creates a non-working day (NOT IMPLEMENTED)
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-days-non-working-date
+      path: /api/v3/days/non_working/{date}
+      operations:
+      - name: view-non-working-day
+        method: GET
+        description: View a non-working day
+        inputParameters:
+        - name: date
+          in: path
+          type: string
+          required: true
+          description: The date of the non-working day to view in ISO 8601 format.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: update-non-working-day
+        method: PATCH
+        description: Update a non-working day attributes (NOT IMPLEMENTED)
+        inputParameters:
+        - name: date
+          in: path
+          type: string
+          required: true
+          description: The date of the non-working day to view in ISO 8601 format.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: delete-non-working-day
+        method: DELETE
+        description: Removes a non-working day (NOT IMPLEMENTED)
+        inputParameters:
+        - name: date
+          in: path
+          type: string
+          required: true
+          description: The date of the non-working day to view in ISO 8601 format.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-days-week
+      path: /api/v3/days/week
+      operations:
+      - name: list-week-days
+        method: GET
+        description: Lists week days
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: update-week-days
+        method: PATCH
+        description: Update week days (NOT IMPLEMENTED)
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-days-week-day
+      path: /api/v3/days/week/{day}
+      operations:
+      - name: view-week-day
+        method: GET
+        description: View a week day
+        inputParameters:
+        - name: day
+          in: path
+          type: integer
+          required: true
+          description: The week day from 1 to 7. 1 is Monday. 7 is Sunday.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: update-week-day
+        method: PATCH
+        description: Update a week day attributes (NOT IMPLEMENTED)
+        inputParameters:
+        - name: day
+          in: path
+          type: integer
+          required: true
+          description: The week day from 1 to 7. 1 is Monday. 7 is Sunday.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-days
+      path: /api/v3/days
+      operations:
+      - name: list-days
+        method: GET
+        description: Lists days
+        inputParameters:
+        - name: filters
+          in: query
+          type: string
+          description: JSON specifying filter conditions. Accepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)
+            endpoint. Curre
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-days-date
+      path: /api/v3/days/{date}
+      operations:
+      - name: view-day
+        method: GET
+        description: View day
+        inputParameters:
+        - name: date
+          in: path
+          type: string
+          required: true
+          description: The date of the non-working day to view in ISO 8601 format.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-documents
+      path: /api/v3/documents
+      operations:
+      - name: list-documents
+        method: GET
+        description: List Documents
+        inputParameters:
+        - name: offset
+          in: query
+          type: integer
+          description: Page number inside the requested collection.
+        - name: pageSize
+          in: query
+          type: integer
+          description: Number of elements to display per page.
+        - name: sortBy
+          in: query
+          type: string
+          description: JSON specifying sort criteria. Accepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)
+            endpoint. Currently
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-documents-id
+      path: /api/v3/documents/{id}
+      operations:
+      - name: view-document
+        method: GET
+        description: View document
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: Document id
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: update-document
+        method: PATCH
+        description: Update document
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: Document id
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-example-form
+      path: /api/v3/example/form
+      operations:
+      - name: show-or-validate-form
+        method: POST
+        description: show or validate form
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-example-schema
+      path: /api/v3/example/schema
+      operations:
+      - name: view-the-schema
+        method: GET
+        description: view the schema
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-examples
+      path: /api/v3/examples
+      operations:
+      - name: view-aggregated-result
+        method: GET
+        description: view aggregated result
+        inputParameters:
+        - name: groupBy
+          in: query
+          type: string
+          description: 'The column to group by. Note: Aggregation is as of now only supported by the work package collection.
+            You can pass any column name as returned by the [queries]('
+        - name: showSums
+          in: query
+          type: boolean
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-file-links-id
+      path: /api/v3/file_links/{id}
+      operations:
+      - name: view-file-link
+        method: GET
+        description: Gets a file link.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: File link id
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: delete-file-link
+        method: DELETE
+        description: Removes a file link.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: File link id
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-file-links-id-open
+      path: /api/v3/file_links/{id}/open
+      operations:
+      - name: open-file-link
+        method: GET
+        description: Creates an opening uri of the linked file.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: File link id
+        - name: location
+          in: query
+          type: boolean
+          description: Boolean flag indicating, if the file should be opened directly or rather the directory location.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-file-links-id-download
+      path: /api/v3/file_links/{id}/download
+      operations:
+      - name: download-file-link
+        method: GET
+        description: Creates a download uri of the linked file.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: File link id
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-grids
+      path: /api/v3/grids
+      operations:
+      - name: list-grids
+        method: GET
+        description: List grids
+        inputParameters:
+        - name: offset
+          in: query
+          type: integer
+          description: Page number inside the requested collection.
+        - name: pageSize
+          in: query
+          type: integer
+          description: Number of elements to display per page.
+        - name: filters
+          in: query
+          type: string
+          description: JSON specifying filter conditions. Accepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)
+            endpoint. Curre
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: create-grid
+        method: POST
+        description: Create a grid
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-grids-form
+      path: /api/v3/grids/form
+      operations:
+      - name: grid-create-form
+        method: POST
+        description: Grid Create Form
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-grids-id
+      path: /api/v3/grids/{id}
+      operations:
+      - name: get-grid
+        method: GET
+        description: Get a grid
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: Grid id
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: update-grid
+        method: PATCH
+        description: Update a grid
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: Grid id
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-grids-id-form
+      path: /api/v3/grids/{id}/form
+      operations:
+      - name: grid-update-form
+        method: POST
+        description: Grid Update Form
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: ID of the grid being modified
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-groups
+      path: /api/v3/groups
+      operations:
+      - name: list-groups
+        method: GET
+        description: List groups
+        inputParameters:
+        - name: sortBy
+          in: query
+          type: string
+          description: JSON specifying sort criteria. Accepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)
+            endpoint. Currently
+        - name: select
+          in: query
+          type: string
+          description: Comma separated list of properties to include.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: create-group
+        method: POST
+        description: Create group
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-groups-id
+      path: /api/v3/groups/{id}
+      operations:
+      - name: delete-group
+        method: DELETE
+        description: Delete group
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: Group id
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: get-group
+        method: GET
+        description: Get group
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: Group id
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: update-group
+        method: PATCH
+        description: Update group
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: Group id
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-help-texts
+      path: /api/v3/help_texts
+      operations:
+      - name: list-help-texts
+        method: GET
+        description: List help texts
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-help-texts-id
+      path: /api/v3/help_texts/{id}
+      operations:
+      - name: get-help-text
+        method: GET
+        description: Get help text
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: Help text id
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-meetings
+      path: /api/v3/meetings
+      operations:
+      - name: list-meetings
+        method: GET
+        description: List all visible meetings
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-meetings-id
+      path: /api/v3/meetings/{id}
+      operations:
+      - name: get-meeting
+        method: GET
+        description: Get a meeting
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: Meeting identifier
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+  exposes:
+  - type: rest
+    port: 8080
+    namespace: openproject-rest
+    description: REST adapter for OpenProject API V3 (Stable).
+    resources:
+    - path: /api/v3
+      name: view-root
+      operations:
+      - method: GET
+        name: view-root
+        description: View root
+        call: openproject.view-root
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/actions
+      name: list-actions
+      operations:
+      - method: GET
+        name: list-actions
+        description: List actions
+        call: openproject.list-actions
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/actions/{id}
+      name: view-action
+      operations:
+      - method: GET
+        name: view-action
+        description: View action
+        call: openproject.view-action
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/activities/{id}
+      name: get-activity
+      operations:
+      - method: GET
+        name: get-activity
+        description: Get an activity
+        call: openproject.get-activity
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/activities/{id}
+      name: update-activity
+      operations:
+      - method: PATCH
+        name: update-activity
+        description: Update activity
+        call: openproject.update-activity
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/activities/{id}/attachments
+      name: list-activity-attachments
+      operations:
+      - method: GET
+        name: list-activity-attachments
+        description: List attachments by activity
+        call: openproject.list-activity-attachments
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/activities/{id}/attachments
+      name: create-activity-attachment
+      operations:
+      - method: POST
+        name: create-activity-attachment
+        description: Add attachment to activity
+        call: openproject.create-activity-attachment
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/activities/{id}/emoji_reactions
+      name: list-activity-emoji-reactions
+      operations:
+      - method: GET
+        name: list-activity-emoji-reactions
+        description: List emoji reactions by activity
+        call: openproject.list-activity-emoji-reactions
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/activities/{id}/emoji_reactions
+      name: toggle-activity-emoji-reaction
+      operations:
+      - method: PATCH
+        name: toggle-activity-emoji-reaction
+        description: Toggle emoji reaction for an activity
+        call: openproject.toggle-activity-emoji-reaction
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/attachments
+      name: create-attachment
+      operations:
+      - method: POST
+        name: create-attachment
+        description: Create Attachment
+        call: openproject.create-attachment
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/attachments/{id}
+      name: delete-attachment
+      operations:
+      - method: DELETE
+        name: delete-attachment
+        description: Delete attachment
+        call: openproject.delete-attachment
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/attachments/{id}
+      name: view-attachment
+      operations:
+      - method: GET
+        name: view-attachment
+        description: View attachment
+        call: openproject.view-attachment
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/budgets/{id}
+      name: view-budget
+      operations:
+      - method: GET
+        name: view-budget
+        description: view Budget
+        call: openproject.view-budget
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/capabilities
+      name: list-capabilities
+      operations:
+      - method: GET
+        name: list-capabilities
+        description: List capabilities
+        call: openproject.list-capabilities
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/capabilities/context/global
+      name: view-global-context
+      operations:
+      - method: GET
+        name: view-global-context
+        description: View global context
+        call: openproject.view-global-context
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/capabilities/{id}
+      name: view-capabilities
+      operations:
+      - method: GET
+        name: view-capabilities
+        description: View capabilities
+        call: openproject.view-capabilities
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/categories/{id}
+      name: view-category
+      operations:
+      - method: GET
+        name: view-category
+        description: View Category
+        call: openproject.view-category
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/configuration
+      name: view-configuration
+      operations:
+      - method: GET
+        name: view-configuration
+        description: View configuration
+        call: openproject.view-configuration
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/custom_actions/{id}
+      name: get-custom-action
+      operations:
+      - method: GET
+        name: get-custom-action
+        description: Get a custom action
+        call: openproject.get-custom-action
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/custom_actions/{id}/execute
+      name: execute-custom-action
+      operations:
+      - method: POST
+        name: execute-custom-action
+        description: Execute custom action
+        call: openproject.execute-custom-action
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/custom_fields/{id}/items
+      name: get-custom-field-items
+      operations:
+      - method: GET
+        name: get-custom-field-items
+        description: Get the custom field hierarchy items
+        call: openproject.get-custom-field-items
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/custom_field_items/{id}
+      name: get-custom-field-item
+      operations:
+      - method: GET
+        name: get-custom-field-item
+        description: Get a custom field hierarchy item
+        call: openproject.get-custom-field-item
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/custom_field_items/{id}/branch
+      name: get-custom-field-item-branch
+      operations:
+      - method: GET
+        name: get-custom-field-item-branch
+        description: Get a custom field hierarchy item's branch
+        call: openproject.get-custom-field-item-branch
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/custom_options/{id}
+      name: view-custom-option
+      operations:
+      - method: GET
+        name: view-custom-option
+        description: View Custom Option
+        call: openproject.view-custom-option
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/days/non_working
+      name: list-non-working-days
+      operations:
+      - method: GET
+        name: list-non-working-days
+        description: Lists all non working days
+        call: openproject.list-non-working-days
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/days/non_working
+      name: create-non-working-day
+      operations:
+      - method: POST
+        name: create-non-working-day
+        description: Creates a non-working day (NOT IMPLEMENTED)
+        call: openproject.create-non-working-day
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/days/non_working/{date}
+      name: view-non-working-day
+      operations:
+      - method: GET
+        name: view-non-working-day
+        description: View a non-working day
+        call: openproject.view-non-working-day
+        with:
+          date: rest.date
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/days/non_working/{date}
+      name: update-non-working-day
+      operations:
+      - method: PATCH
+        name: update-non-working-day
+        description: Update a non-working day attributes (NOT IMPLEMENTED)
+        call: openproject.update-non-working-day
+        with:
+          date: rest.date
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/days/non_working/{date}
+      name: delete-non-working-day
+      operations:
+      - method: DELETE
+        name: delete-non-working-day
+        description: Removes a non-working day (NOT IMPLEMENTED)
+        call: openproject.delete-non-working-day
+        with:
+          date: rest.date
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/days/week
+      name: list-week-days
+      operations:
+      - method: GET
+        name: list-week-days
+        description: Lists week days
+        call: openproject.list-week-days
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/days/week
+      name: update-week-days
+      operations:
+      - method: PATCH
+        name: update-week-days
+        description: Update week days (NOT IMPLEMENTED)
+        call: openproject.update-week-days
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/days/week/{day}
+      name: view-week-day
+      operations:
+      - method: GET
+        name: view-week-day
+        description: View a week day
+        call: openproject.view-week-day
+        with:
+          day: rest.day
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/days/week/{day}
+      name: update-week-day
+      operations:
+      - method: PATCH
+        name: update-week-day
+        description: Update a week day attributes (NOT IMPLEMENTED)
+        call: openproject.update-week-day
+        with:
+          day: rest.day
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/days
+      name: list-days
+      operations:
+      - method: GET
+        name: list-days
+        description: Lists days
+        call: openproject.list-days
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/days/{date}
+      name: view-day
+      operations:
+      - method: GET
+        name: view-day
+        description: View day
+        call: openproject.view-day
+        with:
+          date: rest.date
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/documents
+      name: list-documents
+      operations:
+      - method: GET
+        name: list-documents
+        description: List Documents
+        call: openproject.list-documents
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/documents/{id}
+      name: view-document
+      operations:
+      - method: GET
+        name: view-document
+        description: View document
+        call: openproject.view-document
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/documents/{id}
+      name: update-document
+      operations:
+      - method: PATCH
+        name: update-document
+        description: Update document
+        call: openproject.update-document
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/example/form
+      name: show-or-validate-form
+      operations:
+      - method: POST
+        name: show-or-validate-form
+        description: show or validate form
+        call: openproject.show-or-validate-form
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/example/schema
+      name: view-the-schema
+      operations:
+      - method: GET
+        name: view-the-schema
+        description: view the schema
+        call: openproject.view-the-schema
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/examples
+      name: view-aggregated-result
+      operations:
+      - method: GET
+        name: view-aggregated-result
+        description: view aggregated result
+        call: openproject.view-aggregated-result
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/file_links/{id}
+      name: view-file-link
+      operations:
+      - method: GET
+        name: view-file-link
+        description: Gets a file link.
+        call: openproject.view-file-link
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/file_links/{id}
+      name: delete-file-link
+      operations:
+      - method: DELETE
+        name: delete-file-link
+        description: Removes a file link.
+        call: openproject.delete-file-link
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/file_links/{id}/open
+      name: open-file-link
+      operations:
+      - method: GET
+        name: open-file-link
+        description: Creates an opening uri of the linked file.
+        call: openproject.open-file-link
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/file_links/{id}/download
+      name: download-file-link
+      operations:
+      - method: GET
+        name: download-file-link
+        description: Creates a download uri of the linked file.
+        call: openproject.download-file-link
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/grids
+      name: list-grids
+      operations:
+      - method: GET
+        name: list-grids
+        description: List grids
+        call: openproject.list-grids
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/grids
+      name: create-grid
+      operations:
+      - method: POST
+        name: create-grid
+        description: Create a grid
+        call: openproject.create-grid
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/grids/form
+      name: grid-create-form
+      operations:
+      - method: POST
+        name: grid-create-form
+        description: Grid Create Form
+        call: openproject.grid-create-form
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/grids/{id}
+      name: get-grid
+      operations:
+      - method: GET
+        name: get-grid
+        description: Get a grid
+        call: openproject.get-grid
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/grids/{id}
+      name: update-grid
+      operations:
+      - method: PATCH
+        name: update-grid
+        description: Update a grid
+        call: openproject.update-grid
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/grids/{id}/form
+      name: grid-update-form
+      operations:
+      - method: POST
+        name: grid-update-form
+        description: Grid Update Form
+        call: openproject.grid-update-form
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/groups
+      name: list-groups
+      operations:
+      - method: GET
+        name: list-groups
+        description: List groups
+        call: openproject.list-groups
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/groups
+      name: create-group
+      operations:
+      - method: POST
+        name: create-group
+        description: Create group
+        call: openproject.create-group
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/groups/{id}
+      name: delete-group
+      operations:
+      - method: DELETE
+        name: delete-group
+        description: Delete group
+        call: openproject.delete-group
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/groups/{id}
+      name: get-group
+      operations:
+      - method: GET
+        name: get-group
+        description: Get group
+        call: openproject.get-group
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/groups/{id}
+      name: update-group
+      operations:
+      - method: PATCH
+        name: update-group
+        description: Update group
+        call: openproject.update-group
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/help_texts
+      name: list-help-texts
+      operations:
+      - method: GET
+        name: list-help-texts
+        description: List help texts
+        call: openproject.list-help-texts
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/help_texts/{id}
+      name: get-help-text
+      operations:
+      - method: GET
+        name: get-help-text
+        description: Get help text
+        call: openproject.get-help-text
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/meetings
+      name: list-meetings
+      operations:
+      - method: GET
+        name: list-meetings
+        description: List all visible meetings
+        call: openproject.list-meetings
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /api/v3/meetings/{id}
+      name: get-meeting
+      operations:
+      - method: GET
+        name: get-meeting
+        description: Get a meeting
+        call: openproject.get-meeting
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    port: 9090
+    namespace: openproject-mcp
+    transport: http
+    description: MCP adapter for OpenProject API V3 (Stable) for AI agent use.
+    tools:
+    - name: view-root
+      description: View root
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.view-root
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-actions
+      description: List actions
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.list-actions
+      with:
+        filters: tools.filters
+        sortBy: tools.sortBy
+      inputParameters:
+      - name: filters
+        type: string
+        description: JSON specifying filter conditions. Accepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)
+          endpoint. Curre
+      - name: sortBy
+        type: string
+        description: JSON specifying sort criteria. Accepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)
+          endpoint. Currently
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: view-action
+      description: View action
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.view-action
+      with:
+        id: tools.id
+      inputParameters:
+      - name: id
+        type: string
+        description: action id which is the name of the action
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: get-activity
+      description: Get an activity
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.get-activity
+      with:
+        id: tools.id
+      inputParameters:
+      - name: id
+        type: integer
+        description: Activity id
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: update-activity
+      description: Update activity
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject.update-activity
+      with:
+        id: tools.id
+      inputParameters:
+      - name: id
+        type: integer
+        description: Activity id
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-activity-attachments
+      description: List attachments by activity
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.list-activity-attachments
+      with:
+        id: tools.id
+      inputParameters:
+      - name: id
+        type: integer
+        description: ID of the activity whose attachments will be listed
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: create-activity-attachment
+      description: Add attachment to activity
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject.create-activity-attachment
+      with:
+        id: tools.id
+      inputParameters:
+      - name: id
+        type: integer
+        description: ID of the activity to receive the attachment
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-activity-emoji-reactions
+      description: List emoji reactions by activity
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.list-activity-emoji-reactions
+      with:
+        id: tools.id
+      inputParameters:
+      - name: id
+        type: integer
+        description: ID of the activity whose emoji reactions will be listed
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: toggle-activity-emoji-reaction
+      description: Toggle emoji reaction for an activity
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject.toggle-activity-emoji-reaction
+      with:
+        id: tools.id
+      inputParameters:
+      - name: id
+        type: integer
+        description: ID of the activity to toggle emoji reaction for
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: create-attachment
+      description: Create Attachment
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject.create-attachment
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: delete-attachment
+      description: Delete attachment
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: openproject.delete-attachment
+      with:
+        id: tools.id
+      inputParameters:
+      - name: id
+        type: integer
+        description: Attachment id
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: view-attachment
+      description: View attachment
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.view-attachment
+      with:
+        id: tools.id
+      inputParameters:
+      - name: id
+        type: integer
+        description: Attachment id
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: view-budget
+      description: view Budget
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.view-budget
+      with:
+        id: tools.id
+      inputParameters:
+      - name: id
+        type: integer
+        description: Budget id
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-capabilities
+      description: List capabilities
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.list-capabilities
+      with:
+        filters: tools.filters
+        sortBy: tools.sortBy
+      inputParameters:
+      - name: filters
+        type: string
+        description: JSON specifying filter conditions. Accepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)
+          endpoint. + act
+      - name: sortBy
+        type: string
+        description: JSON specifying sort criteria. Accepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)
+          endpoint. Currently
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: view-global-context
+      description: View global context
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.view-global-context
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: view-capabilities
+      description: View capabilities
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.view-capabilities
+      with:
+        id: tools.id
+      inputParameters:
+      - name: id
+        type: string
+        description: capability id
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: view-category
+      description: View Category
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.view-category
+      with:
+        id: tools.id
+      inputParameters:
+      - name: id
+        type: integer
+        description: Category id
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: view-configuration
+      description: View configuration
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.view-configuration
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: get-custom-action
+      description: Get a custom action
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.get-custom-action
+      with:
+        id: tools.id
+      inputParameters:
+      - name: id
+        type: integer
+        description: The id of the custom action to fetch
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: execute-custom-action
+      description: Execute custom action
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject.execute-custom-action
+      with:
+        id: tools.id
+      inputParameters:
+      - name: id
+        type: integer
+        description: The id of the custom action to execute
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: get-custom-field-items
+      description: Get the custom field hierarchy items
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.get-custom-field-items
+      with:
+        id: tools.id
+        parent: tools.parent
+        depth: tools.depth
+      inputParameters:
+      - name: id
+        type: integer
+        description: The custom field's unique identifier
+        required: true
+      - name: parent
+        type: integer
+        description: The identifier of the parent hierarchy item
+      - name: depth
+        type: integer
+        description: The level of hierarchy depth
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: get-custom-field-item
+      description: Get a custom field hierarchy item
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.get-custom-field-item
+      with:
+        id: tools.id
+      inputParameters:
+      - name: id
+        type: integer
+        description: The custom field item's unique identifier
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: get-custom-field-item-branch
+      description: Get a custom field hierarchy item's branch
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.get-custom-field-item-branch
+      with:
+        id: tools.id
+      inputParameters:
+      - name: id
+        type: integer
+        description: The custom field item's unique identifier
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: view-custom-option
+      description: View Custom Option
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.view-custom-option
+      with:
+        id: tools.id
+      inputParameters:
+      - name: id
+        type: integer
+        description: The custom option's identifier
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-non-working-days
+      description: Lists all non working days
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.list-non-working-days
+      with:
+        filters: tools.filters
+      inputParameters:
+      - name: filters
+        type: string
+        description: JSON specifying filter conditions. Accepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)
+          endpoint. Curre
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: create-non-working-day
+      description: Creates a non-working day (NOT IMPLEMENTED)
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject.create-non-working-day
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: view-non-working-day
+      description: View a non-working day
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.view-non-working-day
+      with:
+        date: tools.date
+      inputParameters:
+      - name: date
+        type: string
+        description: The date of the non-working day to view in ISO 8601 format.
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: update-non-working-day
+      description: Update a non-working day attributes (NOT IMPLEMENTED)
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject.update-non-working-day
+      with:
+        date: tools.date
+      inputParameters:
+      - name: date
+        type: string
+        description: The date of the non-working day to view in ISO 8601 format.
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: delete-non-working-day
+      description: Removes a non-working day (NOT IMPLEMENTED)
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: openproject.delete-non-working-day
+      with:
+        date: tools.date
+      inputParameters:
+      - name: date
+        type: string
+        description: The date of the non-working day to view in ISO 8601 format.
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-week-days
+      description: Lists week days
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.list-week-days
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: update-week-days
+      description: Update week days (NOT IMPLEMENTED)
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject.update-week-days
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: view-week-day
+      description: View a week day
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.view-week-day
+      with:
+        day: tools.day
+      inputParameters:
+      - name: day
+        type: integer
+        description: The week day from 1 to 7. 1 is Monday. 7 is Sunday.
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: update-week-day
+      description: Update a week day attributes (NOT IMPLEMENTED)
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject.update-week-day
+      with:
+        day: tools.day
+      inputParameters:
+      - name: day
+        type: integer
+        description: The week day from 1 to 7. 1 is Monday. 7 is Sunday.
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-days
+      description: Lists days
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.list-days
+      with:
+        filters: tools.filters
+      inputParameters:
+      - name: filters
+        type: string
+        description: JSON specifying filter conditions. Accepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)
+          endpoint. Curre
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: view-day
+      description: View day
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.view-day
+      with:
+        date: tools.date
+      inputParameters:
+      - name: date
+        type: string
+        description: The date of the non-working day to view in ISO 8601 format.
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-documents
+      description: List Documents
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.list-documents
+      with:
+        offset: tools.offset
+        pageSize: tools.pageSize
+        sortBy: tools.sortBy
+      inputParameters:
+      - name: offset
+        type: integer
+        description: Page number inside the requested collection.
+      - name: pageSize
+        type: integer
+        description: Number of elements to display per page.
+      - name: sortBy
+        type: string
+        description: JSON specifying sort criteria. Accepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)
+          endpoint. Currently
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: view-document
+      description: View document
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.view-document
+      with:
+        id: tools.id
+      inputParameters:
+      - name: id
+        type: integer
+        description: Document id
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: update-document
+      description: Update document
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject.update-document
+      with:
+        id: tools.id
+      inputParameters:
+      - name: id
+        type: integer
+        description: Document id
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: show-or-validate-form
+      description: show or validate form
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject.show-or-validate-form
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: view-the-schema
+      description: view the schema
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.view-the-schema
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: view-aggregated-result
+      description: view aggregated result
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.view-aggregated-result
+      with:
+        groupBy: tools.groupBy
+        showSums: tools.showSums
+      inputParameters:
+      - name: groupBy
+        type: string
+        description: 'The column to group by. Note: Aggregation is as of now only supported by the work package collection.
+          You can pass any column name as returned by the [queries]('
+      - name: showSums
+        type: boolean
+        description: showSums
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: view-file-link
+      description: Gets a file link.
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.view-file-link
+      with:
+        id: tools.id
+      inputParameters:
+      - name: id
+        type: integer
+        description: File link id
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: delete-file-link
+      description: Removes a file link.
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: openproject.delete-file-link
+      with:
+        id: tools.id
+      inputParameters:
+      - name: id
+        type: integer
+        description: File link id
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: open-file-link
+      description: Creates an opening uri of the linked file.
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.open-file-link
+      with:
+        id: tools.id
+        location: tools.location
+      inputParameters:
+      - name: id
+        type: integer
+        description: File link id
+        required: true
+      - name: location
+        type: boolean
+        description: Boolean flag indicating, if the file should be opened directly or rather the directory location.
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: download-file-link
+      description: Creates a download uri of the linked file.
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.download-file-link
+      with:
+        id: tools.id
+      inputParameters:
+      - name: id
+        type: integer
+        description: File link id
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-grids
+      description: List grids
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.list-grids
+      with:
+        offset: tools.offset
+        pageSize: tools.pageSize
+        filters: tools.filters
+      inputParameters:
+      - name: offset
+        type: integer
+        description: Page number inside the requested collection.
+      - name: pageSize
+        type: integer
+        description: Number of elements to display per page.
+      - name: filters
+        type: string
+        description: JSON specifying filter conditions. Accepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)
+          endpoint. Curre
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: create-grid
+      description: Create a grid
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject.create-grid
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: grid-create-form
+      description: Grid Create Form
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject.grid-create-form
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: get-grid
+      description: Get a grid
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.get-grid
+      with:
+        id: tools.id
+      inputParameters:
+      - name: id
+        type: integer
+        description: Grid id
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: update-grid
+      description: Update a grid
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject.update-grid
+      with:
+        id: tools.id
+      inputParameters:
+      - name: id
+        type: integer
+        description: Grid id
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: grid-update-form
+      description: Grid Update Form
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject.grid-update-form
+      with:
+        id: tools.id
+      inputParameters:
+      - name: id
+        type: integer
+        description: ID of the grid being modified
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-groups
+      description: List groups
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.list-groups
+      with:
+        sortBy: tools.sortBy
+        select: tools.select
+      inputParameters:
+      - name: sortBy
+        type: string
+        description: JSON specifying sort criteria. Accepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)
+          endpoint. Currently
+      - name: select
+        type: string
+        description: Comma separated list of properties to include.
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: create-group
+      description: Create group
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject.create-group
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: delete-group
+      description: Delete group
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: openproject.delete-group
+      with:
+        id: tools.id
+      inputParameters:
+      - name: id
+        type: integer
+        description: Group id
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: get-group
+      description: Get group
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.get-group
+      with:
+        id: tools.id
+      inputParameters:
+      - name: id
+        type: integer
+        description: Group id
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: update-group
+      description: Update group
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject.update-group
+      with:
+        id: tools.id
+      inputParameters:
+      - name: id
+        type: integer
+        description: Group id
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-help-texts
+      description: List help texts
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.list-help-texts
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: get-help-text
+      description: Get help text
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.get-help-text
+      with:
+        id: tools.id
+      inputParameters:
+      - name: id
+        type: integer
+        description: Help text id
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-meetings
+      description: List all visible meetings
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.list-meetings
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: get-meeting
+      description: Get a meeting
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject.get-meeting
+      with:
+        id: tools.id
+      inputParameters:
+      - name: id
+        type: integer
+        description: Meeting identifier
+        required: true
+      outputParameters:
+      - type: object
+        mapping: $.
+binds:
+- namespace: env
+  keys:
+    OPENPROJECT_USERNAME: OPENPROJECT_USERNAME
+    OPENPROJECT_PASSWORD: OPENPROJECT_PASSWORD
