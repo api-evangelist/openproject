@@ -65,6 +65,13 @@ common:
     url: https://community.openproject.org/login
   - type: Support
     url: https://www.openproject.org/docs/support/
+  - type: Integrations
+    url: https://www.openproject.org/integrations/
+integrations:
+  - name: Nextcloud
+  - name: OneDrive/SharePoint
+  - name: GitHub
+  - name: GitLab
 maintainers:
   - FN: Kin Lane
     email: kin@apievangelist.com
