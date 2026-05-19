@@ -1,0 +1,165 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: OpenProject API V3 (Stable) — EmojiReactions
+  description: 'OpenProject API V3 (Stable) — EmojiReactions. 3 operations. Lead operation: List emoji reactions by activity.
+    Self-contained Naftiko capability covering one Openproject business surface.'
+  tags:
+  - Openproject
+  - EmojiReactions
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    OPENPROJECT_API_KEY: OPENPROJECT_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: openproject-emojireactions
+    baseUri: https://qa.openproject-edge.com
+    description: OpenProject API V3 (Stable) — EmojiReactions business capability. Self-contained, no shared references.
+    resources:
+    - name: api-v3-activities-id-emoji_reactions
+      path: /api/v3/activities/{id}/emoji_reactions
+      operations:
+      - name: listactivityemojireactions
+        method: GET
+        description: List emoji reactions by activity
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: ID of the activity whose emoji reactions will be listed
+          required: true
+      - name: toggleactivityemojireaction
+        method: PATCH
+        description: Toggle emoji reaction for an activity
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: ID of the activity to toggle emoji reaction for
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: api-v3-work_packages-id-activities_emoji_reactions
+      path: /api/v3/work_packages/{id}/activities_emoji_reactions
+      operations:
+      - name: listworkpackageactivitiesemojireactions
+        method: GET
+        description: List emoji reactions by work package activities
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: ID of the work package whose activities' emoji reactions will be listed
+          required: true
+    authentication:
+      type: basic
+      username: '{{env.OPENPROJECT_USER}}'
+      password: '{{env.OPENPROJECT_PASS}}'
+  exposes:
+  - type: rest
+    namespace: openproject-emojireactions-rest
+    port: 8080
+    description: REST adapter for OpenProject API V3 (Stable) — EmojiReactions. One Spectral-compliant resource per consumed
+      operation, prefixed with /v1.
+    resources:
+    - path: /v1/api/v3/activities/{id}/emoji-reactions
+      name: api-v3-activities-id-emoji-reactions
+      description: REST surface for api-v3-activities-id-emoji_reactions.
+      operations:
+      - method: GET
+        name: listactivityemojireactions
+        description: List emoji reactions by activity
+        call: openproject-emojireactions.listactivityemojireactions
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PATCH
+        name: toggleactivityemojireaction
+        description: Toggle emoji reaction for an activity
+        call: openproject-emojireactions.toggleactivityemojireaction
+        with:
+          id: rest.id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/work-packages/{id}/activities-emoji-reactions
+      name: api-v3-work-packages-id-activities-emoji-reactions
+      description: REST surface for api-v3-work_packages-id-activities_emoji_reactions.
+      operations:
+      - method: GET
+        name: listworkpackageactivitiesemojireactions
+        description: List emoji reactions by work package activities
+        call: openproject-emojireactions.listworkpackageactivitiesemojireactions
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: openproject-emojireactions-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for OpenProject API V3 (Stable) — EmojiReactions. One tool per consumed operation, routed inline
+      through this capability's consumes block.
+    tools:
+    - name: list-emoji-reactions-activity
+      description: List emoji reactions by activity
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-emojireactions.listactivityemojireactions
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: toggle-emoji-reaction-activity
+      description: Toggle emoji reaction for an activity
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: openproject-emojireactions.toggleactivityemojireaction
+      with:
+        id: tools.id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-emoji-reactions-work-package
+      description: List emoji reactions by work package activities
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-emojireactions.listworkpackageactivitiesemojireactions
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.

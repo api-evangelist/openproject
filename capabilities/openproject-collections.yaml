@@ -1,0 +1,85 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: OpenProject API V3 (Stable) — Collections
+  description: 'OpenProject API V3 (Stable) — Collections. 1 operations. Lead operation: view aggregated result. Self-contained
+    Naftiko capability covering one Openproject business surface.'
+  tags:
+  - Openproject
+  - Collections
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    OPENPROJECT_API_KEY: OPENPROJECT_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: openproject-collections
+    baseUri: https://qa.openproject-edge.com
+    description: OpenProject API V3 (Stable) — Collections business capability. Self-contained, no shared references.
+    resources:
+    - name: api-v3-examples
+      path: /api/v3/examples
+      operations:
+      - name: viewaggregatedresult
+        method: GET
+        description: view aggregated result
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: groupBy
+          in: query
+          type: string
+          description: The column to group by.
+        - name: showSums
+          in: query
+          type: boolean
+    authentication:
+      type: basic
+      username: '{{env.OPENPROJECT_USER}}'
+      password: '{{env.OPENPROJECT_PASS}}'
+  exposes:
+  - type: rest
+    namespace: openproject-collections-rest
+    port: 8080
+    description: REST adapter for OpenProject API V3 (Stable) — Collections. One Spectral-compliant resource per consumed
+      operation, prefixed with /v1.
+    resources:
+    - path: /v1/api/v3/examples
+      name: api-v3-examples
+      description: REST surface for api-v3-examples.
+      operations:
+      - method: GET
+        name: viewaggregatedresult
+        description: view aggregated result
+        call: openproject-collections.viewaggregatedresult
+        with:
+          groupBy: rest.groupBy
+          showSums: rest.showSums
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: openproject-collections-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for OpenProject API V3 (Stable) — Collections. One tool per consumed operation, routed inline
+      through this capability's consumes block.
+    tools:
+    - name: view-aggregated-result
+      description: view aggregated result
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-collections.viewaggregatedresult
+      with:
+        groupBy: tools.groupBy
+        showSums: tools.showSums
+      outputParameters:
+      - type: object
+        mapping: $.

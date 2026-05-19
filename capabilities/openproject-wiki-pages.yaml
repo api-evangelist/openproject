@@ -1,0 +1,81 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: OpenProject API V3 (Stable) — Wiki Pages
+  description: 'OpenProject API V3 (Stable) — Wiki Pages. 1 operations. Lead operation: View Wiki Page. Self-contained Naftiko
+    capability covering one Openproject business surface.'
+  tags:
+  - Openproject
+  - Wiki Pages
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    OPENPROJECT_API_KEY: OPENPROJECT_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: openproject-wiki-pages
+    baseUri: https://qa.openproject-edge.com
+    description: OpenProject API V3 (Stable) — Wiki Pages business capability. Self-contained, no shared references.
+    resources:
+    - name: api-v3-wiki_pages-id
+      path: /api/v3/wiki_pages/{id}
+      operations:
+      - name: viewwikipage
+        method: GET
+        description: View Wiki Page
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Wiki page identifier
+          required: true
+    authentication:
+      type: basic
+      username: '{{env.OPENPROJECT_USER}}'
+      password: '{{env.OPENPROJECT_PASS}}'
+  exposes:
+  - type: rest
+    namespace: openproject-wiki-pages-rest
+    port: 8080
+    description: REST adapter for OpenProject API V3 (Stable) — Wiki Pages. One Spectral-compliant resource per consumed operation,
+      prefixed with /v1.
+    resources:
+    - path: /v1/api/v3/wiki-pages/{id}
+      name: api-v3-wiki-pages-id
+      description: REST surface for api-v3-wiki_pages-id.
+      operations:
+      - method: GET
+        name: viewwikipage
+        description: View Wiki Page
+        call: openproject-wiki-pages.viewwikipage
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: openproject-wiki-pages-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for OpenProject API V3 (Stable) — Wiki Pages. One tool per consumed operation, routed inline
+      through this capability's consumes block.
+    tools:
+    - name: view-wiki-page
+      description: View Wiki Page
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-wiki-pages.viewwikipage
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.

@@ -1,0 +1,190 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: OpenProject API V3 (Stable) — Workspaces
+  description: 'OpenProject API V3 (Stable) — Workspaces. 4 operations. Lead operation: View workspace schema. Self-contained
+    Naftiko capability covering one Openproject business surface.'
+  tags:
+  - Openproject
+  - Workspaces
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    OPENPROJECT_API_KEY: OPENPROJECT_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: openproject-workspaces
+    baseUri: https://qa.openproject-edge.com
+    description: OpenProject API V3 (Stable) — Workspaces business capability. Self-contained, no shared references.
+    resources:
+    - name: api-v3-workspaces-schema
+      path: /api/v3/workspaces/schema
+      operations:
+      - name: viewworkspaceschema
+        method: GET
+        description: View workspace schema
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-workspaces-id-favorite
+      path: /api/v3/workspaces/{id}/favorite
+      operations:
+      - name: unfavoriteworkspace
+        method: DELETE
+        description: Unfavorite Workspace
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Workspace id
+          required: true
+      - name: favoriteworkspace
+        method: POST
+        description: Favorite Workspace
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Workspace id
+          required: true
+    - name: api-v3-workspaces-id-types
+      path: /api/v3/workspaces/{id}/types
+      operations:
+      - name: listtypesavailableinaworkspace
+        method: GET
+        description: List types available in a workspace
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: ID of the workspace whose types will be listed
+          required: true
+    authentication:
+      type: basic
+      username: '{{env.OPENPROJECT_USER}}'
+      password: '{{env.OPENPROJECT_PASS}}'
+  exposes:
+  - type: rest
+    namespace: openproject-workspaces-rest
+    port: 8080
+    description: REST adapter for OpenProject API V3 (Stable) — Workspaces. One Spectral-compliant resource per consumed operation,
+      prefixed with /v1.
+    resources:
+    - path: /v1/api/v3/workspaces/schema
+      name: api-v3-workspaces-schema
+      description: REST surface for api-v3-workspaces-schema.
+      operations:
+      - method: GET
+        name: viewworkspaceschema
+        description: View workspace schema
+        call: openproject-workspaces.viewworkspaceschema
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/workspaces/{id}/favorite
+      name: api-v3-workspaces-id-favorite
+      description: REST surface for api-v3-workspaces-id-favorite.
+      operations:
+      - method: DELETE
+        name: unfavoriteworkspace
+        description: Unfavorite Workspace
+        call: openproject-workspaces.unfavoriteworkspace
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: favoriteworkspace
+        description: Favorite Workspace
+        call: openproject-workspaces.favoriteworkspace
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/workspaces/{id}/types
+      name: api-v3-workspaces-id-types
+      description: REST surface for api-v3-workspaces-id-types.
+      operations:
+      - method: GET
+        name: listtypesavailableinaworkspace
+        description: List types available in a workspace
+        call: openproject-workspaces.listtypesavailableinaworkspace
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: openproject-workspaces-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for OpenProject API V3 (Stable) — Workspaces. One tool per consumed operation, routed inline
+      through this capability's consumes block.
+    tools:
+    - name: view-workspace-schema
+      description: View workspace schema
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-workspaces.viewworkspaceschema
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: unfavorite-workspace
+      description: Unfavorite Workspace
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: openproject-workspaces.unfavoriteworkspace
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: favorite-workspace
+      description: Favorite Workspace
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-workspaces.favoriteworkspace
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-types-available-workspace
+      description: List types available in a workspace
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-workspaces.listtypesavailableinaworkspace
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.

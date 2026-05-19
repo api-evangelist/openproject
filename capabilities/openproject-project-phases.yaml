@@ -1,0 +1,81 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: OpenProject API V3 (Stable) — Project Phases
+  description: 'OpenProject API V3 (Stable) — Project Phases. 1 operations. Lead operation: Get a project phase. Self-contained
+    Naftiko capability covering one Openproject business surface.'
+  tags:
+  - Openproject
+  - Project Phases
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    OPENPROJECT_API_KEY: OPENPROJECT_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: openproject-project-phases
+    baseUri: https://qa.openproject-edge.com
+    description: OpenProject API V3 (Stable) — Project Phases business capability. Self-contained, no shared references.
+    resources:
+    - name: api-v3-project_phases-id
+      path: /api/v3/project_phases/{id}
+      operations:
+      - name: getprojectphase
+        method: GET
+        description: Get a project phase
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Project phase id
+          required: true
+    authentication:
+      type: basic
+      username: '{{env.OPENPROJECT_USER}}'
+      password: '{{env.OPENPROJECT_PASS}}'
+  exposes:
+  - type: rest
+    namespace: openproject-project-phases-rest
+    port: 8080
+    description: REST adapter for OpenProject API V3 (Stable) — Project Phases. One Spectral-compliant resource per consumed
+      operation, prefixed with /v1.
+    resources:
+    - path: /v1/api/v3/project-phases/{id}
+      name: api-v3-project-phases-id
+      description: REST surface for api-v3-project_phases-id.
+      operations:
+      - method: GET
+        name: getprojectphase
+        description: Get a project phase
+        call: openproject-project-phases.getprojectphase
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: openproject-project-phases-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for OpenProject API V3 (Stable) — Project Phases. One tool per consumed operation, routed inline
+      through this capability's consumes block.
+    tools:
+    - name: get-project-phase
+      description: Get a project phase
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-project-phases.getprojectphase
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.

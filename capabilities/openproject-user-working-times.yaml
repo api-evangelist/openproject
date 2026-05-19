@@ -1,0 +1,493 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: OpenProject API V3 (Stable) — User Working Times
+  description: 'OpenProject API V3 (Stable) — User Working Times. 10 operations. Lead operation: List personal non-working
+    times for a user. Self-contained Naftiko capability covering one Openproject business surface.'
+  tags:
+  - Openproject
+  - User Working Times
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    OPENPROJECT_API_KEY: OPENPROJECT_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: openproject-user-working-times
+    baseUri: https://qa.openproject-edge.com
+    description: OpenProject API V3 (Stable) — User Working Times business capability. Self-contained, no shared references.
+    resources:
+    - name: api-v3-users-id-non_working_times
+      path: /api/v3/users/{id}/non_working_times
+      operations:
+      - name: listusernonworkingtimes
+        method: GET
+        description: List personal non-working times for a user
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: string
+          description: User id. Use `me` to reference the current user.
+          required: true
+        - name: year
+          in: query
+          type: integer
+          description: Filter results to the given year. Defaults to the current year if not provided.
+      - name: createusernonworkingtime
+        method: POST
+        description: Create a personal non-working day for a user
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: string
+          description: User id. Use `me` to reference the current user.
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: api-v3-users-id-non_working_times-non_working_time_id
+      path: /api/v3/users/{id}/non_working_times/{non_working_time_id}
+      operations:
+      - name: viewusernonworkingtime
+        method: GET
+        description: View a personal non-working time record
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: string
+          description: User id. Use `me` to reference the current user.
+          required: true
+        - name: non_working_time_id
+          in: path
+          type: integer
+          description: The id of the personal non-working time record.
+          required: true
+      - name: updateusernonworkingtime
+        method: PATCH
+        description: Update a personal non-working time record
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: string
+          description: User id. Use `me` to reference the current user.
+          required: true
+        - name: non_working_time_id
+          in: path
+          type: integer
+          description: The id of the personal non-working time record.
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+      - name: deleteusernonworkingtime
+        method: DELETE
+        description: Delete a personal non-working time record
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: string
+          description: User id. Use `me` to reference the current user.
+          required: true
+        - name: non_working_time_id
+          in: path
+          type: integer
+          description: The id of the personal non-working time record.
+          required: true
+    - name: api-v3-users-id-working_hours
+      path: /api/v3/users/{id}/working_hours
+      operations:
+      - name: listuserworkinghours
+        method: GET
+        description: List working hours for a user
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: string
+          description: User id. Use `me` to reference the current user.
+          required: true
+      - name: createuserworkinghours
+        method: POST
+        description: Create a working hours record for a user
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: string
+          description: User id. Use `me` to reference the current user.
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: api-v3-users-id-working_hours-working_hours_id
+      path: /api/v3/users/{id}/working_hours/{working_hours_id}
+      operations:
+      - name: viewuserworkinghoursrecord
+        method: GET
+        description: View a working hours record
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: User id.
+          required: true
+        - name: working_hours_id
+          in: path
+          type: integer
+          description: Working hours record id.
+          required: true
+      - name: updateuserworkinghoursrecord
+        method: PATCH
+        description: Update a working hours record
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: User id.
+          required: true
+        - name: working_hours_id
+          in: path
+          type: integer
+          description: Working hours record id.
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+      - name: deleteuserworkinghoursrecord
+        method: DELETE
+        description: Delete a working hours record
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: User id.
+          required: true
+        - name: working_hours_id
+          in: path
+          type: integer
+          description: Working hours record id.
+          required: true
+    authentication:
+      type: basic
+      username: '{{env.OPENPROJECT_USER}}'
+      password: '{{env.OPENPROJECT_PASS}}'
+  exposes:
+  - type: rest
+    namespace: openproject-user-working-times-rest
+    port: 8080
+    description: REST adapter for OpenProject API V3 (Stable) — User Working Times. One Spectral-compliant resource per consumed
+      operation, prefixed with /v1.
+    resources:
+    - path: /v1/api/v3/users/{id}/non-working-times
+      name: api-v3-users-id-non-working-times
+      description: REST surface for api-v3-users-id-non_working_times.
+      operations:
+      - method: GET
+        name: listusernonworkingtimes
+        description: List personal non-working times for a user
+        call: openproject-user-working-times.listusernonworkingtimes
+        with:
+          id: rest.id
+          year: rest.year
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: createusernonworkingtime
+        description: Create a personal non-working day for a user
+        call: openproject-user-working-times.createusernonworkingtime
+        with:
+          id: rest.id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/users/{id}/non-working-times/{non-working-time-id}
+      name: api-v3-users-id-non-working-times-non-working-time-id
+      description: REST surface for api-v3-users-id-non_working_times-non_working_time_id.
+      operations:
+      - method: GET
+        name: viewusernonworkingtime
+        description: View a personal non-working time record
+        call: openproject-user-working-times.viewusernonworkingtime
+        with:
+          id: rest.id
+          non_working_time_id: rest.non_working_time_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PATCH
+        name: updateusernonworkingtime
+        description: Update a personal non-working time record
+        call: openproject-user-working-times.updateusernonworkingtime
+        with:
+          id: rest.id
+          non_working_time_id: rest.non_working_time_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: DELETE
+        name: deleteusernonworkingtime
+        description: Delete a personal non-working time record
+        call: openproject-user-working-times.deleteusernonworkingtime
+        with:
+          id: rest.id
+          non_working_time_id: rest.non_working_time_id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/users/{id}/working-hours
+      name: api-v3-users-id-working-hours
+      description: REST surface for api-v3-users-id-working_hours.
+      operations:
+      - method: GET
+        name: listuserworkinghours
+        description: List working hours for a user
+        call: openproject-user-working-times.listuserworkinghours
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: createuserworkinghours
+        description: Create a working hours record for a user
+        call: openproject-user-working-times.createuserworkinghours
+        with:
+          id: rest.id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/users/{id}/working-hours/{working-hours-id}
+      name: api-v3-users-id-working-hours-working-hours-id
+      description: REST surface for api-v3-users-id-working_hours-working_hours_id.
+      operations:
+      - method: GET
+        name: viewuserworkinghoursrecord
+        description: View a working hours record
+        call: openproject-user-working-times.viewuserworkinghoursrecord
+        with:
+          id: rest.id
+          working_hours_id: rest.working_hours_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PATCH
+        name: updateuserworkinghoursrecord
+        description: Update a working hours record
+        call: openproject-user-working-times.updateuserworkinghoursrecord
+        with:
+          id: rest.id
+          working_hours_id: rest.working_hours_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: DELETE
+        name: deleteuserworkinghoursrecord
+        description: Delete a working hours record
+        call: openproject-user-working-times.deleteuserworkinghoursrecord
+        with:
+          id: rest.id
+          working_hours_id: rest.working_hours_id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: openproject-user-working-times-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for OpenProject API V3 (Stable) — User Working Times. One tool per consumed operation, routed
+      inline through this capability's consumes block.
+    tools:
+    - name: list-personal-non-working-times
+      description: List personal non-working times for a user
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-user-working-times.listusernonworkingtimes
+      with:
+        id: tools.id
+        year: tools.year
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: create-personal-non-working-day
+      description: Create a personal non-working day for a user
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-user-working-times.createusernonworkingtime
+      with:
+        id: tools.id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: view-personal-non-working-time
+      description: View a personal non-working time record
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-user-working-times.viewusernonworkingtime
+      with:
+        id: tools.id
+        non_working_time_id: tools.non_working_time_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: update-personal-non-working-time
+      description: Update a personal non-working time record
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: openproject-user-working-times.updateusernonworkingtime
+      with:
+        id: tools.id
+        non_working_time_id: tools.non_working_time_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: delete-personal-non-working-time
+      description: Delete a personal non-working time record
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: openproject-user-working-times.deleteusernonworkingtime
+      with:
+        id: tools.id
+        non_working_time_id: tools.non_working_time_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-working-hours-user
+      description: List working hours for a user
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-user-working-times.listuserworkinghours
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: create-working-hours-record-user
+      description: Create a working hours record for a user
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-user-working-times.createuserworkinghours
+      with:
+        id: tools.id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: view-working-hours-record
+      description: View a working hours record
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-user-working-times.viewuserworkinghoursrecord
+      with:
+        id: tools.id
+        working_hours_id: tools.working_hours_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: update-working-hours-record
+      description: Update a working hours record
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: openproject-user-working-times.updateuserworkinghoursrecord
+      with:
+        id: tools.id
+        working_hours_id: tools.working_hours_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: delete-working-hours-record
+      description: Delete a working hours record
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: openproject-user-working-times.deleteuserworkinghoursrecord
+      with:
+        id: tools.id
+        working_hours_id: tools.working_hours_id
+      outputParameters:
+      - type: object
+        mapping: $.

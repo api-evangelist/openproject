@@ -1,0 +1,165 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: OpenProject API V3 (Stable) — Categories
+  description: 'OpenProject API V3 (Stable) — Categories. 3 operations. Lead operation: View Category. Self-contained Naftiko
+    capability covering one Openproject business surface.'
+  tags:
+  - Openproject
+  - Categories
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    OPENPROJECT_API_KEY: OPENPROJECT_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: openproject-categories
+    baseUri: https://qa.openproject-edge.com
+    description: OpenProject API V3 (Stable) — Categories business capability. Self-contained, no shared references.
+    resources:
+    - name: api-v3-categories-id
+      path: /api/v3/categories/{id}
+      operations:
+      - name: viewcategory
+        method: GET
+        description: View Category
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Category id
+          required: true
+    - name: api-v3-projects-id-categories
+      path: /api/v3/projects/{id}/categories
+      operations:
+      - name: listcategoriesofaproject
+        method: GET
+        description: List categories of a project
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: ID of the project whose categories will be listed
+          required: true
+    - name: api-v3-workspaces-id-categories
+      path: /api/v3/workspaces/{id}/categories
+      operations:
+      - name: listcategoriesofaworkspace
+        method: GET
+        description: List categories of a workspace
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: ID of the workspace whose categories will be listed
+          required: true
+    authentication:
+      type: basic
+      username: '{{env.OPENPROJECT_USER}}'
+      password: '{{env.OPENPROJECT_PASS}}'
+  exposes:
+  - type: rest
+    namespace: openproject-categories-rest
+    port: 8080
+    description: REST adapter for OpenProject API V3 (Stable) — Categories. One Spectral-compliant resource per consumed operation,
+      prefixed with /v1.
+    resources:
+    - path: /v1/api/v3/categories/{id}
+      name: api-v3-categories-id
+      description: REST surface for api-v3-categories-id.
+      operations:
+      - method: GET
+        name: viewcategory
+        description: View Category
+        call: openproject-categories.viewcategory
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/projects/{id}/categories
+      name: api-v3-projects-id-categories
+      description: REST surface for api-v3-projects-id-categories.
+      operations:
+      - method: GET
+        name: listcategoriesofaproject
+        description: List categories of a project
+        call: openproject-categories.listcategoriesofaproject
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/workspaces/{id}/categories
+      name: api-v3-workspaces-id-categories
+      description: REST surface for api-v3-workspaces-id-categories.
+      operations:
+      - method: GET
+        name: listcategoriesofaworkspace
+        description: List categories of a workspace
+        call: openproject-categories.listcategoriesofaworkspace
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: openproject-categories-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for OpenProject API V3 (Stable) — Categories. One tool per consumed operation, routed inline
+      through this capability's consumes block.
+    tools:
+    - name: view-category
+      description: View Category
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-categories.viewcategory
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-categories-project
+      description: List categories of a project
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-categories.listcategoriesofaproject
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-categories-workspace
+      description: List categories of a workspace
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-categories.listcategoriesofaworkspace
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.

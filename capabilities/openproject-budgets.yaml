@@ -1,0 +1,123 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: OpenProject API V3 (Stable) — Budgets
+  description: 'OpenProject API V3 (Stable) — Budgets. 2 operations. Lead operation: view Budget. Self-contained Naftiko capability
+    covering one Openproject business surface.'
+  tags:
+  - Openproject
+  - Budgets
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    OPENPROJECT_API_KEY: OPENPROJECT_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: openproject-budgets
+    baseUri: https://qa.openproject-edge.com
+    description: OpenProject API V3 (Stable) — Budgets business capability. Self-contained, no shared references.
+    resources:
+    - name: api-v3-budgets-id
+      path: /api/v3/budgets/{id}
+      operations:
+      - name: viewbudget
+        method: GET
+        description: view Budget
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Budget id
+          required: true
+    - name: api-v3-projects-id-budgets
+      path: /api/v3/projects/{id}/budgets
+      operations:
+      - name: viewbudgetsofaproject
+        method: GET
+        description: view Budgets of a Project
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Project id
+          required: true
+    authentication:
+      type: basic
+      username: '{{env.OPENPROJECT_USER}}'
+      password: '{{env.OPENPROJECT_PASS}}'
+  exposes:
+  - type: rest
+    namespace: openproject-budgets-rest
+    port: 8080
+    description: REST adapter for OpenProject API V3 (Stable) — Budgets. One Spectral-compliant resource per consumed operation,
+      prefixed with /v1.
+    resources:
+    - path: /v1/api/v3/budgets/{id}
+      name: api-v3-budgets-id
+      description: REST surface for api-v3-budgets-id.
+      operations:
+      - method: GET
+        name: viewbudget
+        description: view Budget
+        call: openproject-budgets.viewbudget
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/projects/{id}/budgets
+      name: api-v3-projects-id-budgets
+      description: REST surface for api-v3-projects-id-budgets.
+      operations:
+      - method: GET
+        name: viewbudgetsofaproject
+        description: view Budgets of a Project
+        call: openproject-budgets.viewbudgetsofaproject
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: openproject-budgets-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for OpenProject API V3 (Stable) — Budgets. One tool per consumed operation, routed inline through
+      this capability's consumes block.
+    tools:
+    - name: view-budget
+      description: view Budget
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-budgets.viewbudget
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: view-budgets-project
+      description: view Budgets of a Project
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-budgets.viewbudgetsofaproject
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.

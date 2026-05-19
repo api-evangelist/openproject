@@ -1,0 +1,210 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: OpenProject API V3 (Stable) — Time entries
+  description: 'OpenProject API V3 (Stable) — Time entries. 4 operations. Lead operation: List time entries. Self-contained
+    Naftiko capability covering one Openproject business surface.'
+  tags:
+  - Openproject
+  - Time entries
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    OPENPROJECT_API_KEY: OPENPROJECT_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: openproject-time-entries-2
+    baseUri: https://qa.openproject-edge.com
+    description: OpenProject API V3 (Stable) — Time entries business capability. Self-contained, no shared references.
+    resources:
+    - name: api-v3-time_entries
+      path: /api/v3/time_entries
+      operations:
+      - name: listtimeentries
+        method: GET
+        description: List time entries
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: offset
+          in: query
+          type: integer
+          description: Page number inside the requested collection.
+        - name: pageSize
+          in: query
+          type: integer
+          description: Number of elements to display per page.
+        - name: sortBy
+          in: query
+          type: string
+          description: JSON specifying sort criteria.
+        - name: filters
+          in: query
+          type: string
+          description: JSON specifying filter conditions.
+      - name: createtimeentry
+        method: POST
+        description: Create time entry
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: api-v3-time_entries-id
+      path: /api/v3/time_entries/{id}
+      operations:
+      - name: deletetimeentry
+        method: DELETE
+        description: Delete time entry
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Time entry id
+          required: true
+      - name: gettimeentry
+        method: GET
+        description: Get time entry
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: time entry id
+          required: true
+    authentication:
+      type: basic
+      username: '{{env.OPENPROJECT_USER}}'
+      password: '{{env.OPENPROJECT_PASS}}'
+  exposes:
+  - type: rest
+    namespace: openproject-time-entries-2-rest
+    port: 8080
+    description: REST adapter for OpenProject API V3 (Stable) — Time entries. One Spectral-compliant resource per consumed
+      operation, prefixed with /v1.
+    resources:
+    - path: /v1/api/v3/time-entries
+      name: api-v3-time-entries
+      description: REST surface for api-v3-time_entries.
+      operations:
+      - method: GET
+        name: listtimeentries
+        description: List time entries
+        call: openproject-time-entries-2.listtimeentries
+        with:
+          offset: rest.offset
+          pageSize: rest.pageSize
+          sortBy: rest.sortBy
+          filters: rest.filters
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: createtimeentry
+        description: Create time entry
+        call: openproject-time-entries-2.createtimeentry
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/time-entries/{id}
+      name: api-v3-time-entries-id
+      description: REST surface for api-v3-time_entries-id.
+      operations:
+      - method: DELETE
+        name: deletetimeentry
+        description: Delete time entry
+        call: openproject-time-entries-2.deletetimeentry
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: gettimeentry
+        description: Get time entry
+        call: openproject-time-entries-2.gettimeentry
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: openproject-time-entries-2-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for OpenProject API V3 (Stable) — Time entries. One tool per consumed operation, routed inline
+      through this capability's consumes block.
+    tools:
+    - name: list-time-entries
+      description: List time entries
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-time-entries-2.listtimeentries
+      with:
+        offset: tools.offset
+        pageSize: tools.pageSize
+        sortBy: tools.sortBy
+        filters: tools.filters
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: create-time-entry
+      description: Create time entry
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-time-entries-2.createtimeentry
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: delete-time-entry
+      description: Delete time entry
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: openproject-time-entries-2.deletetimeentry
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: get-time-entry
+      description: Get time entry
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-time-entries-2.gettimeentry
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.

@@ -1,0 +1,254 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: OpenProject API V3 (Stable) — Relations
+  description: 'OpenProject API V3 (Stable) — Relations. 5 operations. Lead operation: List Relations. Self-contained Naftiko
+    capability covering one Openproject business surface.'
+  tags:
+  - Openproject
+  - Relations
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    OPENPROJECT_API_KEY: OPENPROJECT_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: openproject-relations
+    baseUri: https://qa.openproject-edge.com
+    description: OpenProject API V3 (Stable) — Relations business capability. Self-contained, no shared references.
+    resources:
+    - name: api-v3-relations
+      path: /api/v3/relations
+      operations:
+      - name: listrelations
+        method: GET
+        description: List Relations
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: filters
+          in: query
+          type: string
+          description: JSON specifying filter conditions. Accepts the same format as returned by
+        - name: sortBy
+          in: query
+          type: string
+          description: JSON specifying sort criteria.
+    - name: api-v3-relations-id
+      path: /api/v3/relations/{id}
+      operations:
+      - name: getrelation
+        method: GET
+        description: Get Relation
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Relation id
+          required: true
+      - name: deleterelation
+        method: DELETE
+        description: Delete Relation
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: The unique identifier of the relation resource
+          required: true
+      - name: updaterelation
+        method: PATCH
+        description: Update Relation
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Relation ID
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: api-v3-work_packages-id-relations
+      path: /api/v3/work_packages/{id}/relations
+      operations:
+      - name: createrelation
+        method: POST
+        description: Create relation
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Work package id
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: basic
+      username: '{{env.OPENPROJECT_USER}}'
+      password: '{{env.OPENPROJECT_PASS}}'
+  exposes:
+  - type: rest
+    namespace: openproject-relations-rest
+    port: 8080
+    description: REST adapter for OpenProject API V3 (Stable) — Relations. One Spectral-compliant resource per consumed operation,
+      prefixed with /v1.
+    resources:
+    - path: /v1/api/v3/relations
+      name: api-v3-relations
+      description: REST surface for api-v3-relations.
+      operations:
+      - method: GET
+        name: listrelations
+        description: List Relations
+        call: openproject-relations.listrelations
+        with:
+          filters: rest.filters
+          sortBy: rest.sortBy
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/relations/{id}
+      name: api-v3-relations-id
+      description: REST surface for api-v3-relations-id.
+      operations:
+      - method: GET
+        name: getrelation
+        description: Get Relation
+        call: openproject-relations.getrelation
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: DELETE
+        name: deleterelation
+        description: Delete Relation
+        call: openproject-relations.deleterelation
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PATCH
+        name: updaterelation
+        description: Update Relation
+        call: openproject-relations.updaterelation
+        with:
+          id: rest.id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/work-packages/{id}/relations
+      name: api-v3-work-packages-id-relations
+      description: REST surface for api-v3-work_packages-id-relations.
+      operations:
+      - method: POST
+        name: createrelation
+        description: Create relation
+        call: openproject-relations.createrelation
+        with:
+          id: rest.id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: openproject-relations-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for OpenProject API V3 (Stable) — Relations. One tool per consumed operation, routed inline through
+      this capability's consumes block.
+    tools:
+    - name: list-relations
+      description: List Relations
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-relations.listrelations
+      with:
+        filters: tools.filters
+        sortBy: tools.sortBy
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: get-relation
+      description: Get Relation
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-relations.getrelation
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: delete-relation
+      description: Delete Relation
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: openproject-relations.deleterelation
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: update-relation
+      description: Update Relation
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: openproject-relations.updaterelation
+      with:
+        id: tools.id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: create-relation
+      description: Create relation
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-relations.createrelation
+      with:
+        id: tools.id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

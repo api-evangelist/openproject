@@ -1,0 +1,468 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: OpenProject API V3 (Stable) — Work Schedule
+  description: 'OpenProject API V3 (Stable) — Work Schedule. 11 operations. Lead operation: Lists days. Self-contained Naftiko
+    capability covering one Openproject business surface.'
+  tags:
+  - Openproject
+  - Work Schedule
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    OPENPROJECT_API_KEY: OPENPROJECT_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: openproject-work-schedule
+    baseUri: https://qa.openproject-edge.com
+    description: OpenProject API V3 (Stable) — Work Schedule business capability. Self-contained, no shared references.
+    resources:
+    - name: api-v3-days
+      path: /api/v3/days
+      operations:
+      - name: listdays
+        method: GET
+        description: Lists days
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: filters
+          in: query
+          type: string
+          description: JSON specifying filter conditions.
+    - name: api-v3-days-non_working
+      path: /api/v3/days/non_working
+      operations:
+      - name: listnonworkingdays
+        method: GET
+        description: Lists all non working days
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: filters
+          in: query
+          type: string
+          description: JSON specifying filter conditions.
+      - name: createnonworkingday
+        method: POST
+        description: Creates a non-working day (NOT IMPLEMENTED)
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: api-v3-days-non_working-date
+      path: /api/v3/days/non_working/{date}
+      operations:
+      - name: viewnonworkingday
+        method: GET
+        description: View a non-working day
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: date
+          in: path
+          type: string
+          description: The date of the non-working day to view in ISO 8601 format.
+          required: true
+      - name: updatenonworkingday
+        method: PATCH
+        description: Update a non-working day attributes (NOT IMPLEMENTED)
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: date
+          in: path
+          type: string
+          description: The date of the non-working day to view in ISO 8601 format.
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+      - name: deletenonworkingday
+        method: DELETE
+        description: Removes a non-working day (NOT IMPLEMENTED)
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: date
+          in: path
+          type: string
+          description: The date of the non-working day to view in ISO 8601 format.
+          required: true
+    - name: api-v3-days-week
+      path: /api/v3/days/week
+      operations:
+      - name: listweekdays
+        method: GET
+        description: Lists week days
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: updateweekdays
+        method: PATCH
+        description: Update week days (NOT IMPLEMENTED)
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: api-v3-days-week-day
+      path: /api/v3/days/week/{day}
+      operations:
+      - name: viewweekday
+        method: GET
+        description: View a week day
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: day
+          in: path
+          type: integer
+          description: The week day from 1 to 7. 1 is Monday. 7 is Sunday.
+          required: true
+      - name: updateweekday
+        method: PATCH
+        description: Update a week day attributes (NOT IMPLEMENTED)
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: day
+          in: path
+          type: integer
+          description: The week day from 1 to 7. 1 is Monday. 7 is Sunday.
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: api-v3-days-date
+      path: /api/v3/days/{date}
+      operations:
+      - name: viewday
+        method: GET
+        description: View day
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: date
+          in: path
+          type: string
+          description: The date of the non-working day to view in ISO 8601 format.
+          required: true
+    authentication:
+      type: basic
+      username: '{{env.OPENPROJECT_USER}}'
+      password: '{{env.OPENPROJECT_PASS}}'
+  exposes:
+  - type: rest
+    namespace: openproject-work-schedule-rest
+    port: 8080
+    description: REST adapter for OpenProject API V3 (Stable) — Work Schedule. One Spectral-compliant resource per consumed
+      operation, prefixed with /v1.
+    resources:
+    - path: /v1/api/v3/days
+      name: api-v3-days
+      description: REST surface for api-v3-days.
+      operations:
+      - method: GET
+        name: listdays
+        description: Lists days
+        call: openproject-work-schedule.listdays
+        with:
+          filters: rest.filters
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/days/non-working
+      name: api-v3-days-non-working
+      description: REST surface for api-v3-days-non_working.
+      operations:
+      - method: GET
+        name: listnonworkingdays
+        description: Lists all non working days
+        call: openproject-work-schedule.listnonworkingdays
+        with:
+          filters: rest.filters
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: createnonworkingday
+        description: Creates a non-working day (NOT IMPLEMENTED)
+        call: openproject-work-schedule.createnonworkingday
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/days/non-working/{date}
+      name: api-v3-days-non-working-date
+      description: REST surface for api-v3-days-non_working-date.
+      operations:
+      - method: GET
+        name: viewnonworkingday
+        description: View a non-working day
+        call: openproject-work-schedule.viewnonworkingday
+        with:
+          date: rest.date
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PATCH
+        name: updatenonworkingday
+        description: Update a non-working day attributes (NOT IMPLEMENTED)
+        call: openproject-work-schedule.updatenonworkingday
+        with:
+          date: rest.date
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: DELETE
+        name: deletenonworkingday
+        description: Removes a non-working day (NOT IMPLEMENTED)
+        call: openproject-work-schedule.deletenonworkingday
+        with:
+          date: rest.date
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/days/week
+      name: api-v3-days-week
+      description: REST surface for api-v3-days-week.
+      operations:
+      - method: GET
+        name: listweekdays
+        description: Lists week days
+        call: openproject-work-schedule.listweekdays
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PATCH
+        name: updateweekdays
+        description: Update week days (NOT IMPLEMENTED)
+        call: openproject-work-schedule.updateweekdays
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/days/week/{day}
+      name: api-v3-days-week-day
+      description: REST surface for api-v3-days-week-day.
+      operations:
+      - method: GET
+        name: viewweekday
+        description: View a week day
+        call: openproject-work-schedule.viewweekday
+        with:
+          day: rest.day
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PATCH
+        name: updateweekday
+        description: Update a week day attributes (NOT IMPLEMENTED)
+        call: openproject-work-schedule.updateweekday
+        with:
+          day: rest.day
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/days/{date}
+      name: api-v3-days-date
+      description: REST surface for api-v3-days-date.
+      operations:
+      - method: GET
+        name: viewday
+        description: View day
+        call: openproject-work-schedule.viewday
+        with:
+          date: rest.date
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: openproject-work-schedule-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for OpenProject API V3 (Stable) — Work Schedule. One tool per consumed operation, routed inline
+      through this capability's consumes block.
+    tools:
+    - name: lists-days
+      description: Lists days
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-work-schedule.listdays
+      with:
+        filters: tools.filters
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: lists-all-non-working-days
+      description: Lists all non working days
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-work-schedule.listnonworkingdays
+      with:
+        filters: tools.filters
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: creates-non-working-day-not
+      description: Creates a non-working day (NOT IMPLEMENTED)
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-work-schedule.createnonworkingday
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: view-non-working-day
+      description: View a non-working day
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-work-schedule.viewnonworkingday
+      with:
+        date: tools.date
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: update-non-working-day-attributes
+      description: Update a non-working day attributes (NOT IMPLEMENTED)
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: openproject-work-schedule.updatenonworkingday
+      with:
+        date: tools.date
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: removes-non-working-day-not
+      description: Removes a non-working day (NOT IMPLEMENTED)
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: openproject-work-schedule.deletenonworkingday
+      with:
+        date: tools.date
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: lists-week-days
+      description: Lists week days
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-work-schedule.listweekdays
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: update-week-days-not-implemented
+      description: Update week days (NOT IMPLEMENTED)
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: openproject-work-schedule.updateweekdays
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: view-week-day
+      description: View a week day
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-work-schedule.viewweekday
+      with:
+        day: tools.day
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: update-week-day-attributes-not
+      description: Update a week day attributes (NOT IMPLEMENTED)
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: openproject-work-schedule.updateweekday
+      with:
+        day: tools.day
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: view-day
+      description: View day
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-work-schedule.viewday
+      with:
+        date: tools.date
+      outputParameters:
+      - type: object
+        mapping: $.

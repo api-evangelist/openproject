@@ -1,0 +1,206 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: OpenProject API V3 (Stable) — File Links
+  description: 'OpenProject API V3 (Stable) — File Links. 4 operations. Lead operation: Gets a list of project storages. Self-contained
+    Naftiko capability covering one Openproject business surface.'
+  tags:
+  - Openproject
+  - File Links
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    OPENPROJECT_API_KEY: OPENPROJECT_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: openproject-file-links
+    baseUri: https://qa.openproject-edge.com
+    description: OpenProject API V3 (Stable) — File Links business capability. Self-contained, no shared references.
+    resources:
+    - name: api-v3-project_storages
+      path: /api/v3/project_storages
+      operations:
+      - name: listprojectstorages
+        method: GET
+        description: Gets a list of project storages
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: filters
+          in: query
+          type: string
+          description: JSON specifying filter conditions.
+    - name: api-v3-project_storages-id
+      path: /api/v3/project_storages/{id}
+      operations:
+      - name: getprojectstorage
+        method: GET
+        description: Gets a project storage
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Project storage id
+          required: true
+    - name: api-v3-project_storages-id-open
+      path: /api/v3/project_storages/{id}/open
+      operations:
+      - name: openprojectstorage
+        method: GET
+        description: Open the project storage
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Project storage id
+          required: true
+    - name: api-v3-storages-id-open
+      path: /api/v3/storages/{id}/open
+      operations:
+      - name: openstorage
+        method: GET
+        description: Open the storage
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Storage id
+          required: true
+    authentication:
+      type: basic
+      username: '{{env.OPENPROJECT_USER}}'
+      password: '{{env.OPENPROJECT_PASS}}'
+  exposes:
+  - type: rest
+    namespace: openproject-file-links-rest
+    port: 8080
+    description: REST adapter for OpenProject API V3 (Stable) — File Links. One Spectral-compliant resource per consumed operation,
+      prefixed with /v1.
+    resources:
+    - path: /v1/api/v3/project-storages
+      name: api-v3-project-storages
+      description: REST surface for api-v3-project_storages.
+      operations:
+      - method: GET
+        name: listprojectstorages
+        description: Gets a list of project storages
+        call: openproject-file-links.listprojectstorages
+        with:
+          filters: rest.filters
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/project-storages/{id}
+      name: api-v3-project-storages-id
+      description: REST surface for api-v3-project_storages-id.
+      operations:
+      - method: GET
+        name: getprojectstorage
+        description: Gets a project storage
+        call: openproject-file-links.getprojectstorage
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/project-storages/{id}/open
+      name: api-v3-project-storages-id-open
+      description: REST surface for api-v3-project_storages-id-open.
+      operations:
+      - method: GET
+        name: openprojectstorage
+        description: Open the project storage
+        call: openproject-file-links.openprojectstorage
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/storages/{id}/open
+      name: api-v3-storages-id-open
+      description: REST surface for api-v3-storages-id-open.
+      operations:
+      - method: GET
+        name: openstorage
+        description: Open the storage
+        call: openproject-file-links.openstorage
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: openproject-file-links-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for OpenProject API V3 (Stable) — File Links. One tool per consumed operation, routed inline
+      through this capability's consumes block.
+    tools:
+    - name: gets-list-project-storages
+      description: Gets a list of project storages
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-file-links.listprojectstorages
+      with:
+        filters: tools.filters
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: gets-project-storage
+      description: Gets a project storage
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-file-links.getprojectstorage
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: open-project-storage
+      description: Open the project storage
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-file-links.openprojectstorage
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: open-storage
+      description: Open the storage
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-file-links.openstorage
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.

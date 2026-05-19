@@ -1,0 +1,226 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: OpenProject API V3 (Stable) — Time Entries
+  description: 'OpenProject API V3 (Stable) — Time Entries. 5 operations. Lead operation: Available projects for time entries.
+    Self-contained Naftiko capability covering one Openproject business surface.'
+  tags:
+  - Openproject
+  - Time Entries
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    OPENPROJECT_API_KEY: OPENPROJECT_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: openproject-time-entries
+    baseUri: https://qa.openproject-edge.com
+    description: OpenProject API V3 (Stable) — Time Entries business capability. Self-contained, no shared references.
+    resources:
+    - name: api-v3-time_entries-available_projects
+      path: /api/v3/time_entries/available_projects
+      operations:
+      - name: availableprojectsfortimeentries
+        method: GET
+        description: Available projects for time entries
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-time_entries-form
+      path: /api/v3/time_entries/form
+      operations:
+      - name: timeentrycreateform
+        method: POST
+        description: Time entry create form
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-time_entries-schema
+      path: /api/v3/time_entries/schema
+      operations:
+      - name: viewtimeentryschema
+        method: GET
+        description: View time entry schema
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-time_entries-id
+      path: /api/v3/time_entries/{id}
+      operations:
+      - name: updatetimeentry
+        method: PATCH
+        description: update time entry
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Time entry id
+          required: true
+    - name: api-v3-time_entries-id-form
+      path: /api/v3/time_entries/{id}/form
+      operations:
+      - name: timeentryupdateform
+        method: POST
+        description: Time entry update form
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Time entries activity id
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: basic
+      username: '{{env.OPENPROJECT_USER}}'
+      password: '{{env.OPENPROJECT_PASS}}'
+  exposes:
+  - type: rest
+    namespace: openproject-time-entries-rest
+    port: 8080
+    description: REST adapter for OpenProject API V3 (Stable) — Time Entries. One Spectral-compliant resource per consumed
+      operation, prefixed with /v1.
+    resources:
+    - path: /v1/api/v3/time-entries/available-projects
+      name: api-v3-time-entries-available-projects
+      description: REST surface for api-v3-time_entries-available_projects.
+      operations:
+      - method: GET
+        name: availableprojectsfortimeentries
+        description: Available projects for time entries
+        call: openproject-time-entries.availableprojectsfortimeentries
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/time-entries/form
+      name: api-v3-time-entries-form
+      description: REST surface for api-v3-time_entries-form.
+      operations:
+      - method: POST
+        name: timeentrycreateform
+        description: Time entry create form
+        call: openproject-time-entries.timeentrycreateform
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/time-entries/schema
+      name: api-v3-time-entries-schema
+      description: REST surface for api-v3-time_entries-schema.
+      operations:
+      - method: GET
+        name: viewtimeentryschema
+        description: View time entry schema
+        call: openproject-time-entries.viewtimeentryschema
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/time-entries/{id}
+      name: api-v3-time-entries-id
+      description: REST surface for api-v3-time_entries-id.
+      operations:
+      - method: PATCH
+        name: updatetimeentry
+        description: update time entry
+        call: openproject-time-entries.updatetimeentry
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/time-entries/{id}/form
+      name: api-v3-time-entries-id-form
+      description: REST surface for api-v3-time_entries-id-form.
+      operations:
+      - method: POST
+        name: timeentryupdateform
+        description: Time entry update form
+        call: openproject-time-entries.timeentryupdateform
+        with:
+          id: rest.id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: openproject-time-entries-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for OpenProject API V3 (Stable) — Time Entries. One tool per consumed operation, routed inline
+      through this capability's consumes block.
+    tools:
+    - name: available-projects-time-entries
+      description: Available projects for time entries
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-time-entries.availableprojectsfortimeentries
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: time-entry-create-form
+      description: Time entry create form
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-time-entries.timeentrycreateform
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: view-time-entry-schema
+      description: View time entry schema
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-time-entries.viewtimeentryschema
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: update-time-entry
+      description: update time entry
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: openproject-time-entries.updatetimeentry
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: time-entry-update-form
+      description: Time entry update form
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-time-entries.timeentryupdateform
+      with:
+        id: tools.id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

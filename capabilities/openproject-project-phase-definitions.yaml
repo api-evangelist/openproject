@@ -1,0 +1,113 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: OpenProject API V3 (Stable) — Project Phase Definitions
+  description: 'OpenProject API V3 (Stable) — Project Phase Definitions. 2 operations. Lead operation: List project phase
+    definitions. Self-contained Naftiko capability covering one Openproject business surface.'
+  tags:
+  - Openproject
+  - Project Phase Definitions
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    OPENPROJECT_API_KEY: OPENPROJECT_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: openproject-project-phase-definitions
+    baseUri: https://qa.openproject-edge.com
+    description: OpenProject API V3 (Stable) — Project Phase Definitions business capability. Self-contained, no shared references.
+    resources:
+    - name: api-v3-project_phase_definitions
+      path: /api/v3/project_phase_definitions
+      operations:
+      - name: listprojectphasedefinitions
+        method: GET
+        description: List project phase definitions
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-project_phase_definitions-id
+      path: /api/v3/project_phase_definitions/{id}
+      operations:
+      - name: getprojectphasedefinition
+        method: GET
+        description: Get a project phase definition
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Project phase definition id
+          required: true
+    authentication:
+      type: basic
+      username: '{{env.OPENPROJECT_USER}}'
+      password: '{{env.OPENPROJECT_PASS}}'
+  exposes:
+  - type: rest
+    namespace: openproject-project-phase-definitions-rest
+    port: 8080
+    description: REST adapter for OpenProject API V3 (Stable) — Project Phase Definitions. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/api/v3/project-phase-definitions
+      name: api-v3-project-phase-definitions
+      description: REST surface for api-v3-project_phase_definitions.
+      operations:
+      - method: GET
+        name: listprojectphasedefinitions
+        description: List project phase definitions
+        call: openproject-project-phase-definitions.listprojectphasedefinitions
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/project-phase-definitions/{id}
+      name: api-v3-project-phase-definitions-id
+      description: REST surface for api-v3-project_phase_definitions-id.
+      operations:
+      - method: GET
+        name: getprojectphasedefinition
+        description: Get a project phase definition
+        call: openproject-project-phase-definitions.getprojectphasedefinition
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: openproject-project-phase-definitions-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for OpenProject API V3 (Stable) — Project Phase Definitions. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: list-project-phase-definitions
+      description: List project phase definitions
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-project-phase-definitions.listprojectphasedefinitions
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: get-project-phase-definition
+      description: Get a project phase definition
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-project-phase-definitions.getprojectphasedefinition
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.

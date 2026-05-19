@@ -1,0 +1,758 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: OpenProject API V3 (Stable) — Projects
+  description: 'OpenProject API V3 (Stable) — Projects. 17 operations. Lead operation: View project status. Self-contained
+    Naftiko capability covering one Openproject business surface.'
+  tags:
+  - Openproject
+  - Projects
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    OPENPROJECT_API_KEY: OPENPROJECT_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: openproject-projects
+    baseUri: https://qa.openproject-edge.com
+    description: OpenProject API V3 (Stable) — Projects business capability. Self-contained, no shared references.
+    resources:
+    - name: api-v3-project_statuses-id
+      path: /api/v3/project_statuses/{id}
+      operations:
+      - name: viewprojectstatus
+        method: GET
+        description: View project status
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: string
+          description: Project status id
+          required: true
+    - name: api-v3-projects
+      path: /api/v3/projects
+      operations:
+      - name: listprojects
+        method: GET
+        description: List projects
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: filters
+          in: query
+          type: string
+          description: JSON specifying filter conditions.
+        - name: sortBy
+          in: query
+          type: string
+          description: JSON specifying sort criteria.
+        - name: select
+          in: query
+          type: string
+          description: Comma separated list of properties to include.
+      - name: createproject
+        method: POST
+        description: Create project
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: api-v3-projects-available_parent_projects
+      path: /api/v3/projects/available_parent_projects
+      operations:
+      - name: listavailableparentprojectcandidates
+        method: GET
+        description: List available parent project candidates
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: filters
+          in: query
+          type: string
+          description: JSON specifying filter conditions.
+        - name: of
+          in: query
+          type: string
+          description: The id or identifier of the project the parent candidate is determined for
+        - name: workspace_type
+          in: query
+          type: string
+          description: The workspace type of the new project the parent candidate is determined for. Ignored when `of` parameter
+            is provided.
+        - name: sortBy
+          in: query
+          type: string
+          description: JSON specifying sort criteria.
+    - name: api-v3-projects-form
+      path: /api/v3/projects/form
+      operations:
+      - name: projectcreateform
+        method: POST
+        description: Project create form
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: api-v3-projects-schema
+      path: /api/v3/projects/schema
+      operations:
+      - name: viewprojectschema
+        method: GET
+        description: View project schema
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-projects-id
+      path: /api/v3/projects/{id}
+      operations:
+      - name: deleteproject
+        method: DELETE
+        description: Delete Project
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Project id
+          required: true
+      - name: viewproject
+        method: GET
+        description: View project
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Project id
+          required: true
+      - name: updateproject
+        method: PATCH
+        description: Update Project
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Project id
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: api-v3-projects-id-configuration
+      path: /api/v3/projects/{id}/configuration
+      operations:
+      - name: viewprojectconfiguration
+        method: GET
+        description: View project configuration
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Project id
+          required: true
+    - name: api-v3-projects-id-copy
+      path: /api/v3/projects/{id}/copy
+      operations:
+      - name: createprojectcopy
+        method: POST
+        description: Create project copy
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Project id
+          required: true
+    - name: api-v3-projects-id-copy-form
+      path: /api/v3/projects/{id}/copy/form
+      operations:
+      - name: projectcopyform
+        method: POST
+        description: Project copy form
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Project id
+          required: true
+    - name: api-v3-projects-id-favorite
+      path: /api/v3/projects/{id}/favorite
+      operations:
+      - name: unfavoriteproject
+        method: DELETE
+        description: Unfavorite Project
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Project id
+          required: true
+      - name: favoriteproject
+        method: POST
+        description: Favorite Project
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Project id
+          required: true
+    - name: api-v3-projects-id-form
+      path: /api/v3/projects/{id}/form
+      operations:
+      - name: projectupdateform
+        method: POST
+        description: Project update form
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Project id
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: api-v3-versions-id-projects
+      path: /api/v3/versions/{id}/projects
+      operations:
+      - name: listprojectswithversion
+        method: GET
+        description: List projects having version
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Version id
+          required: true
+    - name: api-v3-versions-id-workspaces
+      path: /api/v3/versions/{id}/workspaces
+      operations:
+      - name: listworkspaceswithversion
+        method: GET
+        description: List workspaces having version
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Version id
+          required: true
+    authentication:
+      type: basic
+      username: '{{env.OPENPROJECT_USER}}'
+      password: '{{env.OPENPROJECT_PASS}}'
+  exposes:
+  - type: rest
+    namespace: openproject-projects-rest
+    port: 8080
+    description: REST adapter for OpenProject API V3 (Stable) — Projects. One Spectral-compliant resource per consumed operation,
+      prefixed with /v1.
+    resources:
+    - path: /v1/api/v3/project-statuses/{id}
+      name: api-v3-project-statuses-id
+      description: REST surface for api-v3-project_statuses-id.
+      operations:
+      - method: GET
+        name: viewprojectstatus
+        description: View project status
+        call: openproject-projects.viewprojectstatus
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/projects
+      name: api-v3-projects
+      description: REST surface for api-v3-projects.
+      operations:
+      - method: GET
+        name: listprojects
+        description: List projects
+        call: openproject-projects.listprojects
+        with:
+          filters: rest.filters
+          sortBy: rest.sortBy
+          select: rest.select
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: createproject
+        description: Create project
+        call: openproject-projects.createproject
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/projects/available-parent-projects
+      name: api-v3-projects-available-parent-projects
+      description: REST surface for api-v3-projects-available_parent_projects.
+      operations:
+      - method: GET
+        name: listavailableparentprojectcandidates
+        description: List available parent project candidates
+        call: openproject-projects.listavailableparentprojectcandidates
+        with:
+          filters: rest.filters
+          of: rest.of
+          workspace_type: rest.workspace_type
+          sortBy: rest.sortBy
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/projects/form
+      name: api-v3-projects-form
+      description: REST surface for api-v3-projects-form.
+      operations:
+      - method: POST
+        name: projectcreateform
+        description: Project create form
+        call: openproject-projects.projectcreateform
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/projects/schema
+      name: api-v3-projects-schema
+      description: REST surface for api-v3-projects-schema.
+      operations:
+      - method: GET
+        name: viewprojectschema
+        description: View project schema
+        call: openproject-projects.viewprojectschema
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/projects/{id}
+      name: api-v3-projects-id
+      description: REST surface for api-v3-projects-id.
+      operations:
+      - method: DELETE
+        name: deleteproject
+        description: Delete Project
+        call: openproject-projects.deleteproject
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: viewproject
+        description: View project
+        call: openproject-projects.viewproject
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PATCH
+        name: updateproject
+        description: Update Project
+        call: openproject-projects.updateproject
+        with:
+          id: rest.id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/projects/{id}/configuration
+      name: api-v3-projects-id-configuration
+      description: REST surface for api-v3-projects-id-configuration.
+      operations:
+      - method: GET
+        name: viewprojectconfiguration
+        description: View project configuration
+        call: openproject-projects.viewprojectconfiguration
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/projects/{id}/copy
+      name: api-v3-projects-id-copy
+      description: REST surface for api-v3-projects-id-copy.
+      operations:
+      - method: POST
+        name: createprojectcopy
+        description: Create project copy
+        call: openproject-projects.createprojectcopy
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/projects/{id}/copy/form
+      name: api-v3-projects-id-copy-form
+      description: REST surface for api-v3-projects-id-copy-form.
+      operations:
+      - method: POST
+        name: projectcopyform
+        description: Project copy form
+        call: openproject-projects.projectcopyform
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/projects/{id}/favorite
+      name: api-v3-projects-id-favorite
+      description: REST surface for api-v3-projects-id-favorite.
+      operations:
+      - method: DELETE
+        name: unfavoriteproject
+        description: Unfavorite Project
+        call: openproject-projects.unfavoriteproject
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: favoriteproject
+        description: Favorite Project
+        call: openproject-projects.favoriteproject
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/projects/{id}/form
+      name: api-v3-projects-id-form
+      description: REST surface for api-v3-projects-id-form.
+      operations:
+      - method: POST
+        name: projectupdateform
+        description: Project update form
+        call: openproject-projects.projectupdateform
+        with:
+          id: rest.id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/versions/{id}/projects
+      name: api-v3-versions-id-projects
+      description: REST surface for api-v3-versions-id-projects.
+      operations:
+      - method: GET
+        name: listprojectswithversion
+        description: List projects having version
+        call: openproject-projects.listprojectswithversion
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/versions/{id}/workspaces
+      name: api-v3-versions-id-workspaces
+      description: REST surface for api-v3-versions-id-workspaces.
+      operations:
+      - method: GET
+        name: listworkspaceswithversion
+        description: List workspaces having version
+        call: openproject-projects.listworkspaceswithversion
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: openproject-projects-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for OpenProject API V3 (Stable) — Projects. One tool per consumed operation, routed inline through
+      this capability's consumes block.
+    tools:
+    - name: view-project-status
+      description: View project status
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-projects.viewprojectstatus
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-projects
+      description: List projects
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-projects.listprojects
+      with:
+        filters: tools.filters
+        sortBy: tools.sortBy
+        select: tools.select
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: create-project
+      description: Create project
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-projects.createproject
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-available-parent-project-candidates
+      description: List available parent project candidates
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-projects.listavailableparentprojectcandidates
+      with:
+        filters: tools.filters
+        of: tools.of
+        workspace_type: tools.workspace_type
+        sortBy: tools.sortBy
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: project-create-form
+      description: Project create form
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-projects.projectcreateform
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: view-project-schema
+      description: View project schema
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-projects.viewprojectschema
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: delete-project
+      description: Delete Project
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: openproject-projects.deleteproject
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: view-project
+      description: View project
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-projects.viewproject
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: update-project
+      description: Update Project
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: openproject-projects.updateproject
+      with:
+        id: tools.id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: view-project-configuration
+      description: View project configuration
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-projects.viewprojectconfiguration
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: create-project-copy
+      description: Create project copy
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-projects.createprojectcopy
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: project-copy-form
+      description: Project copy form
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-projects.projectcopyform
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: unfavorite-project
+      description: Unfavorite Project
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: openproject-projects.unfavoriteproject
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: favorite-project
+      description: Favorite Project
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-projects.favoriteproject
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: project-update-form
+      description: Project update form
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-projects.projectupdateform
+      with:
+        id: tools.id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-projects-having-version
+      description: List projects having version
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-projects.listprojectswithversion
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-workspaces-having-version
+      description: List workspaces having version
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-projects.listworkspaceswithversion
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.

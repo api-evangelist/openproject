@@ -1,0 +1,285 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: OpenProject API V3 (Stable) — Grids
+  description: 'OpenProject API V3 (Stable) — Grids. 6 operations. Lead operation: List grids. Self-contained Naftiko capability
+    covering one Openproject business surface.'
+  tags:
+  - Openproject
+  - Grids
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    OPENPROJECT_API_KEY: OPENPROJECT_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: openproject-grids
+    baseUri: https://qa.openproject-edge.com
+    description: OpenProject API V3 (Stable) — Grids business capability. Self-contained, no shared references.
+    resources:
+    - name: api-v3-grids
+      path: /api/v3/grids
+      operations:
+      - name: listgrids
+        method: GET
+        description: List grids
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: offset
+          in: query
+          type: integer
+          description: Page number inside the requested collection.
+        - name: pageSize
+          in: query
+          type: integer
+          description: Number of elements to display per page.
+        - name: filters
+          in: query
+          type: string
+          description: JSON specifying filter conditions. Accepts the same format as returned by
+      - name: creategrid
+        method: POST
+        description: Create a grid
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: api-v3-grids-form
+      path: /api/v3/grids/form
+      operations:
+      - name: gridcreateform
+        method: POST
+        description: Grid Create Form
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-grids-id
+      path: /api/v3/grids/{id}
+      operations:
+      - name: getgrid
+        method: GET
+        description: Get a grid
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Grid id
+          required: true
+      - name: updategrid
+        method: PATCH
+        description: Update a grid
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Grid id
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: api-v3-grids-id-form
+      path: /api/v3/grids/{id}/form
+      operations:
+      - name: gridupdateform
+        method: POST
+        description: Grid Update Form
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: ID of the grid being modified
+          required: true
+    authentication:
+      type: basic
+      username: '{{env.OPENPROJECT_USER}}'
+      password: '{{env.OPENPROJECT_PASS}}'
+  exposes:
+  - type: rest
+    namespace: openproject-grids-rest
+    port: 8080
+    description: REST adapter for OpenProject API V3 (Stable) — Grids. One Spectral-compliant resource per consumed operation,
+      prefixed with /v1.
+    resources:
+    - path: /v1/api/v3/grids
+      name: api-v3-grids
+      description: REST surface for api-v3-grids.
+      operations:
+      - method: GET
+        name: listgrids
+        description: List grids
+        call: openproject-grids.listgrids
+        with:
+          offset: rest.offset
+          pageSize: rest.pageSize
+          filters: rest.filters
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: creategrid
+        description: Create a grid
+        call: openproject-grids.creategrid
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/grids/form
+      name: api-v3-grids-form
+      description: REST surface for api-v3-grids-form.
+      operations:
+      - method: POST
+        name: gridcreateform
+        description: Grid Create Form
+        call: openproject-grids.gridcreateform
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/grids/{id}
+      name: api-v3-grids-id
+      description: REST surface for api-v3-grids-id.
+      operations:
+      - method: GET
+        name: getgrid
+        description: Get a grid
+        call: openproject-grids.getgrid
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PATCH
+        name: updategrid
+        description: Update a grid
+        call: openproject-grids.updategrid
+        with:
+          id: rest.id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/grids/{id}/form
+      name: api-v3-grids-id-form
+      description: REST surface for api-v3-grids-id-form.
+      operations:
+      - method: POST
+        name: gridupdateform
+        description: Grid Update Form
+        call: openproject-grids.gridupdateform
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: openproject-grids-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for OpenProject API V3 (Stable) — Grids. One tool per consumed operation, routed inline through
+      this capability's consumes block.
+    tools:
+    - name: list-grids
+      description: List grids
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-grids.listgrids
+      with:
+        offset: tools.offset
+        pageSize: tools.pageSize
+        filters: tools.filters
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: create-grid
+      description: Create a grid
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-grids.creategrid
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: grid-create-form
+      description: Grid Create Form
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-grids.gridcreateform
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: get-grid
+      description: Get a grid
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-grids.getgrid
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: update-grid
+      description: Update a grid
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: openproject-grids.updategrid
+      with:
+        id: tools.id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: grid-update-form
+      description: Grid Update Form
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-grids.gridupdateform
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.

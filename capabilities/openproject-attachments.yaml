@@ -1,0 +1,540 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: OpenProject API V3 (Stable) — Attachments
+  description: 'OpenProject API V3 (Stable) — Attachments. 13 operations. Lead operation: List attachments by activity. Self-contained
+    Naftiko capability covering one Openproject business surface.'
+  tags:
+  - Openproject
+  - Attachments
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    OPENPROJECT_API_KEY: OPENPROJECT_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: openproject-attachments
+    baseUri: https://qa.openproject-edge.com
+    description: OpenProject API V3 (Stable) — Attachments business capability. Self-contained, no shared references.
+    resources:
+    - name: api-v3-activities-id-attachments
+      path: /api/v3/activities/{id}/attachments
+      operations:
+      - name: listactivityattachments
+        method: GET
+        description: List attachments by activity
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: ID of the activity whose attachments will be listed
+          required: true
+      - name: createactivityattachment
+        method: POST
+        description: Add attachment to activity
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: ID of the activity to receive the attachment
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: api-v3-attachments
+      path: /api/v3/attachments
+      operations:
+      - name: createattachment
+        method: POST
+        description: Create Attachment
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-attachments-id
+      path: /api/v3/attachments/{id}
+      operations:
+      - name: deleteattachment
+        method: DELETE
+        description: Delete attachment
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Attachment id
+          required: true
+      - name: viewattachment
+        method: GET
+        description: View attachment
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Attachment id
+          required: true
+    - name: api-v3-meetings-id-attachments
+      path: /api/v3/meetings/{id}/attachments
+      operations:
+      - name: listattachmentsbymeeting
+        method: GET
+        description: List attachments by meeting
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: ID of the meeting whose attachments will be listed
+          required: true
+      - name: addattachmenttomeeting
+        method: POST
+        description: Add attachment to meeting
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: ID of the meeting to receive the attachment
+          required: true
+    - name: api-v3-posts-id-attachments
+      path: /api/v3/posts/{id}/attachments
+      operations:
+      - name: listattachmentsbypost
+        method: GET
+        description: List attachments by post
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: ID of the post whose attachments will be listed
+          required: true
+      - name: addattachmenttopost
+        method: POST
+        description: Add attachment to post
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: ID of the post to receive the attachment
+          required: true
+    - name: api-v3-wiki_pages-id-attachments
+      path: /api/v3/wiki_pages/{id}/attachments
+      operations:
+      - name: listattachmentsbywikipage
+        method: GET
+        description: List attachments by wiki page
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: ID of the wiki page whose attachments will be listed
+          required: true
+      - name: addattachmenttowikipage
+        method: POST
+        description: Add attachment to wiki page
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: ID of the wiki page to receive the attachment
+          required: true
+    - name: api-v3-work_packages-id-attachments
+      path: /api/v3/work_packages/{id}/attachments
+      operations:
+      - name: listworkpackageattachments
+        method: GET
+        description: List attachments by work package
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: ID of the work package whose attachments will be listed
+          required: true
+      - name: createworkpackageattachment
+        method: POST
+        description: Create work package attachment
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: ID of the work package to receive the attachment
+          required: true
+    authentication:
+      type: basic
+      username: '{{env.OPENPROJECT_USER}}'
+      password: '{{env.OPENPROJECT_PASS}}'
+  exposes:
+  - type: rest
+    namespace: openproject-attachments-rest
+    port: 8080
+    description: REST adapter for OpenProject API V3 (Stable) — Attachments. One Spectral-compliant resource per consumed
+      operation, prefixed with /v1.
+    resources:
+    - path: /v1/api/v3/activities/{id}/attachments
+      name: api-v3-activities-id-attachments
+      description: REST surface for api-v3-activities-id-attachments.
+      operations:
+      - method: GET
+        name: listactivityattachments
+        description: List attachments by activity
+        call: openproject-attachments.listactivityattachments
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: createactivityattachment
+        description: Add attachment to activity
+        call: openproject-attachments.createactivityattachment
+        with:
+          id: rest.id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/attachments
+      name: api-v3-attachments
+      description: REST surface for api-v3-attachments.
+      operations:
+      - method: POST
+        name: createattachment
+        description: Create Attachment
+        call: openproject-attachments.createattachment
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/attachments/{id}
+      name: api-v3-attachments-id
+      description: REST surface for api-v3-attachments-id.
+      operations:
+      - method: DELETE
+        name: deleteattachment
+        description: Delete attachment
+        call: openproject-attachments.deleteattachment
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: viewattachment
+        description: View attachment
+        call: openproject-attachments.viewattachment
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/meetings/{id}/attachments
+      name: api-v3-meetings-id-attachments
+      description: REST surface for api-v3-meetings-id-attachments.
+      operations:
+      - method: GET
+        name: listattachmentsbymeeting
+        description: List attachments by meeting
+        call: openproject-attachments.listattachmentsbymeeting
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: addattachmenttomeeting
+        description: Add attachment to meeting
+        call: openproject-attachments.addattachmenttomeeting
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/posts/{id}/attachments
+      name: api-v3-posts-id-attachments
+      description: REST surface for api-v3-posts-id-attachments.
+      operations:
+      - method: GET
+        name: listattachmentsbypost
+        description: List attachments by post
+        call: openproject-attachments.listattachmentsbypost
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: addattachmenttopost
+        description: Add attachment to post
+        call: openproject-attachments.addattachmenttopost
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/wiki-pages/{id}/attachments
+      name: api-v3-wiki-pages-id-attachments
+      description: REST surface for api-v3-wiki_pages-id-attachments.
+      operations:
+      - method: GET
+        name: listattachmentsbywikipage
+        description: List attachments by wiki page
+        call: openproject-attachments.listattachmentsbywikipage
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: addattachmenttowikipage
+        description: Add attachment to wiki page
+        call: openproject-attachments.addattachmenttowikipage
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/work-packages/{id}/attachments
+      name: api-v3-work-packages-id-attachments
+      description: REST surface for api-v3-work_packages-id-attachments.
+      operations:
+      - method: GET
+        name: listworkpackageattachments
+        description: List attachments by work package
+        call: openproject-attachments.listworkpackageattachments
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: createworkpackageattachment
+        description: Create work package attachment
+        call: openproject-attachments.createworkpackageattachment
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: openproject-attachments-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for OpenProject API V3 (Stable) — Attachments. One tool per consumed operation, routed inline
+      through this capability's consumes block.
+    tools:
+    - name: list-attachments-activity
+      description: List attachments by activity
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-attachments.listactivityattachments
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: add-attachment-activity
+      description: Add attachment to activity
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-attachments.createactivityattachment
+      with:
+        id: tools.id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: create-attachment
+      description: Create Attachment
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-attachments.createattachment
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: delete-attachment
+      description: Delete attachment
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: openproject-attachments.deleteattachment
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: view-attachment
+      description: View attachment
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-attachments.viewattachment
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-attachments-meeting
+      description: List attachments by meeting
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-attachments.listattachmentsbymeeting
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: add-attachment-meeting
+      description: Add attachment to meeting
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-attachments.addattachmenttomeeting
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-attachments-post
+      description: List attachments by post
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-attachments.listattachmentsbypost
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: add-attachment-post
+      description: Add attachment to post
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-attachments.addattachmenttopost
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-attachments-wiki-page
+      description: List attachments by wiki page
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-attachments.listattachmentsbywikipage
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: add-attachment-wiki-page
+      description: Add attachment to wiki page
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-attachments.addattachmenttowikipage
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-attachments-work-package
+      description: List attachments by work package
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-attachments.listworkpackageattachments
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: create-work-package-attachment
+      description: Create work package attachment
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-attachments.createworkpackageattachment
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.

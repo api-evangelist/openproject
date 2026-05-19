@@ -1,0 +1,395 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: OpenProject API V3 (Stable) — Memberships
+  description: 'OpenProject API V3 (Stable) — Memberships. 9 operations. Lead operation: List memberships. Self-contained
+    Naftiko capability covering one Openproject business surface.'
+  tags:
+  - Openproject
+  - Memberships
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    OPENPROJECT_API_KEY: OPENPROJECT_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: openproject-memberships
+    baseUri: https://qa.openproject-edge.com
+    description: OpenProject API V3 (Stable) — Memberships business capability. Self-contained, no shared references.
+    resources:
+    - name: api-v3-memberships
+      path: /api/v3/memberships
+      operations:
+      - name: listmemberships
+        method: GET
+        description: List memberships
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: filters
+          in: query
+          type: string
+          description: JSON specifying filter conditions.
+        - name: sortBy
+          in: query
+          type: string
+          description: JSON specifying sort criteria.
+      - name: createmembership
+        method: POST
+        description: Create a membership
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: api-v3-memberships-available_projects
+      path: /api/v3/memberships/available_projects
+      operations:
+      - name: getmembershipsavailableprojects
+        method: GET
+        description: Available projects for memberships
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-memberships-form
+      path: /api/v3/memberships/form
+      operations:
+      - name: formcreatemembership
+        method: POST
+        description: Form create membership
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: api-v3-memberships-schema
+      path: /api/v3/memberships/schema
+      operations:
+      - name: getmembershipschema
+        method: GET
+        description: Schema membership
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-memberships-id
+      path: /api/v3/memberships/{id}
+      operations:
+      - name: deletemembership
+        method: DELETE
+        description: Delete membership
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Membership id
+          required: true
+      - name: getmembership
+        method: GET
+        description: Get a membership
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Membership id
+          required: true
+      - name: updatemembership
+        method: PATCH
+        description: Update membership
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Membership id
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: api-v3-memberships-id-form
+      path: /api/v3/memberships/{id}/form
+      operations:
+      - name: formupdatemembership
+        method: POST
+        description: Form update membership
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Membership id
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: basic
+      username: '{{env.OPENPROJECT_USER}}'
+      password: '{{env.OPENPROJECT_PASS}}'
+  exposes:
+  - type: rest
+    namespace: openproject-memberships-rest
+    port: 8080
+    description: REST adapter for OpenProject API V3 (Stable) — Memberships. One Spectral-compliant resource per consumed
+      operation, prefixed with /v1.
+    resources:
+    - path: /v1/api/v3/memberships
+      name: api-v3-memberships
+      description: REST surface for api-v3-memberships.
+      operations:
+      - method: GET
+        name: listmemberships
+        description: List memberships
+        call: openproject-memberships.listmemberships
+        with:
+          filters: rest.filters
+          sortBy: rest.sortBy
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: createmembership
+        description: Create a membership
+        call: openproject-memberships.createmembership
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/memberships/available-projects
+      name: api-v3-memberships-available-projects
+      description: REST surface for api-v3-memberships-available_projects.
+      operations:
+      - method: GET
+        name: getmembershipsavailableprojects
+        description: Available projects for memberships
+        call: openproject-memberships.getmembershipsavailableprojects
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/memberships/form
+      name: api-v3-memberships-form
+      description: REST surface for api-v3-memberships-form.
+      operations:
+      - method: POST
+        name: formcreatemembership
+        description: Form create membership
+        call: openproject-memberships.formcreatemembership
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/memberships/schema
+      name: api-v3-memberships-schema
+      description: REST surface for api-v3-memberships-schema.
+      operations:
+      - method: GET
+        name: getmembershipschema
+        description: Schema membership
+        call: openproject-memberships.getmembershipschema
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/memberships/{id}
+      name: api-v3-memberships-id
+      description: REST surface for api-v3-memberships-id.
+      operations:
+      - method: DELETE
+        name: deletemembership
+        description: Delete membership
+        call: openproject-memberships.deletemembership
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: getmembership
+        description: Get a membership
+        call: openproject-memberships.getmembership
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PATCH
+        name: updatemembership
+        description: Update membership
+        call: openproject-memberships.updatemembership
+        with:
+          id: rest.id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/memberships/{id}/form
+      name: api-v3-memberships-id-form
+      description: REST surface for api-v3-memberships-id-form.
+      operations:
+      - method: POST
+        name: formupdatemembership
+        description: Form update membership
+        call: openproject-memberships.formupdatemembership
+        with:
+          id: rest.id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: openproject-memberships-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for OpenProject API V3 (Stable) — Memberships. One tool per consumed operation, routed inline
+      through this capability's consumes block.
+    tools:
+    - name: list-memberships
+      description: List memberships
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-memberships.listmemberships
+      with:
+        filters: tools.filters
+        sortBy: tools.sortBy
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: create-membership
+      description: Create a membership
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-memberships.createmembership
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: available-projects-memberships
+      description: Available projects for memberships
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-memberships.getmembershipsavailableprojects
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: form-create-membership
+      description: Form create membership
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-memberships.formcreatemembership
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: schema-membership
+      description: Schema membership
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-memberships.getmembershipschema
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: delete-membership
+      description: Delete membership
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: openproject-memberships.deletemembership
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: get-membership
+      description: Get a membership
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-memberships.getmembership
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: update-membership
+      description: Update membership
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: openproject-memberships.updatemembership
+      with:
+        id: tools.id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: form-update-membership
+      description: Form update membership
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-memberships.formupdatemembership
+      with:
+        id: tools.id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

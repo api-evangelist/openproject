@@ -1,0 +1,81 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: OpenProject API V3 (Stable) — Forms
+  description: 'OpenProject API V3 (Stable) — Forms. 1 operations. Lead operation: show or validate form. Self-contained Naftiko
+    capability covering one Openproject business surface.'
+  tags:
+  - Openproject
+  - Forms
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    OPENPROJECT_API_KEY: OPENPROJECT_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: openproject-forms
+    baseUri: https://qa.openproject-edge.com
+    description: OpenProject API V3 (Stable) — Forms business capability. Self-contained, no shared references.
+    resources:
+    - name: api-v3-example-form
+      path: /api/v3/example/form
+      operations:
+      - name: showorvalidateform
+        method: POST
+        description: show or validate form
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: basic
+      username: '{{env.OPENPROJECT_USER}}'
+      password: '{{env.OPENPROJECT_PASS}}'
+  exposes:
+  - type: rest
+    namespace: openproject-forms-rest
+    port: 8080
+    description: REST adapter for OpenProject API V3 (Stable) — Forms. One Spectral-compliant resource per consumed operation,
+      prefixed with /v1.
+    resources:
+    - path: /v1/api/v3/example/form
+      name: api-v3-example-form
+      description: REST surface for api-v3-example-form.
+      operations:
+      - method: POST
+        name: showorvalidateform
+        description: show or validate form
+        call: openproject-forms.showorvalidateform
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: openproject-forms-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for OpenProject API V3 (Stable) — Forms. One tool per consumed operation, routed inline through
+      this capability's consumes block.
+    tools:
+    - name: show-validate-form
+      description: show or validate form
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: false
+      call: openproject-forms.showorvalidateform
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

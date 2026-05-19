@@ -1,0 +1,197 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: OpenProject API V3 (Stable) — Types
+  description: 'OpenProject API V3 (Stable) — Types. 4 operations. Lead operation: List types available in a project. Self-contained
+    Naftiko capability covering one Openproject business surface.'
+  tags:
+  - Openproject
+  - Types
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    OPENPROJECT_API_KEY: OPENPROJECT_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: openproject-types
+    baseUri: https://qa.openproject-edge.com
+    description: OpenProject API V3 (Stable) — Types business capability. Self-contained, no shared references.
+    resources:
+    - name: api-v3-projects-id-types
+      path: /api/v3/projects/{id}/types
+      operations:
+      - name: listtypesavailableinaproject
+        method: GET
+        description: List types available in a project
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: ID of the project whose types will be listed
+          required: true
+    - name: api-v3-types
+      path: /api/v3/types
+      operations:
+      - name: listalltypes
+        method: GET
+        description: List all Types
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-types-id
+      path: /api/v3/types/{id}
+      operations:
+      - name: viewtype
+        method: GET
+        description: View Type
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Type id
+          required: true
+    - name: api-v3-workspaces-id-types
+      path: /api/v3/workspaces/{id}/types
+      operations:
+      - name: listtypesavailableinaworkspace
+        method: GET
+        description: List types available in a workspace
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: ID of the workspace whose types will be listed
+          required: true
+    authentication:
+      type: basic
+      username: '{{env.OPENPROJECT_USER}}'
+      password: '{{env.OPENPROJECT_PASS}}'
+  exposes:
+  - type: rest
+    namespace: openproject-types-rest
+    port: 8080
+    description: REST adapter for OpenProject API V3 (Stable) — Types. One Spectral-compliant resource per consumed operation,
+      prefixed with /v1.
+    resources:
+    - path: /v1/api/v3/projects/{id}/types
+      name: api-v3-projects-id-types
+      description: REST surface for api-v3-projects-id-types.
+      operations:
+      - method: GET
+        name: listtypesavailableinaproject
+        description: List types available in a project
+        call: openproject-types.listtypesavailableinaproject
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/types
+      name: api-v3-types
+      description: REST surface for api-v3-types.
+      operations:
+      - method: GET
+        name: listalltypes
+        description: List all Types
+        call: openproject-types.listalltypes
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/types/{id}
+      name: api-v3-types-id
+      description: REST surface for api-v3-types-id.
+      operations:
+      - method: GET
+        name: viewtype
+        description: View Type
+        call: openproject-types.viewtype
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/workspaces/{id}/types
+      name: api-v3-workspaces-id-types
+      description: REST surface for api-v3-workspaces-id-types.
+      operations:
+      - method: GET
+        name: listtypesavailableinaworkspace
+        description: List types available in a workspace
+        call: openproject-types.listtypesavailableinaworkspace
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: openproject-types-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for OpenProject API V3 (Stable) — Types. One tool per consumed operation, routed inline through
+      this capability's consumes block.
+    tools:
+    - name: list-types-available-project
+      description: List types available in a project
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-types.listtypesavailableinaproject
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-all-types
+      description: List all Types
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-types.listalltypes
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: view-type
+      description: View Type
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-types.viewtype
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-types-available-workspace
+      description: List types available in a workspace
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-types.listtypesavailableinaworkspace
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.

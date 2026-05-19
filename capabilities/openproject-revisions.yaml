@@ -1,0 +1,81 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: OpenProject API V3 (Stable) — Revisions
+  description: 'OpenProject API V3 (Stable) — Revisions. 1 operations. Lead operation: View revision. Self-contained Naftiko
+    capability covering one Openproject business surface.'
+  tags:
+  - Openproject
+  - Revisions
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    OPENPROJECT_API_KEY: OPENPROJECT_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: openproject-revisions
+    baseUri: https://qa.openproject-edge.com
+    description: OpenProject API V3 (Stable) — Revisions business capability. Self-contained, no shared references.
+    resources:
+    - name: api-v3-revisions-id
+      path: /api/v3/revisions/{id}
+      operations:
+      - name: viewrevision
+        method: GET
+        description: View revision
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Revision id
+          required: true
+    authentication:
+      type: basic
+      username: '{{env.OPENPROJECT_USER}}'
+      password: '{{env.OPENPROJECT_PASS}}'
+  exposes:
+  - type: rest
+    namespace: openproject-revisions-rest
+    port: 8080
+    description: REST adapter for OpenProject API V3 (Stable) — Revisions. One Spectral-compliant resource per consumed operation,
+      prefixed with /v1.
+    resources:
+    - path: /v1/api/v3/revisions/{id}
+      name: api-v3-revisions-id
+      description: REST surface for api-v3-revisions-id.
+      operations:
+      - method: GET
+        name: viewrevision
+        description: View revision
+        call: openproject-revisions.viewrevision
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: openproject-revisions-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for OpenProject API V3 (Stable) — Revisions. One tool per consumed operation, routed inline through
+      this capability's consumes block.
+    tools:
+    - name: view-revision
+      description: View revision
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-revisions.viewrevision
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.

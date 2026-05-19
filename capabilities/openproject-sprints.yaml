@@ -1,0 +1,194 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: OpenProject API V3 (Stable) — Sprints
+  description: 'OpenProject API V3 (Stable) — Sprints. 3 operations. Lead operation: List sprints in project. Self-contained
+    Naftiko capability covering one Openproject business surface.'
+  tags:
+  - Openproject
+  - Sprints
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    OPENPROJECT_API_KEY: OPENPROJECT_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: openproject-sprints
+    baseUri: https://qa.openproject-edge.com
+    description: OpenProject API V3 (Stable) — Sprints business capability. Self-contained, no shared references.
+    resources:
+    - name: api-v3-projects-id-sprints
+      path: /api/v3/projects/{id}/sprints
+      operations:
+      - name: listsprintsinproject
+        method: GET
+        description: List sprints in project
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: ID of the project whose sprints will be listed
+          required: true
+        - name: filters
+          in: query
+          type: string
+          description: JSON specifying filter conditions.
+        - name: offset
+          in: query
+          type: integer
+          description: Page number inside the requested collection.
+        - name: pageSize
+          in: query
+          type: integer
+          description: Number of elements to display per page.
+    - name: api-v3-sprints
+      path: /api/v3/sprints
+      operations:
+      - name: listsprints
+        method: GET
+        description: List sprints
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: filters
+          in: query
+          type: string
+          description: JSON specifying filter conditions.
+        - name: offset
+          in: query
+          type: integer
+          description: Page number inside the requested collection.
+        - name: pageSize
+          in: query
+          type: integer
+          description: Number of elements to display per page.
+    - name: api-v3-sprints-id
+      path: /api/v3/sprints/{id}
+      operations:
+      - name: getsprint
+        method: GET
+        description: Get sprint
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Sprint id
+          required: true
+    authentication:
+      type: basic
+      username: '{{env.OPENPROJECT_USER}}'
+      password: '{{env.OPENPROJECT_PASS}}'
+  exposes:
+  - type: rest
+    namespace: openproject-sprints-rest
+    port: 8080
+    description: REST adapter for OpenProject API V3 (Stable) — Sprints. One Spectral-compliant resource per consumed operation,
+      prefixed with /v1.
+    resources:
+    - path: /v1/api/v3/projects/{id}/sprints
+      name: api-v3-projects-id-sprints
+      description: REST surface for api-v3-projects-id-sprints.
+      operations:
+      - method: GET
+        name: listsprintsinproject
+        description: List sprints in project
+        call: openproject-sprints.listsprintsinproject
+        with:
+          id: rest.id
+          filters: rest.filters
+          offset: rest.offset
+          pageSize: rest.pageSize
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/sprints
+      name: api-v3-sprints
+      description: REST surface for api-v3-sprints.
+      operations:
+      - method: GET
+        name: listsprints
+        description: List sprints
+        call: openproject-sprints.listsprints
+        with:
+          filters: rest.filters
+          offset: rest.offset
+          pageSize: rest.pageSize
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/sprints/{id}
+      name: api-v3-sprints-id
+      description: REST surface for api-v3-sprints-id.
+      operations:
+      - method: GET
+        name: getsprint
+        description: Get sprint
+        call: openproject-sprints.getsprint
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: openproject-sprints-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for OpenProject API V3 (Stable) — Sprints. One tool per consumed operation, routed inline through
+      this capability's consumes block.
+    tools:
+    - name: list-sprints-project
+      description: List sprints in project
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-sprints.listsprintsinproject
+      with:
+        id: tools.id
+        filters: tools.filters
+        offset: tools.offset
+        pageSize: tools.pageSize
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-sprints
+      description: List sprints
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-sprints.listsprints
+      with:
+        filters: tools.filters
+        offset: tools.offset
+        pageSize: tools.pageSize
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: get-sprint
+      description: Get sprint
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-sprints.getsprint
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.

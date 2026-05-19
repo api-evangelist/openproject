@@ -1,0 +1,677 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: OpenProject API V3 (Stable) — File links
+  description: 'OpenProject API V3 (Stable) — File links. 15 operations. Lead operation: Gets a file link.. Self-contained
+    Naftiko capability covering one Openproject business surface.'
+  tags:
+  - Openproject
+  - File links
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    OPENPROJECT_API_KEY: OPENPROJECT_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: openproject-file-links-2
+    baseUri: https://qa.openproject-edge.com
+    description: OpenProject API V3 (Stable) — File links business capability. Self-contained, no shared references.
+    resources:
+    - name: api-v3-file_links-id
+      path: /api/v3/file_links/{id}
+      operations:
+      - name: viewfilelink
+        method: GET
+        description: Gets a file link.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: File link id
+          required: true
+      - name: deletefilelink
+        method: DELETE
+        description: Removes a file link.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: File link id
+          required: true
+    - name: api-v3-file_links-id-download
+      path: /api/v3/file_links/{id}/download
+      operations:
+      - name: downloadfilelink
+        method: GET
+        description: Creates a download uri of the linked file.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: File link id
+          required: true
+    - name: api-v3-file_links-id-open
+      path: /api/v3/file_links/{id}/open
+      operations:
+      - name: openfilelink
+        method: GET
+        description: Creates an opening uri of the linked file.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: File link id
+          required: true
+        - name: location
+          in: query
+          type: boolean
+          description: Boolean flag indicating, if the file should be opened directly or rather the directory location.
+    - name: api-v3-storages
+      path: /api/v3/storages
+      operations:
+      - name: liststorages
+        method: GET
+        description: Get Storages
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: createstorage
+        method: POST
+        description: Creates a storage.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: api-v3-storages-id
+      path: /api/v3/storages/{id}
+      operations:
+      - name: getstorage
+        method: GET
+        description: Get a storage
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Storage id
+          required: true
+      - name: updatestorage
+        method: PATCH
+        description: Update a storage
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Storage id
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+      - name: deletestorage
+        method: DELETE
+        description: Delete a storage
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Storage id
+          required: true
+    - name: api-v3-storages-id-files
+      path: /api/v3/storages/{id}/files
+      operations:
+      - name: getstoragefiles
+        method: GET
+        description: Gets files of a storage.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Storage id
+          required: true
+        - name: parent
+          in: query
+          type: string
+          description: Parent file identification
+    - name: api-v3-storages-id-files-prepare_upload
+      path: /api/v3/storages/{id}/files/prepare_upload
+      operations:
+      - name: preparestoragefileupload
+        method: POST
+        description: Preparation of a direct upload of a file to the given storage.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Storage id
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: api-v3-storages-id-folders
+      path: /api/v3/storages/{id}/folders
+      operations:
+      - name: createstoragefolder
+        method: POST
+        description: Creation of a new folder
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Storage id
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: api-v3-storages-id-oauth_client_credentials
+      path: /api/v3/storages/{id}/oauth_client_credentials
+      operations:
+      - name: createstorageoauthcredentials
+        method: POST
+        description: Creates an oauth client credentials object for a storage.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Storage id
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: api-v3-work_packages-id-file_links
+      path: /api/v3/work_packages/{id}/file_links
+      operations:
+      - name: createworkpackagefilelink
+        method: POST
+        description: Creates file links.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Work package id
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+      - name: listworkpackagefilelinks
+        method: GET
+        description: Gets all file links of a work package
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Work package id
+          required: true
+        - name: filters
+          in: query
+          type: string
+          description: JSON specifying filter conditions.
+    authentication:
+      type: basic
+      username: '{{env.OPENPROJECT_USER}}'
+      password: '{{env.OPENPROJECT_PASS}}'
+  exposes:
+  - type: rest
+    namespace: openproject-file-links-2-rest
+    port: 8080
+    description: REST adapter for OpenProject API V3 (Stable) — File links. One Spectral-compliant resource per consumed operation,
+      prefixed with /v1.
+    resources:
+    - path: /v1/api/v3/file-links/{id}
+      name: api-v3-file-links-id
+      description: REST surface for api-v3-file_links-id.
+      operations:
+      - method: GET
+        name: viewfilelink
+        description: Gets a file link.
+        call: openproject-file-links-2.viewfilelink
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: DELETE
+        name: deletefilelink
+        description: Removes a file link.
+        call: openproject-file-links-2.deletefilelink
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/file-links/{id}/download
+      name: api-v3-file-links-id-download
+      description: REST surface for api-v3-file_links-id-download.
+      operations:
+      - method: GET
+        name: downloadfilelink
+        description: Creates a download uri of the linked file.
+        call: openproject-file-links-2.downloadfilelink
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/file-links/{id}/open
+      name: api-v3-file-links-id-open
+      description: REST surface for api-v3-file_links-id-open.
+      operations:
+      - method: GET
+        name: openfilelink
+        description: Creates an opening uri of the linked file.
+        call: openproject-file-links-2.openfilelink
+        with:
+          id: rest.id
+          location: rest.location
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/storages
+      name: api-v3-storages
+      description: REST surface for api-v3-storages.
+      operations:
+      - method: GET
+        name: liststorages
+        description: Get Storages
+        call: openproject-file-links-2.liststorages
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: createstorage
+        description: Creates a storage.
+        call: openproject-file-links-2.createstorage
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/storages/{id}
+      name: api-v3-storages-id
+      description: REST surface for api-v3-storages-id.
+      operations:
+      - method: GET
+        name: getstorage
+        description: Get a storage
+        call: openproject-file-links-2.getstorage
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PATCH
+        name: updatestorage
+        description: Update a storage
+        call: openproject-file-links-2.updatestorage
+        with:
+          id: rest.id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: DELETE
+        name: deletestorage
+        description: Delete a storage
+        call: openproject-file-links-2.deletestorage
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/storages/{id}/files
+      name: api-v3-storages-id-files
+      description: REST surface for api-v3-storages-id-files.
+      operations:
+      - method: GET
+        name: getstoragefiles
+        description: Gets files of a storage.
+        call: openproject-file-links-2.getstoragefiles
+        with:
+          id: rest.id
+          parent: rest.parent
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/storages/{id}/files/prepare-upload
+      name: api-v3-storages-id-files-prepare-upload
+      description: REST surface for api-v3-storages-id-files-prepare_upload.
+      operations:
+      - method: POST
+        name: preparestoragefileupload
+        description: Preparation of a direct upload of a file to the given storage.
+        call: openproject-file-links-2.preparestoragefileupload
+        with:
+          id: rest.id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/storages/{id}/folders
+      name: api-v3-storages-id-folders
+      description: REST surface for api-v3-storages-id-folders.
+      operations:
+      - method: POST
+        name: createstoragefolder
+        description: Creation of a new folder
+        call: openproject-file-links-2.createstoragefolder
+        with:
+          id: rest.id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/storages/{id}/oauth-client-credentials
+      name: api-v3-storages-id-oauth-client-credentials
+      description: REST surface for api-v3-storages-id-oauth_client_credentials.
+      operations:
+      - method: POST
+        name: createstorageoauthcredentials
+        description: Creates an oauth client credentials object for a storage.
+        call: openproject-file-links-2.createstorageoauthcredentials
+        with:
+          id: rest.id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/work-packages/{id}/file-links
+      name: api-v3-work-packages-id-file-links
+      description: REST surface for api-v3-work_packages-id-file_links.
+      operations:
+      - method: POST
+        name: createworkpackagefilelink
+        description: Creates file links.
+        call: openproject-file-links-2.createworkpackagefilelink
+        with:
+          id: rest.id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: listworkpackagefilelinks
+        description: Gets all file links of a work package
+        call: openproject-file-links-2.listworkpackagefilelinks
+        with:
+          id: rest.id
+          filters: rest.filters
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: openproject-file-links-2-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for OpenProject API V3 (Stable) — File links. One tool per consumed operation, routed inline
+      through this capability's consumes block.
+    tools:
+    - name: gets-file-link
+      description: Gets a file link.
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-file-links-2.viewfilelink
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: removes-file-link
+      description: Removes a file link.
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: openproject-file-links-2.deletefilelink
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: creates-download-uri-linked-file
+      description: Creates a download uri of the linked file.
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-file-links-2.downloadfilelink
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: creates-opening-uri-linked-file
+      description: Creates an opening uri of the linked file.
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-file-links-2.openfilelink
+      with:
+        id: tools.id
+        location: tools.location
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: get-storages
+      description: Get Storages
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-file-links-2.liststorages
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: creates-storage
+      description: Creates a storage.
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-file-links-2.createstorage
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: get-storage
+      description: Get a storage
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-file-links-2.getstorage
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: update-storage
+      description: Update a storage
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: openproject-file-links-2.updatestorage
+      with:
+        id: tools.id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: delete-storage
+      description: Delete a storage
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: openproject-file-links-2.deletestorage
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: gets-files-storage
+      description: Gets files of a storage.
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-file-links-2.getstoragefiles
+      with:
+        id: tools.id
+        parent: tools.parent
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: preparation-direct-upload-file-given
+      description: Preparation of a direct upload of a file to the given storage.
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-file-links-2.preparestoragefileupload
+      with:
+        id: tools.id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: creation-new-folder
+      description: Creation of a new folder
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-file-links-2.createstoragefolder
+      with:
+        id: tools.id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: creates-oauth-client-credentials-object
+      description: Creates an oauth client credentials object for a storage.
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-file-links-2.createstorageoauthcredentials
+      with:
+        id: tools.id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: creates-file-links
+      description: Creates file links.
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-file-links-2.createworkpackagefilelink
+      with:
+        id: tools.id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: gets-all-file-links-work
+      description: Gets all file links of a work package
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-file-links-2.listworkpackagefilelinks
+      with:
+        id: tools.id
+        filters: tools.filters
+      outputParameters:
+      - type: object
+        mapping: $.

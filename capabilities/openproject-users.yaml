@@ -1,0 +1,409 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: OpenProject API V3 (Stable) — Users
+  description: 'OpenProject API V3 (Stable) — Users. 9 operations. Lead operation: List Users. Self-contained Naftiko capability
+    covering one Openproject business surface.'
+  tags:
+  - Openproject
+  - Users
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    OPENPROJECT_API_KEY: OPENPROJECT_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: openproject-users
+    baseUri: https://qa.openproject-edge.com
+    description: OpenProject API V3 (Stable) — Users business capability. Self-contained, no shared references.
+    resources:
+    - name: api-v3-users
+      path: /api/v3/users
+      operations:
+      - name: listusers
+        method: GET
+        description: List Users
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: offset
+          in: query
+          type: integer
+          description: Page number inside the requested collection.
+        - name: pageSize
+          in: query
+          type: integer
+          description: Number of elements to display per page.
+        - name: filters
+          in: query
+          type: string
+          description: JSON specifying filter conditions.
+        - name: sortBy
+          in: query
+          type: string
+          description: JSON specifying sort criteria.
+        - name: select
+          in: query
+          type: string
+          description: Comma separated list of properties to include.
+      - name: createuser
+        method: POST
+        description: Create User
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: api-v3-users-schema
+      path: /api/v3/users/schema
+      operations:
+      - name: viewuserschema
+        method: GET
+        description: View user schema
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-users-id
+      path: /api/v3/users/{id}
+      operations:
+      - name: deleteuser
+        method: DELETE
+        description: Delete user
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: string
+          description: User id. Use `me` to reference current user, if any.
+          required: true
+      - name: viewuser
+        method: GET
+        description: View user
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: string
+          description: User id. Use `me` to reference current user, if any.
+          required: true
+      - name: updateuser
+        method: PATCH
+        description: Update user
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: string
+          description: User id. Use `me` to reference current user, if any.
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: api-v3-users-id-form
+      path: /api/v3/users/{id}/form
+      operations:
+      - name: userupdateform
+        method: POST
+        description: User update form
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: string
+          description: User id. Use `me` to reference current user, if any.
+          required: true
+    - name: api-v3-users-id-lock
+      path: /api/v3/users/{id}/lock
+      operations:
+      - name: unlockuser
+        method: DELETE
+        description: Unlock user
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: User id
+          required: true
+      - name: lockuser
+        method: POST
+        description: Lock user
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: User id
+          required: true
+    authentication:
+      type: basic
+      username: '{{env.OPENPROJECT_USER}}'
+      password: '{{env.OPENPROJECT_PASS}}'
+  exposes:
+  - type: rest
+    namespace: openproject-users-rest
+    port: 8080
+    description: REST adapter for OpenProject API V3 (Stable) — Users. One Spectral-compliant resource per consumed operation,
+      prefixed with /v1.
+    resources:
+    - path: /v1/api/v3/users
+      name: api-v3-users
+      description: REST surface for api-v3-users.
+      operations:
+      - method: GET
+        name: listusers
+        description: List Users
+        call: openproject-users.listusers
+        with:
+          offset: rest.offset
+          pageSize: rest.pageSize
+          filters: rest.filters
+          sortBy: rest.sortBy
+          select: rest.select
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: createuser
+        description: Create User
+        call: openproject-users.createuser
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/users/schema
+      name: api-v3-users-schema
+      description: REST surface for api-v3-users-schema.
+      operations:
+      - method: GET
+        name: viewuserschema
+        description: View user schema
+        call: openproject-users.viewuserschema
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/users/{id}
+      name: api-v3-users-id
+      description: REST surface for api-v3-users-id.
+      operations:
+      - method: DELETE
+        name: deleteuser
+        description: Delete user
+        call: openproject-users.deleteuser
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: viewuser
+        description: View user
+        call: openproject-users.viewuser
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PATCH
+        name: updateuser
+        description: Update user
+        call: openproject-users.updateuser
+        with:
+          id: rest.id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/users/{id}/form
+      name: api-v3-users-id-form
+      description: REST surface for api-v3-users-id-form.
+      operations:
+      - method: POST
+        name: userupdateform
+        description: User update form
+        call: openproject-users.userupdateform
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/users/{id}/lock
+      name: api-v3-users-id-lock
+      description: REST surface for api-v3-users-id-lock.
+      operations:
+      - method: DELETE
+        name: unlockuser
+        description: Unlock user
+        call: openproject-users.unlockuser
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: lockuser
+        description: Lock user
+        call: openproject-users.lockuser
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: openproject-users-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for OpenProject API V3 (Stable) — Users. One tool per consumed operation, routed inline through
+      this capability's consumes block.
+    tools:
+    - name: list-users
+      description: List Users
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-users.listusers
+      with:
+        offset: tools.offset
+        pageSize: tools.pageSize
+        filters: tools.filters
+        sortBy: tools.sortBy
+        select: tools.select
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: create-user
+      description: Create User
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-users.createuser
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: view-user-schema
+      description: View user schema
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-users.viewuserschema
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: delete-user
+      description: Delete user
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: openproject-users.deleteuser
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: view-user
+      description: View user
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-users.viewuser
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: update-user
+      description: Update user
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: openproject-users.updateuser
+      with:
+        id: tools.id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: user-update-form
+      description: User update form
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-users.userupdateform
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: unlock-user
+      description: Unlock user
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: openproject-users.unlockuser
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: lock-user
+      description: Lock user
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-users.lockuser
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.

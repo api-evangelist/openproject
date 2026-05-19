@@ -1,0 +1,240 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: OpenProject API V3 (Stable) — Groups
+  description: 'OpenProject API V3 (Stable) — Groups. 5 operations. Lead operation: List groups. Self-contained Naftiko capability
+    covering one Openproject business surface.'
+  tags:
+  - Openproject
+  - Groups
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    OPENPROJECT_API_KEY: OPENPROJECT_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: openproject-groups
+    baseUri: https://qa.openproject-edge.com
+    description: OpenProject API V3 (Stable) — Groups business capability. Self-contained, no shared references.
+    resources:
+    - name: api-v3-groups
+      path: /api/v3/groups
+      operations:
+      - name: listgroups
+        method: GET
+        description: List groups
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: sortBy
+          in: query
+          type: string
+          description: JSON specifying sort criteria.
+        - name: select
+          in: query
+          type: string
+          description: Comma separated list of properties to include.
+      - name: creategroup
+        method: POST
+        description: Create group
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: api-v3-groups-id
+      path: /api/v3/groups/{id}
+      operations:
+      - name: deletegroup
+        method: DELETE
+        description: Delete group
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Group id
+          required: true
+      - name: getgroup
+        method: GET
+        description: Get group
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Group id
+          required: true
+      - name: updategroup
+        method: PATCH
+        description: Update group
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Group id
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: basic
+      username: '{{env.OPENPROJECT_USER}}'
+      password: '{{env.OPENPROJECT_PASS}}'
+  exposes:
+  - type: rest
+    namespace: openproject-groups-rest
+    port: 8080
+    description: REST adapter for OpenProject API V3 (Stable) — Groups. One Spectral-compliant resource per consumed operation,
+      prefixed with /v1.
+    resources:
+    - path: /v1/api/v3/groups
+      name: api-v3-groups
+      description: REST surface for api-v3-groups.
+      operations:
+      - method: GET
+        name: listgroups
+        description: List groups
+        call: openproject-groups.listgroups
+        with:
+          sortBy: rest.sortBy
+          select: rest.select
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: creategroup
+        description: Create group
+        call: openproject-groups.creategroup
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/groups/{id}
+      name: api-v3-groups-id
+      description: REST surface for api-v3-groups-id.
+      operations:
+      - method: DELETE
+        name: deletegroup
+        description: Delete group
+        call: openproject-groups.deletegroup
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: getgroup
+        description: Get group
+        call: openproject-groups.getgroup
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PATCH
+        name: updategroup
+        description: Update group
+        call: openproject-groups.updategroup
+        with:
+          id: rest.id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: openproject-groups-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for OpenProject API V3 (Stable) — Groups. One tool per consumed operation, routed inline through
+      this capability's consumes block.
+    tools:
+    - name: list-groups
+      description: List groups
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-groups.listgroups
+      with:
+        sortBy: tools.sortBy
+        select: tools.select
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: create-group
+      description: Create group
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-groups.creategroup
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: delete-group
+      description: Delete group
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: openproject-groups.deletegroup
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: get-group
+      description: Get group
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-groups.getgroup
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: update-group
+      description: Update group
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: openproject-groups.updategroup
+      with:
+        id: tools.id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

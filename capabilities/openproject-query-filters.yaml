@@ -1,0 +1,81 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: OpenProject API V3 (Stable) — Query Filters
+  description: 'OpenProject API V3 (Stable) — Query Filters. 1 operations. Lead operation: View Query Filter. Self-contained
+    Naftiko capability covering one Openproject business surface.'
+  tags:
+  - Openproject
+  - Query Filters
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    OPENPROJECT_API_KEY: OPENPROJECT_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: openproject-query-filters
+    baseUri: https://qa.openproject-edge.com
+    description: OpenProject API V3 (Stable) — Query Filters business capability. Self-contained, no shared references.
+    resources:
+    - name: api-v3-queries-filters-id
+      path: /api/v3/queries/filters/{id}
+      operations:
+      - name: viewqueryfilter
+        method: GET
+        description: View Query Filter
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: string
+          description: QueryFilter identifier
+          required: true
+    authentication:
+      type: basic
+      username: '{{env.OPENPROJECT_USER}}'
+      password: '{{env.OPENPROJECT_PASS}}'
+  exposes:
+  - type: rest
+    namespace: openproject-query-filters-rest
+    port: 8080
+    description: REST adapter for OpenProject API V3 (Stable) — Query Filters. One Spectral-compliant resource per consumed
+      operation, prefixed with /v1.
+    resources:
+    - path: /v1/api/v3/queries/filters/{id}
+      name: api-v3-queries-filters-id
+      description: REST surface for api-v3-queries-filters-id.
+      operations:
+      - method: GET
+        name: viewqueryfilter
+        description: View Query Filter
+        call: openproject-query-filters.viewqueryfilter
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: openproject-query-filters-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for OpenProject API V3 (Stable) — Query Filters. One tool per consumed operation, routed inline
+      through this capability's consumes block.
+    tools:
+    - name: view-query-filter
+      description: View Query Filter
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-query-filters.viewqueryfilter
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.

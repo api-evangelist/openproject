@@ -1,0 +1,239 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: OpenProject API V3 (Stable) — Reminders
+  description: 'OpenProject API V3 (Stable) — Reminders. 5 operations. Lead operation: List all active reminders. Self-contained
+    Naftiko capability covering one Openproject business surface.'
+  tags:
+  - Openproject
+  - Reminders
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    OPENPROJECT_API_KEY: OPENPROJECT_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: openproject-reminders
+    baseUri: https://qa.openproject-edge.com
+    description: OpenProject API V3 (Stable) — Reminders business capability. Self-contained, no shared references.
+    resources:
+    - name: api-v3-reminders
+      path: /api/v3/reminders
+      operations:
+      - name: listreminders
+        method: GET
+        description: List all active reminders
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: api-v3-reminders-id
+      path: /api/v3/reminders/{id}
+      operations:
+      - name: updatereminder
+        method: PATCH
+        description: Update a reminder
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Reminder ID
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+      - name: deletereminder
+        method: DELETE
+        description: Delete a reminder
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: integer
+          description: Reminder ID
+          required: true
+    - name: api-v3-work_packages-work_package_id-reminders
+      path: /api/v3/work_packages/{work_package_id}/reminders
+      operations:
+      - name: listworkpackagereminders
+        method: GET
+        description: List work package reminders
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: work_package_id
+          in: path
+          type: integer
+          description: Work package id
+          required: true
+      - name: createworkpackagereminder
+        method: POST
+        description: Create a work package reminder
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: work_package_id
+          in: path
+          type: integer
+          description: Work package id
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: basic
+      username: '{{env.OPENPROJECT_USER}}'
+      password: '{{env.OPENPROJECT_PASS}}'
+  exposes:
+  - type: rest
+    namespace: openproject-reminders-rest
+    port: 8080
+    description: REST adapter for OpenProject API V3 (Stable) — Reminders. One Spectral-compliant resource per consumed operation,
+      prefixed with /v1.
+    resources:
+    - path: /v1/api/v3/reminders
+      name: api-v3-reminders
+      description: REST surface for api-v3-reminders.
+      operations:
+      - method: GET
+        name: listreminders
+        description: List all active reminders
+        call: openproject-reminders.listreminders
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/reminders/{id}
+      name: api-v3-reminders-id
+      description: REST surface for api-v3-reminders-id.
+      operations:
+      - method: PATCH
+        name: updatereminder
+        description: Update a reminder
+        call: openproject-reminders.updatereminder
+        with:
+          id: rest.id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: DELETE
+        name: deletereminder
+        description: Delete a reminder
+        call: openproject-reminders.deletereminder
+        with:
+          id: rest.id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/api/v3/work-packages/{work-package-id}/reminders
+      name: api-v3-work-packages-work-package-id-reminders
+      description: REST surface for api-v3-work_packages-work_package_id-reminders.
+      operations:
+      - method: GET
+        name: listworkpackagereminders
+        description: List work package reminders
+        call: openproject-reminders.listworkpackagereminders
+        with:
+          work_package_id: rest.work_package_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: createworkpackagereminder
+        description: Create a work package reminder
+        call: openproject-reminders.createworkpackagereminder
+        with:
+          work_package_id: rest.work_package_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: openproject-reminders-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for OpenProject API V3 (Stable) — Reminders. One tool per consumed operation, routed inline through
+      this capability's consumes block.
+    tools:
+    - name: list-all-active-reminders
+      description: List all active reminders
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-reminders.listreminders
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: update-reminder
+      description: Update a reminder
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: openproject-reminders.updatereminder
+      with:
+        id: tools.id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: delete-reminder
+      description: Delete a reminder
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: openproject-reminders.deletereminder
+      with:
+        id: tools.id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-work-package-reminders
+      description: List work package reminders
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: openproject-reminders.listworkpackagereminders
+      with:
+        work_package_id: tools.work_package_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: create-work-package-reminder
+      description: Create a work package reminder
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: openproject-reminders.createworkpackagereminder
+      with:
+        work_package_id: tools.work_package_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
