@@ -44,6 +44,12 @@ apis:
       - Work Packages
       - HAL+JSON
 common:
+  - type: VulnerabilityDisclosure
+    url: security/openproject-vulnerability-disclosure.yml
+  - type: DomainSecurity
+    url: security/openproject-domain-security.yml
+  - type: Authentication
+    url: authentication/openproject-authentication.yml
   - type: LinkedIn
     url: https://www.linkedin.com/company/openproject-gmbh
   - type: Website
@@ -64,6 +70,8 @@ common:
     url: https://www.openproject.org/docs/support/
   - type: Integrations
     url: https://www.openproject.org/integrations/
+  - url: https://www.openproject.org/feed.xml
+    type: Blog
 integrations:
   - name: Nextcloud
   - name: OneDrive/SharePoint
