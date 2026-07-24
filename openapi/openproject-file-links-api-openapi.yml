@@ -1,0 +1,2789 @@
+openapi: 3.1.2
+info:
+  description: "You're looking at the current **stable** documentation of the OpenProject APIv3. If you're interested in the current\ndevelopment version, please go to [github.com/opf](https://github.com/opf/openproject/tree/dev/docs/api/apiv3).\n\n## Introduction\n\nThe documentation for the APIv3 is written according to the [OpenAPI 3.1 Specification](https://swagger.io/specification/).\nYou can either view the static version of this documentation on the [website](https://www.openproject.org/docs/api/introduction/)\nor the interactive version, rendered with [OpenAPI Explorer](https://github.com/Rhosys/openapi-explorer/blob/main/README.md),\nin your OpenProject installation under `/api/docs`.\nIn the latter you can try out the various API endpoints directly interacting with our OpenProject data.\nMoreover you can access the specification source itself under `/api/v3/spec.json` and `/api/v3/spec.yml`\n(e.g. [here](https://community.openproject.org/api/v3/spec.yml)).\n\nThe APIv3 is a hypermedia REST API, a shorthand for \"Hypermedia As The Engine Of Application State\" (HATEOAS).\nThis means that each endpoint of this API will have links to other resources or actions defined in the resulting body.\n\nThese related resources and actions for any given resource will be context sensitive. For example, only actions that the\nauthenticated user can take are being rendered. This can be used to dynamically identify actions that the user might take for any\ngiven response.\n\nAs an example, if you fetch a work package through the [Work Package endpoint](https://www.openproject.org/docs/api/endpoints/work-packages/), the `update` link will only\nbe present when the user you authenticated has been granted a permission to update the work package in the assigned project.\n\n## HAL+JSON\n\nHAL is a simple format that gives a consistent and easy way to hyperlink between resources in your API.\nRead more in the following specification: [https://tools.ietf.org/html/draft-kelly-json-hal-08](https://tools.ietf.org/html/draft-kelly-json-hal-08)\n\n**OpenProject API implementation of HAL+JSON format** enriches JSON and introduces a few meta properties:\n\n- `_type` - specifies the type of the resource (e.g.: WorkPackage, Project)\n- `_links` - contains all related resource and action links available for the resource\n- `_embedded` - contains all embedded objects\n\nHAL does not guarantee that embedded resources are embedded in their full representation, they might as well be\npartially represented (e.g. some properties can be left out).\nHowever in this API you have the guarantee that whenever a resource is **embedded**, it is embedded in its **full representation**.\n\n## API response structure\n\nAll API responses contain a single HAL+JSON object, even collections of objects are technically represented by\na single HAL+JSON object that itself contains its members. More details on collections can be found\nin the [Collections Section](https://www.openproject.org/docs/api/collections/).\n\n## Authentication\n\nThe API supports the following authentication schemes:\n\n* Session-based authentication\n* API tokens\n    * passed as Bearer token\n    * passed via Basic auth\n* OAuth 2.0\n    * using built-in authorization server\n    * using an external authorization server (RFC 9068)\n\nDepending on the settings of the OpenProject instance many resources can be accessed without being authenticated.\nIn case the instance requires authentication on all requests the client will receive an **HTTP 401** status code\nin response to any request.\n\nOtherwise unauthenticated clients have all the permissions of the anonymous user.\n\n### Session-based authentication\n\nThis means you have to login to OpenProject via the Web-Interface to be authenticated in the API.\nThis method is well-suited for clients acting within the browser, like the Angular-Client built into OpenProject.\n\nIn this case, you always need to pass the HTTP header `X-Requested-With \"XMLHttpRequest\"` for authentication.\n\n### API token as bearer token\n\nUsers can authenticate towards the API v3 using an API token as a bearer token.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -H \"Authorization: Bearer $API_KEY\" https://community.openproject.org/api/v3/users/42\n```\n\nUsers can generate API tokens on their account page.\n\n### API token through Basic Auth\n\nAPI tokens can also be used with basic auth, using the user name `apikey` (NOT your login) and the API token as the password.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -u apikey:$API_KEY https://community.openproject.org/api/v3/users/42\n```\n\n### OAuth 2.0 authentication\n\nOpenProject allows authentication and authorization with OAuth2 with *Authorization code flow*, as well as *Client credentials* operation modes.\n\nTo get started, you first need to register an application in the OpenProject OAuth administration section of your installation.\nThis will save an entry for your application with a client unique identifier (`client_id`) and an accompanying secret key (`client_secret`).\n\nYou can then use one the following guides to perform the supported OAuth 2.0 flows:\n\n- [Authorization code flow](https://oauth.net/2/grant-types/authorization-code)\n\n- [Authorization code flow with PKCE](https://doorkeeper.gitbook.io/guides/ruby-on-rails/pkce-flow), recommended for clients unable to keep the client_secret confidential\n\n- [Client credentials](https://oauth.net/2/grant-types/client-credentials/) - Requires an application to be bound to an impersonating user for non-public access\n\n### OAuth 2.0 using an external authorization server\n\nThere is a possibility to use JSON Web Tokens (JWT) generated by an OIDC provider configured in OpenProject as a bearer token to do authenticated requests against the API.\nThe following requirements must be met:\n\n- OIDC provider must be configured in OpenProject with **jwks_uri**\n- JWT must be signed using RSA algorithm\n- JWT **iss** claim must be equal to OIDC provider **issuer**\n- JWT **aud** claim must contain the OpenProject **client ID** used at the OIDC provider\n- JWT **scope** claim must include a valid scope to access the desired API (e.g. `api_v3` for APIv3)\n- JWT must be actual (neither expired or too early to be used)\n- JWT must be passed in Authorization header like: `Authorization: Bearer {jwt}`\n- User from **sub** claim must be linked to OpenProject before (e.g. by logging in), otherwise it will be not authenticated\n\nIn more general terms, OpenProject should be compliant to [RFC 9068](https://www.rfc-editor.org/rfc/rfc9068) when validating access tokens.\n\n### Why not username and password?\n\nThe simplest way to do basic auth would be to use a user's username and password naturally.\nHowever, OpenProject already has supported API keys in the past for the API v2, though not through basic auth.\n\nUsing **username and password** directly would have some advantages:\n\n* It is intuitive for the user who then just has to provide those just as they would when logging into OpenProject.\n\n* No extra logic for token management necessary.\n\nOn the other hand using **API keys** has some advantages too, which is why we went for that:\n\n* If compromised while saved on an insecure client the user only has to regenerate the API key instead of changing their password, too.\n\n* They are naturally long and random which makes them invulnerable to dictionary attacks and harder to crack in general.\n\nMost importantly users may not actually have a password to begin with. Specifically when they have registered\nthrough an OpenID Connect provider.\n\n## Cross-Origin Resource Sharing (CORS)\n\nBy default, the OpenProject API is _not_ responding with any CORS headers.\nIf you want to allow cross-domain AJAX calls against your OpenProject instance, you need to enable CORS headers being returned.\n\nPlease see [our API settings documentation](https://www.openproject.org/docs/system-admin-guide/api-and-webhooks/) on\nhow to selectively enable CORS.\n\n## Allowed HTTP methods\n\n- `GET` - Get a single resource or collection of resources\n\n- `POST` - Create a new resource or perform\n\n- `PATCH` - Update a resource\n\n- `DELETE` - Delete a resource\n\n## Compression\n\nResponses are compressed if requested by the client. Currently [gzip](https://www.gzip.org/) and [deflate](https://tools.ietf.org/html/rfc1951)\nare supported. The client signals the desired compression by setting the [`Accept-Encoding` header](https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3).\nIf no `Accept-Encoding` header is send, `Accept-Encoding: identity` is assumed which will result in the API responding uncompressed."
+  title: OpenProject API V3 (Stable) Actions & Capabilities File Links API
+  version: '3'
+servers:
+- url: https://qa.openproject-edge.com
+  description: Edge QA instance
+- url: https://qa.openproject-stage.com
+  description: Staging instance
+- url: https://community.openproject.org
+  description: Community instance
+security:
+- BasicAuth: []
+tags:
+- name: File Links
+paths:
+  /api/v3/project_storages:
+    get:
+      summary: Gets a list of project storages
+      operationId: list_project_storages
+      tags:
+      - File Links
+      description: Gets a collection of all project storages that meet the provided filters and the user has permission to see them.
+      parameters:
+      - name: filters
+        in: query
+        required: false
+        schema:
+          default: '[]'
+          type: string
+        description: 'JSON specifying filter conditions.
+
+          Accepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)
+
+          endpoint. Currently supported filters are:
+
+
+          - project_id
+
+          - storage_id
+
+          - storage_url'
+        example: '[{ "project_id": { "operator": "=", "values": ["42"] }}, { "storage_id": { "operator": "=", "values": ["1337"] }}]'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ProjectStorageCollectionModel'
+        '400':
+          description: Returned if any given filter is invalid.
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:InvalidQuery
+                message: The query parameter 'filters' is missing or malformed.
+  /api/v3/project_storages/{id}:
+    get:
+      summary: Gets a project storage
+      operationId: get_project_storage
+      tags:
+      - File Links
+      description: 'Gets a project storage resource. This resource contains all data that is applicable on the relation between a
+
+        storage and a project.'
+      parameters:
+      - name: id
+        description: Project storage id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1337
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ProjectStorageModel'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The requested resource could not be found.
+          description: 'Returned if the project storage does not exist or the client does not have sufficient permissions to see it.
+
+
+            **Required permission:** view file links'
+  /api/v3/project_storages/{id}/open:
+    get:
+      summary: Open the project storage
+      operationId: open_project_storage
+      tags:
+      - File Links
+      description: 'Gets a redirect to the location of the project storage''s remote origin. If the project storage has a project
+
+        folder, it is opened at this location. If not, the storage root is opened.'
+      parameters:
+      - name: id
+        description: Project storage id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1337
+      responses:
+        '303':
+          description: Redirect
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:Unauthenticated
+                message: You are not authorized to access this resource.
+          description: Returned if the authorization token of the current user grants no permission to access the remote storage.
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The requested resource could not be found.
+          description: 'Returned if the project storage does not exist or the client does not have sufficient permissions to see it.
+
+
+            **Required permission:** view file links'
+  /api/v3/storages/{id}/open:
+    get:
+      summary: Open the storage
+      operationId: open_storage
+      tags:
+      - File Links
+      description: 'Gets a redirect to the location of the storage''s remote origin. The storage''s files root should be the target
+
+        location.'
+      parameters:
+      - name: id
+        description: Storage id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1337
+      responses:
+        '303':
+          description: Redirect
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The requested resource could not be found.
+          description: 'Returned if the storage does not exist or the client does not have sufficient permissions to see it.
+
+
+            **Required permission:** view file links'
+  /api/v3/file_links/{id}:
+    get:
+      summary: Gets a file link.
+      operationId: view_file_link
+      tags:
+      - File Links
+      description: Gets a single file link resource of a work package.
+      parameters:
+      - name: id
+        description: File link id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 42
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/FileLinkReadModel'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The requested resource could not be found.
+          description: 'Returned if the work package does not exist or the client does not have sufficient permissions to see it.
+
+
+            **Required permission:** view work package, view file links'
+    delete:
+      summary: Removes a file link.
+      operationId: delete_file_link
+      tags:
+      - File Links
+      description: 'Removes a file link on a work package.
+
+
+        The request contains only the file link identifier as a path parameter. No request body is needed.'
+      parameters:
+      - name: id
+        description: File link id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 42
+      responses:
+        '200':
+          description: OK
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** manage file links
+
+
+            *Note that you will only receive this error, if you are at least allowed to see the corresponding work package.*'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The requested resource could not be found.
+          description: 'Returned if the work package or the file link does not exist or the client does not have sufficient permissions
+
+            to see it.
+
+
+            **Required permission:** view work package, view file links'
+  /api/v3/file_links/{id}/open:
+    get:
+      summary: Creates an opening uri of the linked file.
+      operationId: open_file_link
+      tags:
+      - File Links
+      description: 'Creates a uri to open the origin file linked by the given file link. This uri depends on the storage type and
+
+        is always located on the origin storage itself.'
+      parameters:
+      - name: id
+        description: File link id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 42
+      - name: location
+        description: Boolean flag indicating, if the file should be opened directly or rather the directory location.
+        in: query
+        required: false
+        schema:
+          type: boolean
+        example: true
+      responses:
+        '303':
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+          description: 'Returned if the request was successful. In the `Location` header is the uri where the client can open the origin
+
+            file on the storage.'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The requested resource could not be found.
+          description: 'Returned if the work package does not exist or the client does not have sufficient permissions to see it.
+
+
+            **Required permission:** view work package, view file links'
+  /api/v3/file_links/{id}/download:
+    get:
+      summary: Creates a download uri of the linked file.
+      operationId: download_file_link
+      tags:
+      - File Links
+      description: 'Creates a uri to download the origin file linked by the given file link. This uri depends on the storage type and
+
+        is always located on the origin storage itself.'
+      parameters:
+      - name: id
+        description: File link id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 42
+      responses:
+        '303':
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+          description: 'Returned if the request was successful. In the `Location` header is the uri where the client can download the
+
+            origin file from the storage.'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The requested resource could not be found.
+          description: 'Returned if the work package does not exist or the client does not have sufficient permissions to see it.
+
+
+            **Required permission:** view work package, view file links'
+  /api/v3/storages:
+    get:
+      summary: Get Storages
+      operationId: list_storages
+      tags:
+      - File Links
+      description: Returns a collection of storages.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/StorageCollectionModel'
+              examples:
+                Simple storage collection:
+                  $ref: '#/components/examples/StoragesSimpleCollectionModel'
+        '400':
+          description: Returned if the client sends invalid request parameters e.g. filters
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:InvalidQuery
+                message: Filters Invalid filter does not exist.
+    post:
+      summary: Creates a storage.
+      operationId: create_storage
+      tags:
+      - File Links
+      description: 'Creates a storage resource. When creating a storage, a confidential OAuth 2 provider application is created
+
+        automatically. The oauth client id and secret of the created OAuth application are returned in the response.
+
+
+        **IMPORTANT:** This is the only time, the oauth client secret is visible to the consumer. After that, the secret is
+
+        hidden.
+
+
+        To update the storage with OAuth client credentials, which enable the storage resource to behave as an OAuth 2
+
+        client against an external OAuth 2 provider application, another request must be made to create those, see
+
+        `POST /api/v3/storages/{id}/oauth_client_credentials`.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StorageWriteModel'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/StorageReadModel'
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** Depends on the page the grid is defined for.'
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          description: 'Returned if:
+
+
+            * a constraint for a property was violated (`PropertyConstraintViolation`)'
+  /api/v3/storages/{id}:
+    get:
+      summary: Get a storage
+      operationId: get_storage
+      tags:
+      - File Links
+      description: 'Gets a storage resource. As a side effect, a live connection to the storages origin is established to retrieve
+
+        connection state data.'
+      parameters:
+      - name: id
+        description: Storage id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1337
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/StorageReadModel'
+              examples:
+                Nextcloud storage:
+                  $ref: '#/components/examples/StorageNextcloudResponse'
+                Freshly created Nextcloud storage:
+                  $ref: '#/components/examples/StorageNextcloudResponseForCreation'
+                OneDrive storage:
+                  $ref: '#/components/examples/StorageOneDriveResponse'
+                Incomplete OneDrive storage:
+                  $ref: '#/components/examples/StorageOneDriveIncompleteResponse'
+                Unauthorized Nextcloud storage:
+                  $ref: '#/components/examples/StorageNextcloudUnauthorizedResponse'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The requested resource could not be found.
+          description: 'Returned if the storage does not exist or the client does not have sufficient permissions to see it.
+
+
+            **Required permission:** view file links'
+    patch:
+      summary: Update a storage
+      operationId: update_storage
+      tags:
+      - File Links
+      description: 'Updates a storage resource. Only data that is not generated by the server can be updated. This excludes the OAuth 2
+
+        application data.'
+      parameters:
+      - name: id
+        description: Storage id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1337
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StorageWriteModel'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/StorageReadModel'
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** admin'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The requested resource could not be found.
+          description: 'Returned if the storage does not exist or the client does not have sufficient permissions to see it.
+
+
+            **Required permission:** view file links'
+    delete:
+      summary: Delete a storage
+      operationId: delete_storage
+      tags:
+      - File Links
+      description: 'Deletes a storage resource. This also deletes all related records, like the created oauth application, client, and
+
+        any file links created within this storage.'
+      parameters:
+      - name: id
+        description: Storage id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1337
+      responses:
+        '204':
+          description: No content
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** admin'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The requested resource could not be found.
+          description: 'Returned if the storage does not exist or the client does not have sufficient permissions to see it.
+
+
+            **Required permission:** view file links'
+  /api/v3/storages/{id}/files:
+    get:
+      summary: Gets files of a storage.
+      operationId: get_storage_files
+      tags:
+      - File Links
+      description: 'Gets a collection of files from a storage.
+
+
+        If no `parent` context is given, the result is the content of the document root. With `parent` context given, the
+
+        result contains the collections of files/directories from within the given parent file id.
+
+
+        If given `parent` context is no directory, `400 Bad Request` is returned.'
+      parameters:
+      - name: id
+        description: Storage id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1337
+      - name: parent
+        description: Parent file identification
+        in: query
+        required: false
+        schema:
+          type: string
+        example: /my/data
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/StorageFilesModel'
+        '400':
+          description: Returned if the given parent parameter value does not refer to a directory.
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:InvalidQuery
+                message: The given parent is not a directory.
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The requested resource could not be found.
+          description: "Returned in either of those cases:\n- if the storage does not exist or the client does not have sufficient permissions to see it\n\n  **Required permission:** view file links\n- if the document root file identification does not exist on the storage"
+  /api/v3/storages/{id}/files/prepare_upload:
+    post:
+      summary: Preparation of a direct upload of a file to the given storage.
+      operationId: prepare_storage_file_upload
+      tags:
+      - File Links
+      description: 'Executes a request that prepares a link for a direct upload to the storage.
+
+
+        The background here is, that the client needs to make a direct request to the storage instance for file uploading,
+
+        but should not get access to the credentials, which are stored in the backend. The response contains a link object,
+
+        that enables the client to execute a file upload without the real credentials.'
+      parameters:
+      - name: id
+        description: Storage id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1337
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StorageFileUploadPreparationModel'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/StorageFileUploadLinkModel'
+        '400':
+          description: Returned if the given parent parameter value does not refer to a directory.
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:InvalidQuery
+                message: The given parent is not a directory.
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** manage file links'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The requested resource could not be found.
+          description: 'Returned if the storage does not exist or the client does not have sufficient permissions to see it.
+
+
+            **Required permission:** view file links'
+        '500':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                outbound request failed:
+                  description: 'This error is returned, if the outbound request to the file storage failed with a 404, e.g. if the
+
+                    upload location is not available.'
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:OutboundRequest:NotFound
+                    message: An outbound request to another resource has failed with status code 404.
+                enterprise token missing:
+                  description: 'This error is returned, if there is no Enterprise token available. The file upload to that storage is
+
+                    only available in an Enterprise edition.'
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingEnterpriseToken
+                    message: The request cannot be handled due to invalid or missing Enterprise token.
+          description: Returned if the outbound request to the storage has failed with any reason.
+  /api/v3/storages/{id}/folders:
+    post:
+      summary: Creation of a new folder
+      operationId: create_storage_folder
+      tags:
+      - File Links
+      description: Creates a new folder under the given parent
+      parameters:
+      - name: id
+        description: Storage id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1337
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StorageFolderWriteModel'
+            examples:
+              Valid example:
+                $ref: '#/components/examples/StorageCreateFolderRequestBody'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/StorageFileModel'
+        '400':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:InvalidQuery
+                message: The given parent is not a directory.
+          description: Returned if the request is missing a required parameter.
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** manage file links'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The requested resource could not be found.
+          description: 'Returned if the storage does not exist or the client does not have sufficient permissions to see it.
+
+
+            **Required permission:** view file links'
+  /api/v3/storages/{id}/oauth_client_credentials:
+    post:
+      summary: Creates an oauth client credentials object for a storage.
+      operationId: create_storage_oauth_credentials
+      tags:
+      - File Links
+      description: 'Inserts the OAuth 2 credentials into the storage, to allow the storage to act as an OAuth 2 client. Calling this
+
+        endpoint on a storage that already contains OAuth 2 client credentials will replace them.'
+      parameters:
+      - name: id
+        description: Storage id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1337
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OAuthClientCredentialsWriteModel'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/StorageReadModel'
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** admin'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The requested resource could not be found.
+          description: 'Returned if the storage does not exist or the client does not have sufficient permissions to see it.
+
+
+            **Required permission:** view file links'
+  /api/v3/work_packages/{id}/file_links:
+    post:
+      summary: Creates file links.
+      operationId: create_work_package_file_link
+      tags:
+      - File Links
+      description: 'Creates file links on a work package.
+
+
+        The request is interpreted as a bulk insert, where every element of the collection is validated separately. Each
+
+        element contains the origin meta data and a link to the storage, the file link is about to point to. The storage
+
+        link can be provided as a resource link with id or as the host url.
+
+
+        The file''s id and name are considered mandatory information. The rest of the origin meta data SHOULD be provided
+
+        by the client. The _mimeType_ SHOULD be a standard mime type. An empty mime type will be handled as unknown. To link
+
+        a folder, the custom mime type `application/x-op-directory` MUST be used.
+
+
+        Up to 20 file links can be submitted at once.
+
+
+        If any element data is invalid, no file links will be created.
+
+
+        If a file link with matching origin id, work package, and storage already exists, then it will not create an
+
+        additional file link or update the meta data. Instead the information from the existing file link will be returned.'
+      parameters:
+      - name: id
+        description: Work package id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1337
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileLinkCollectionWriteModel'
+            example:
+              _type: Collection
+              _embedded:
+                elements:
+                - originData:
+                    id: 5503
+                    name: logo.png
+                    mimeType: image/png
+                    size: 433765
+                    createdAt: '2021-12-19T09:42:10.170Z'
+                    lastModifiedAt: '2021-12-20T14:00:13.987Z'
+                    createdByName: Luke Skywalker
+                    lastModifiedByName: Anakin Skywalker
+                  _links:
+                    storageUrl:
+                      href: https://nextcloud.deathstar.rocks/
+      responses:
+        '201':
+          description: Created
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/FileLinkCollectionReadModel'
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** manage file links
+
+
+            *Note that you will only receive this error, if you are at least allowed to see the corresponding work package.*'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The requested resource could not be found.
+          description: 'Returned if the work package does not exist or the client does not have sufficient permissions to see it.
+
+
+            **Required permission:** view work package, view file links'
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+                message: The request was invalid. File Link logo.png - Storage was invalid.
+          description: 'Occurs if the request body was correctly formatted, but some properties lead to errors in the validation
+
+            process. This happens e.g. if the provided storage url is not available on the server.'
+    get:
+      summary: Gets all file links of a work package
+      operationId: list_work_package_file_links
+      tags:
+      - File Links
+      description: 'Gets all file links of a work package.
+
+
+        As a side effect, for every file link a request is sent to the storage''s origin to fetch live data and patch
+
+        the file link''s data before returning, as well as retrieving permissions of the user on this origin file. '
+      parameters:
+      - name: id
+        description: Work package id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1337
+      - name: filters
+        in: query
+        description: 'JSON specifying filter conditions.
+
+          Accepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)
+
+          endpoint. The following filters are supported:
+
+
+          - storage'
+        required: false
+        example: '[{"storage":{"operator":"=","values":["42"]}}]'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/FileLinkCollectionReadModel'
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** view file links
+
+
+            *Note that you will only receive this error, if you are at least allowed to see the corresponding work package.*'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The requested resource could not be found.
+          description: 'Returned if the work package does not exist or the client does not have sufficient permissions to see it.
+
+
+            **Required permission:** view work package'
+components:
+  schemas:
+    CollectionModel:
+      type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
+    FileLinkCollectionWriteModel:
+      type: object
+      required:
+      - _embedded
+      properties:
+        _embedded:
+          type: object
+          required:
+          - elements
+          properties:
+            elements:
+              type: array
+              items:
+                $ref: '#/components/schemas/FileLinkWriteModel'
+      example:
+        _embedded:
+          elements:
+          - originData:
+              id: '5503'
+              name: logo.png
+              mimeType: image/png
+              size: 16042
+              createdAt: '2021-12-19T09:42:10.170Z'
+              lastModifiedAt: '2021-12-20T14:00:13.987Z'
+              createdByName: Luke Skywalker
+              lastModifiedByName: Anakin Skywalker
+            _links:
+              storage:
+                href: /api/v3/storage/42
+    FileLinkReadModel:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: File link id
+        _type:
+          type: string
+          enum:
+          - FileLink
+        createdAt:
+          type: string
+          format: date-time
+          description: Time of creation
+        updatedAt:
+          type: string
+          format: date-time
+          description: Time of the most recent change to the file link
+        originData:
+          $ref: '#/components/schemas/FileLinkOriginDataModel'
+        _embedded:
+          type: object
+          required:
+          - storage
+          - container
+          properties:
+            storage:
+              $ref: '#/components/schemas/StorageReadModel'
+        _links:
+          type: object
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This file link.
+
+
+                  **Resource**: FileLink'
+            storage:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The storage resource of the linked file.
+
+
+                  **Resource**: Storage'
+            container:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The container the origin file is linked to.
+
+
+                  Can be one of the following **Resources**:
+
+
+                  - WorkPackage'
+            creator:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The creator of the file link.
+
+
+                  **Resource**: User'
+            delete:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The uri to delete the file link.
+
+
+                  **Resource**: N/A'
+            status:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The urn of the user specific file link status on its storage. Can be one of:
+
+
+                  - urn:openproject-org:api:v3:file-links:permission:ViewAllowed
+
+                  - urn:openproject-org:api:v3:file-links:permission:ViewNotAllowed
+
+                  - urn:openproject-org:api:v3:file-links:NotFound
+
+                  - urn:openproject-org:api:v3:file-links:Error
+
+
+                  **Resource**: N/A'
+            originOpen:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The uri to open the origin file on the origin itself.
+
+
+                  **Resource**: N/A'
+            staticOriginOpen:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'A static uri to open the origin file on the storage. Responds with a redirect.
+
+
+                  **Resource**: N/A'
+            originOpenLocation:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The uri to open the location of origin file on the origin itself.
+
+
+                  **Resource**: N/A'
+            staticOriginOpenLocation:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'A static uri to open the location of the origin file on the storage. Responds with a redirect.
+
+
+                  **Resource**: N/A'
+            staticOriginDownload:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'A static uri to generate a new download URL from the storage. Responds with a redirect.
+
+
+                  **Resource**: N/A'
+      example:
+        id: 1337
+        _type: FileLink
+        createdAt: '2021-12-20T13:37:00.211Z'
+        updatedAt: '2021-12-20T13:37:00.211Z'
+        originData:
+          id: '5503'
+          name: logo.png
+          mimeType: image/png
+          size: 16042
+          createdAt: '2021-12-19T09:42:10.170Z'
+          lastModifiedAt: '2021-12-20T14:00:13.987Z'
+          createdByName: Luke Skywalker
+          lastModifiedByName: Anakin Skywalker
+        _embedded:
+          storage:
+            id: 1337
+            _type: Storage
+            name: It's no moon
+            createdAt: '2021-12-20T13:37:00.211Z'
+            updatedAt: '2021-12-20T13:37:00.211Z'
+            _links:
+              self:
+                href: /api/v3/storages/1337
+                title: It's no moon
+              type:
+                href: urn:openproject-org:api:v3:storages:nextcloud
+                title: Nextcloud
+              origin:
+                href: https://nextcloud.deathstar.rocks/
+              open:
+                href: https://example.com/a-link-to-open-the-file
+              authorizationState:
+                href: urn:openproject-org:api:v3:storages:authorization:Connected
+          container:
+            _hint: Work package resource shortened for brevity
+            _type: WorkPackage
+            id: 1528
+            subject: Develop API
+        _links:
+          self:
+            href: /api/v3/work_package/17/file_links/1337
+          storage:
+            href: /api/v3/storage/42
+            title: It's no moon
+          container:
+            href: /api/v3/work_package/17
+            title: Develop API
+          creator:
+            href: /api/v3/users/33
+            title: Obi-Wan Kenobi
+          delete:
+            href: /api/v3/work_package/17/file_links/1337
+          status:
+            href: urn:openproject-org:api:v3:file-links:permission:ViewAllowed
+            title: View allowed
+          originOpen:
+            href: https://nextcloud.deathstar.rocks/index.php/f/5503?openfile=1
+          staticOriginOpen:
+            href: /api/v3/file_links/1337/open
+          originOpenLocation:
+            href: https://nextcloud.deathstar.rocks/index.php/f/5503?openfile=0
+          staticOriginOpenLocation:
+            href: /api/v3/file_links/1337/open?location=true
+          staticOriginDownload:
+            href: /api/v3/file_links/1337/download
+    ProjectStorageModel:
+      type: object
+      required:
+      - _type
+      - id
+      - projectFolderMode
+      - createdAt
+      - updatedAt
+      properties:
+        _type:
+          type: string
+          enum:
+          - ProjectStorage
+        id:
+          type: integer
+          description: The project storage's id
+          minimum: 1
+        projectFolderMode:
+          type: string
+          enum:
+          - inactive
+          - manual
+        createdAt:
+          type: string
+          format: date-time
+          description: Time of creation
+        updatedAt:
+          type: string
+          format: date-time
+          description: Time of the most recent change to the project storage
+        _links:
+          type: object
+          required:
+          - self
+          - creator
+          - storage
+          - project
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This project storage.
+
+
+                  **Resource**: ProjectStorage'
+            creator:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The user who created the project storage.
+
+
+                  **Resource**: User'
+            storage:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The storage resource, that is linked to a project with this project storage.
+
+
+                  **Resource**: Storage'
+            project:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The project resource, that is linked to a storage with this project storage.
+
+
+                  **Resource**: Project'
+            projectFolder:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The directory on the storage that is used as a project folder.
+
+
+                  **Resource**: StorageFile
+
+
+                  # Conditions
+
+
+                  Only provided, if the `projectFolderMode` is `manual` or `automatic`.'
+            open:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'A link to OpenProject strorage.
+
+
+                  # Conditions
+
+
+                  If the storage has not been configured(oauth client is missing, for instance), then the link is null.'
+            openWithConnectionEnsured:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'A link to OpenProject storage with making sure user has access to it.
+
+
+                  **Deprecated:** Use `open` instead, which returns a link that will ensure the user''s connection to the storage
+
+                  as well, but properly works for all kinds of storage configurations.'
+      example:
+        _type: ProjectStorage
+        id: 1337
+        projectFolderMode: manual
+        createdAt: '2023-01-20T14:30:00.368Z'
+        updatedAt: '2023-05-23T11:57:48.618Z'
+        _links:
+          self:
+            href: /api/v3/project_storages/23
+          projectFolder:
+            href: /api/v3/storages/81/files/30
+          creator:
+            title: Darth Vader
+            href: /api/v3/users/3
+          project:
+            title: Death Star 3.0
+            href: /api/v3/projects/11
+          storage:
+            title: Palpatine's Data Vault
+            href: /api/v3/storages/81
+          open:
+            href: /api/v3/storages/81/open
+          openWithConnectionEnsured:
+            href: /api/v3/storages/81/open
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
+    StorageReadModel:
+      type: object
+      required:
+      - id
+      - _type
+      - name
+      - _links
+      properties:
+        id:
+          type: integer
+          description: Storage id
+        _type:
+          type: string
+          enum:
+          - Storage
+        name:
+          type: string
+          description: Storage name
+        storageAudience:
+          type: string
+          description: 'The audience that the storage expects in tokens for requests to it,
+
+            usually the storage''s client ID at the identity provider.
+
+
+            This is only required for authentication through single-sign-on and so far
+
+            only supported for provider type Nextcloud.'
+        tokenExchangeScope:
+          type: string
+          description: 'The scope that will be requested when requesting a token for the storage through token exchange. Has no effect if no
+
+            token exchange is performed.
+
+
+            This is only required for authentication through single-sign-on and so far only supported for provider type Nextcloud.'
+        tenantId:
+          type:
+          - string
+          - 'null'
+          description: 'The tenant id of a file storage of type OneDrive.
+
+
+            Ignored if the provider type is not OneDrive. May be null if the storage is not configured completely.'
+        driveId:
+          type:
+          - string
+          - 'null'
+          description: 'The drive id of a file storage of type OneDrive.
+
+
+            Ignored if the provider type is not OneDrive. May be null if the storage is not configured completely.'
+        hasApplicationPassword:
+          type: boolean
+          description: 'Whether the storage has the application password to use for the Nextcloud storage.
+
+
+            Ignored if the provider type is not Nextcloud.'
+        forbiddenFileNameCharacters:
+          type: string
+          description: 'A string with all the characters forbidden to be used for file and folder names in the storage. Used by OpenProject to avoid
+
+            creating files with unsupported names (e.g. when creating project folders).
+
+
+            Only supported for provider type Nextcloud so far.'
+        createdAt:
+          type: string
+          format: date-time
+          description: Time of creation
+        updatedAt:
+          type: string
+          format: date-time
+          description: Time of the most recent change to the storage
+        configured:
+          type: boolean
+          description: Indication, if the storage is fully configured
+        _embedded:
+          type: object
+          properties:
+            oauthApplication:
+              $ref: '#/components/schemas/OAuthApplicationReadModel'
+            oauthClientCredentials:
+              $ref: '#/components/schemas/OAuthClientCredentialsReadModel'
+        _links:
+          type: object
+          required:
+          - self
+          - type
+          - open
+          - authorizationState
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This storage resource. Contains the user defined storage name as title.
+
+
+                  **Resource**: Storage'
+            type:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The urn of the storage type. Currently Nextcloud and OneDrive storages are supported.
+
+
+                  - urn:openproject-org:api:v3:storages:Nextcloud
+
+                  - urn:openproject-org:api:v3:storages:OneDrive
+
+
+                  **Resource**: N/A'
+            authenticationMethod:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The urn of the authentication method. Currently only Nextcloud storages support this setting.
+
+
+                  - urn:openproject-org:api:v3:storages:authenticationMethod:TwoWayOAuth2 (default)
+
+                  - urn:openproject-org:api:v3:storages:authenticationMethod:OAuth2SSO
+
+
+                  **Resource**: N/A'
+            origin:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'Web URI of the storage instance. This link is ignored, if the storage is hosted in a cloud and has no own
+
+                  URL, like file storages of type OneDrive.
+
+
+                  **Resource**: N/A'
+            open:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'URI of the file storage location, from where the user usually starts browsing files.
+
+
+                  **Resource**: N/A'
+            authorizationState:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The urn of the storage connection state. Can be one of:
+
+
+                  - urn:openproject-org:api:v3:storages:authorization:Connected
+
+                  - urn:openproject-org:api:v3:storages:authorization:FailedAuthorization
+
+                  - urn:openproject-org:api:v3:storages:authorization:Error
+
+
+                  **Resource**: N/A'
+            authorize:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The link to the starting point of the authorization cycle for a configured storage provider.
+
+
+                  # Conditions
+
+
+                  `authorizationState` is:
+
+
+                  - urn:openproject-org:api:v3:storages:authorization:FailedAuthorization
+
+
+                  **Resource**: N/A'
+            oauthApplication:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The OAuth 2 provider application linked to the storage.
+
+
+                  # Conditions
+
+
+                  - User has role `admin`
+
+
+                  **Resource**: OAuthApplication'
+            oauthClientCredentials:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The OAuth 2 credentials resource linked to the storage.
+
+
+                  # Conditions
+
+
+                  - User has role `admin`
+
+
+                  **Resource**: OAuthClientCredentials'
+    StorageFileUploadLinkModel:
+      type: object
+      required:
+      - _type
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - UploadLink
+        _links:
+          type: object
+          required:
+          - self
+          - destination
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The resource link of the upload link resource.
+
+
+                  As the upload link is a temporal object, and cannot be retrieved again, the
+
+                  self link usually is `urn:openproject-org:api:v3:storages:upload_link:no_link_provided`.
+
+
+                  **Resource**: UploadLink'
+            destination:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The direct upload link.
+
+
+                  **Resource**: N/A'
+    PaginatedCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - pageSize
+        - offset
+        properties:
+          pageSize:
+            type: integer
+            description: Amount of elements that a response will hold.
+            minimum: 0
+          offset:
+            type: integer
+            description: The page number that is requested from paginated collection.
+            minimum: 1
+          _links:
+            type: object
+            required:
+            - jumpTo
+            - changeSize
+            properties:
+              jumpTo:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Templated link to another page offset.
+
+
+                    **Resource**: Collection'
+              changeSize:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Templated link for another page size.
+
+
+                    **Resource**: Collection'
+    OAuthClientCredentialsWriteModel:
+      type: object
+      required:
+      - clientId
+      - clientSecret
+      properties:
+        clientId:
+          type: string
+          description: OAuth 2 client id
+        clientSecret:
+          type: string
+          description: OAuth 2 client secret
+      example:
+        clientId: O5h6WObhMg1Z8IcLHRE3_LMh4jJYmmca2V6OTFSv8DA
+        clientSecret: LSk52mn4jmtSYTgH0NzDj-u2z5LMpT8bsS0BouwJQQw
+    StorageWriteModel:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Storage name, if not provided, falls back to a default.
+        storageAudience:
+          type: string
+          description: 'The audience that the storage expects in tokens for requests to it,
+
+            usually the storage''s client ID at the identity provider.
+
+
+            This is only required for authentication through single-sign-on and so far
+
+            only supported for provider type Nextcloud.'
+        tokenExchangeScope:
+          type: string
+          description: 'The scope that will be requested when requesting a token for the storage through token exchange. Has no effect if no
+
+            token exchange is performed.
+
+
+            This is only required for authentication through single-sign-on and so far only supported for provider type Nextcloud.'
+        applicationPassword:
+          type:
+          - string
+          - 'null'
+          description: 'The application password to use for the Nextcloud storage. Ignored if the provider type is not Nextcloud.
+
+
+            If a string is provided, the password is set and automatic management is enabled for the storage.
+
+            If null is provided, the password is unset and automatic management is disabled for the storage.'
+        forbiddenFileNameCharacters:
+          type: string
+          description: 'A string with all the characters forbidden to be used for file and folder names in the storage. Used by OpenProject to avoid
+
+            creating files with unsupported names (e.g. when creating project folders).
+
+
+            Only supported for provider type Nextcloud so far.'
+        _links:
+          type: object
+          required:
+          - origin
+          - type
+          properties:
+            origin:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The storage''s host URL.
+
+
+                  **Resource**: N/A'
+            type:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The urn of the storage type. Currently Nextcloud and OneDrive storages are supported.
+
+
+                  - urn:openproject-org:api:v3:storages:Nextcloud
+
+                  - urn:openproject-org:api:v3:storages:OneDrive
+
+
+                  **Resource**: N/A'
+            authenticationMethod:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The urn of the authentication method. Currently only Nextcloud storages support this setting.
+
+
+                  - urn:openproject-org:api:v3:storages:authenticationMethod:TwoWayOAuth2 (default)
+
+                  - urn:openproject-org:api:v3:storages:authenticationMethod:OAuth2SSO
+
+
+                  **Resource**: N/A'
+      example:
+        name: Coruscant
+        applicationPassword: qJ_VLNReW@sd-Edz2hyC
+        _links:
+          origin:
+            href: https://nextcloud.deathstar.rocks
+          type:
+            href: urn:openproject-org:api:v3:storages:Nextcloud
+    StorageFilesModel:
+      type: object
+      required:
+      - _type
+      - files
+      - parent
+      - ancestors
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - StorageFiles
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/StorageFileModel'
+          description: List of files provided by the selected storage.
+        parent:
+          allOf:
+          - $ref: '#/components/schemas/StorageFileModel'
+          - description: File of the currently selected parent directory.
+        ancestors:
+          type: array
+          items:
+            $ref: '#/components/schemas/StorageFileModel'
+          description: List of ancestors of the parent directory. Can be empty, if parent directory was root directory.
+        _links:
+          type: object
+          required:
+          - self
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'Not provided
+
+
+                  **Resource**: urn:openproject-org:api:v3:storages:storage_file:no_link_provided'
+      example:
+        _type: StorageFiles
+        files:
+        - id: '42'
+          name: readme.md
+          _type: StorageFile
+          location: /readme.md
+          mimeType: text/markdown
+          size: 4096
+          createdAt: '2021-12-19T09:42:10.170Z'
+          lastModifiedAt: '2021-12-20T14:00:13.987Z'
+          createdByName: Luke Skywalker
+          lastModifiedByName: Anakin Skywalker
+          _links:
+            self:
+              href: urn:openproject-org:api:v3:storages:storage_file:no_link_provided
+        - id: '43'
+          name: readme.pdf
+          _type: StorageFile
+          location: /readme.pdf
+          mimeType: application/pdf
+          size: 2048
+          createdAt: '2021-12-19T09:42:10.170Z'
+          lastModifiedAt: '2021-12-20T14:00:13.987Z'
+          createdByName: Luke Skywalker
+          lastModifiedByName: Anakin Skywalker
+          _links:
+            self:
+              href: urn:openproject-org:api:v3:storages:storage_file:no_link_provided
+        parent:
+          id: '41'
+          name: /
+          _type: StorageFile
+          location: /
+          mimeType: application/x-op-directory
+          size: 6144
+          createdAt: '2021-12-20T09:42:10.170Z'
+          lastModifiedAt: '2021-12-21T14:00:13.987Z'
+          createdByName: Luke Skywalker
+          lastModifiedByName: Anakin Skywalker
+          _links:
+            self:
+              href: urn:openproject-org:api:v3:storages:storage_file:no_link_provided
+        ancestors: []
+        _links:
+          self:
+            href: urn:openproject-org:api:v3:storages:storage_file:no_link_provided
+    OAuthApplicationReadModel:
+      type: object
+      required:
+      - id
+      - _type
+      - name
+      - clientId
+      - confidential
+      - _links
+      properties:
+        id:
+          type: integer
+          minimum: 1
+        _type:
+          type: string
+          enum:
+          - OAuthApplication
+        name:
+          type: string
+          description: The name of the OAuth 2 application
+        clientId:
+          type: string
+          description: OAuth 2 client id
+        clientSecret:
+          type: string
+          description: OAuth 2 client secret. This is only returned when creating a new OAuth application.
+        confidential:
+          type: boolean
+          description: true, if OAuth 2 credentials are confidential, false, if no secret is stored
+        createdAt:
+          type: string
+          format: date-time
+          description: The time the OAuth 2 Application was created at
+        updatedAt:
+          type: string
+          format: date-time
+          description: The time the OAuth 2 Application was last updated
+        scopes:
+          type: array
+          description: An array of the scopes of the OAuth 2 Application
+          items:
+            type: string
+        _links:
+          type: object
+          required:
+          - self
+          - owner
+          - redirectUri
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This OAuth application
+
+
+                  **Resource**: OAuthApplication'
+            owner:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The user that created the OAuth application.
+
+
+                  **Resource**: User'
+            integration:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The resource that integrates this OAuth application into itself. Currently, only `Storage` resources are
+
+                  able to create and maintain own OAuth application.
+
+
+                  **Resource**: Storage'
+            redirectUri:
+              type: array
+              items:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'A redirect URI of the OAuth application
+
+
+                    **Resource**: N/A'
+      example:
+        id: 1337
+        _type: OAuthApplication
+        name: Vader's secure OAuth app
+        clientId: O5h6WObhMg1Z8IcLHRE3_LMh4jJYmmca2V6OTFSv8DA
+        confidential: true
+        createdAt: '2022-12-07T12:56:42.626Z'
+        updatedAt: '2022-12-07T12:56:42.626Z'
+        scopes:
+        - api_v3
+        _links:
+          self:
+            href: /api/v3/oauth_applications/1337
+          owner:
+            href: /api/v3/users/13
+            title: Darth Vader
+          integration:
+            href: /api/v3/storages/42
+            title: Death Star Cloud
+          redirectUri:
+          - href: https://death-star.cloud.tools/index.php/apps/integration_openproject/oauth-redirect
+    FileLinkOriginDataModel:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: string
+          description: Linked file's id on the origin
+        name:
+          type: string
+          description: Linked file's name on the origin
+        mimeType:
+          type: string
+          minLength: 0
+          description: 'MIME type of the linked file.
+
+
+            To link a folder entity, the custom MIME type `application/x-op-directory` MUST be provided. Otherwise it defaults back to
+
+            an unknown MIME type.'
+        size:
+          type: integer
+          minimum: 0
+          description: file size on origin in bytes
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp of the creation datetime of the file on the origin
+        lastModifiedAt:
+          type: string
+          format: date-time
+          description: Timestamp of the datetime of the last modification of the file on the origin
+        createdByName:
+          type: string
+          description: Display name of the author that created the file on the origin
+        lastModifiedByName:
+          type: string
+          description: Display name of the author that modified the file on the origin last
+    OAuthClientCredentialsReadModel:
+      type: object
+      required:
+      - id
+      - _type
+      - clientId
+      - confidential
+      - _links
+      properties:
+        id:
+          type: integer
+          minimum: 1
+        _type:
+          type: string
+          enum:
+          - OAuthClientCredentials
+        clientId:
+          type: string
+          description: OAuth 2 client id
+        confidential:
+          type: boolean
+          description: true, if OAuth 2 credentials are confidential, false, if no secret is stored
+        createdAt:
+          type: string
+          format: date-time
+          description: The time the OAuth client credentials were created at
+        updatedAt:
+          type: string
+          format: date-time
+          description: The time the OAuth client credentials were last updated
+        _links:
+          type: object
+          required:
+          - self
+          - integration
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This OAuth Client Credentials object
+
+
+                  **Resource**: OAuthClientCredentials'
+            integration:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The resource that integrates this OAuth client credentials. Currently, only `Storage` resources are
+
+                  able to contain OAuth client credentials.
+
+
+                  **Resource**: Storage'
+      example:
+        id: 1337
+        _type: OAuthClientCredentials
+        clientId: O5h6WObhMg1Z8IcLHRE3_LMh4jJYmmca2V6OTFSv8DA
+        confidential: true
+        createdAt: '2022-12-07T12:56:42.836Z'
+        updatedAt: '2022-12-07T12:56:42.836Z'
+        _links:
+          self:
+            href: /api/v3/oauth_client_credentials/1337
+          integration:
+            href: /api/v3/storages/42
+            title: Death Star Cloud
+    ProjectStorageCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This file links collection
+
+
+                    **Resource**: ProjectStorageCollectionModel'
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectStorageModel'
+      example:
+        _type: Collection
+        total: 2
+        count: 2
+        _links:
+          self:
+            href: /api/v3/project_storages?filters=%5B%7B%22storage%22%3A%7B%22operator%22%3A%22%3D%22%2C%22values%22%3A%5B%2281%22%5D%7D%7D%5D
+        _embedded:
+          elements:
+          - id: 1337
+            _type: ProjectStorage
+            _abbreviated: project storage resource shortened for brevity
+          - id: 1338
+            _type: ProjectStorage
+            _abbreviated: File Link resource shortened for brevity
+    FileLinkCollectionReadModel:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedCollectionModel'
+      - type: object
+        properties:
+          _links:
+            type: object
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This file links collection
+
+
+                    **Resource**: FileLinkCollectionReadModel'
+          _embedded:
+            type: object
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FileLinkReadModel'
+      example:
+        _type: Collection
+        total: 2
+        count: 2
+        pageSize: 30
+        offset: 1
+        _links:
+          self:
+            href: /api/v3/work_packages/42/file_links
+          jumpTo:
+            href: /api/v3/work_packages/42/file_links?offset=%7Boffset%7D&pageSize=30
+            templated: true
+          changeSize:
+            href: /api/v3/work_packages/42/file_links?offset=1&pageSize=%7Bsize%7D
+            templated: true
+        _embedded:
+          elements:
+          - id: 1337
+            _type: FileLink
+            createdAt: '2021-12-20T13:37:00.211Z'
+            updatedAt: '2021-12-20T13:37:00.211Z'
+            originData:
+              id: '5503'
+              name: logo.png
+              mimeType: image/png
+              size: 16042
+              createdAt: '2021-12-19T09:42:10.170Z'
+              lastModifiedAt: '2021-12-20T14:00:13.987Z'
+              createdByName: Luke Skywalker
+              lastModifiedByName: Anakin Skywalker
+            _links:
+              self:
+                href: /api/v3/work_package/17/file_links/1337
+                title: file link
+              storage:
+                href: /api/v3/storage/42
+                title: storage
+              container:
+                href: /api/v3/work_package/17
+                title: work package
+              creator:
+                href: /api/v3/users/33
+                title: Obi-Wan Kenobi
+              delete:
+                href: /api/v3/work_package/17/file_links/1337
+                method: delete
+              originOpen:
+                href: https://nextcloud.deathstar.rocks/index.php/f?fileid=5503
+              staticOriginOpen:
+                href: /api/v3/work_package/17/file_links/1337/open
+          - _hint: File Link resource shortened for brevity
+            id: 1338
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    FileLinkWriteModel:
+      type: object
+      required:
+      - originData
+      - _links
+      properties:
+        originData:
+          $ref: '#/components/schemas/FileLinkOriginDataModel'
+        _links:
+          oneOf:
+          - type: object
+            required:
+            - storage
+            properties:
+              storage:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The storage resource of the linked file.
+
+
+                    **Resource**: Storage'
+          - type: object
+            required:
+            - storageUrl
+            properties:
+              storageUrl:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The storage url the file link references to.
+
+
+                    **Resource**: N/A'
+      example:
+        originData:
+          id: '5503'
+          name: logo.png
+          mimeType: image/png
+          size: 16042
+          createdAt: '2021-12-19T09:42:10.170Z'
+          lastModifiedAt: '2021-12-20T14:00:13.987Z'
+          createdByName: Luke Skywalker
+          lastModifiedByName: Anakin Skywalker
+        _links:
+          storageUrl:
+            href: https://nextcloud.my-deathstar.org
+    StorageFileModel:
+      allOf:
+      - $ref: '#/components/schemas/FileLinkOriginDataModel'
+      - type: object
+        required:
+        - _type
+        - location
+        - _links
+        properties:
+          _type:
+            type: string
+            enum:
+            - StorageFile
+          location:
+            type: string
+            description: Location identification for file in storage
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Not provided
+
+
+                    **Resource**: urn:openproject-org:api:v3:storages:storage_file:no_link_provided'
+      example:
+        id: '42'
+        name: readme.md
+        _type: StorageFile
+        location: /readme.md
+        _links:
+          self:
+            href: urn:openproject-org:api:v3:storages:storage_file:no_link_provided
+    StorageFolderWriteModel:
+      type: object
+      required:
+      - name
+      - parentId
+      properties:
+        name:
+          type: string
+          description: Name of the folder to be created
+        parentId:
+          type: string
+          description: Unique identifier of the parent folder in which the new folder should be created in
+    StorageFileUploadPreparationModel:
+      type: object
+      required:
+      - projectId
+      - fileName
+      - parent
+      properties:
+        projectId:
+          type: integer
+          description: The project identifier, from where a user starts uploading a file.
+          minimum: 1
+        fileName:
+          type: string
+          description: The file name.
+        parent:
+          type: string
+          description: 'The directory to which the file is to be uploaded. For root directories, the value `/` must
+
+            be provided.'
+    StorageCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This storage collection
+
+
+                    **Resource**: StorageCollectionReadModel'
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StorageReadModel'
+  examples:
+    StorageCreateFolderRequestBody:
+      description: A valid request body to create a new folder on a external storage
+      value:
+        name: Uploads
+        parentId: '200'
+    StorageNextcloudResponseForCreation:
+      value:
+        _type: Storage
+        id: 1337
+        name: My New DeathStar
+        hasApplicationPassword: false
+        createdAt: '2024-05-21T09:11:53.880Z'
+        updatedAt: '2024-05-21T09:11:53.880Z'
+        configured: false
+        _embedded:
+          oauthApplication:
+            id: 42
+            _type: OAuthApplication
+            name: My New DeathStar (Nextcloud)
+            clientId: gNQ-gi3VX59ruoft5B9aRmukEYbZOhKIsxXE9iT1tcQ
+            confidential: true
+            clientSecret: 79hIlb1Ezj5kPx8LgE6LI9L1-mb8g7jX1-u_a08RJlI
+            createdAt: '2024-05-21T09:11:53.908Z'
+            updatedAt: '2024-05-21T09:11:53.908Z'
+            scopes:
+            - api_v3
+            _links:
+              self:
+                href: /api/v3/oauth_applications/42
+              owner:
+                href: /api/v3/users/13
+                title: Darth Vader
+              integration:
+                href: /api/v3/storages/1337
+                title: My New DeathStar
+              redirectUri:
+              - href: https://nextcloud.deathstar.rocks/index.php/apps/integration_openproject/oauth-redirect
+        _links:
+          self:
+            href: /api/v3/storages/1337
+            title: My New DeathStar
+          type:
+            href: urn:openproject-org:api:v3:storages:Nextcloud
+            title: Nextcloud
+          origin:
+            href: https://nextcloud.deathstar.rocks/
+          open:
+            href: /api/v3/storages/1337/open
+          prepareUpload: []
+          authorizationState:
+            href: urn:openproject-org:api:v3:storages:authorization:FailedAuthorization
+            title: Authorization failed
+          projectStorages:
+            href: /api/v3/project_storages?filters=[{"storageId":{"operator":"=","values":["1337"]}}]
+          oauthApplication:
+            href: /api/v3/oauth_application/42
+            title: My New DeathStar (Nextcloud)
+          oauthClientCredentials:
+            href: null
+    StorageNextcloudUnauthorizedResponse:
+      value:
+        _type: Storage
+        id: 1337
+        name: It's no moon
+        hasApplicationPassword: false
+        createdAt: '2021-12-20T13:37:00.211Z'
+        updatedAt: '2021-12-20T13:37:00.211Z'
+        configured: true
+        _embedded:
+          oauthApplication:
+            id: 42
+            _type: OAuthApplication
+            name: It's no moon (Nextcloud)
+            clientId: O5h6WObhMg1Z8IcLHRE3_LMh4jJYmmca2V6OTFSv8DA
+            confidential: true
+            createdAt: '2022-12-07T12:56:42.626Z'
+            updatedAt: '2022-12-07T12:56:42.626Z'
+            scopes:
+            - api_v3
+            _links:
+              self:
+                href: /api/v3/oauth_applications/42
+              owner:
+                href: /api/v3/users/13
+                title: Darth Vader
+              integration:
+                href: /api/v3/storages/1337
+                title: It's no moon
+              redirectUri:
+              - href: https://nextcloud.deathstar.rocks/index.php/apps/integration_openproject/oauth-redirect
+          oauthClientCredentials:
+            _type: OAuthClientCredentials
+            id: 42
+            clientId: fGEFWxIpROrpci25TW6qWCZozDFEAKSkonMBkrf3LYvBXRljBbLajBf2vD2fjePm
+            confidential: true
+            createdAt: '2023-12-08T09:49:24.397Z'
+            updatedAt: '2023-12-08T09:49:24.397Z'
+            _links:
+              self:
+                href: /api/v3/oauth_client_credentials/42
+              integration:
+                href: /api/v3/storages/1337
+                title: It's no moon
+        _links:
+          self:
+            href: /api/v3/storages/1337
+            title: It's no moon
+          type:
+            href: urn:openproject-org:api:v3:storages:Nextcloud
+            title: Nextcloud
+          origin:
+            href: https://nextcloud.deathstar.rocks/
+          prepareUpload: []
+          open:
+            href: /api/v3/storages/1337/open
+          authorizationState:
+            href: urn:openproject-org:api:v3:storages:authorization:FailedAuthorization
+            title: Authorization failed
+          authorize:
+            href: https://nextcloud25.local/index.php/apps/oauth2/authorize?client_id=fnrIeJZqqAKGQlejuDaGhSQfCAVtoayHLACWCYcPJ0w17Pp6daPPUktkM9QaGxca&redirect_uri=https://openproject.local/oauth_clients/fnrIeJZqqAKGQlejuDaGhSQfCAVtoayHLACWCYcPJ0w17Pp6daPPUktkM9QaGxca/callback&response_type=code
+            title: Authorize
+          projectStorages:
+            href: /api/v3/project_storages?filters=[{"storageId":{"operator":"=","values":["1337"]}}]
+          oauthApplication:
+            href: /api/v3/oauth_application/42
+            title: It's no moon (Nextcloud)
+          oauthClientCredentials:
+            href: /api/v3/oauth_client_credentials/42
+    StoragesSimpleCollectionModel:
+      value:
+        _type: Collection
+        count: 2
+        total: 2
+        offset: 1
+        pageSize: 20
+        _embedded:
+          elements:
+          - id: 1337
+            _type: Storage
+            name: It's no moon
+            hasApplicationPassword: true
+            configured: true
+            createdAt: '2021-12-20T13:37:00.211Z'
+            updatedAt: '2021-12-20T13:37:00.211Z'
+            _links:
+              self:
+                href: /api/v3/storages/1337
+                title: It's no moon
+              type:
+                href: urn:openproject-org:api:v3:storages:nextcloud
+                title: Nextcloud
+              origin:
+                href: https://nextcloud.deathstar.rocks/
+              open:
+                href: https://nextcloud.deathstar.rocks/apps/files
+              authorizationState:
+                href: urn:openproject-org:api:v3:storages:authorization:FailedAuthorization
+                title: Failed Authorization
+              authorize:
+                href: https://nextcloud.deathstar.rocks/authorize/
+                title: Authorize
+              projectStorages:
+                href: /api/v3/project_storages?filters=[{"storageId":{"operator":"=","values":["1337"]}}]
+              oauthApplication:
+                href: /api/v3/oauth_application/42
+                title: It's no moon (Nextcloud)
+              oauthClientCredentials:
+                href: /api/v3/oauth_client_credentials/42
+          - id: 1338
+            _type: Storage
+            name: EmpireSharepoint
+            tenantId: e36f1dbc-fdae-427e-b61b-0d96ddfb81a4
+            driveId: b!FeOZEMfQx0eGQKqVBLcP__BG8mq-4-9FuRqOyk3MXY8Qconfm2i6SKEoCmuGYqQK
+            createdAt: '2021-12-20T13:37:00.211Z'
+            updatedAt: '2021-12-20T13:37:00.211Z'
+            configured: true
+            _links:
+              self:
+                href: /api/v3/storages/1338
+                title: EmpireSharepoint
+              type:
+                href: urn:openproject-org:api:v3:storages:one-drive
+                title: OneDrive
+              open:
+                href: https://empire.sharepoint.com/sites/Documents
+              authorizationState:
+                href: urn:openproject-org:api:v3:storages:authorization:Connected
+                title: Connected
+              projectStorages:
+                href: /api/v3/project_storages?filters=[{"storageId":{"operator":"=","values":["1338"]}}]
+              oauthClientCredentials:
+                href: /api/v3/oauth_client_credentials/44
+        _links:
+          self:
+            href: /api/v3/storages?filters=%5B%5D&offset=1&pageSize=20
+          jumpTo:
+            href: /api/v3/storages?filters=%5B%5D&offset=%7Boffset%7D&pageSize=20
+            templated: true
+          changeSize:
+            href: /api/v3/storages?filters=%5B%5D&offset=1&pageSize=%7Bsize%7D
+            templated: true
+          nextByOffset:
+            href: /api/v3/storages?filters=%5B%5D&offset=2&pageSize=20
+    StorageNextcloudResponse:
+      value:
+        _type: Storage
+        id: 1337
+        name: It's no moon
+        hasApplicationPassword: true
+        createdAt: '2021-12-20T13:37:00.211Z'
+        updatedAt: '2021-12-20T13:37:00.211Z'
+        configured: true
+        _embedded:
+          oauthApplication:
+            id: 42
+            _type: OAuthApplication
+            name: It's no moon (Nextcloud)
+            clientId: O5h6WObhMg1Z8IcLHRE3_LMh4jJYmmca2V6OTFSv8DA
+            confidential: true
+            createdAt: '2022-12-07T12:56:42.626Z'
+            updatedAt: '2022-12-07T12:56:42.626Z'
+            scopes:
+            - api_v3
+            _links:
+              self:
+                href: /api/v3/oauth_applications/42
+              owner:
+                href: /api/v3/users/13
+                title: Darth Vader
+              integration:
+                href: /api/v3/storages/1337
+                title: It's no moon
+              redirectUri:
+              - href: https://nextcloud.deathstar.rocks/index.php/apps/integration_openproject/oauth-redirect
+          oauthClientCredentials:
+            _type: OAuthClientCredentials
+            id: 42
+            clientId: fGEFWxIpROrpci25TW6qWCZozDFEAKSkonMBkrf3LYvBXRljBbLajBf2vD2fjePm
+            confidential: true
+            createdAt: '2023-12-08T09:49:24.397Z'
+            updatedAt: '2023-12-08T09:49:24.397Z'
+            _links:
+              self:
+                href: /api/v3/oauth_client_credentials/42
+              integration:
+                href: /api/v3/storages/1337
+                title: It's no moon
+        _links:
+          self:
+            href: /api/v3/storages/1337
+            title: It's no moon
+          type:
+            href: urn:openproject-org:api:v3:storages:Nextcloud
+            title: Nextcloud
+          origin:
+            href: https://nextcloud.deathstar.rocks/
+          prepareUpload:
+          - href: /api/v3/storages/1337/files/prepare_upload
+            method: post
+            title: Upload file
+            payload:
+              projectId: 21
+              fileName: '{fileName}'
+              parent: '{parent}'
+            templated: true
+          - href: /api/v3/storages/95/files/prepare_upload
+            method: post
+            title: Upload file
+            payload:
+              projectId: 11
+              fileName: '{fileName}'
+              parent: '{parent}'
+            templated: true
+          open:
+            href: /api/v3/storages/1337/open
+          authorizationState:
+            href: urn:openproject-org:api:v3:storages:authorization:Connected
+            title: Connected
+          projectStorages:
+            href: /api/v3/project_storages?filters=[{"storageId":{"operator":"=","values":["1337"]}}]
+          oauthApplication:
+            href: /api/v3/oauth_application/42
+            title: It's no moon (Nextcloud)
+          oauthClientCredentials:
+            href: /api/v3/oauth_client_credentials/42
+    StorageOneDriveIncompleteResponse:
+      value:
+        _type: Storage
+        id: 1337
+        name: It's no moon
+        tenantId: e36f1dbc-fdae-427e-b61b-0d96ddfb81a4
+        driveId: null
+        createdAt: '2021-12-20T13:37:00.211Z'
+        updatedAt: '2021-12-20T13:37:00.211Z'
+        configured: false
+        _links:
+          self:
+            href: /api/v3/storages/1337
+            title: It's no moon
+          type:
+            href: urn:openproject-org:api:v3:storages:OneDrive
+            title: OneDrive/SharePoint
+          prepareUpload: []
+          open:
+            href: /api/v3/storages/1337/open
+          authorizationState:
+            href: urn:openproject-org:api:v3:storages:authorization:FailedAuthorization
+            title: Authorization failed
+          projectStorages:
+            href: /api/v3/project_storages?filters=[{"storageId":{"operator":"=","values":["1337"]}}]
+          oauthClientCredentials:
+            href: /api/v3/oauth_client_credentials/42
+    StorageOneDriveResponse:
+      value:
+        _type: Storage
+        id: 1337
+        name: It's no moon
+        tenantId: e36f1dbc-fdae-427e-b61b-0d96ddfb81a4
+        driveId: b!FeOZEMfQx0eGQKqVBLcP__BG8mq-4-9FuRqOyk3MXY8Qconfm2i6SKEoCmuGYqQK
+        createdAt: '2021-12-20T13:37:00.211Z'
+        updatedAt: '2021-12-20T13:37:00.211Z'
+        configured: true
+        _embedded:
+          oauthClientCredentials:
+            _type: OAuthClientCredentials
+            id: 42
+            clientId: b8a5bb54-5fb2-4e0e-9427-9d24dbac32ff
+            confidential: true
+            createdAt: '2023-12-08T09:49:24.397Z'
+            updatedAt: '2023-12-08T09:49:24.397Z'
+            _links:
+              self:
+                href: /api/v3/oauth_client_credentials/42
+              integration:
+                href: /api/v3/storages/1337
+                title: It's no moon
+        _links:
+          self:
+            href: /api/v3/storages/1337
+            title: It's no moon
+          type:
+            href: urn:openproject-org:api:v3:storages:OneDrive
+            title: OneDrive
+          prepareUpload:
+          - href: /api/v3/storages/1337/files/prepare_upload
+            method: post
+            title: Upload file
+            payload:
+              projectId: 33
+              fileName: '{fileName}'
+              parent: '{parent}'
+            templated: true
+          open:
+            href: /api/v3/storages/1337/open
+          authorizationState:
+            href: urn:openproject-org:api:v3:storages:authorization:Connected
+            title: Connected
+          projectStorages:
+            href: /api/v3/project_storages?filters=[{"storageId":{"operator":"=","values":["1337"]}}]
+          oauthClientCredentials:
+            href: /api/v3/oauth_client_credentials/42
+  responses:
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
+    UnsupportedMediaType:
+      description: Occurs when the client sends an unsupported Content-Type header.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
+            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+    InvalidRequestBody:
+      description: Occurs when the client did not send a valid JSON object in the request body.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+            message: The request body was not a single JSON object.
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic

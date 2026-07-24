@@ -1,0 +1,1154 @@
+openapi: 3.1.2
+info:
+  description: "You're looking at the current **stable** documentation of the OpenProject APIv3. If you're interested in the current\ndevelopment version, please go to [github.com/opf](https://github.com/opf/openproject/tree/dev/docs/api/apiv3).\n\n## Introduction\n\nThe documentation for the APIv3 is written according to the [OpenAPI 3.1 Specification](https://swagger.io/specification/).\nYou can either view the static version of this documentation on the [website](https://www.openproject.org/docs/api/introduction/)\nor the interactive version, rendered with [OpenAPI Explorer](https://github.com/Rhosys/openapi-explorer/blob/main/README.md),\nin your OpenProject installation under `/api/docs`.\nIn the latter you can try out the various API endpoints directly interacting with our OpenProject data.\nMoreover you can access the specification source itself under `/api/v3/spec.json` and `/api/v3/spec.yml`\n(e.g. [here](https://community.openproject.org/api/v3/spec.yml)).\n\nThe APIv3 is a hypermedia REST API, a shorthand for \"Hypermedia As The Engine Of Application State\" (HATEOAS).\nThis means that each endpoint of this API will have links to other resources or actions defined in the resulting body.\n\nThese related resources and actions for any given resource will be context sensitive. For example, only actions that the\nauthenticated user can take are being rendered. This can be used to dynamically identify actions that the user might take for any\ngiven response.\n\nAs an example, if you fetch a work package through the [Work Package endpoint](https://www.openproject.org/docs/api/endpoints/work-packages/), the `update` link will only\nbe present when the user you authenticated has been granted a permission to update the work package in the assigned project.\n\n## HAL+JSON\n\nHAL is a simple format that gives a consistent and easy way to hyperlink between resources in your API.\nRead more in the following specification: [https://tools.ietf.org/html/draft-kelly-json-hal-08](https://tools.ietf.org/html/draft-kelly-json-hal-08)\n\n**OpenProject API implementation of HAL+JSON format** enriches JSON and introduces a few meta properties:\n\n- `_type` - specifies the type of the resource (e.g.: WorkPackage, Project)\n- `_links` - contains all related resource and action links available for the resource\n- `_embedded` - contains all embedded objects\n\nHAL does not guarantee that embedded resources are embedded in their full representation, they might as well be\npartially represented (e.g. some properties can be left out).\nHowever in this API you have the guarantee that whenever a resource is **embedded**, it is embedded in its **full representation**.\n\n## API response structure\n\nAll API responses contain a single HAL+JSON object, even collections of objects are technically represented by\na single HAL+JSON object that itself contains its members. More details on collections can be found\nin the [Collections Section](https://www.openproject.org/docs/api/collections/).\n\n## Authentication\n\nThe API supports the following authentication schemes:\n\n* Session-based authentication\n* API tokens\n    * passed as Bearer token\n    * passed via Basic auth\n* OAuth 2.0\n    * using built-in authorization server\n    * using an external authorization server (RFC 9068)\n\nDepending on the settings of the OpenProject instance many resources can be accessed without being authenticated.\nIn case the instance requires authentication on all requests the client will receive an **HTTP 401** status code\nin response to any request.\n\nOtherwise unauthenticated clients have all the permissions of the anonymous user.\n\n### Session-based authentication\n\nThis means you have to login to OpenProject via the Web-Interface to be authenticated in the API.\nThis method is well-suited for clients acting within the browser, like the Angular-Client built into OpenProject.\n\nIn this case, you always need to pass the HTTP header `X-Requested-With \"XMLHttpRequest\"` for authentication.\n\n### API token as bearer token\n\nUsers can authenticate towards the API v3 using an API token as a bearer token.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -H \"Authorization: Bearer $API_KEY\" https://community.openproject.org/api/v3/users/42\n```\n\nUsers can generate API tokens on their account page.\n\n### API token through Basic Auth\n\nAPI tokens can also be used with basic auth, using the user name `apikey` (NOT your login) and the API token as the password.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -u apikey:$API_KEY https://community.openproject.org/api/v3/users/42\n```\n\n### OAuth 2.0 authentication\n\nOpenProject allows authentication and authorization with OAuth2 with *Authorization code flow*, as well as *Client credentials* operation modes.\n\nTo get started, you first need to register an application in the OpenProject OAuth administration section of your installation.\nThis will save an entry for your application with a client unique identifier (`client_id`) and an accompanying secret key (`client_secret`).\n\nYou can then use one the following guides to perform the supported OAuth 2.0 flows:\n\n- [Authorization code flow](https://oauth.net/2/grant-types/authorization-code)\n\n- [Authorization code flow with PKCE](https://doorkeeper.gitbook.io/guides/ruby-on-rails/pkce-flow), recommended for clients unable to keep the client_secret confidential\n\n- [Client credentials](https://oauth.net/2/grant-types/client-credentials/) - Requires an application to be bound to an impersonating user for non-public access\n\n### OAuth 2.0 using an external authorization server\n\nThere is a possibility to use JSON Web Tokens (JWT) generated by an OIDC provider configured in OpenProject as a bearer token to do authenticated requests against the API.\nThe following requirements must be met:\n\n- OIDC provider must be configured in OpenProject with **jwks_uri**\n- JWT must be signed using RSA algorithm\n- JWT **iss** claim must be equal to OIDC provider **issuer**\n- JWT **aud** claim must contain the OpenProject **client ID** used at the OIDC provider\n- JWT **scope** claim must include a valid scope to access the desired API (e.g. `api_v3` for APIv3)\n- JWT must be actual (neither expired or too early to be used)\n- JWT must be passed in Authorization header like: `Authorization: Bearer {jwt}`\n- User from **sub** claim must be linked to OpenProject before (e.g. by logging in), otherwise it will be not authenticated\n\nIn more general terms, OpenProject should be compliant to [RFC 9068](https://www.rfc-editor.org/rfc/rfc9068) when validating access tokens.\n\n### Why not username and password?\n\nThe simplest way to do basic auth would be to use a user's username and password naturally.\nHowever, OpenProject already has supported API keys in the past for the API v2, though not through basic auth.\n\nUsing **username and password** directly would have some advantages:\n\n* It is intuitive for the user who then just has to provide those just as they would when logging into OpenProject.\n\n* No extra logic for token management necessary.\n\nOn the other hand using **API keys** has some advantages too, which is why we went for that:\n\n* If compromised while saved on an insecure client the user only has to regenerate the API key instead of changing their password, too.\n\n* They are naturally long and random which makes them invulnerable to dictionary attacks and harder to crack in general.\n\nMost importantly users may not actually have a password to begin with. Specifically when they have registered\nthrough an OpenID Connect provider.\n\n## Cross-Origin Resource Sharing (CORS)\n\nBy default, the OpenProject API is _not_ responding with any CORS headers.\nIf you want to allow cross-domain AJAX calls against your OpenProject instance, you need to enable CORS headers being returned.\n\nPlease see [our API settings documentation](https://www.openproject.org/docs/system-admin-guide/api-and-webhooks/) on\nhow to selectively enable CORS.\n\n## Allowed HTTP methods\n\n- `GET` - Get a single resource or collection of resources\n\n- `POST` - Create a new resource or perform\n\n- `PATCH` - Update a resource\n\n- `DELETE` - Delete a resource\n\n## Compression\n\nResponses are compressed if requested by the client. Currently [gzip](https://www.gzip.org/) and [deflate](https://tools.ietf.org/html/rfc1951)\nare supported. The client signals the desired compression by setting the [`Accept-Encoding` header](https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3).\nIf no `Accept-Encoding` header is send, `Accept-Encoding: identity` is assumed which will result in the API responding uncompressed."
+  title: OpenProject API V3 (Stable) Actions & Capabilities Time Entries API
+  version: '3'
+servers:
+- url: https://qa.openproject-edge.com
+  description: Edge QA instance
+- url: https://qa.openproject-stage.com
+  description: Staging instance
+- url: https://community.openproject.org
+  description: Community instance
+security:
+- BasicAuth: []
+tags:
+- name: Time Entries
+paths:
+  /api/v3/time_entries/{id}/form:
+    post:
+      parameters:
+      - description: Time entries activity id
+        example: 1
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          headers: {}
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions to edit the time entry.
+
+
+            **Required permission:** *edit time entries* for every time entry of a project, or *edit own time entries* for time entries belonging to the user.'
+          headers: {}
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                    message: The requested resource could not be found.
+          description: 'Returned if the time entry does not exist or if the client does not have sufficient permissions to view it.
+
+
+            **Required permission** `view time entries` in the project the time entry is assigned to or `view own time entries` for time entries belonging to the user'
+          headers: {}
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+      tags:
+      - Time Entries
+      description: ''
+      operationId: Time_entry_update_form
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: integer
+        description: Time entries activity id
+        required: true
+      summary: Time entry update form
+  /api/v3/time_entries/available_projects:
+    get:
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              examples:
+                response:
+                  value:
+                    _embedded:
+                      elements:
+                      - _type: Project...
+                      - _type: Project...
+                    _links:
+                      self:
+                        href: /api/v3/time_entries/available_projects
+                    _type: Collection
+                    count: 2
+                    total: 2
+              schema:
+                $ref: '#/components/schemas/Available_projects_for_time_entriesModel'
+          description: OK
+          headers: {}
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** *log time*, *edit time entries* or *edit own time entries* in any project'
+          headers: {}
+      tags:
+      - Time Entries
+      description: Gets a list of projects in which a time entry can be created in or be assigned to on update. The list contains all projects in which the user issuing the request has the necessary permissions.
+      operationId: Available_projects_for_time_entries
+      summary: Available projects for time entries
+  /api/v3/time_entries/form:
+    post:
+      responses:
+        '200':
+          description: OK
+          headers: {}
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** *log time* in any project'
+          headers: {}
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+      tags:
+      - Time Entries
+      description: ''
+      operationId: Time_entry_create_form
+      summary: Time entry create form
+  /api/v3/time_entries/schema:
+    get:
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              examples:
+                response:
+                  value:
+                    _dependencies: []
+                    _links:
+                      self:
+                        href: /api/v3/time_entries/schema
+                    _type: Schema
+                    activity:
+                      _links: {}
+                      hasDefault: true
+                      location: _links
+                      name: Activity
+                      required: true
+                      type: TimeEntriesActivity
+                      writable: true
+                    createdAt:
+                      hasDefault: false
+                      name: Created on
+                      options: {}
+                      required: true
+                      type: DateTime
+                      writable: false
+                    customField29:
+                      hasDefault: false
+                      name: sfsdfsdfsdfsdfdsf
+                      options:
+                        rtl: null
+                      required: false
+                      type: String
+                      writable: true
+                    hours:
+                      hasDefault: false
+                      name: Hours
+                      options: {}
+                      required: true
+                      type: Duration
+                      writable: true
+                    id:
+                      hasDefault: false
+                      name: ID
+                      options: {}
+                      required: true
+                      type: Integer
+                      writable: false
+                    project:
+                      _links: {}
+                      hasDefault: false
+                      location: _links
+                      name: Project
+                      required: false
+                      type: Project
+                      writable: true
+                    ongoing:
+                      hasDefault: false
+                      name: Ongoing
+                      options: {}
+                      required: false
+                      type: Boolean
+                      writable: true
+                    spentOn:
+                      hasDefault: false
+                      name: Date
+                      options: {}
+                      required: true
+                      type: Date
+                      writable: true
+                    updatedAt:
+                      hasDefault: false
+                      name: Updated on
+                      options: {}
+                      required: true
+                      type: DateTime
+                      writable: false
+                    user:
+                      hasDefault: false
+                      name: User
+                      options: {}
+                      required: true
+                      type: User
+                      writable: false
+                    workPackage:
+                      _links: {}
+                      hasDefault: false
+                      location: _links
+                      name: Work package
+                      required: false
+                      type: WorkPackage
+                      writable: true
+              schema:
+                $ref: '#/components/schemas/View_time_entry_schemaModel'
+          description: OK
+          headers: {}
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions to see the schema.
+
+
+            **Required permission:** *log time* or *view time entries* or *edit time entries* or *edit own time entries* on any project'
+          headers: {}
+      tags:
+      - Time Entries
+      description: ''
+      operationId: View_time_entry_schema
+      summary: View time entry schema
+  /api/v3/time_entries/{id}:
+    patch:
+      summary: update time entry
+      tags:
+      - Time Entries
+      description: 'Updates the given time entry by applying the attributes provided in
+
+        the body. Please note that while there is a fixed set of attributes, custom fields
+
+        can extend a time entries'' attributes and are accepted by the endpoint.'
+      operationId: update_time_entry
+      parameters:
+      - name: id
+        description: Time entry id
+        example: 1
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/TimeEntryModel'
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '403':
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** Edit (own) time entries, depending on what time entry is being modified.'
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                message: You are not authorized to access this resource.
+          headers: {}
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          description: 'Returned if:
+
+
+            * a constraint for a property was violated (`PropertyConstraintViolation`)'
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _embedded:
+                  details:
+                    attribute: workPackage
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+                message: Work package is invalid.
+    delete:
+      summary: Delete time entry
+      tags:
+      - Time Entries
+      description: Permanently deletes the specified time entry.
+      operationId: delete_time_entry
+      parameters:
+      - name: id
+        description: Time entry id
+        example: 1
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Returned if the time entry was deleted successfully.
+        '403':
+          description: Returned if the client does not have sufficient permissions
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                message: You are not authorized to access this resource.
+        '404':
+          description: 'Returned if the time entry does not exist or if the user does not have sufficient permissions to see the time entry.
+
+
+            **Required permission** `view time entries` in the project the time entry is assigned to or `view own time entries` for time entries belonging to the user'
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The requested resource could not be found.
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+    get:
+      summary: Get time entry
+      tags:
+      - Time Entries
+      description: Retrieves a single time entry identified by the given id.
+      operationId: get_time_entry
+      parameters:
+      - name: id
+        description: time entry id
+        example: 1
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/TimeEntryModel'
+        '404':
+          description: 'Returned if the time entry does not exist or if the user does not have permission to view them.
+
+
+            **Required permission**
+
+            - `view time entries` in the project the time entry is assigned to or
+
+            - `view own time entries` for time entries belonging to the user'
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The requested resource could not be found.
+  /api/v3/time_entries:
+    get:
+      summary: List time entries
+      operationId: list_time_entries
+      tags:
+      - Time Entries
+      description: 'Lists time entries. The time entries returned depend on the filters
+
+        provided and also on the permission of the requesting user.'
+      parameters:
+      - name: offset
+        description: Page number inside the requested collection.
+        example: 25
+        in: query
+        required: false
+        schema:
+          default: 1
+          type: integer
+      - name: pageSize
+        description: Number of elements to display per page.
+        example: '25'
+        in: query
+        required: false
+        schema:
+          type: integer
+      - name: sortBy
+        description: 'JSON specifying sort criteria.
+
+          Accepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint. Currently supported sorts are:
+
+
+          + id: Sort by primary key
+
+
+          + hours: Sort by logged hours
+
+
+          + spent_on: Sort by spent on date
+
+
+          + created_at: Sort by time entry creation datetime
+
+
+          + updated_at: Sort by the time the time entry was updated last'
+        example: '[["spent_on", "asc"]]'
+        in: query
+        required: false
+        schema:
+          default: '["spent_on", "asc"]'
+          type: string
+      - name: filters
+        description: 'JSON specifying filter conditions.
+
+          Accepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint. Currently supported filters are:
+
+
+          + entity_type: Filter time entries depending on the entity they are logged on. Can either be `WorkPackage` or `Meeting`.
+
+
+          + entity_id: Filter time entries for the specified entity IDs.
+
+
+          + project_id: Filter time entries by project
+
+
+          + user_id: Filter time entries by users
+
+
+          + ongoing: Filter to only recevie ongoing timers
+
+
+          + spent_on: Filter time entries by spent on date
+
+
+          + created_at: Filter time entries by creation datetime
+
+
+          + updated_at: Filter time entries by the last time they where updated
+
+
+          + activity_id: Filter time entries by time entry activity'
+        example: '[{ "entity_type": { "operator": "=", "values": ["WorkPackage"] }}, { "entity_id": { "operator": "=", "values": ["1", "2"] } }, { "project": { "operator": "=", "values": ["1"] } }]'
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/TimeEntryCollectionModel'
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '403':
+          description: Returned if the client is not logged in and login is required.
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                message: You are not authorized to view this resource.
+    post:
+      summary: Create time entry
+      tags:
+      - Time Entries
+      description: 'Creates a new time entry applying the attributes provided in the body.
+
+        Please note that while there is a fixed set of attributes, custom fields can extend
+
+        a time entries'' attributes and are accepted by the endpoint.'
+      operationId: create_time_entry
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimeEntryModel'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/TimeEntryModel'
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '403':
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** Log time'
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not authorized to access this resource.
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          description: 'Returned if:
+
+
+            * a constraint for a property was violated (`PropertyConstraintViolation`)'
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _embedded:
+                      details:
+                        attribute: workPackage
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+                    message: Work package is invalid.
+components:
+  schemas:
+    CollectionModel:
+      type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
+    View_time_entry_schemaModel:
+      type: object
+      example:
+        _type: Schema
+        _dependencies: []
+        id:
+          type: Integer
+          name: ID
+          required: true
+          hasDefault: false
+          writable: false
+          options: {}
+        createdAt:
+          type: DateTime
+          name: Created on
+          required: true
+          hasDefault: false
+          writable: false
+          options: {}
+        updatedAt:
+          type: DateTime
+          name: Updated on
+          required: true
+          hasDefault: false
+          writable: false
+          options: {}
+        spentOn:
+          type: Date
+          name: Date
+          required: true
+          hasDefault: false
+          writable: true
+          options: {}
+        hours:
+          type: Duration
+          name: Hours
+          required: true
+          hasDefault: false
+          writable: true
+          options: {}
+        user:
+          type: User
+          name: User
+          required: true
+          hasDefault: false
+          writable: false
+          options: {}
+        workPackage:
+          type: WorkPackage
+          name: Work package
+          required: false
+          hasDefault: false
+          writable: true
+          location: _links
+          _links: {}
+        project:
+          type: Project
+          name: Project
+          required: false
+          hasDefault: false
+          writable: true
+          location: _links
+          _links: {}
+        activity:
+          type: TimeEntriesActivity
+          name: Activity
+          required: true
+          hasDefault: true
+          writable: true
+          location: _links
+          _links: {}
+        customField29:
+          type: String
+          name: sfsdfsdfsdfsdfdsf
+          required: false
+          hasDefault: false
+          writable: true
+          options:
+            rtl: null
+        _links:
+          self:
+            href: /api/v3/time_entries/schema
+    Available_projects_for_time_entriesModel:
+      type: object
+      example:
+        _links:
+          self:
+            href: /api/v3/time_entries/available_projects
+        _type: Collection
+        total: 2
+        count: 2
+        _embedded:
+          elements:
+          - _type: Project...
+          - _type: Project...
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
+    Formattable:
+      type: object
+      required:
+      - format
+      properties:
+        format:
+          type: string
+          enum:
+          - plain
+          - markdown
+          - custom
+          readOnly: true
+          description: Indicates the formatting language of the raw text
+          example: markdown
+        raw:
+          type: string
+          description: The raw text, as entered by the user
+          example: I **am** formatted!
+        html:
+          type: string
+          readOnly: true
+          description: The text converted to HTML according to the format
+          example: I <strong>am</strong> formatted!
+      example:
+        format: markdown
+        raw: I am formatted!
+        html: I am formatted!
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    TimeEntryModel:
+      allOf:
+      - $ref: '#/components/schemas/CustomFieldProperties'
+      - type: object
+        properties:
+          id:
+            type: integer
+            description: The id of the time entry
+            minimum: 1
+          comment:
+            allOf:
+            - $ref: '#/components/schemas/Formattable'
+            - description: A comment to the time entry
+          spentOn:
+            type: string
+            format: date
+            description: The date the expenditure is booked for
+          hours:
+            type: string
+            format: duration
+            description: The time quantifying the expenditure
+          ongoing:
+            type: boolean
+            description: Whether the time entry is actively tracking time
+          createdAt:
+            type: string
+            format: date-time
+            description: The time the time entry was created
+          startTime:
+            type:
+            - string
+            - 'null'
+            format: date-time
+            description: 'The time the time entry was started, or null if the time entry does not have a start time.
+
+
+              The time is returned as UTC time, if presented to the user it should be converted to the user''s timezone.
+
+
+              This field is only available if the global `allow_tracking_start_and_end_times` setting is enabled.'
+          endTime:
+            type:
+            - string
+            - 'null'
+            format: date-time
+            description: 'The time the time entry was ended, or null if the time entry does not have a start time.
+
+
+              The time is returned as UTC time, if presented to the user it should be converted to the user''s timezone.
+
+
+              This field is only available if the global `allow_tracking_start_and_end_times` setting is enabled.'
+          updatedAt:
+            type: string
+            format: date-time
+            description: The time the time entry was last updated
+          _links:
+            type: object
+            required:
+            - self
+            - project
+            - user
+            - activity
+            - entity
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This time entry
+
+
+                    **Resource**: TimeEntry'
+              updateImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Directly perform edits on this time entry
+
+
+                    # Conditions
+
+
+                    **Permission**: ''edit time entries'' or ''edit own time entries'' if the time entry belongs to the user'
+              update:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Form endpoint that aids in preparing and performing edits on a TimeEntry
+
+
+                    # Conditions
+
+
+                    **Permission**: ''edit time entries'' or ''edit own time entries'' if the time entry belongs to the user'
+              delete:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Delete this time entry
+
+
+                    # Conditions
+
+
+                    **Permission**: ''edit time entries'' or ''edit own time entries'' if the time entry belongs to the user'
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The time entry schema
+
+
+                    **Resource**: Schema'
+              project:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The project the time entry is bundled in. The project might be different from the work package''s project once the workPackage is moved.
+
+
+                    **Resource**: Project'
+              entity:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The entity the time entry is created on
+
+
+                    **Resource**: WorkPackage, Meeting'
+              user:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The user the time entry tracks expenditures for
+
+
+                    **Resource**: User'
+              activity:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The time entry activity the time entry is categorized as
+
+
+                    **Resource**: TimeEntriesActivity'
+        example:
+          _type: TimeEntry
+          id: 42
+          comment:
+            format: plain
+            raw: The force shall set me free.
+            html: <p>The force shall set me free.</p>
+          spentOn: '2023-01-11'
+          hours: PT4H
+          startTime: '2023-01-11T09:58:00.000Z'
+          endTime: '2023-01-11T13:58:00.000Z'
+          createdAt: '2023-01-11T13:58:24.927Z'
+          updatedAt: '2023-01-11T13:58:24.927Z'
+          _links:
+            self:
+              href: /api/v3/time_entries/42
+            updateImmediately:
+              href: /api/v3/time_entries/42
+              method: patch
+            update:
+              href: /api/v3/time_entries/42/form
+              method: post
+            delete:
+              href: /api/v3/time_entries/42
+              method: delete
+            schema:
+              href: /api/v3/time_entries/schema
+            project:
+              href: /api/v3/projects/11
+              title: DeathStarV2
+            entity:
+              href: /api/v3/work_packages/77
+              title: Build new hangar
+            user:
+              href: /api/v3/users/3
+              title: Darth Vader
+            activity:
+              href: /api/v3/time_entries/activities/1
+              title: Management
+    TimeEntryCollectionModel:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This time entry collection
+
+
+                    **Resource**: TimeEntryCollectionModel'
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TimeEntryModel'
+      example:
+        _type: Collection
+        total: 39
+        count: 2
+        pageSize: 2
+        offset: 1
+        _embedded:
+          elements:
+          - _type: TimeEntry
+            id: 5
+            comment:
+              format: plain
+              raw: Some comment
+              html: <p>Some comment</p>
+            spentOn: '2015-03-20'
+            hours: PT5H
+            startTime: '2015-03-20T10:00:00.000Z'
+            endTime: '2015-03-20T15:00:00.000Z'
+            createdAt: '2015-03-20T12:56:56.803Z'
+            updatedAt: '2015-03-20T12:56:56.803Z'
+            _links:
+              self:
+                href: /api/v3/time_entries/1
+              updateImmediately:
+                href: /api/v3/time_entries/1
+                method: patch
+              delete:
+                href: /api/v3/time_entries/1
+                method: delete
+              project:
+                href: /api/v3/projects/1
+                title: Some project
+              entity:
+                href: /api/v3/work_packages/1
+                title: Some work package
+              user:
+                href: /api/v3/users/2
+                title: Some user
+              activity:
+                href: /api/v3/time_entries/activities/18
+                title: Some time entry activity
+          - _type: TimeEntry
+            id: 10
+            comment:
+              format: plain
+              raw: Another comment
+              html: <p>Another comment</p>
+            spentOn: '2015-03-21'
+            hours: PT7H
+            startTime: '2015-03-20T15:00:00.000Z'
+            endTime: '2015-03-20T22:00:00.000Z'
+            createdAt: '2015-03-20T12:56:56.569Z'
+            updatedAt: '2015-03-20T12:56:56.371Z'
+            _links:
+              self:
+                href: /api/v3/time_entries/2
+              project:
+                href: /api/v3/projects/42
+                title: Some other project
+              entity:
+                href: /api/v3/work_packages/541
+                title: Some other work package
+              user:
+                href: /api/v3/users/6
+                title: Some other project
+              activity:
+                href: /api/v3/time_entries/activities/14
+                title: some other time entry activity
+        _links:
+          self:
+            href: /api/v3/time_entries?offset=1&pageSize=2
+          jumpTo:
+            href: /api/v3/time_entries?offset=%7Boffset%7D&pageSize=2
+            templated: true
+          changeSize:
+            href: /api/v3/time_entries?offset=1&pageSize=%7Bsize%7D
+            templated: true
+          nextByOffset:
+            href: /api/v3/time_entries?offset=2&pageSize=2
+          createTimeEntry:
+            href: /api/v3/time_entries/form
+            method: post
+          createTimeEntryImmediately:
+            href: /api/v3/time_entries
+            method: post
+    CustomFieldProperties:
+      type: object
+      patternProperties:
+        ^customField\d+$:
+          type:
+          - 'null'
+          - number
+          - boolean
+          - string
+          - object
+          description: 'A custom field value, that belongs to a custom field of a simple type:
+
+
+            - Boolean
+
+            - Date
+
+            - Float
+
+            - Integer
+
+            - Link (URL)
+
+            - Text
+
+            - Long text'
+  responses:
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
+    InvalidRequestBody:
+      description: Occurs when the client did not send a valid JSON object in the request body.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+            message: The request body was not a single JSON object.
+    UnsupportedMediaType:
+      description: Occurs when the client sends an unsupported Content-Type header.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
+            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic

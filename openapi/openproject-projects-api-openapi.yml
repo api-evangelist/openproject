@@ -1,0 +1,3132 @@
+openapi: 3.1.2
+info:
+  description: "You're looking at the current **stable** documentation of the OpenProject APIv3. If you're interested in the current\ndevelopment version, please go to [github.com/opf](https://github.com/opf/openproject/tree/dev/docs/api/apiv3).\n\n## Introduction\n\nThe documentation for the APIv3 is written according to the [OpenAPI 3.1 Specification](https://swagger.io/specification/).\nYou can either view the static version of this documentation on the [website](https://www.openproject.org/docs/api/introduction/)\nor the interactive version, rendered with [OpenAPI Explorer](https://github.com/Rhosys/openapi-explorer/blob/main/README.md),\nin your OpenProject installation under `/api/docs`.\nIn the latter you can try out the various API endpoints directly interacting with our OpenProject data.\nMoreover you can access the specification source itself under `/api/v3/spec.json` and `/api/v3/spec.yml`\n(e.g. [here](https://community.openproject.org/api/v3/spec.yml)).\n\nThe APIv3 is a hypermedia REST API, a shorthand for \"Hypermedia As The Engine Of Application State\" (HATEOAS).\nThis means that each endpoint of this API will have links to other resources or actions defined in the resulting body.\n\nThese related resources and actions for any given resource will be context sensitive. For example, only actions that the\nauthenticated user can take are being rendered. This can be used to dynamically identify actions that the user might take for any\ngiven response.\n\nAs an example, if you fetch a work package through the [Work Package endpoint](https://www.openproject.org/docs/api/endpoints/work-packages/), the `update` link will only\nbe present when the user you authenticated has been granted a permission to update the work package in the assigned project.\n\n## HAL+JSON\n\nHAL is a simple format that gives a consistent and easy way to hyperlink between resources in your API.\nRead more in the following specification: [https://tools.ietf.org/html/draft-kelly-json-hal-08](https://tools.ietf.org/html/draft-kelly-json-hal-08)\n\n**OpenProject API implementation of HAL+JSON format** enriches JSON and introduces a few meta properties:\n\n- `_type` - specifies the type of the resource (e.g.: WorkPackage, Project)\n- `_links` - contains all related resource and action links available for the resource\n- `_embedded` - contains all embedded objects\n\nHAL does not guarantee that embedded resources are embedded in their full representation, they might as well be\npartially represented (e.g. some properties can be left out).\nHowever in this API you have the guarantee that whenever a resource is **embedded**, it is embedded in its **full representation**.\n\n## API response structure\n\nAll API responses contain a single HAL+JSON object, even collections of objects are technically represented by\na single HAL+JSON object that itself contains its members. More details on collections can be found\nin the [Collections Section](https://www.openproject.org/docs/api/collections/).\n\n## Authentication\n\nThe API supports the following authentication schemes:\n\n* Session-based authentication\n* API tokens\n    * passed as Bearer token\n    * passed via Basic auth\n* OAuth 2.0\n    * using built-in authorization server\n    * using an external authorization server (RFC 9068)\n\nDepending on the settings of the OpenProject instance many resources can be accessed without being authenticated.\nIn case the instance requires authentication on all requests the client will receive an **HTTP 401** status code\nin response to any request.\n\nOtherwise unauthenticated clients have all the permissions of the anonymous user.\n\n### Session-based authentication\n\nThis means you have to login to OpenProject via the Web-Interface to be authenticated in the API.\nThis method is well-suited for clients acting within the browser, like the Angular-Client built into OpenProject.\n\nIn this case, you always need to pass the HTTP header `X-Requested-With \"XMLHttpRequest\"` for authentication.\n\n### API token as bearer token\n\nUsers can authenticate towards the API v3 using an API token as a bearer token.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -H \"Authorization: Bearer $API_KEY\" https://community.openproject.org/api/v3/users/42\n```\n\nUsers can generate API tokens on their account page.\n\n### API token through Basic Auth\n\nAPI tokens can also be used with basic auth, using the user name `apikey` (NOT your login) and the API token as the password.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -u apikey:$API_KEY https://community.openproject.org/api/v3/users/42\n```\n\n### OAuth 2.0 authentication\n\nOpenProject allows authentication and authorization with OAuth2 with *Authorization code flow*, as well as *Client credentials* operation modes.\n\nTo get started, you first need to register an application in the OpenProject OAuth administration section of your installation.\nThis will save an entry for your application with a client unique identifier (`client_id`) and an accompanying secret key (`client_secret`).\n\nYou can then use one the following guides to perform the supported OAuth 2.0 flows:\n\n- [Authorization code flow](https://oauth.net/2/grant-types/authorization-code)\n\n- [Authorization code flow with PKCE](https://doorkeeper.gitbook.io/guides/ruby-on-rails/pkce-flow), recommended for clients unable to keep the client_secret confidential\n\n- [Client credentials](https://oauth.net/2/grant-types/client-credentials/) - Requires an application to be bound to an impersonating user for non-public access\n\n### OAuth 2.0 using an external authorization server\n\nThere is a possibility to use JSON Web Tokens (JWT) generated by an OIDC provider configured in OpenProject as a bearer token to do authenticated requests against the API.\nThe following requirements must be met:\n\n- OIDC provider must be configured in OpenProject with **jwks_uri**\n- JWT must be signed using RSA algorithm\n- JWT **iss** claim must be equal to OIDC provider **issuer**\n- JWT **aud** claim must contain the OpenProject **client ID** used at the OIDC provider\n- JWT **scope** claim must include a valid scope to access the desired API (e.g. `api_v3` for APIv3)\n- JWT must be actual (neither expired or too early to be used)\n- JWT must be passed in Authorization header like: `Authorization: Bearer {jwt}`\n- User from **sub** claim must be linked to OpenProject before (e.g. by logging in), otherwise it will be not authenticated\n\nIn more general terms, OpenProject should be compliant to [RFC 9068](https://www.rfc-editor.org/rfc/rfc9068) when validating access tokens.\n\n### Why not username and password?\n\nThe simplest way to do basic auth would be to use a user's username and password naturally.\nHowever, OpenProject already has supported API keys in the past for the API v2, though not through basic auth.\n\nUsing **username and password** directly would have some advantages:\n\n* It is intuitive for the user who then just has to provide those just as they would when logging into OpenProject.\n\n* No extra logic for token management necessary.\n\nOn the other hand using **API keys** has some advantages too, which is why we went for that:\n\n* If compromised while saved on an insecure client the user only has to regenerate the API key instead of changing their password, too.\n\n* They are naturally long and random which makes them invulnerable to dictionary attacks and harder to crack in general.\n\nMost importantly users may not actually have a password to begin with. Specifically when they have registered\nthrough an OpenID Connect provider.\n\n## Cross-Origin Resource Sharing (CORS)\n\nBy default, the OpenProject API is _not_ responding with any CORS headers.\nIf you want to allow cross-domain AJAX calls against your OpenProject instance, you need to enable CORS headers being returned.\n\nPlease see [our API settings documentation](https://www.openproject.org/docs/system-admin-guide/api-and-webhooks/) on\nhow to selectively enable CORS.\n\n## Allowed HTTP methods\n\n- `GET` - Get a single resource or collection of resources\n\n- `POST` - Create a new resource or perform\n\n- `PATCH` - Update a resource\n\n- `DELETE` - Delete a resource\n\n## Compression\n\nResponses are compressed if requested by the client. Currently [gzip](https://www.gzip.org/) and [deflate](https://tools.ietf.org/html/rfc1951)\nare supported. The client signals the desired compression by setting the [`Accept-Encoding` header](https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3).\nIf no `Accept-Encoding` header is send, `Accept-Encoding: identity` is assumed which will result in the API responding uncompressed."
+  title: OpenProject API V3 (Stable) Actions & Capabilities Projects API
+  version: '3'
+servers:
+- url: https://qa.openproject-edge.com
+  description: Edge QA instance
+- url: https://qa.openproject-stage.com
+  description: Staging instance
+- url: https://community.openproject.org
+  description: Community instance
+security:
+- BasicAuth: []
+tags:
+- description: 'Projects are one of the types of [workspaces](https://www.openproject.org/docs/api/endpoints/workspaces) in OpenProject structuring the information (e.g. work packages, wikis) into smaller sets. They can be used in a classic project management approach but also when structuring work by departments.
+
+
+    As containers, they also control behaviour of the elements within them. One of the most important aspects of this is that projects limit permissions by having members with a certain permission set (roles) assigned to them.
+
+
+    Prior to OpenProject 17.0, only projects existed and the concept of workspaces wasn''t implemented in the API. With 17.0 the other workspace types (program and portfolio) exist and might be returned in places where before, only projects were.
+
+
+    ## Actions
+
+
+    | Link                         | Description                                                          | Condition                                                                                     |
+
+    |:--------------------------:  |----------------------------------------------------------------------| ---------------------------------                                                             |
+
+    | update                       | Form endpoint that aids in updating this project                     | **Permission**: edit workspace                                                                |
+
+    | updateImmediately            | Directly update this project                                         | **Permission**: edit workspace                                                                |
+
+    | delete                       | Delete this project                                                  | **Permission**: admin                                                                         |
+
+    | favor                        | Mark this project as favorited by the current user                   | **Permission**: none but login is required, only present if the project is not yet favorited  |
+
+    | disfavor                     | Mark this project as no longer favorited by the current user         | **Permission**: none but login is required, only present if the project is favorited          |
+
+    | createWorkPackage            | Form endpoint that aids in preparing and creating a work package     | **Permission**: add work packages                                                             |
+
+    | createWorkPackageImmediately | Directly creates a work package in the project                       | **Permission**: add work packages                                                             |
+
+
+    ## Linked Properties
+
+
+    | Link         | Description                                                                                                         | Type          | Constraints | Supported operations |Condition                                                                                    |
+
+    | :----------: | -------------                                                                                                       | ----          | ----------- | -------------------- |-----------------------------------------                                                    |
+
+    | self         | This project                                                                                                        | Project       | not null    | READ                 |                                                                                             |
+
+    | ancestors    | Array of all ancestors of the project, down from the root node (first element) to the parent (last element).        | Collection    | not null    | READ                 | **Permission** any permission on the ancestor project. Non visible projects will be omitted |
+
+    | categories   | Categories available in this project                                                                                | Collection    | not null    | READ                 |                                                                                             |
+
+    | types        | Types available in this project                                                                                     | Collection    | not null    | READ                 | **Permission**: view work packages or manage types                                          |
+
+    | versions     | Versions available in this project                                                                                  | Collection    | not null    | READ                 | **Permission**: view work packages or manage versions                                       |
+
+    | memberships  | Memberships in the project                                                                                          | Collection    | not null    | READ                 | **Permission**: view members                                                                |
+
+    | workPackages | Work Packages of this project                                                                                       | Collection    | not null    | READ                 |                                                                                             |
+
+    | parent       | Parent project of the project                                                                                       | Project       |             | READ/WRITE           | **Permission** edit workspace                                                               |
+
+    | status       | Denotes the status of the project, so whether the project is on track, at risk or is having trouble.                | ProjectStatus |             | READ/WRITE           | **Permission** edit workspace                                                               |
+
+
+    Depending on custom fields defined for projects, additional links might exist.
+
+
+    Note, that the parent and ancestor links may contain the "undisclosed uri" `urn:openproject-org:api:v3:undisclosed` in case an
+
+    ancestor project is defined but the client lacks permission to see it. See the
+
+    [general introduction into links'' properties](https://www.openproject.org/docs/api/basic-objects/#local-properties) for more information.
+
+
+    ## Local Properties
+
+
+    | Property               | Description                                                                                           | Type              | Constraints                          | Supported operations |
+
+    | :---------------------:| -------------                                                                                         | ----              | -----------                          | -------------------- |
+
+    | id                     | Projects'' id                                                                                          | Integer           | x > 0                                | READ/WRITE           |
+
+    | identifier             |                                                                                                       | String            |                                      | READ/WRITE           |
+
+    | name                   |                                                                                                       | String            |                                      | READ/WRITE           |
+
+    | active                 | Indicates whether the project is currently active or already archived                                 | Boolean           |                                      | READ/WRITE           |
+
+    | favorited              | Indicates whether the project is favorited by the current user                                        | Boolean           |                                      | READ                 |
+
+    | statusExplanation      | A text detailing and explaining why the project has the reported status                               | Formattable       |                                      | READ/WRITE           |
+
+    | public                 | Indicates whether the project is accessible for everybody                                             | Boolean           |                                      | READ/WRITE           |
+
+    | description            |                                                                                                       | Formattable       |                                      | READ/WRITE           |
+
+    | createdAt              | Time of creation                                                                                      | DateTime          |                                      | READ                 |
+
+    | updatedAt              | Time of the most recent change to the project                                                         | DateTime          |                                      | READ                 |
+
+
+    Depending on custom fields defined for projects, additional properties might exist.'
+  name: Projects
+paths:
+  /api/v3/projects:
+    get:
+      summary: List projects
+      operationId: list_projects
+      tags:
+      - Projects
+      description: 'Returns a collection of projects. The collection can be filtered via query parameters similar to how work packages are filtered. In addition to the provided filter, the result set is always limited to only contain projects the client is allowed to see.
+
+        Prior to OpenProject 17.0, only projects existed and the concept of workspaces wasn''t implemented in the API. With 17.0 the other workspace types (program and portfolio) exist and will be returned alongside projects by this endpoint. This might surprise typed clients.'
+      parameters:
+      - name: filters
+        schema:
+          type: string
+        in: query
+        required: false
+        description: 'JSON specifying filter conditions.
+
+          Accepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint.
+
+          Currently supported filters are:
+
+
+          + active: based on the active property of the project
+
+          + ancestor: filters projects by their ancestor. A project is not considered to be its own ancestor.
+
+          + available_project_attributes: filters projects based on the activated project project attributes.
+
+          + created_at: based on the time the project was created
+
+          + favorited: based on the favorited property of the project
+
+          + id: based on projects'' id.
+
+          + latest_activity_at: based on the time the last activity was registered on a project.
+
+          + name_and_identifier: based on both the name and the identifier.
+
+          + parent_id: filters projects by their parent.
+
+          + principal: based on members of the project.
+
+          + project_phase_any: based on the project phases active in a project.
+
+          + project_status_code: based on status code of the project
+
+          + storage_id: filters projects by linked storages
+
+          + storage_url: filters projects by linked storages identified by the host url
+
+          + type_id: based on the types active in a project.
+
+          + user_action: based on the actions the current user has in the project.
+
+          + visible: based on the visibility for the user (id) provided as the filter value. This filter is useful for admins to identify the projects visible to a user.
+
+
+          There might also be additional filters based on the custom fields that have been configured.
+
+
+          Each defined lifecycle step will also define a filter in this list endpoint. Given that the elements are not
+
+          static but rather dynamically created on each OpenProject instance, a list cannot be provided. Those filters follow the schema:
+
+          + project_start_gate_[id]: a filter on a project phase''s start gate active in a project. The id is the id of the phase the gate belongs to.
+
+          + project_finish_gate_[id]: a filter on a project phase''s finish gate active in a project. The id is the id of the phase the gate belongs to.
+
+          + project_phase_[id]: a filter on a project phase active in a project. The id is the id of the phase queried for.'
+        example: '[{ "ancestor": { "operator": "=", "values": ["1"] }" }]'
+      - name: sortBy
+        schema:
+          type: string
+        in: query
+        required: false
+        description: 'JSON specifying sort criteria.
+
+          Currently supported orders are:
+
+
+          + id
+
+          + name
+
+          + typeahead (sorting by hierarchy and name)
+
+          + created_at
+
+          + public
+
+          + latest_activity_at
+
+          + required_disk_space
+
+
+          There might also be additional orders based on the custom fields that have been configured.'
+        example: '[["id", "asc"]]'
+      - name: select
+        schema:
+          type: string
+        in: query
+        required: false
+        description: Comma separated list of properties to include.
+        example: total,elements/identifier,elements/name
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ProjectCollectionModel'
+              examples:
+                simple project collection:
+                  $ref: '#/components/examples/ProjectCollection'
+        '400':
+          description: Returned if the client sends invalid request parameters e.g. filters
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:InvalidQuery
+                message: Filters Invalid filter does not exist.
+    post:
+      summary: Create project
+      operationId: create_project
+      tags:
+      - Projects
+      description: 'Creates a new project, applying the attributes provided in the body.
+
+
+        You can use the form and schema to be retrieve the valid attribute values and by that be guided towards successful creation.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectModel'
+            examples:
+              with custom fields:
+                $ref: '#/components/examples/ProjectBody'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ProjectModel'
+              examples:
+                with custom fields:
+                  $ref: '#/components/examples/Project'
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** add project which is a global permission'
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _embedded:
+                  details:
+                    attribute: name
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+                message: Name can't be blank.
+          description: 'Returned if:
+
+
+            * a constraint for a property was violated (`PropertyConstraintViolation`)'
+  /api/v3/projects/form:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+            examples:
+              with custom fields:
+                $ref: '#/components/examples/ProjectBody'
+              empty:
+                description: Empty request to get the form initially in order to start the guided creation of a project
+                value: {}
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              schema:
+                type: object
+              examples:
+                response:
+                  value:
+                    _embedded:
+                      payload:
+                        _links:
+                          customField26:
+                            href: null
+                            title: null
+                          customField31:
+                            href: null
+                            title: null
+                          parent:
+                            href: null
+                          status:
+                            href: null
+                        active: true
+                        customField30: null
+                        customField34: null
+                        customField35: Text custom field value
+                        customField41:
+                          format: markdown
+                          html: ''
+                          raw: ''
+                        customField42: null
+                        description:
+                          format: markdown
+                          html: ''
+                          raw: null
+                        identifier: new_project_identifier
+                        name: New project name
+                        public: false
+                        statusExplanation:
+                          format: markdown
+                          html: <p></p>
+                          raw: null
+                      schema:
+                        _dependencies: []
+                        _links: {}
+                        _type: Schema
+                        active:
+                          hasDefault: true
+                          name: Active
+                          required: true
+                          type: Boolean
+                          writable: true
+                        createdAt:
+                          hasDefault: false
+                          name: Created on
+                          required: true
+                          type: DateTime
+                          writable: false
+                        customField26:
+                          _links:
+                            allowedValues:
+                              href: /api/v3/principals?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22%21%22%2C%22values%22%3A%5B%220%22%2C%223%22%5D%7D%7D%2C%7B%22type%22%3A%7B%22operator%22%3A%22%3D%22%2C%22values%22%3A%5B%22User%22%5D%7D%7D%2C%7B%22member%22%3A%7B%22operator%22%3A%22%3D%22%2C%22values%22%3A%5B%22%22%5D%7D%7D%5D&pageSize=0
+                          hasDefault: false
+                          location: _links
+                          name: Project user
+                          required: false
+                          type: User
+                          visibility: default
+                          writable: true
+                        customField30:
+                          hasDefault: false
+                          name: some project cf
+                          required: false
+                          type: Integer
+                          visibility: default
+                          writable: true
+                        customField31:
+                          _embedded:
+                            allowedValues:
+                            - _links:
+                                self:
+                                  href: /api/v3/custom_options/513
+                                  title: abc
+                              _type: CustomOption
+                              id: 513
+                              value: abc
+                            - _links:
+                                self:
+                                  href: /api/v3/custom_options/514
+                                  title: def
+                              _type: CustomOption
+                              id: 514
+                              value: def
+                            - _links:
+                                self:
+                                  href: /api/v3/custom_options/515
+                                  title: ghi
+                              _type: CustomOption
+                              id: 515
+                              value: ghi
+                          _links:
+                            allowedValues:
+                            - href: /api/v3/custom_options/513
+                              title: abc
+                            - href: /api/v3/custom_options/514
+                              title: def
+                            - href: /api/v3/custom_options/515
+                              title: ghi
+                          hasDefault: false
+                          location: _links
+                          name: list project cf
+                          required: false
+                          type: CustomOption
+                          visibility: default
+                          writable: true
+                        customField34:
+                          hasDefault: false
+                          name: Bool Project CF
+                          required: false
+                          type: Boolean
+                          visibility: default
+                          writable: true
+                        customField35:
+                          hasDefault: false
+                          name: text project cf
+                          required: true
+                          type: String
+                          visibility: default
+                          writable: true
+                        customField41:
+                          hasDefault: false
+                          name: Long text project cf
+                          required: false
+                          type: Formattable
+                          visibility: default
+                          writable: true
+                        customField42:
+                          hasDefault: false
+                          name: Date project cf
+                          required: false
+                          type: Date
+                          visibility: default
+                          writable: true
+                        description:
+                          hasDefault: false
+                          name: Description
+                          required: false
+                          type: Formattable
+                          writable: true
+                        id:
+                          hasDefault: false
+                          name: ID
+                          required: true
+                          type: Integer
+                          writable: false
+                        identifier:
+                          hasDefault: false
+                          maxLength: 100
+                          minLength: 1
+                          name: Identifier
+                          required: true
+                          type: String
+                          writable: true
+                        name:
+                          hasDefault: false
+                          maxLength: 255
+                          minLength: 1
+                          name: Name
+                          required: true
+                          type: String
+                          writable: true
+                        parent:
+                          _links:
+                            allowedValues:
+                              href: /api/v3/projects/available_parent_projects
+                          hasDefault: false
+                          location: _links
+                          name: Subproject of
+                          required: false
+                          type: Project
+                          visibility: default
+                          writable: true
+                        public:
+                          hasDefault: false
+                          name: Public
+                          required: true
+                          type: Boolean
+                          writable: true
+                        status:
+                          _links:
+                            allowedValues:
+                            - href: /api/v3/project_statuses/on_track
+                              title: On track
+                            - href: /api/v3/project_statuses/at_risk
+                              title: At risk
+                            - href: /api/v3/project_statuses/off_track
+                              title: Off track
+                          hasDefault: true
+                          name: Status
+                          required: false
+                          type: ProjectStatus
+                          writable: true
+                        statusExplanation:
+                          hasDefault: false
+                          name: Status explanation
+                          required: false
+                          type: Formattable
+                          writable: true
+                        updatedAt:
+                          hasDefault: false
+                          name: Updated on
+                          required: true
+                          type: DateTime
+                          writable: false
+                      validationErrors:
+                        identifier:
+                          _embedded:
+                            details:
+                              attribute: identifier
+                          _type: Error
+                          errorIdentifier: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+                          message: Identifier has already been taken.
+                    _links:
+                      self:
+                        href: /api/v3/projects/form
+                        method: post
+                      validate:
+                        href: /api/v3/projects/form
+                        method: post
+                    _type: Form
+          description: OK
+          headers: {}
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** add project which is a global permission'
+          headers: {}
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+      tags:
+      - Projects
+      description: ''
+      operationId: Project_create_form
+      summary: Project create form
+  /api/v3/projects/schema:
+    get:
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              examples:
+                response:
+                  value:
+                    _dependencies: []
+                    _attributeGroups:
+                    - _type: ProjectFormCustomFieldSection
+                      name: Project Details
+                      attributes:
+                      - customField30
+                      - customField34
+                    - _type: ProjectFormCustomFieldSection
+                      name: Budget Information
+                      attributes:
+                      - customField31
+                      - customField32
+                      - customField35
+                    _links:
+                      self:
+                        href: /api/v3/projects/schema
+                    _type: Schema
+                    active:
+                      hasDefault: true
+                      name: Active
+                      required: true
+                      type: Boolean
+                      writable: true
+                    createdAt:
+                      hasDefault: false
+                      name: Created on
+                      required: true
+                      type: DateTime
+                      writable: false
+                    customField30:
+                      hasDefault: false
+                      name: Integer project custom field
+                      required: false
+                      type: Integer
+                      visibility: default
+                      writable: true
+                    customField31:
+                      _links: {}
+                      hasDefault: false
+                      location: _links
+                      name: List project custom field
+                      required: false
+                      type: CustomOption
+                      visibility: default
+                      writable: true
+                    customField32:
+                      _links: {}
+                      hasDefault: false
+                      location: _links
+                      name: Version project custom field
+                      required: false
+                      type: Version
+                      visibility: default
+                      writable: true
+                    customField34:
+                      hasDefault: false
+                      name: Boolean project custom field
+                      required: false
+                      type: Boolean
+                      visibility: default
+                      writable: true
+                    customField35:
+                      hasDefault: false
+                      name: Text project custom field
+                      required: true
+                      type: String
+                      visibility: default
+                      writable: true
+                    description:
+                      hasDefault: false
+                      name: Description
+                      required: false
+                      type: Formattable
+                      writable: true
+                    id:
+                      hasDefault: false
+                      name: ID
+                      required: true
+                      type: Integer
+                      writable: false
+                    identifier:
+                      hasDefault: false
+                      maxLength: 100
+                      minLength: 1
+                      name: Identifier
+                      required: true
+                      type: String
+                      writable: true
+                    name:
+                      hasDefault: false
+                      maxLength: 255
+                      minLength: 1
+                      name: Name
+                      required: true
+                      type: String
+                      writable: true
+                    parent:
+                      _links: {}
+                      hasDefault: false
+                      location: _links
+                      name: Subproject of
+                      required: false
+                      type: Project
+                      visibility: default
+                      writable: true
+                    public:
+                      hasDefault: false
+                      name: Public
+                      required: true
+                      type: Boolean
+                      writable: true
+                    status:
+                      _links:
+                        allowedValues:
+                        - href: /api/v3/project_statuses/on_track
+                          title: On track
+                        - href: /api/v3/project_statuses/at_risk
+                          title: At risk
+                        - href: /api/v3/project_statuses/off_track
+                          title: Off track
+                      hasDefault: true
+                      name: Status
+                      required: false
+                      type: ProjectStatus
+                      writable: true
+                    statusExplanation:
+                      hasDefault: false
+                      name: Status explanation
+                      required: false
+                      type: Formattable
+                      writable: true
+                    updatedAt:
+                      hasDefault: false
+                      name: Updated on
+                      required: true
+                      type: DateTime
+                      writable: false
+              schema:
+                $ref: '#/components/schemas/Workspaces_schemaModel'
+          description: OK
+          headers: {}
+      tags:
+      - Projects
+      description: 'Provides the schema describing a project resource.
+
+        This endpoint is deprecated. As projects are workspaces, an equivalent schema can be found fetching `/api/v3/workspaces/schema`.'
+      operationId: View_project_schema
+      summary: View project schema
+  /api/v3/projects/{id}:
+    delete:
+      parameters:
+      - description: Project id
+        example: 1
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: 'Returned if the project was successfully deleted. There is currently no endpoint to query for the actual deletion status.
+
+            Such an endpoint _might_ be added in the future.'
+          headers: {}
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** admin'
+          headers: {}
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                    message: The requested resource could not be found.
+          description: 'Returned if the project does not exist or the client does not have sufficient permissions
+
+            to see it.
+
+
+            **Required permission:** any permission in the project
+
+
+            *Note: A client without sufficient permissions shall not be able to test for the existence of
+
+            a version. That''s why a 404 is returned here, even if a 403 might be more appropriate.*'
+          headers: {}
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _embedded:
+                      details:
+                        attribute: base
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+                    message: Work packages in non descendant projects reference versions of the project or its descendants.
+          description: 'Returned if the project cannot be deleted. This can happen when there are still references to the project in other workspaces
+
+            that need to be severed at first.'
+          headers: {}
+      tags:
+      - Projects
+      description: 'Deletes the project permanently. As this is a lengthy process, the actual deletion is carried out asynchronously.
+
+        So the project might exist well after the request has returned successfully. To prevent unwanted changes to
+
+        the project scheduled for deletion, it is archived at once.'
+      operationId: Delete_Project
+      summary: Delete Project
+    get:
+      parameters:
+      - description: Project id
+        example: 1
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              examples:
+                with custom fields:
+                  $ref: '#/components/examples/Project'
+              schema:
+                $ref: '#/components/schemas/ProjectModel'
+          description: OK
+          headers: {}
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                    message: The requested resource could not be found.
+          description: 'Returned if the project does not exist or the client does not have sufficient permissions
+
+            to see it.
+
+
+            **Required permission:** view project
+
+
+            *Note: A client without sufficient permissions shall not be able to test for the existence of a project.
+
+            That''s why a 404 is returned here, even if a 403 might be more appropriate.*'
+          headers: {}
+      tags:
+      - Projects
+      description: ''
+      operationId: View_project
+      summary: View project
+    patch:
+      parameters:
+      - description: Project id
+        example: 1
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectModel'
+            examples:
+              with custom fields:
+                $ref: '#/components/examples/ProjectBody'
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ProjectModel'
+              examples:
+                with custom fields:
+                  $ref: '#/components/examples/Project'
+          description: OK
+          headers: {}
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** edit project for the project to be altered'
+          headers: {}
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                    message: The requested resource could not be found.
+          description: 'Returned if the project does not exist or the client does not have sufficient permissions
+
+            to see it.
+
+
+            **Required permission:** view project
+
+
+            *Note: A client without sufficient permissions shall not be able to test for the existence of
+
+            a version. That''s why a 404 is returned here, even if a 403 might be more appropriate.*'
+          headers: {}
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _embedded:
+                      details:
+                        attribute: name
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+                    message: Name can't be blank.
+          description: 'Returned if:
+
+
+            * a constraint for a property was violated (`PropertyConstraintViolation`)'
+          headers: {}
+      tags:
+      - Projects
+      description: Updates the given project by applying the attributes provided in the body.
+      operationId: Update_Project
+      summary: Update Project
+  /api/v3/projects/{id}/form:
+    post:
+      parameters:
+      - description: Project id
+        example: 1
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+            examples:
+              with custom fields:
+                $ref: '#/components/examples/ProjectBody'
+              empty:
+                description: Empty request to get the form initially in order to start the guided update of a project
+                value: {}
+      responses:
+        '200':
+          description: OK
+          headers: {}
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** edit projects in the project'
+          headers: {}
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+      tags:
+      - Projects
+      description: ''
+      operationId: Project_update_form
+      summary: Project update form
+  /api/v3/projects/{id}/copy:
+    post:
+      parameters:
+      - description: Project id
+        example: '1'
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '302':
+          description: Returned if the request is successful. It will redirect to the job statuses API with the backend job that got created. You can query that endpoint to check the status of the copy, and eventually get the created project.
+          headers: {}
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** copy projects in the source project'
+          headers: {}
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _embedded:
+                      details:
+                        attribute: name
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+                    message: Name can't be blank.
+          description: 'Returned if:
+
+
+            * a constraint for a property was violated (`PropertyConstraintViolation`)'
+          headers: {}
+      tags:
+      - Projects
+      description: ''
+      operationId: Create_project_copy
+      summary: Create project copy
+  /api/v3/projects/{id}/copy/form:
+    post:
+      parameters:
+      - description: Project id
+        example: '1'
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          headers: {}
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** copy projects in the source project'
+          headers: {}
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+      tags:
+      - Projects
+      description: ''
+      operationId: Project_copy_form
+      summary: Project copy form
+  /api/v3/project_statuses/{id}:
+    get:
+      parameters:
+      - description: Project status id
+        example: on_track
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              examples:
+                response:
+                  value:
+                    _links:
+                      self:
+                        href: /api/v3/project_statuses/on_track
+                    _type: ProjectStatus
+                    id: on_track
+                    name: On track
+              schema:
+                $ref: '#/components/schemas/View_project_statusModel'
+          description: OK
+          headers: {}
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                    message: The requested resource could not be found.
+          description: Returned if the project status does not exist.
+          headers: {}
+      tags:
+      - Projects
+      description: ''
+      operationId: View_project_status
+      summary: View project status
+  /api/v3/projects/available_parent_projects:
+    get:
+      parameters:
+      - description: JSON specifying filter conditions.
+        example: '[{ "ancestor": { "operator": "=", "values": [''1''] }" }]'
+        in: query
+        name: filters
+        required: false
+        schema:
+          type: string
+      - description: The id or identifier of the project the parent candidate is determined for
+        example: '123'
+        in: query
+        name: of
+        required: false
+        schema:
+          type: string
+      - description: 'The workspace type of the new project the parent candidate is determined for. Ignored when `of` parameter is provided.
+
+          Note that while ''portfolio'' is supported as a type (since it is a type of Workspace), the endpoint will currently always return an empty resultset as portfolios cannot have parents.'
+        example: program
+        in: query
+        name: workspace_type
+        required: false
+        schema:
+          type: string
+          enum:
+          - project
+          - program
+          - portfolio
+      - description: 'JSON specifying sort criteria.
+
+          Accepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint and allows all the filters and sortBy supported by the project list endpoint.'
+        example: '[["id", "asc"]]'
+        in: query
+        name: sortBy
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              examples:
+                response:
+                  value:
+                    _embedded:
+                      elements:
+                      - _links:
+                          categories:
+                            href: /api/v3/projects/6/categories
+                          createWorkPackage:
+                            href: /api/v3/projects/6/work_packages/form
+                            method: post
+                          createWorkPackageImmediate:
+                            href: /api/v3/projects/6/work_packages
+                            method: post
+                          self:
+                            href: /api/v3/projects/6
+                            title: A project
+                          status:
+                            href: /api/v3/project_statuses/on_track
+                            title: On track
+                          versions:
+                            href: /api/v3/projects/6/versions
+                        _type: Project
+                        active: true
+                        createdAt: '2015-07-06T13:28:14+00:00'
+                        description:
+                          format: markdown
+                          html: <p>Lorem <strong>ipsum</strong> dolor sit amet</p>
+                          raw: Lorem **ipsum** dolor sit amet
+                        id: 6
+                        identifier: a_project
+                        name: A project
+                        public: false
+                        statusExplanation:
+                          format: markdown
+                          html: <p>Everything <strong>fine</strong></p>
+                          raw: Everything **fine**
+                        type: Customer Project
+                        updatedAt: '2015-10-01T09:55:02+00:00'
+                      - _links:
+                          categories:
+                            href: /api/v3/projects/14/categories
+                          createWorkPackage:
+                            href: /api/v3/projects/14/work_packages/form
+                            method: post
+                          createWorkPackageImmediate:
+                            href: /api/v3/projects/14/work_packages
+                            method: post
+                          self:
+                            href: /api/v3/projects/14
+                            title: Another project
+                          status:
+                            href: /api/v3/project_statuses/on_track
+                            title: On track
+                          versions:
+                            href: /api/v3/projects/14/versions
+                        _type: Project
+                        active: true
+                        createdAt: '2016-02-29T12:50:20+00:00'
+                        description:
+                          format: markdown
+                          html: ''
+                          raw: ''
+                        id: 14
+                        identifier: another_project
+                        name: Another project
+                        public: true
+                        statusExplanation:
+                          format: markdown
+                          html: <p>Everything super <strong>fine</strong></p>
+                          raw: Everything super **fine**
+                        type: null
+                        updatedAt: '2016-02-29T12:50:20+00:00'
+                    _links:
+                      self:
+                        href: /api/v3/projects/available_parent_projects?of=123
+                    _type: Collection
+                    count: 2
+                    total: 2
+              schema:
+                $ref: '#/components/schemas/List_available_parent_project_candidatesModel'
+          description: OK
+          headers: {}
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** edit project in a project or the global add project permission'
+          headers: {}
+      tags:
+      - Projects
+      description: 'Lists projects which can become parent to another project. Only sound candidates are returned.
+
+        For instance a project cannot become parent of itself or its children.
+
+
+        To specify the project for which a parent is queried for, the `of` parameter can be provided. If no `of`
+
+        parameter is provided, a new project is assumed. Then, the check for the hierarchy is omitted as a new project cannot be
+
+        part of a hierarchy yet, instead `workspace_type` parameter can be passed defining it for new project.
+
+
+        Candidates can be filtered. Most commonly one will want to filter by name or identifier.
+
+        You can do this through the `filters` parameter which works just like the work package index.
+
+
+        For instance to find all parent candidates with "rollout" in their name:
+
+
+        ```
+
+        ?filters=[{"name_and_identifier":{"operator":"~","values":["rollout"]}}]
+
+        ```'
+      operationId: List_available_parent_project_candidates
+      summary: List available parent project candidates
+  /api/v3/projects/{id}/favorite:
+    delete:
+      parameters:
+      - description: Project id
+        example: '1'
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Returned if the project was successfully removed from favorites.
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                    message: The requested resource could not be found.
+          description: 'Returned if the project does not exist or the client does not have sufficient permissions
+
+            to see it.
+
+
+            **Required permission:** view project'
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** logged in'
+      tags:
+      - Projects
+      description: 'Removes the project from the current user''s favorites.
+
+
+        This endpoint is deprecated and replaced by [`/api/v3/workspaces/{id}/favorite`](https://www.openproject.org/docs/api/endpoints/workspaces/#unfavorite-workspace)'
+      operationId: Unfavorite_Project
+      summary: Unfavorite Project
+    post:
+      parameters:
+      - description: Project id
+        example: '1'
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Returned if the project was successfully added to favorites.
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                    message: The requested resource could not be found.
+          description: 'Returned if the project does not exist or the client does not have sufficient permissions
+
+            to see it.
+
+
+            **Required permission:** view project'
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** logged in'
+      tags:
+      - Projects
+      description: 'Adds the project to the current user''s favorites.
+
+
+        This endpoint is deprecated and replaced by [`/api/v3/workspaces/{id}/favorite`](https://www.openproject.org/docs/api/endpoints/workspaces/#favorite-workspace)'
+      operationId: Favorite_Project
+      summary: Favorite Project
+  /api/v3/projects/{id}/configuration:
+    get:
+      parameters:
+      - description: Project id
+        example: '1'
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              examples:
+                response:
+                  value:
+                    _type: Configuration
+                    _links:
+                      self:
+                        href: /api/v3/projects/1/configuration
+                      userPreferences:
+                        href: /api/v3/my_preferences
+                    maximumAttachmentFileSize: 5242880
+                    perPageOptions:
+                    - 20
+                    - 100
+                    enabledInternalComments: true
+              schema:
+                $ref: '#/components/schemas/ProjectConfigurationModel'
+          description: OK
+          headers: {}
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                    message: The requested resource could not be found.
+          description: Returned if the project does not exist or the user cannot view it.
+          headers: {}
+      tags:
+      - Projects
+      description: 'Returns the configuration scoped to a specific project, including all global
+
+        configuration properties plus project-specific settings.'
+      operationId: View_project_configuration
+      summary: View project configuration
+  /api/v3/versions/{id}/projects:
+    get:
+      parameters:
+      - description: Version id
+        example: 1
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              examples:
+                response:
+                  value:
+                    _embedded:
+                      elements:
+                      - _links:
+                          categories:
+                            href: /api/v3/projects/1/categories
+                          self:
+                            href: /api/v3/projects/1
+                            title: Lorem
+                          status:
+                            href: /api/v3/project_statuses/on_track
+                            title: On track
+                          versions:
+                            href: /api/v3/projects/1/versions
+                        _type: Project
+                        active: true
+                        createdAt: '2014-05-21T08:51:20.396Z'
+                        description:
+                          format: markdown
+                          html: <p>Lorem <strong>ipsum</strong> dolor sit amet</p>
+                          raw: Lorem **ipsum** dolor sit amet
+                        id: 1
+                        identifier: project_identifier
+                        name: Project example
+                        statusExplanation:
+                          format: markdown
+                          html: <p>Everything <strong>fine</strong></p>
+                          raw: Everything **fine**
+                        updatedAt: '2014-05-21T08:51:20.396Z'
+                    _links:
+                      self:
+                        href: /api/v3/versions/2/projects
+                    _type: Collection
+                    count: 1
+                    total: 1
+              schema:
+                $ref: '#/components/schemas/List_workspaces_by_versionModel'
+          description: OK
+          headers: {}
+        '404':
+          description: 'Returned if the version does not exist or the client does not have sufficient permissions
+
+            to see it.
+
+
+            **Required permission:** view work packages **or** manage versions (any project where the given version is available)
+
+
+            *Note: A client without sufficient permissions shall not be able to test for the existence of a version.
+
+            That''s why a 404 is returned here, even if a 403 might be more appropriate.*'
+          headers: {}
+      tags:
+      - Projects
+      description: 'This endpoint lists the projects where the given version is available.
+
+
+        The projects returned depend on the sharing settings of the given version,
+
+        but are also limited to the projects that the current user is allowed to see.
+
+
+        This endpoint is deprecated and replaced by [`/api/v3/versions/{id}/workspaces`](https://www.openproject.org/docs/api/endpoints/projects/#list-workspaces-having-version)'
+      operationId: List_projects_with_version
+      summary: List projects having version
+  /api/v3/versions/{id}/workspaces:
+    get:
+      parameters:
+      - description: Version id
+        example: 1
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              examples:
+                response:
+                  value:
+                    _embedded:
+                      elements:
+                      - _links:
+                          categories:
+                            href: /api/v3/projects/1/categories
+                          self:
+                            href: /api/v3/projects/1
+                            title: Lorem
+                          status:
+                            href: /api/v3/project_statuses/on_track
+                            title: On track
+                          versions:
+                            href: /api/v3/projects/1/versions
+                        _type: Project
+                        active: true
+                        createdAt: '2014-05-21T08:51:20.396Z'
+                        description:
+                          format: markdown
+                          html: <p>Lorem <strong>ipsum</strong> dolor sit amet</p>
+                          raw: Lorem **ipsum** dolor sit amet
+                        id: 1
+                        identifier: project_identifier
+                        name: Project example
+                        statusExplanation:
+                          format: markdown
+                          html: <p>Everything <strong>fine</strong></p>
+                          raw: Everything **fine**
+                        updatedAt: '2014-05-21T08:51:20.396Z'
+                    _links:
+                      self:
+                        href: /api/v3/versions/2/projects
+                    _type: Collection
+                    count: 1
+                    total: 1
+              schema:
+                $ref: '#/components/schemas/List_workspaces_by_versionModel'
+          description: OK
+          headers: {}
+        '404':
+          description: 'Returned if the version does not exist or the client does not have sufficient permissions
+
+            to see it.
+
+
+            **Required permission:** view work packages **or** manage versions (any workspace where the given version is available)
+
+
+            *Note: A client without sufficient permissions shall not be able to test for the existence of a version.
+
+            That''s why a 404 is returned here, even if a 403 might be more appropriate.*'
+          headers: {}
+      tags:
+      - Projects
+      description: 'This endpoint lists the workspaces where the given version is available.
+
+
+        The workspaces returned depend on the sharing settings of the given version,
+
+        but are also limited to the workspaces that the current user is allowed to see.'
+      operationId: List_workspaces_with_version
+      summary: List workspaces having version
+components:
+  schemas:
+    CollectionModel:
+      type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
+    ProjectConfigurationModel:
+      allOf:
+      - $ref: '#/components/schemas/ConfigurationModel'
+      - type: object
+        properties:
+          enabledInternalComments:
+            type: boolean
+            description: Whether internal comments are enabled for this project
+            readOnly: true
+    List_available_parent_project_candidatesModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The project collection
+
+
+                    **Resource**: ProjectCollection'
+                  readOnly: true
+          _embedded:
+            type: object
+            properties:
+              elements:
+                type: array
+                readOnly: true
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/ProjectModel'
+                  - $ref: '#/components/schemas/ProgramModel'
+                  - $ref: '#/components/schemas/PortfolioModel'
+                description: Collection of projects
+    PortfolioModel:
+      allOf:
+      - $ref: '#/components/schemas/CustomFieldProperties'
+      - $ref: '#/components/schemas/CustomCommentProperties'
+      - type: object
+        properties:
+          _type:
+            type: string
+            enum:
+            - Portfolio
+          id:
+            type: integer
+            description: Portfolios' id
+            minimum: 1
+          identifier:
+            type: string
+          name:
+            type: string
+          active:
+            type: boolean
+            description: Indicates whether the portfolio is currently active or already archived
+          favorited:
+            type: boolean
+            description: Indicates whether the portfolio is favorited by the current user
+          statusExplanation:
+            allOf:
+            - $ref: '#/components/schemas/Formattable'
+            - description: A text detailing and explaining why the portfolio has the reported status
+          public:
+            type: boolean
+            description: Indicates whether the portfolio is accessible for everybody
+          description:
+            $ref: '#/components/schemas/Formattable'
+          createdAt:
+            type: string
+            format: date-time
+            description: Time of creation. Can be writable by admins with the `apiv3_write_readonly_attributes` setting enabled.
+          updatedAt:
+            type: string
+            format: date-time
+            description: Time of the most recent change to the portfolio
+          _links:
+            type: object
+            required:
+            - self
+            - categories
+            properties:
+              update:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Form endpoint that aids in updating this portfolio
+
+
+                    # Conditions
+
+
+                    **Permission**: edit workspace'
+              updateImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Directly update this portfolio
+
+
+                    # Conditions
+
+
+                    **Permission**: edit workspace'
+              delete:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Delete this portfolio
+
+
+                    # Conditions
+
+
+                    **Permission**: admin'
+              favor:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Mark this portfolio as favorited by the current user
+
+
+                    # Conditions
+
+
+                    Only present if the portfolio is not yet favorited
+
+
+                    Permission**: none but login is required'
+              disfavor:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Mark this portfolio as not favorited by the current user
+
+
+                    # Conditions
+
+                    Only present if the portfolio is favorited by the current user
+
+
+                    Permission**: none but login is required'
+              createWorkPackage:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Form endpoint that aids in preparing and creating a work package
+
+
+                    # Conditions
+
+
+                    **Permission**: add work packages'
+              createWorkPackageImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Directly creates a work package in the portfolio
+
+
+                    # Conditions
+
+
+                    **Permission**: add work packages'
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This portfolio
+
+
+                    **Resource**: Portfolio'
+              categories:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Categories available in this portfolio
+
+
+                    **Resource**: Collection'
+              types:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Types available in this portfolio
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view work packages or manage types'
+              versions:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Versions available in this portfolio
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view work packages or manage versions'
+              memberships:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Memberships in the  portfolio
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view members'
+              workPackages:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Work Packages of this portfolio
+
+
+                    **Resource**: Collection'
+              parent:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Parent of the portfolio
+
+
+                    **Resource**: Portfolio
+
+
+                    # Conditions
+
+
+                    **Permission** edit workspace'
+              status:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Denotes the status of the portfolio, so whether the portfolio is on track, at risk or is having trouble.
+
+
+                    **Resource**: ProjectStatus
+
+
+                    # Conditions
+
+
+                    **Permission** edit workspace'
+              storages:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'The link to a storage that is active for this portfolio.
+
+
+                      **Resource**: Storage
+
+
+                      # Conditions
+
+
+                      **Permission**: view_file_links'
+              projectStorages:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The project storage collection of this portfolio.
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view_file_links'
+              ancestors:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'A collection of links to the ancestor portfolios.
+
+
+                      **Resource**: Portfolio'
+    View_project_statusModel:
+      type: object
+      example:
+        _type: ProjectStatus
+        id: on_track
+        name: On track
+        _links:
+          self:
+            href: /api/v3/project_statuses/on_track
+    SchemaPropertyModel:
+      type: object
+      required:
+      - type
+      - name
+      - required
+      - hasDefault
+      - writable
+      properties:
+        type:
+          type: string
+          description: The resource type for this property.
+        name:
+          type: string
+          description: The name of the property.
+        required:
+          type: boolean
+          description: Indicates, if the property is required for submitting a request of this schema.
+        hasDefault:
+          type: boolean
+          description: Indicates, if the property has a default.
+        writable:
+          type: boolean
+          description: Indicates, if the property is writable when sending a request of this schema.
+        options:
+          type: object
+          description: Additional options for the property.
+        location:
+          type: string
+          description: Defines the json path where the property is located in the payload.
+          default: ''
+        placeholder:
+          type: string
+          description: A placeholder for the property to display if the property has no value.
+        _links:
+          type: object
+          description: Useful links for this property (e.g. an endpoint to fetch allowed values)
+    Workspaces_schemaModel:
+      type: object
+      description: A schema for a workspace. This schema defines the attributes of a workspace.
+      properties:
+        _type:
+          type: string
+          enum:
+          - Schema
+          description: The type identifier for this resource
+        _dependencies:
+          type: array
+          description: Schema dependencies (currently empty for workspaces)
+        _attributeGroups:
+          type: array
+          items:
+            type: object
+            properties:
+              _type:
+                type: string
+                enum:
+                - ProjectFormCustomFieldSection
+                description: The type identifier for this resource
+              id:
+                type: integer
+                description: The unique identifier of the custom field section
+              name:
+                type: string
+                description: The human-readable name of the custom field section
+              attributes:
+                type: array
+                items:
+                  type: string
+                description: 'Array of camelCase custom field attribute names belonging to this section.
+
+                  Only includes custom fields visible to the current user.'
+          description: "Defines the organizational structure of project custom fields into sections for UI rendering.\n\nEach attribute group represents a project attribute section containing related project attributes.\nThe sections determine how project attributes are visually organized and grouped in forms.\n\n**Key behaviors:**\n- Admin-only project attributes appear only for users with admin privileges\n- Empty sections (with no accessible project attributes) are omitted from the response\n- The order reflects the configured section positioning in admin settings\n- Each section contains only project attributes assigned to that specific section\n\n**Example structure:**\n```json\n[\n  {\n    \"_type\": \"ProjectFormCustomFieldSection\",\n    \"name\": \"Project Details\",\n    \"attributes\": [\"customField1\", \"customField3\"]\n  },\n  {\n    \"_type\": \"ProjectFormCustomFieldSection\",\n    \"name\": \"Budget Information\",\n    \"attributes\": [\"customField2\", \"customField4\"]\n  }\n]\n```"
+        id:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        name:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        identifier:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        description:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        public:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        active:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        status:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        statusExplanation:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        parent:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        createdAt:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        updatedAt:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        _links:
+          type: object
+          description: Links related to this resource
+          properties:
+            self:
+              type: object
+              properties:
+                href:
+                  type: string
+                  example: /api/v3/workspaces/schema
+      patternProperties:
+        ^customField\d+$:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        ^customComment\d+$:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+      example:
+        _type: Schema
+        _dependencies: []
+        _attributeGroups:
+        - _type: ProjectFormCustomFieldSection
+          name: Project Details
+          attributes:
+          - customField30
+          - customField34
+        - _type: ProjectFormCustomFieldSection
+          name: Budget Information
+          attributes:
+          - customField31
+          - customField32
+          - customField35
+        id:
+          type: Integer
+          name: ID
+          required: true
+          hasDefault: false
+          writable: false
+        name:
+          type: String
+          name: Name
+          required: true
+          hasDefault: false
+          writable: true
+          minLength: 1
+          maxLength: 255
+        identifier:
+          type: String
+          name: Identifier
+          required: true
+          hasDefault: false
+          writable: true
+          minLength: 1
+          maxLength: 100
+        description:
+          type: Formattable
+          name: Description
+          required: false
+          hasDefault: false
+          writable: true
+        public:
+          type: Boolean
+          name: Public
+          required: true
+          hasDefault: false
+          writable: true
+        active:
+          type: Boolean
+          name: Active
+          required: true
+          hasDefault: true
+          writable: true
+        status:
+          type: ProjectStatus
+          name: Status
+          required: false
+          hasDefault: true
+          writable: true
+          _links:
+            allowedValues:
+            - href: /api/v3/project_statuses/on_track
+              title: On track
+            - href: /api/v3/project_statuses/at_risk
+              title: At risk
+            - href: /api/v3/project_statuses/off_track
+              title: Off track
+        statusExplanation:
+          type: Formattable
+          name: Status explanation
+          required: false
+          hasDefault: false
+          writable: true
+        parent:
+          type: Workspace
+          name: Subproject of
+          required: false
+          hasDefault: false
+          writable: true
+          location: _links
+          visibility: default
+          _links: {}
+        createdAt:
+          type: DateTime
+          name: Created on
+          required: true
+          hasDefault: false
+          writable: false
+        updatedAt:
+          type: DateTime
+          name: Updated on
+          required: true
+          hasDefault: false
+          writable: false
+        customField30:
+          type: Integer
+          name: Integer project custom field
+          required: false
+          hasDefault: false
+          writable: true
+          visibility: default
+        customField31:
+          type: CustomOption
+          name: List project custom field
+          required: false
+          hasDefault: false
+          writable: true
+          location: _links
+          visibility: default
+          _links: {}
+        customField32:
+          type: Version
+          name: Version project custom field
+          required: false
+          hasDefault: false
+          writable: true
+          location: _links
+          visibility: default
+          _links: {}
+        customField34:
+          type: Boolean
+          name: Boolean project custom field
+          required: false
+          hasDefault: false
+          writable: true
+          visibility: default
+        customField35:
+          type: String
+          name: Text project custom field
+          required: true
+          hasDefault: false
+          writable: true
+          visibility: default
+        customComment35:
+          type: String
+          name: Text project custom field comment
+          required: false
+          hasDefault: false
+          writable: true
+        _links:
+          self:
+            href: /api/v3/workspaces/schema
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
+    List_workspaces_by_versionModel:
+      type: object
+      example:
+        _links:
+          self:
+            href: /api/v3/versions/2/workspaces
+        total: 1
+        count: 1
+        _type: Collection
+        _embedded:
+          elements:
+          - _type: Project
+            _links:
+              self:
+                href: /api/v3/projects/1
+                title: Lorem
+              categories:
+                href: /api/v3/projects/1/categories
+              versions:
+                href: /api/v3/projects/1/versions
+              status:
+                href: /api/v3/project_statuses/on_track
+                title: On track
+            id: 1
+            identifier: project_identifier
+            name: Project example
+            description:
+              format: markdown
+              raw: Lorem **ipsum** dolor sit amet
+              html: <p>Lorem <strong>ipsum</strong> dolor sit amet</p>
+            active: true
+            statusExplanation:
+              format: markdown
+              raw: Everything **fine**
+              html: <p>Everything <strong>fine</strong></p>
+            createdAt: '2014-05-21T08:51:20.142Z'
+            updatedAt: '2014-05-21T08:51:20.142Z'
+    ConfigurationModel:
+      type: object
+      properties:
+        maximumAttachmentFileSize:
+          type: integer
+          description: The maximum allowed size of an attachment in Bytes
+          readOnly: true
+        hostName:
+          type: string
+          description: The host name configured for the system
+          readOnly: true
+        perPageOptions:
+          type: array
+          description: Page size steps to be offered in paginated list UI
+          items:
+            type: integer
+        durationFormat:
+          type: string
+          description: The format used to display Work, Remaining Work, and Spent time durations
+          readOnly: true
+        activeFeatureFlags:
+          type: array
+          description: The list of all feature flags that are active
+          items:
+            type: string
+    Formattable:
+      type: object
+      required:
+      - format
+      properties:
+        format:
+          type: string
+          enum:
+          - plain
+          - markdown
+          - custom
+          readOnly: true
+          description: Indicates the formatting language of the raw text
+          example: markdown
+        raw:
+          type: string
+          description: The raw text, as entered by the user
+          example: I **am** formatted!
+        html:
+          type: string
+          readOnly: true
+          description: The text converted to HTML according to the format
+          example: I <strong>am</strong> formatted!
+      example:
+        format: markdown
+        raw: I am formatted!
+        html: I am formatted!
+    OffsetPaginatedCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - pageSize
+        - offset
+        - _links
+        properties:
+          pageSize:
+            type: integer
+            description: 'The amount of elements per page. If not set by the request this value defaults to the server''s system
+
+              settings.'
+            minimum: 0
+          offset:
+            type: integer
+            description: The page offset indicating on which page the element collection starts.
+            minimum: 0
+          _links:
+            $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    ProjectCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/OffsetPaginatedCollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            allOf:
+            - $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
+            - type: object
+              properties:
+                representations:
+                  type: array
+                  items:
+                    allOf:
+                    - $ref: '#/components/schemas/Link'
+                    - description: A project collection representation in a specific file format.
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectModel'
+    ProgramModel:
+      allOf:
+      - $ref: '#/components/schemas/CustomFieldProperties'
+      - $ref: '#/components/schemas/CustomCommentProperties'
+      - type: object
+        properties:
+          _type:
+            type: string
+            enum:
+            - Program
+          id:
+            type: integer
+            description: Programs' id
+            minimum: 1
+          identifier:
+            type: string
+          name:
+            type: string
+          active:
+            type: boolean
+            description: Indicates whether the program is currently active or already archived
+          favorited:
+            type: boolean
+            description: Indicates whether the program is favorited by the current user
+          statusExplanation:
+            allOf:
+            - $ref: '#/components/schemas/Formattable'
+            - description: A text detailing and explaining why the program has the reported status
+          public:
+            type: boolean
+            description: Indicates whether the program is accessible for everybody
+          description:
+            $ref: '#/components/schemas/Formattable'
+          createdAt:
+            type: string
+            format: date-time
+            description: Time of creation. Can be writable by admins with the `apiv3_write_readonly_attributes` setting enabled.
+          updatedAt:
+            type: string
+            format: date-time
+            description: Time of the most recent change to the program
+          _links:
+            type: object
+            required:
+            - self
+            - categories
+            properties:
+              update:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Form endpoint that aids in updating this program
+
+
+                    # Conditions
+
+
+                    **Permission**: edit workspace'
+              updateImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Directly update this program
+
+
+                    # Conditions
+
+
+                    **Permission**: edit workspace'
+              delete:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Delete this program
+
+
+                    # Conditions
+
+
+                    **Permission**: admin'
+              favor:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Mark this program as favorited by the current user
+
+
+                    # Conditions
+
+
+                    Only present if the program is not yet favorited
+
+
+                    Permission**: none but login is required'
+              disfavor:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Mark this program as not favorited by the current user
+
+
+                    # Conditions
+
+                    Only present if the program is favorited by the current user
+
+
+                    Permission**: none but login is required'
+              createWorkPackage:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Form endpoint that aids in preparing and creating a work package
+
+
+                    # Conditions
+
+
+                    **Permission**: add work packages'
+              createWorkPackageImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Directly creates a work package in the program
+
+
+                    # Conditions
+
+
+                    **Permission**: add work packages'
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This program
+
+
+                    **Resource**: Program'
+              categories:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Categories available in this program
+
+
+                    **Resource**: Collection'
+              types:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Types available in this program
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view work packages or manage types'
+              versions:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Versions available in this program
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view work packages or manage versions'
+              memberships:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Memberships in the  program
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view members'
+              workPackages:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Work Packages of this program
+
+
+                    **Resource**: Collection'
+              parent:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Parent of the program
+
+
+                    **Resource**: Program
+
+
+                    # Conditions
+
+
+                    **Permission** edit workspace'
+              status:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Denotes the status of the program, so whether the program is on track, at risk or is having trouble.
+
+
+                    **Resource**: ProjectStatus
+
+
+                    # Conditions
+
+
+                    **Permission** edit workspace'
+              storages:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'The link to a storage that is active for this program.
+
+
+                      **Resource**: Storage
+
+
+                      # Conditions
+
+
+                      **Permission**: view_file_links'
+              projectStorages:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The project storage collection of this program.
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view_file_links'
+              ancestors:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'A collection of links to the ancestor workspace.
+
+
+                      **Resource**: Workspace'
+    CustomCommentProperties:
+      type: object
+      patternProperties:
+        ^customComment\d+$:
+          type:
+          - 'null'
+          - string
+          description: 'A plain-text comment associated with a project custom field that has comments enabled.
+
+
+            The property is only present when the corresponding `customField{N}` has `has_comment` set to `true`.'
+    ProjectModel:
+      allOf:
+      - $ref: '#/components/schemas/CustomFieldProperties'
+      - $ref: '#/components/schemas/CustomCommentProperties'
+      - type: object
+        properties:
+          _type:
+            type: string
+            enum:
+            - Project
+          id:
+            type: integer
+            description: Projects' id
+            minimum: 1
+          identifier:
+            type: string
+          name:
+            type: string
+          active:
+            type: boolean
+            description: Indicates whether the project is currently active or already archived
+          favorited:
+            type: boolean
+            description: Indicates whether the project is favorited by the current user
+          statusExplanation:
+            allOf:
+            - $ref: '#/components/schemas/Formattable'
+            - description: A text detailing and explaining why the project has the reported status
+          public:
+            type: boolean
+            description: Indicates whether the project is accessible for everybody
+          description:
+            $ref: '#/components/schemas/Formattable'
+          createdAt:
+            type: string
+            format: date-time
+            description: Time of creation. Can be writable by admins with the `apiv3_write_readonly_attributes` setting enabled.
+          updatedAt:
+            type: string
+            format: date-time
+            description: Time of the most recent change to the project
+          _links:
+            type: object
+            required:
+            - self
+            - categories
+            properties:
+              update:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Form endpoint that aids in updating this project
+
+
+                    # Conditions
+
+
+                    **Permission**: edit workspace'
+              updateImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Directly update this project
+
+
+                    # Conditions
+
+
+                    **Permission**: edit workspace'
+              delete:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Delete this project
+
+
+                    # Conditions
+
+
+                    **Permission**: admin'
+              favor:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Mark this project as favorited by the current user
+
+
+                    # Conditions
+
+
+                    Only present if the project is not yet favorited
+
+
+                    Permission**: none but login is required'
+              disfavor:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Mark this project as not favorited by the current user
+
+
+                    # Conditions
+
+                    Only present if the project is favorited by the current user
+
+
+                    Permission**: none but login is required'
+              createWorkPackage:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Form endpoint that aids in preparing and creating a work package
+
+
+                    # Conditions
+
+
+                    **Permission**: add work packages'
+              createWorkPackageImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Directly creates a work package in the project
+
+
+                    # Conditions
+
+
+                    **Permission**: add work packages'
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This project
+
+
+                    **Resource**: Project'
+              categories:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Categories available in this project
+
+
+                    **Resource**: Collection'
+              types:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Types available in this project
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view work packages or manage types'
+              versions:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Versions available in this project
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view work packages or manage versions'
+              memberships:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Memberships in the project
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view members'
+              workPackages:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Work Packages of this project
+
+
+                    **Resource**: Collection'
+              parent:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Parent of the project
+
+
+                    **Resource**: Workspace
+
+
+                    # Conditions
+
+
+                    **Permission** edit workspace'
+              status:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Denotes the status of the project, so whether the project is on track, at risk or is having trouble.
+
+
+                    **Resource**: ProjectStatus
+
+
+                    # Conditions
+
+
+                    **Permission** edit workspace'
+              storages:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'The link to a storage that is active for this project.
+
+
+                      **Resource**: Storage
+
+
+                      # Conditions
+
+
+                      **Permission**: view_file_links'
+              projectStorages:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The project storage collection of this project.
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view_file_links'
+              ancestors:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'A collection of links to the ancestor workspaces.
+
+
+                      **Resource**: Workspace'
+    OffsetPaginatedCollectionLinks:
+      allOf:
+      - $ref: '#/components/schemas/CollectionLinks'
+      - type: object
+        required:
+        - jumpTo
+        - changeSize
+        properties:
+          jumpTo:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: A templated link to jump to a given offset.
+          changeSize:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: A templated link to change the current page size.
+          previousByOffset:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: 'A link to the previous page of the collection.
+
+
+                # Conditions
+
+                - The collection is not on the first page.'
+          nextByOffset:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: 'A link to the next page of the collection.
+
+
+                # Conditions
+
+                - The collection is not on the last page.'
+    CustomFieldProperties:
+      type: object
+      patternProperties:
+        ^customField\d+$:
+          type:
+          - 'null'
+          - number
+          - boolean
+          - string
+          - object
+          description: 'A custom field value, that belongs to a custom field of a simple type:
+
+
+            - Boolean
+
+            - Date
+
+            - Float
+
+            - Integer
+
+            - Link (URL)
+
+            - Text
+
+            - Long text'
+  responses:
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
+    UnsupportedMediaType:
+      description: Occurs when the client sends an unsupported Content-Type header.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
+            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+    InvalidRequestBody:
+      description: Occurs when the client did not send a valid JSON object in the request body.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+            message: The request body was not a single JSON object.
+  examples:
+    Project:
+      value:
+        _type: Project
+        _links:
+          self:
+            href: /api/v3/projects/1
+            title: Lorem
+          createWorkPackage:
+            href: /api/v3/projects/1/work_packages/form
+            method: post
+          createWorkPackageImmediate:
+            href: /api/v3/projects/1/work_packages
+            method: post
+          categories:
+            href: /api/v3/projects/1/categories
+          types:
+            href: /api/v3/projects/1/types
+          versions:
+            href: /api/v3/projects/1/versions
+          workPackages:
+            href: /api/v3/projects/1/work_packages
+          memberships:
+            href: /api/v3/memberships?filters=[{"project":{"operator":"=","values":["1"]}}]
+          customField456:
+            href: /api/v3/users/315
+            title: A user
+          parent:
+            href: /api/v3/projects/123
+            title: Parent project
+          ancestors:
+          - href: /api/v3/portfolios/2
+            title: Root portfolios
+          - href: /api/v3/programs/12
+            title: Grandparent program
+          - href: /api/v3/projects/123
+            title: Parent project
+          status:
+            href: /api/v3/project_statuses/on_track
+            title: On track
+        id: 1
+        identifier: project_example
+        name: Project example
+        active: true
+        public: false
+        statusExplanation:
+          format: markdown
+          raw: Everything **fine**
+          html: <p>Everything <strong>fine</strong></p>
+        description:
+          format: markdown
+          raw: Lorem **ipsum** dolor sit amet
+          html: <p>Lorem <strong>ipsum</strong> dolor sit amet</p>
+        createdAt: '2014-05-21T08:51:20.396Z'
+        updatedAt: '2014-05-21T08:51:20.396Z'
+        customField123: 123
+        customComment123: Why is the value 123?
+    ProjectBody:
+      value:
+        name: Project example
+        statusExplanation:
+          raw: Everything **fine**
+        description:
+          raw: Lorem **ipsum** dolor sit amet
+        customField123: 123
+        customComment123: Because it is 123!
+        _links:
+          parent:
+            href: /api/v3/projects/123
+          customField456:
+            href: /api/v3/users/315
+    ProjectCollection:
+      value:
+        _type: Collection
+        count: 2
+        total: 2
+        pageSize: 20
+        offset: 1
+        _embedded:
+          elements:
+          - _abbreviated: Project resource shortened for brevity
+            id: 1
+            identifier: initialproject
+            name: DeathStar construction
+            active: true
+            public: true
+          - _abbreviated: Project resource shortened for brevity
+            id: 2
+            identifier: mysecret
+            name: Palpatine's secret plan
+            active: true
+            public: false
+        _links:
+          self:
+            href: /api/v3/projects?filters=%5B%5D&offset=1&pageSize=20
+          jumpTo:
+            href: /api/v3/projects?filters=%5B%5D&offset=%7Boffset%7D&pageSize=20
+            templated: true
+          changeSize:
+            href: /api/v3/projects?filters=%5B%5D&offset=1&pageSize=%7Bsize%7D
+            templated: true
+          representations:
+          - href: /projects.csv?filters=%5B%5D&offset=1&pageSize=20
+            identifier: csv
+            type: text/csv
+            title: CSV
+          - href: /projects.xls?filters=%5B%5D&offset=1&pageSize=20
+            identifier: xls
+            type: application/vnd.ms-excel
+            title: XLS
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic

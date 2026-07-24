@@ -1,0 +1,1380 @@
+openapi: 3.1.2
+info:
+  description: "You're looking at the current **stable** documentation of the OpenProject APIv3. If you're interested in the current\ndevelopment version, please go to [github.com/opf](https://github.com/opf/openproject/tree/dev/docs/api/apiv3).\n\n## Introduction\n\nThe documentation for the APIv3 is written according to the [OpenAPI 3.1 Specification](https://swagger.io/specification/).\nYou can either view the static version of this documentation on the [website](https://www.openproject.org/docs/api/introduction/)\nor the interactive version, rendered with [OpenAPI Explorer](https://github.com/Rhosys/openapi-explorer/blob/main/README.md),\nin your OpenProject installation under `/api/docs`.\nIn the latter you can try out the various API endpoints directly interacting with our OpenProject data.\nMoreover you can access the specification source itself under `/api/v3/spec.json` and `/api/v3/spec.yml`\n(e.g. [here](https://community.openproject.org/api/v3/spec.yml)).\n\nThe APIv3 is a hypermedia REST API, a shorthand for \"Hypermedia As The Engine Of Application State\" (HATEOAS).\nThis means that each endpoint of this API will have links to other resources or actions defined in the resulting body.\n\nThese related resources and actions for any given resource will be context sensitive. For example, only actions that the\nauthenticated user can take are being rendered. This can be used to dynamically identify actions that the user might take for any\ngiven response.\n\nAs an example, if you fetch a work package through the [Work Package endpoint](https://www.openproject.org/docs/api/endpoints/work-packages/), the `update` link will only\nbe present when the user you authenticated has been granted a permission to update the work package in the assigned project.\n\n## HAL+JSON\n\nHAL is a simple format that gives a consistent and easy way to hyperlink between resources in your API.\nRead more in the following specification: [https://tools.ietf.org/html/draft-kelly-json-hal-08](https://tools.ietf.org/html/draft-kelly-json-hal-08)\n\n**OpenProject API implementation of HAL+JSON format** enriches JSON and introduces a few meta properties:\n\n- `_type` - specifies the type of the resource (e.g.: WorkPackage, Project)\n- `_links` - contains all related resource and action links available for the resource\n- `_embedded` - contains all embedded objects\n\nHAL does not guarantee that embedded resources are embedded in their full representation, they might as well be\npartially represented (e.g. some properties can be left out).\nHowever in this API you have the guarantee that whenever a resource is **embedded**, it is embedded in its **full representation**.\n\n## API response structure\n\nAll API responses contain a single HAL+JSON object, even collections of objects are technically represented by\na single HAL+JSON object that itself contains its members. More details on collections can be found\nin the [Collections Section](https://www.openproject.org/docs/api/collections/).\n\n## Authentication\n\nThe API supports the following authentication schemes:\n\n* Session-based authentication\n* API tokens\n    * passed as Bearer token\n    * passed via Basic auth\n* OAuth 2.0\n    * using built-in authorization server\n    * using an external authorization server (RFC 9068)\n\nDepending on the settings of the OpenProject instance many resources can be accessed without being authenticated.\nIn case the instance requires authentication on all requests the client will receive an **HTTP 401** status code\nin response to any request.\n\nOtherwise unauthenticated clients have all the permissions of the anonymous user.\n\n### Session-based authentication\n\nThis means you have to login to OpenProject via the Web-Interface to be authenticated in the API.\nThis method is well-suited for clients acting within the browser, like the Angular-Client built into OpenProject.\n\nIn this case, you always need to pass the HTTP header `X-Requested-With \"XMLHttpRequest\"` for authentication.\n\n### API token as bearer token\n\nUsers can authenticate towards the API v3 using an API token as a bearer token.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -H \"Authorization: Bearer $API_KEY\" https://community.openproject.org/api/v3/users/42\n```\n\nUsers can generate API tokens on their account page.\n\n### API token through Basic Auth\n\nAPI tokens can also be used with basic auth, using the user name `apikey` (NOT your login) and the API token as the password.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -u apikey:$API_KEY https://community.openproject.org/api/v3/users/42\n```\n\n### OAuth 2.0 authentication\n\nOpenProject allows authentication and authorization with OAuth2 with *Authorization code flow*, as well as *Client credentials* operation modes.\n\nTo get started, you first need to register an application in the OpenProject OAuth administration section of your installation.\nThis will save an entry for your application with a client unique identifier (`client_id`) and an accompanying secret key (`client_secret`).\n\nYou can then use one the following guides to perform the supported OAuth 2.0 flows:\n\n- [Authorization code flow](https://oauth.net/2/grant-types/authorization-code)\n\n- [Authorization code flow with PKCE](https://doorkeeper.gitbook.io/guides/ruby-on-rails/pkce-flow), recommended for clients unable to keep the client_secret confidential\n\n- [Client credentials](https://oauth.net/2/grant-types/client-credentials/) - Requires an application to be bound to an impersonating user for non-public access\n\n### OAuth 2.0 using an external authorization server\n\nThere is a possibility to use JSON Web Tokens (JWT) generated by an OIDC provider configured in OpenProject as a bearer token to do authenticated requests against the API.\nThe following requirements must be met:\n\n- OIDC provider must be configured in OpenProject with **jwks_uri**\n- JWT must be signed using RSA algorithm\n- JWT **iss** claim must be equal to OIDC provider **issuer**\n- JWT **aud** claim must contain the OpenProject **client ID** used at the OIDC provider\n- JWT **scope** claim must include a valid scope to access the desired API (e.g. `api_v3` for APIv3)\n- JWT must be actual (neither expired or too early to be used)\n- JWT must be passed in Authorization header like: `Authorization: Bearer {jwt}`\n- User from **sub** claim must be linked to OpenProject before (e.g. by logging in), otherwise it will be not authenticated\n\nIn more general terms, OpenProject should be compliant to [RFC 9068](https://www.rfc-editor.org/rfc/rfc9068) when validating access tokens.\n\n### Why not username and password?\n\nThe simplest way to do basic auth would be to use a user's username and password naturally.\nHowever, OpenProject already has supported API keys in the past for the API v2, though not through basic auth.\n\nUsing **username and password** directly would have some advantages:\n\n* It is intuitive for the user who then just has to provide those just as they would when logging into OpenProject.\n\n* No extra logic for token management necessary.\n\nOn the other hand using **API keys** has some advantages too, which is why we went for that:\n\n* If compromised while saved on an insecure client the user only has to regenerate the API key instead of changing their password, too.\n\n* They are naturally long and random which makes them invulnerable to dictionary attacks and harder to crack in general.\n\nMost importantly users may not actually have a password to begin with. Specifically when they have registered\nthrough an OpenID Connect provider.\n\n## Cross-Origin Resource Sharing (CORS)\n\nBy default, the OpenProject API is _not_ responding with any CORS headers.\nIf you want to allow cross-domain AJAX calls against your OpenProject instance, you need to enable CORS headers being returned.\n\nPlease see [our API settings documentation](https://www.openproject.org/docs/system-admin-guide/api-and-webhooks/) on\nhow to selectively enable CORS.\n\n## Allowed HTTP methods\n\n- `GET` - Get a single resource or collection of resources\n\n- `POST` - Create a new resource or perform\n\n- `PATCH` - Update a resource\n\n- `DELETE` - Delete a resource\n\n## Compression\n\nResponses are compressed if requested by the client. Currently [gzip](https://www.gzip.org/) and [deflate](https://tools.ietf.org/html/rfc1951)\nare supported. The client signals the desired compression by setting the [`Accept-Encoding` header](https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3).\nIf no `Accept-Encoding` header is send, `Accept-Encoding: identity` is assumed which will result in the API responding uncompressed."
+  title: OpenProject API V3 (Stable) Actions & Capabilities User Working Times API
+  version: '3'
+servers:
+- url: https://qa.openproject-edge.com
+  description: Edge QA instance
+- url: https://qa.openproject-stage.com
+  description: Staging instance
+- url: https://community.openproject.org
+  description: Community instance
+security:
+- BasicAuth: []
+tags:
+- name: User Working Times
+  description: 'User working times allow configuring per-user working hours and personal non-working days,
+
+    in addition to the system-wide work schedule.
+
+
+    A `UserWorkingHours` record defines how many hours a user works on each day of the week,
+
+    along with an availability factor, effective from a given date (`validFrom`). Multiple records
+
+    can exist for a user, each representing a period of their working time configuration. Only the
+
+    most recently effective record (i.e., the one with the latest `validFrom` that is not in the
+
+    future) is used for capacity calculations.
+
+
+    A `UserNonWorkingTime` marks a date range as non-working for a user
+
+    (e.g., a personal day off or a local holiday not covered by the system-wide non-working days).
+
+    If a personal non-working time overlaps with system-wide non-working days, those days
+
+    are not counted twice.
+
+
+    ## UserWorkingHours Actions
+
+
+    | Link   | Description                         | Condition                                                                                     |
+
+    | :----: | ----------------------------------- | --------------------------------------------------------------------------------------------- |
+
+    | update | Update this working hours record    | Record has not yet taken effect (`validFrom` is in the future); **Permission**: see below     |
+
+    | delete | Delete this working hours record    | **Permission**: see below                                                                     |
+
+
+    ## UserWorkingHours Linked Properties
+
+
+    | Link | Description                                              | Type              | Constraints | Supported operations |
+
+    | :--: | -------------------------------------------------------- | ----------------- | ----------- | -------------------- |
+
+    | self | This working hours record                                | UserWorkingHours  | not null    | READ                 |
+
+    | user | The user this working hours record belongs to            | User              | not null    | READ                 |
+
+
+    ## UserWorkingHours Local Properties
+
+
+    | Property          | Description                                                                               | Type    | Constraints          | Supported operations |
+
+    | :---------------: | ----------------------------------------------------------------------------------------- | ------- | -------------------- | -------------------- |
+
+    | id                | The unique identifier of the record                                                       | Integer | x > 0                | READ                 |
+
+    | validFrom         | The date from which this working hours configuration takes effect (ISO 8601 format)       | Date    | not null             | READ / WRITE         |
+
+    | mondayHours       | Hours worked on Monday                                                                    | Float   | x >= 0               | READ / WRITE         |
+
+    | tuesdayHours      | Hours worked on Tuesday                                                                   | Float   | x >= 0               | READ / WRITE         |
+
+    | wednesdayHours    | Hours worked on Wednesday                                                                 | Float   | x >= 0               | READ / WRITE         |
+
+    | thursdayHours     | Hours worked on Thursday                                                                  | Float   | x >= 0               | READ / WRITE         |
+
+    | fridayHours       | Hours worked on Friday                                                                    | Float   | x >= 0               | READ / WRITE         |
+
+    | saturdayHours     | Hours worked on Saturday                                                                  | Float   | x >= 0               | READ / WRITE         |
+
+    | sundayHours       | Hours worked on Sunday                                                                    | Float   | x >= 0               | READ / WRITE         |
+
+    | availabilityFactor| Percentage of working hours the user is available (0–100)                                 | Integer | 0 <= x <= 100        | READ / WRITE         |
+
+
+    ## UserWorkingHours Permissions
+
+
+    - **Administrators** can read and manage working hours for any user.
+
+    - Users with the global **`manage_own_working_times`** permission can read and manage their own working hours.
+
+    - Users with the global **`manage_working_times`** permission can read and manage working hours for any user.
+
+    - All users can read their own working hours records even without a special permission.
+
+    - Records that have already taken effect (i.e., `validFrom` is today or in the past) cannot be updated.
+
+
+    ## UserNonWorkingTime Actions
+
+
+    | Link   | Description                      | Condition                |
+
+    | :----: | -------------------------------- | ------------------------ |
+
+    | delete | Delete this non-working day      | **Permission**: see below |
+
+
+    ## UserNonWorkingTime Linked Properties
+
+
+    | Link | Description                                          | Type               | Constraints | Supported operations |
+
+    | :--: | ---------------------------------------------------- | ------------------ | ----------- | -------------------- |
+
+    | self | This non-working day                                 | UserNonWorkingTime  | not null    | READ                 |
+
+    | user | The user this non-working day belongs to             | User               | not null    | READ                 |
+
+
+    ## UserNonWorkingTime Local Properties
+
+
+    | Property  | Description                                                                     | Type    | Constraints          | Supported operations |
+
+    | :-------: | ------------------------------------------------------------------------------- | ------- | -------------------- | -------------------- |
+
+    | id        | The unique identifier of the record                                             | Integer | x > 0                | READ                 |
+
+    | startDate | The first date of the non-working time range (ISO 8601 format)                  | Date    | not null             | READ / WRITE         |
+
+    | endDate   | The last date of the non-working time range (ISO 8601 format)                   | Date    | not null, >= startDate | READ / WRITE       |
+
+
+    ## UserNonWorkingTime Permissions
+
+
+    - **Administrators** can read and manage personal non-working days for any user.
+
+    - Users with the global **`manage_own_working_times`** permission can read and manage their own non-working days.
+
+    - Users with the global **`manage_working_times`** permission can read and manage non-working days for any user.
+
+    - A personal non-working time must not overlap with another non-working time record for the same user.'
+paths:
+  /api/v3/users/{id}/non_working_times:
+    get:
+      summary: List personal non-working times for a user
+      operationId: list_user_non_working_times
+      tags:
+      - User Working Times
+      description: 'Returns all personal non-working times for the given user, ordered by start date ascending.
+
+
+        Personal non-working times mark date ranges as non-working for a user
+
+        (e.g., a local holiday or personal day off not covered by the system-wide non-working days).
+
+
+        **Required permissions:**
+
+        - Administrators can view non-working days for any user.
+
+        - Users with the global `manage_own_working_times` permission can view their own records.
+
+        - Users with the global `manage_working_times` permission can view non-working days for any user.
+
+
+        Use `me` as the `id` to reference the current user.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: User id. Use `me` to reference the current user.
+        schema:
+          type: string
+        example: 42
+      - name: year
+        in: query
+        required: false
+        description: Filter results to the given year. Defaults to the current year if not provided.
+        schema:
+          type: integer
+        example: 2025
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/UserNonWorkingTimeCollectionModel'
+        '401':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:Unauthenticated
+                message: You need to be authenticated to access this resource.
+          description: Returned if the client is not authenticated.
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The specified user does not exist or you do not have permission to view them.
+          description: Returned if the user does not exist or is not visible to the requesting user.
+    post:
+      summary: Create a personal non-working day for a user
+      operationId: create_user_non_working_time
+      tags:
+      - User Working Times
+      description: 'Creates a personal non-working time range for the given user.
+
+
+        The date range must not overlap with an existing non-working time record for the same user.
+
+
+        **Required permissions:**
+
+        - Administrators can create non-working days for any user.
+
+        - Users with the global `manage_own_working_times` permission can create records for themselves.
+
+        - Users with the global `manage_working_times` permission can create non-working days for any user.
+
+
+        Use `me` as the `id` to reference the current user.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: User id. Use `me` to reference the current user.
+        schema:
+          type: string
+        example: 42
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserNonWorkingTimeModel'
+            example:
+              startDate: '2025-06-16'
+              endDate: '2025-06-20'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/UserNonWorkingTimeModel'
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '401':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:Unauthenticated
+                message: You need to be authenticated to access this resource.
+          description: Returned if the client is not authenticated.
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** `manage_working_times` globally (for other users) or
+
+            `manage_own_working_times` globally (for own records).'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The specified user does not exist or you do not have permission to view them.
+          description: Returned if the user does not exist or is not visible to the requesting user.
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+                message: Validation failed.
+          description: 'Returned if the request body contains invalid parameters, or if the date range
+
+            overlaps with an existing non-working time record for the user.'
+  /api/v3/users/{id}/non_working_times/{non_working_time_id}:
+    get:
+      summary: View a personal non-working time record
+      operationId: view_user_non_working_time
+      tags:
+      - User Working Times
+      description: 'Returns a single personal non-working time record for the given user.
+
+
+        **Required permissions:**
+
+        - Administrators can view non-working time records for any user.
+
+        - Users with the global `manage_own_working_times` permission can view their own records.
+
+        - Users with the global `manage_working_times` permission can view non-working time records for any user.
+
+
+        Use `me` as the `id` to reference the current user.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: User id. Use `me` to reference the current user.
+        schema:
+          type: string
+        example: 42
+      - name: non_working_time_id
+        in: path
+        required: true
+        description: The id of the personal non-working time record.
+        schema:
+          type: integer
+        example: 7
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/UserNonWorkingTimeModel'
+        '401':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:Unauthenticated
+                message: You need to be authenticated to access this resource.
+          description: Returned if the client is not authenticated.
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The requested resource could not be found.
+          description: 'Returned if the user or non-working time record does not exist,
+
+            or if the requesting user does not have permission to view it.'
+    patch:
+      summary: Update a personal non-working time record
+      operationId: update_user_non_working_time
+      tags:
+      - User Working Times
+      description: 'Updates the given personal non-working time record.
+
+
+        **Required permissions:**
+
+        - Administrators can update non-working time records for any user.
+
+        - Users with the global `manage_own_working_times` permission can update their own records.
+
+        - Users with the global `manage_working_times` permission can update non-working time records for any user.
+
+
+        Use `me` as the `id` to reference the current user.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: User id. Use `me` to reference the current user.
+        schema:
+          type: string
+        example: 42
+      - name: non_working_time_id
+        in: path
+        required: true
+        description: The id of the personal non-working time record.
+        schema:
+          type: integer
+        example: 7
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserNonWorkingTimeModel'
+            example:
+              startDate: '2025-06-23'
+              endDate: '2025-06-27'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/UserNonWorkingTimeModel'
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '401':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:Unauthenticated
+                message: You need to be authenticated to access this resource.
+          description: Returned if the client is not authenticated.
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** `manage_working_times` globally (for other users) or
+
+            `manage_own_working_times` globally (for own records).'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The requested resource could not be found.
+          description: 'Returned if the user or non-working time record does not exist,
+
+            or if the requesting user does not have permission to view it.'
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+                message: Validation failed.
+          description: 'Returned if the request body contains invalid parameters, or if the date range
+
+            overlaps with an existing non-working time record for the user.'
+    delete:
+      summary: Delete a personal non-working time record
+      operationId: delete_user_non_working_time
+      tags:
+      - User Working Times
+      description: 'Removes the personal non-working time record for the given user.
+
+
+        **Required permissions:**
+
+        - Administrators can delete non-working time records for any user.
+
+        - Users with the global `manage_own_working_times` permission can delete their own records.
+
+        - Users with the global `manage_working_times` permission can delete non-working time records for any user.
+
+
+        Use `me` as the `id` to reference the current user.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: User id. Use `me` to reference the current user.
+        schema:
+          type: string
+        example: 42
+      - name: non_working_time_id
+        in: path
+        required: true
+        description: The id of the personal non-working time record.
+        schema:
+          type: integer
+        example: 7
+      responses:
+        '204':
+          description: 'No Content.
+
+            The record was deleted successfully.'
+        '401':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:Unauthenticated
+                message: You need to be authenticated to access this resource.
+          description: Returned if the client is not authenticated.
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** `manage_working_times` globally (for other users) or
+
+            `manage_own_working_times` globally (for own records).'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The requested resource could not be found.
+          description: 'Returned if the user or non-working time record does not exist,
+
+            or if the requesting user does not have permission to view it.'
+  /api/v3/users/{id}/working_hours:
+    get:
+      summary: List working hours for a user
+      operationId: list_user_working_hours
+      tags:
+      - User Working Times
+      description: 'Returns all working hours records for the given user, ordered by `validFrom` descending.
+
+
+        Multiple records may exist for a user; each represents a period of their working time
+
+        configuration. The most recently effective record (the one with the latest `validFrom`
+
+        that is not in the future) is used for capacity calculations.
+
+
+        **Required permissions:**
+
+        - Administrators can view working hours for any user.
+
+        - Users with the global `manage_working_times` permission can view working hours for any user.
+
+        - Any user can view their own working hours records.
+
+
+        Use `me` as the `id` to reference the current user.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: User id. Use `me` to reference the current user.
+        schema:
+          type: string
+        example: 42
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/UserWorkingHoursCollectionModel'
+        '401':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:Unauthenticated
+                message: You need to be authenticated to access this resource.
+          description: Returned if the client is not authenticated.
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The specified user does not exist or you do not have permission to view them.
+          description: Returned if the user does not exist or is not visible to the requesting user.
+    post:
+      summary: Create a working hours record for a user
+      operationId: create_user_working_hours
+      tags:
+      - User Working Times
+      description: 'Creates a new working hours record for the given user, effective from the given date.
+
+
+        **Required permissions:**
+
+        - Administrators can create working hours records for any user.
+
+        - Users with the global `manage_own_working_times` permission can create records for themselves.
+
+        - Users with the global `manage_working_times` permission can create working hours records for any user.
+
+
+        Use `me` as the `id` to reference the current user.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: User id. Use `me` to reference the current user.
+        schema:
+          type: string
+        example: 42
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserWorkingHoursModel'
+            example:
+              validFrom: '2025-01-01'
+              mondayHours: 8
+              tuesdayHours: 8
+              wednesdayHours: 8
+              thursdayHours: 8
+              fridayHours: 8
+              saturdayHours: 0
+              sundayHours: 0
+              availabilityFactor: 100
+      responses:
+        '201':
+          description: Created
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/UserWorkingHoursModel'
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '401':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:Unauthenticated
+                message: You need to be authenticated to access this resource.
+          description: Returned if the client is not authenticated.
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** `manage_working_times` globally (for other users) or
+
+            `manage_own_working_times` globally (for own records).'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The specified user does not exist or you do not have permission to view them.
+          description: Returned if the user does not exist or is not visible to the requesting user.
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+                message: Validation failed.
+          description: Returned if the request body contains invalid parameters.
+  /api/v3/users/{id}/working_hours/{working_hours_id}:
+    get:
+      summary: View a working hours record
+      operationId: view_user_working_hours_record
+      tags:
+      - User Working Times
+      description: 'Returns a single working hours record for the given user.
+
+
+        **Required permissions:**
+
+        - Administrators can view working hours records for any user.
+
+        - Users with the global `manage_working_times` permission can view working hours for any user.
+
+        - Any user can view their own working hours records.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: User id.
+        schema:
+          type: integer
+        example: 42
+      - name: working_hours_id
+        in: path
+        required: true
+        description: Working hours record id.
+        schema:
+          type: integer
+        example: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/UserWorkingHoursModel'
+        '401':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:Unauthenticated
+                message: You need to be authenticated to access this resource.
+          description: Returned if the client is not authenticated.
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The requested resource could not be found.
+          description: 'Returned if the user or working hours record does not exist,
+
+            or if the requesting user does not have permission to view it.'
+    patch:
+      summary: Update a working hours record
+      operationId: update_user_working_hours_record
+      tags:
+      - User Working Times
+      description: 'Updates the given working hours record.
+
+
+        Only records that have not yet taken effect (i.e., `validFrom` is in the future) can be
+
+        updated. Attempting to update a record that is already in effect will return a `422` error.
+
+
+        **Required permissions:**
+
+        - Administrators can update working hours records for any user.
+
+        - Users with the global `manage_own_working_times` permission can update their own records.
+
+        - Users with the global `manage_working_times` permission can update working hours for any user.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: User id.
+        schema:
+          type: integer
+        example: 42
+      - name: working_hours_id
+        in: path
+        required: true
+        description: Working hours record id.
+        schema:
+          type: integer
+        example: 2
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserWorkingHoursModel'
+            example:
+              mondayHours: 6
+              tuesdayHours: 6
+              wednesdayHours: 6
+              thursdayHours: 6
+              fridayHours: 6
+              saturdayHours: 0
+              sundayHours: 0
+              availabilityFactor: 80
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/UserWorkingHoursModel'
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '401':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:Unauthenticated
+                message: You need to be authenticated to access this resource.
+          description: Returned if the client is not authenticated.
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** `manage_working_times` globally (for other users) or
+
+            `manage_own_working_times` globally (for own records).'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The requested resource could not be found.
+          description: 'Returned if the user or working hours record does not exist,
+
+            or if the requesting user does not have permission to view it.'
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+                message: Validation failed.
+          description: 'Returned if the request body contains invalid parameters, or if the record has
+
+            already taken effect and cannot be modified.'
+    delete:
+      summary: Delete a working hours record
+      operationId: delete_user_working_hours_record
+      tags:
+      - User Working Times
+      description: 'Deletes the given working hours record.
+
+
+        **Required permissions:**
+
+        - Administrators can delete working hours records for any user.
+
+        - Users with the global `manage_own_working_times` permission can delete their own records.
+
+        - Users with the global `manage_working_times` permission can delete working hours records for any user.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: User id.
+        schema:
+          type: integer
+        example: 42
+      - name: working_hours_id
+        in: path
+        required: true
+        description: Working hours record id.
+        schema:
+          type: integer
+        example: 2
+      responses:
+        '204':
+          description: 'No Content.
+
+            The record was deleted successfully.'
+        '401':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:Unauthenticated
+                message: You need to be authenticated to access this resource.
+          description: Returned if the client is not authenticated.
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** `manage_working_times` globally (for other users) or
+
+            `manage_own_working_times` globally (for own records).'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The requested resource could not be found.
+          description: 'Returned if the user or working hours record does not exist,
+
+            or if the requesting user does not have permission to view it.'
+components:
+  schemas:
+    CollectionModel:
+      type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
+    UserWorkingHoursModel:
+      type: object
+      required:
+      - _type
+      - id
+      - validFrom
+      - mondayHours
+      - tuesdayHours
+      - wednesdayHours
+      - thursdayHours
+      - fridayHours
+      - saturdayHours
+      - sundayHours
+      - availabilityFactor
+      properties:
+        _type:
+          type: string
+          enum:
+          - UserWorkingHours
+        id:
+          type: integer
+          description: The unique identifier of the working hours record.
+          minimum: 1
+        validFrom:
+          type: string
+          format: date
+          description: 'The date from which this working hours configuration is in effect (ISO 8601 format).
+
+            Multiple records may exist for a user; the one with the latest `validFrom` that is
+
+            not in the future is the currently active record.'
+        mondayHours:
+          type: number
+          format: float
+          description: Hours worked on Monday.
+          minimum: 0
+        tuesdayHours:
+          type: number
+          format: float
+          description: Hours worked on Tuesday.
+          minimum: 0
+        wednesdayHours:
+          type: number
+          format: float
+          description: Hours worked on Wednesday.
+          minimum: 0
+        thursdayHours:
+          type: number
+          format: float
+          description: Hours worked on Thursday.
+          minimum: 0
+        fridayHours:
+          type: number
+          format: float
+          description: Hours worked on Friday.
+          minimum: 0
+        saturdayHours:
+          type: number
+          format: float
+          description: Hours worked on Saturday.
+          minimum: 0
+        sundayHours:
+          type: number
+          format: float
+          description: Hours worked on Sunday.
+          minimum: 0
+        availabilityFactor:
+          type: integer
+          description: The percentage of working hours the user is available. Must be between 0 and 100.
+          minimum: 0
+          maximum: 100
+        _links:
+          type: object
+          required:
+          - self
+          - user
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This working hours record.
+
+                  **Resource**: UserWorkingHours'
+            user:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The user this working hours record belongs to.
+
+                  **Resource**: User'
+      example:
+        _type: UserWorkingHours
+        id: 1
+        validFrom: '2024-01-01'
+        mondayHours: 8.0
+        tuesdayHours: 8.0
+        wednesdayHours: 8.0
+        thursdayHours: 8.0
+        fridayHours: 8.0
+        saturdayHours: 0.0
+        sundayHours: 0.0
+        availabilityFactor: 100
+        _links:
+          self:
+            href: /api/v3/users/42/working_hours/1
+          user:
+            href: /api/v3/users/42
+            title: Jane Doe
+    UserWorkingHoursCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This collection of working hours records.
+
+                    **Resource**: UserWorkingHoursCollectionModel'
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                description: The array of working hours records for the user, ordered by `validFrom` descending.
+                items:
+                  $ref: '#/components/schemas/UserWorkingHoursModel'
+      example:
+        _type: Collection
+        total: 2
+        count: 2
+        _links:
+          self:
+            href: /api/v3/users/42/working_hours
+        _embedded:
+          elements:
+          - _type: UserWorkingHours
+            id: 2
+            validFrom: '2025-01-01'
+            mondayHours: 6.0
+            tuesdayHours: 6.0
+            wednesdayHours: 6.0
+            thursdayHours: 6.0
+            fridayHours: 6.0
+            saturdayHours: 0.0
+            sundayHours: 0.0
+            availabilityFactor: 80
+            _links:
+              self:
+                href: /api/v3/users/42/working_hours/2
+              user:
+                href: /api/v3/users/42
+                title: Jane Doe
+          - _type: UserWorkingHours
+            id: 1
+            validFrom: '2024-01-01'
+            mondayHours: 8.0
+            tuesdayHours: 8.0
+            wednesdayHours: 8.0
+            thursdayHours: 8.0
+            fridayHours: 8.0
+            saturdayHours: 0.0
+            sundayHours: 0.0
+            availabilityFactor: 100
+            _links:
+              self:
+                href: /api/v3/users/42/working_hours/1
+              user:
+                href: /api/v3/users/42
+                title: Jane Doe
+    UserNonWorkingTimeCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This collection of non-working times records.
+
+                    **Resource**: UserNonWorkingTimeCollectionModel'
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                description: The array of personal non-working times for the user, ordered by start date ascending.
+                items:
+                  $ref: '#/components/schemas/UserNonWorkingTimeModel'
+      example:
+        _type: Collection
+        total: 2
+        count: 2
+        _links:
+          self:
+            href: /api/v3/users/42/non_working_times
+        _embedded:
+          elements:
+          - _type: UserNonWorkingTime
+            id: 7
+            startDate: '2025-06-16'
+            endDate: '2025-06-20'
+            _links:
+              self:
+                href: /api/v3/users/42/non_working_times/7
+              user:
+                href: /api/v3/users/42
+                title: Jane Doe
+          - _type: UserNonWorkingTime
+            id: 8
+            startDate: '2025-12-24'
+            endDate: '2025-12-24'
+            _links:
+              self:
+                href: /api/v3/users/42/non_working_times/8
+              user:
+                href: /api/v3/users/42
+                title: Jane Doe
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    UserNonWorkingTimeModel:
+      type: object
+      required:
+      - _type
+      - id
+      - startDate
+      - endDate
+      properties:
+        _type:
+          type: string
+          enum:
+          - UserNonWorkingTime
+        id:
+          type: integer
+          description: The unique identifier of the non-working time record.
+          minimum: 1
+        startDate:
+          type: string
+          format: date
+          description: The first date of the non-working time range in ISO 8601 format (YYYY-MM-DD).
+        endDate:
+          type: string
+          format: date
+          description: 'The last date of the non-working time range in ISO 8601 format (YYYY-MM-DD).
+
+            Must be greater than or equal to `startDate`.'
+        _links:
+          type: object
+          required:
+          - self
+          - user
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This non-working time record.
+
+                  **Resource**: UserNonWorkingTime'
+            user:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The user this non-working time belongs to.
+
+                  **Resource**: User'
+      example:
+        _type: UserNonWorkingTime
+        id: 7
+        startDate: '2025-06-16'
+        endDate: '2025-06-20'
+        _links:
+          self:
+            href: /api/v3/users/42/non_working_times/7
+          user:
+            href: /api/v3/users/42
+            title: Jane Doe
+  responses:
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
+    InvalidRequestBody:
+      description: Occurs when the client did not send a valid JSON object in the request body.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+            message: The request body was not a single JSON object.
+    UnsupportedMediaType:
+      description: Occurs when the client sends an unsupported Content-Type header.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
+            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic

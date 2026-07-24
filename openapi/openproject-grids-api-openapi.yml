@@ -1,0 +1,970 @@
+openapi: 3.1.2
+info:
+  description: "You're looking at the current **stable** documentation of the OpenProject APIv3. If you're interested in the current\ndevelopment version, please go to [github.com/opf](https://github.com/opf/openproject/tree/dev/docs/api/apiv3).\n\n## Introduction\n\nThe documentation for the APIv3 is written according to the [OpenAPI 3.1 Specification](https://swagger.io/specification/).\nYou can either view the static version of this documentation on the [website](https://www.openproject.org/docs/api/introduction/)\nor the interactive version, rendered with [OpenAPI Explorer](https://github.com/Rhosys/openapi-explorer/blob/main/README.md),\nin your OpenProject installation under `/api/docs`.\nIn the latter you can try out the various API endpoints directly interacting with our OpenProject data.\nMoreover you can access the specification source itself under `/api/v3/spec.json` and `/api/v3/spec.yml`\n(e.g. [here](https://community.openproject.org/api/v3/spec.yml)).\n\nThe APIv3 is a hypermedia REST API, a shorthand for \"Hypermedia As The Engine Of Application State\" (HATEOAS).\nThis means that each endpoint of this API will have links to other resources or actions defined in the resulting body.\n\nThese related resources and actions for any given resource will be context sensitive. For example, only actions that the\nauthenticated user can take are being rendered. This can be used to dynamically identify actions that the user might take for any\ngiven response.\n\nAs an example, if you fetch a work package through the [Work Package endpoint](https://www.openproject.org/docs/api/endpoints/work-packages/), the `update` link will only\nbe present when the user you authenticated has been granted a permission to update the work package in the assigned project.\n\n## HAL+JSON\n\nHAL is a simple format that gives a consistent and easy way to hyperlink between resources in your API.\nRead more in the following specification: [https://tools.ietf.org/html/draft-kelly-json-hal-08](https://tools.ietf.org/html/draft-kelly-json-hal-08)\n\n**OpenProject API implementation of HAL+JSON format** enriches JSON and introduces a few meta properties:\n\n- `_type` - specifies the type of the resource (e.g.: WorkPackage, Project)\n- `_links` - contains all related resource and action links available for the resource\n- `_embedded` - contains all embedded objects\n\nHAL does not guarantee that embedded resources are embedded in their full representation, they might as well be\npartially represented (e.g. some properties can be left out).\nHowever in this API you have the guarantee that whenever a resource is **embedded**, it is embedded in its **full representation**.\n\n## API response structure\n\nAll API responses contain a single HAL+JSON object, even collections of objects are technically represented by\na single HAL+JSON object that itself contains its members. More details on collections can be found\nin the [Collections Section](https://www.openproject.org/docs/api/collections/).\n\n## Authentication\n\nThe API supports the following authentication schemes:\n\n* Session-based authentication\n* API tokens\n    * passed as Bearer token\n    * passed via Basic auth\n* OAuth 2.0\n    * using built-in authorization server\n    * using an external authorization server (RFC 9068)\n\nDepending on the settings of the OpenProject instance many resources can be accessed without being authenticated.\nIn case the instance requires authentication on all requests the client will receive an **HTTP 401** status code\nin response to any request.\n\nOtherwise unauthenticated clients have all the permissions of the anonymous user.\n\n### Session-based authentication\n\nThis means you have to login to OpenProject via the Web-Interface to be authenticated in the API.\nThis method is well-suited for clients acting within the browser, like the Angular-Client built into OpenProject.\n\nIn this case, you always need to pass the HTTP header `X-Requested-With \"XMLHttpRequest\"` for authentication.\n\n### API token as bearer token\n\nUsers can authenticate towards the API v3 using an API token as a bearer token.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -H \"Authorization: Bearer $API_KEY\" https://community.openproject.org/api/v3/users/42\n```\n\nUsers can generate API tokens on their account page.\n\n### API token through Basic Auth\n\nAPI tokens can also be used with basic auth, using the user name `apikey` (NOT your login) and the API token as the password.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -u apikey:$API_KEY https://community.openproject.org/api/v3/users/42\n```\n\n### OAuth 2.0 authentication\n\nOpenProject allows authentication and authorization with OAuth2 with *Authorization code flow*, as well as *Client credentials* operation modes.\n\nTo get started, you first need to register an application in the OpenProject OAuth administration section of your installation.\nThis will save an entry for your application with a client unique identifier (`client_id`) and an accompanying secret key (`client_secret`).\n\nYou can then use one the following guides to perform the supported OAuth 2.0 flows:\n\n- [Authorization code flow](https://oauth.net/2/grant-types/authorization-code)\n\n- [Authorization code flow with PKCE](https://doorkeeper.gitbook.io/guides/ruby-on-rails/pkce-flow), recommended for clients unable to keep the client_secret confidential\n\n- [Client credentials](https://oauth.net/2/grant-types/client-credentials/) - Requires an application to be bound to an impersonating user for non-public access\n\n### OAuth 2.0 using an external authorization server\n\nThere is a possibility to use JSON Web Tokens (JWT) generated by an OIDC provider configured in OpenProject as a bearer token to do authenticated requests against the API.\nThe following requirements must be met:\n\n- OIDC provider must be configured in OpenProject with **jwks_uri**\n- JWT must be signed using RSA algorithm\n- JWT **iss** claim must be equal to OIDC provider **issuer**\n- JWT **aud** claim must contain the OpenProject **client ID** used at the OIDC provider\n- JWT **scope** claim must include a valid scope to access the desired API (e.g. `api_v3` for APIv3)\n- JWT must be actual (neither expired or too early to be used)\n- JWT must be passed in Authorization header like: `Authorization: Bearer {jwt}`\n- User from **sub** claim must be linked to OpenProject before (e.g. by logging in), otherwise it will be not authenticated\n\nIn more general terms, OpenProject should be compliant to [RFC 9068](https://www.rfc-editor.org/rfc/rfc9068) when validating access tokens.\n\n### Why not username and password?\n\nThe simplest way to do basic auth would be to use a user's username and password naturally.\nHowever, OpenProject already has supported API keys in the past for the API v2, though not through basic auth.\n\nUsing **username and password** directly would have some advantages:\n\n* It is intuitive for the user who then just has to provide those just as they would when logging into OpenProject.\n\n* No extra logic for token management necessary.\n\nOn the other hand using **API keys** has some advantages too, which is why we went for that:\n\n* If compromised while saved on an insecure client the user only has to regenerate the API key instead of changing their password, too.\n\n* They are naturally long and random which makes them invulnerable to dictionary attacks and harder to crack in general.\n\nMost importantly users may not actually have a password to begin with. Specifically when they have registered\nthrough an OpenID Connect provider.\n\n## Cross-Origin Resource Sharing (CORS)\n\nBy default, the OpenProject API is _not_ responding with any CORS headers.\nIf you want to allow cross-domain AJAX calls against your OpenProject instance, you need to enable CORS headers being returned.\n\nPlease see [our API settings documentation](https://www.openproject.org/docs/system-admin-guide/api-and-webhooks/) on\nhow to selectively enable CORS.\n\n## Allowed HTTP methods\n\n- `GET` - Get a single resource or collection of resources\n\n- `POST` - Create a new resource or perform\n\n- `PATCH` - Update a resource\n\n- `DELETE` - Delete a resource\n\n## Compression\n\nResponses are compressed if requested by the client. Currently [gzip](https://www.gzip.org/) and [deflate](https://tools.ietf.org/html/rfc1951)\nare supported. The client signals the desired compression by setting the [`Accept-Encoding` header](https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3).\nIf no `Accept-Encoding` header is send, `Accept-Encoding: identity` is assumed which will result in the API responding uncompressed."
+  title: OpenProject API V3 (Stable) Actions & Capabilities Grids API
+  version: '3'
+servers:
+- url: https://qa.openproject-edge.com
+  description: Edge QA instance
+- url: https://qa.openproject-stage.com
+  description: Staging instance
+- url: https://community.openproject.org
+  description: Community instance
+security:
+- BasicAuth: []
+tags:
+- description: 'A grid is a layout for a page or a part of the page of the OpenProject application. It defines the structure (number of rows and number of columns) as well as the contents of the page.
+
+
+    The contents is defined by `GridWidget`s. While a `GridWidget` is its own type, it is not a resource in its own right as it is an intrinsic part of a `Grid`.
+
+
+    Depending on what page a grid is defined for, different widgets may be eligible to be placed on the grid. The page might also define the permissions needed for accessing, creating or modifying the grid.
+
+
+    Currently, the following pages employ grids:
+
+
+    + /my/page: The My page every user has. Only a user can access or modify their "My page".
+
+
+    *The delete action is not yet supported*
+
+
+    ## Actions
+
+
+    | Link                | Description                                                          | Condition                                                                                           |
+
+    |:-------------------:| -------------------------------------------------------------------- | ----------------------------------------------------------------                                    |
+
+    | updateImmediately   | Directly perform edits on this grid                                  | **Permission**: depends on the page the grid is defined for                                         |
+
+    | update              | Validate edits on the grid via a form resource before committing     | **Permission**: depends on the page the grid is defined for                                         |
+
+
+    ## Linked Properties
+
+
+    | Link          | Description                                                       | Type                | Constraints           | Supported operations | Condition                                     |
+
+    | :-----------: | --------------------------------------------------------------    | -------------       | --------------------- | -------------------- | -----------------------------------------     |
+
+    | self          | This grid                                                         | Grid                | not null              | READ                 |                                               |
+
+    | page          | The url of the page the grid is defined for                       | url                 | not null              | READ / WRITE         | The page cannot be changed after the creation |
+
+
+    ## Local Properties
+
+
+    | Property     | Description                                               | Type          | Constraints                                          | Supported operations | Condition                   |
+
+    | :----------: | --------------------------------------------------------- | --------      | ---------------------------------------------------- | -------------------- | --------------              |
+
+    | id           | Grid''s id                                                 | Integer       | x > 0                                                | READ                 |                             |
+
+    | rowCount     | The number of rows the grid has                           | Integer       | x > 0                                                | READ/WRITE           |                             |
+
+    | columnCount  | The number of columns the grid has                        | Integer       | x > 0                                                | READ/WRITE           |                             |
+
+    | widgets      | The set of `GridWidget`s selected for the grid            | []GridWidget  |                                                      | READ/WRITE           | The widgets cannot overlap  |
+
+    | createdAt    | The time the grid was created                             | DateTime      |                                                      | READ                 |                             |
+
+    | updatedAt    | The time the grid was last updated                        | DateTime      |                                                      | READ                 |                             |
+
+
+    ## GridWidget Properties
+
+
+    | Property     | Description                                                                        | Type     | Constraints                                          | Supported operations | Condition      |
+
+    | :----------: | ---------------------------------------------------------                          | -------- | ---------------------------------------------------- | -------------------- | -------------- |
+
+    | identifier   | The kind of widget                                                                 | String   | not null                                             | READ/WRITE           |                |
+
+    | startRow     | The row the widget starts at (1 based)                                             | Integer  | x > 0, x < rowCount of the grid, x < endRow          | READ/WRITE           |                |
+
+    | endRow       | The row the widget ends. The widget''s area does not include the row itself.        | Integer  | x > 0, x <= rowCount of the grid, x > startRow       | READ/WRITE           |                |
+
+    | startColumn  | The column the widget starts at (1 based)                                          | Integer  | x > 0, x < columnCount of the grid, x < endColumn    | READ/WRITE           |                |
+
+    | endColumn    | The column the widget ends. The widget''s area does not include the column itself.  | Integer  | x > 0, x <= columnCount of the grid, x > startColumn | READ/WRITE           |                |
+
+    | options      | An options hash of values customizable by the widget                               | JSON     |                                                      | READ/WRITE           |                |'
+  name: Grids
+paths:
+  /api/v3/grids:
+    get:
+      summary: List grids
+      tags:
+      - Grids
+      description: 'Lists all grids matching the provided filters and being part of the selected query page. The grids returned will
+
+        also depend on the permissions of the requesting user.'
+      operationId: list_grids
+      parameters:
+      - name: offset
+        schema:
+          type: integer
+          default: 1
+        description: Page number inside the requested collection.
+        in: query
+        required: false
+        example: 25
+      - name: pageSize
+        schema:
+          type: integer
+          default: 30
+        description: Number of elements to display per page.
+        in: query
+        required: false
+        example: 25
+      - name: filters
+        schema:
+          type: string
+        description: 'JSON specifying filter conditions. Accepts the same format as returned by
+
+          the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint. Currently supported filters
+
+          are:
+
+
+          - page: Filter grid by work package'
+        in: query
+        required: false
+        example: '[{ "page": { "operator": "=", "values": ["/my/page"] } }]'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/GridCollectionModel'
+              examples:
+                Simple grid collection:
+                  $ref: '#/components/examples/GridSimpleCollectionResponse'
+        '400':
+          $ref: '#/components/responses/InvalidQuery'
+        '403':
+          description: Returned if the client is not logged in and login is required.
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                message: You are not authorized to view this resource.
+    post:
+      summary: Create a grid
+      operationId: create_grid
+      tags:
+      - Grids
+      description: 'Creates a new grid applying the attributes provided in the body. The constraints applied to the grid depend on the
+
+        page the grid is placed in which is why the create form endpoint should be used to be guided when wanting to
+
+        create a grid.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GridWriteModel'
+            examples:
+              Simple grid creation:
+                $ref: '#/components/examples/GridSimplePatchModel'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/GridReadModel'
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** Depends on the page the grid is defined for.'
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          description: 'Returned if:
+
+
+            * a constraint for a property was violated (`PropertyConstraintViolation`)'
+  /api/v3/grids/form:
+    post:
+      responses:
+        '200':
+          description: OK
+          headers: {}
+      tags:
+      - Grids
+      description: ''
+      operationId: Grid_Create_Form
+      summary: Grid Create Form
+  /api/v3/grids/{id}:
+    get:
+      summary: Get a grid
+      operationId: get_grid
+      tags:
+      - Grids
+      description: Fetches a single grid identified by its id.
+      parameters:
+      - name: id
+        in: path
+        description: Grid id
+        required: true
+        schema:
+          type: integer
+        example: '42'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/GridReadModel'
+              examples:
+                Simple grid:
+                  $ref: '#/components/examples/GridSimpleResponse'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The requested resource could not be found.
+          description: 'Returned if the Grid does not exist or if the user does not have permission to view it.
+
+
+            **Required permission** depends on the page the grid is defined for'
+    patch:
+      summary: Update a grid
+      operationId: update_grid
+      tags:
+      - Grids
+      description: 'Updates the given grid by applying the attributes provided in the body. The constraints applied to the grid depend
+
+        on the page the grid is placed in which is why the create form endpoint should be used to be guided when wanting
+
+        to update a grid.'
+      parameters:
+      - name: id
+        in: path
+        description: Grid id
+        required: true
+        schema:
+          type: integer
+        example: '42'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GridWriteModel'
+            examples:
+              Simple grid patch:
+                $ref: '#/components/examples/GridSimplePatchModel'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/GridReadModel'
+              examples:
+                Simple grid:
+                  $ref: '#/components/examples/GridSimpleResponse'
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** The permission depends on the page the grid is placed in.'
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          description: 'Returned if:
+
+
+            * a constraint for a property was violated (`PropertyConstraintViolation`)'
+  /api/v3/grids/{id}/form:
+    post:
+      parameters:
+      - description: ID of the grid being modified
+        example: 1
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              schema:
+                type: object
+              examples:
+                response:
+                  value:
+                    _embedded:
+                      payload:
+                        columnCount: 5
+                        rowCount: 6
+                        widgets:
+                        - _type: GridWidget
+                          endColumn: 3
+                          endRow: 8
+                          identifier: time_entries_current_user
+                          startColumn: 1
+                          startRow: 1
+                        - _type: GridWidget
+                          endColumn: 5
+                          endRow: 8
+                          identifier: news
+                          startColumn: 4
+                          startRow: 3
+                        - _type: GridWidget
+                          endColumn: 6
+                          endRow: 3
+                          identifier: documents
+                          startColumn: 3
+                          startRow: 1
+                      schema:
+                        _links: {}
+                        _type: Schema
+                        columnCount:
+                          hasDefault: false
+                          name: Number of columns
+                          required: true
+                          type: Integer
+                          writable: true
+                        createdAt:
+                          hasDefault: false
+                          name: Created on
+                          required: true
+                          type: DateTime
+                          writable: false
+                        id:
+                          hasDefault: false
+                          name: ID
+                          required: true
+                          type: Integer
+                          writable: false
+                        rowCount:
+                          hasDefault: false
+                          name: Number of rows
+                          required: true
+                          type: Integer
+                          writable: true
+                        scope:
+                          _links: {}
+                          hasDefault: false
+                          name: Page
+                          required: true
+                          type: Href
+                          writable: false
+                        updatedAt:
+                          hasDefault: false
+                          name: Updated on
+                          required: true
+                          type: DateTime
+                          writable: false
+                        widgets:
+                          _links: {}
+                          hasDefault: false
+                          name: Widgets
+                          required: true
+                          type: '[]GridWidget'
+                          writable: true
+                      validationErrors:
+                        widgets:
+                          _embedded:
+                            errors:
+                            - _embedded:
+                                details:
+                                  attribute: widgets
+                              _type: Error
+                              errorIdentifier: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+                              message: Widgets is outside of the grid.
+                            - _embedded:
+                                details:
+                                  attribute: widgets
+                              _type: Error
+                              errorIdentifier: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+                              message: Widgets is outside of the grid.
+                          _type: Error
+                          errorIdentifier: urn:openproject-org:api:v3:errors:MultipleErrors
+                          message: Multiple field constraints have been violated.
+                    _links:
+                      self:
+                        href: /api/v3/grids/2/form
+                        method: post
+                      validate:
+                        href: /api/v3/grids/2/form
+                        method: post
+                    _type: Form
+          description: OK
+          headers: {}
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** depends on the page the grid is defined for.
+
+
+            *Note that you will only receive this error, if you are at least allowed to see the corresponding grid.*'
+          headers: {}
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                    message: The requested resource could not be found.
+          description: 'Returned if the grid does not exist or the client does not have sufficient permissions to see it.
+
+
+            **Required permission:** view work package'
+          headers: {}
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+      tags:
+      - Grids
+      description: ''
+      operationId: Grid_Update_Form
+      summary: Grid Update Form
+components:
+  schemas:
+    CollectionModel:
+      type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
+    GridWriteModel:
+      type: object
+      properties:
+        rowCount:
+          type: integer
+          description: The number of rows the grid has
+          minimum: 1
+        columnCount:
+          type: integer
+          description: The number of columns the grid has
+          minimum: 1
+        widgets:
+          type: array
+          description: 'The set of `GridWidget`s selected for the grid.
+
+
+            # Conditions
+
+
+            - The widgets must not overlap.'
+          items:
+            $ref: '#/components/schemas/GridWidgetModel'
+        _links:
+          type: object
+          properties:
+            scope:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: The location where this grid is used, usually represented as a relative URL.
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
+    GridWidgetModel:
+      type: object
+      required:
+      - _type
+      - id
+      - identifier
+      - startRow
+      - endRow
+      - startColumn
+      - endColumn
+      properties:
+        _type:
+          type: string
+          enum:
+          - GridWidget
+        id:
+          type:
+          - integer
+          - 'null'
+          description: The grid widget's unique identifier. Can be null, if a new widget is created within a grid.
+          minimum: 1
+        identifier:
+          type: string
+          description: An alternative, human legible, and unique identifier.
+        startRow:
+          type: integer
+          description: The index of the starting row of the widget. The row is inclusive.
+          minimum: 1
+        endRow:
+          type: integer
+          description: The index of the ending row of the widget. The row is exclusive.
+          minimum: 1
+        startColumn:
+          type: integer
+          description: The index of the starting column of the widget. The column is inclusive.
+          minimum: 1
+        endColumn:
+          type: integer
+          description: The index of the ending column of the widget. The column is exclusive.
+          minimum: 1
+        options:
+          type: object
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
+    GridReadModel:
+      type: object
+      required:
+      - _type
+      - id
+      - rowCount
+      - columnCount
+      - widgets
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Grid
+        id:
+          type: integer
+          description: Grid's id
+          minimum: 1
+        rowCount:
+          type: integer
+          description: The number of rows the grid has
+          minimum: 1
+        columnCount:
+          type: integer
+          description: The number of columns the grid has
+          minimum: 1
+        widgets:
+          type: array
+          description: 'The set of `GridWidget`s selected for the grid.
+
+
+            # Conditions
+
+
+            - The widgets must not overlap.'
+          items:
+            $ref: '#/components/schemas/GridWidgetModel'
+        createdAt:
+          type: string
+          format: date-time
+          description: The time the grid was created.
+        updatedAt:
+          type: string
+          format: date-time
+          description: The time the grid was last updated.
+        _links:
+          type: object
+          required:
+          - self
+          - scope
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This grid.
+
+
+                  **Resource**: Grid'
+            attachments:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The attachment collection of this grid.
+
+
+                  **Resource**: AttachmentCollection'
+            addAttachment:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: Link for adding an attachment to this grid.
+            scope:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: The location where this grid is used, usually represented as a relative URL.
+            updateImmediately:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'Directly perform edits on this grid.
+
+
+                  # Conditions
+
+
+                  **Permission**: depends on the page the grid is defined for'
+            update:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'Validate edits on the grid via a form resource before committing
+
+
+                  # Conditions
+
+
+                  **Permission**: depends on the page the grid is defined for'
+            delete:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: Deletes this grid resource.
+    PaginatedCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - pageSize
+        - offset
+        properties:
+          pageSize:
+            type: integer
+            description: Amount of elements that a response will hold.
+            minimum: 0
+          offset:
+            type: integer
+            description: The page number that is requested from paginated collection.
+            minimum: 1
+          _links:
+            type: object
+            required:
+            - jumpTo
+            - changeSize
+            properties:
+              jumpTo:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Templated link to another page offset.
+
+
+                    **Resource**: Collection'
+              changeSize:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Templated link for another page size.
+
+
+                    **Resource**: Collection'
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    GridCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedCollectionModel'
+      - type: object
+        required:
+        - _embedded
+        properties:
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GridReadModel'
+  responses:
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
+    InvalidRequestBody:
+      description: Occurs when the client did not send a valid JSON object in the request body.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+            message: The request body was not a single JSON object.
+    InvalidQuery:
+      description: Returned if the client sends invalid request parameters e.g. filters
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidQuery
+            message: Filters Invalid filter does not exist.
+    UnsupportedMediaType:
+      description: Occurs when the client sends an unsupported Content-Type header.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
+            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+  examples:
+    GridSimplePatchModel:
+      value:
+        rowCount: 1
+        columnCount: 2
+        widgets:
+        - _type: GridWidget
+          identifier: tasks
+          startRow: 1
+          endRow: 2
+          startColumn: 1
+          endColumn: 2
+          options:
+            name: Tasks
+        - _type: GridWidget
+          identifier: news
+          startRow: 1
+          endRow: 2
+          startColumn: 2
+          endColumn: 3
+          options:
+            name: News
+        _links:
+          scope:
+            href: /my/page
+            type: text/html
+    GridSimpleCollectionResponse:
+      value:
+        _type: Collection
+        total: 1
+        count: 1
+        pageSize: 30
+        offset: 1
+        _embedded:
+          elements:
+          - _type: Grid
+            id: 2
+            rowCount: 8
+            columnCount: 5
+            widgets:
+            - _type: GridWidget
+              id: 1
+              identifier: time_entries_current_user
+              startRow: 1
+              endRow: 8
+              startColumn: 1
+              endColumn: 3
+            - _type: GridWidget
+              id: 2
+              identifier: news
+              startRow: 3
+              endRow: 8
+              startColumn: 4
+              endColumn: 5
+            - _type: GridWidget
+              id: 3
+              identifier: documents
+              startRow: 1
+              endRow: 3
+              startColumn: 3
+              endColumn: 6
+            createdAt: '2018-12-03T16:58:30.297Z'
+            updatedAt: '2018-12-13T19:36:40.352Z'
+            _links:
+              scope:
+                href: /my/page
+                type: text/html
+              updateImmediately:
+                href: /api/v3/grids/2
+                method: patch
+              update:
+                href: /api/v3/grids/2/form
+                method: post
+              self:
+                href: /api/v3/grids/2
+        _links:
+          self:
+            href: /api/v3/grids
+          jumpTo:
+            href: /api/v3/grids?filters=%5B%5D&offset=%7Boffset%7D&pageSize=20
+            templated: true
+          changeSize:
+            href: /api/v3/grids?filters=%5B%5D&offset=1&pageSize=%7Bsize%7D
+            templated: true
+    GridSimpleResponse:
+      value:
+        _type: Grid
+        id: 2
+        rowCount: 8
+        columnCount: 5
+        widgets:
+        - _type: GridWidget
+          id: 1
+          identifier: tasks
+          startRow: 1
+          endRow: 8
+          startColumn: 1
+          endColumn: 3
+        - _type: GridWidget
+          id: 2
+          identifier: news
+          startRow: 3
+          endRow: 8
+          startColumn: 4
+          endColumn: 5
+        - _type: GridWidget
+          id: 3
+          identifier: documents
+          startRow: 1
+          endRow: 3
+          startColumn: 3
+          endColumn: 6
+        createdAt: '2018-12-03T16:58:30.915Z'
+        updatedAt: '2018-12-13T19:36:40.588Z'
+        _links:
+          self:
+            href: /api/v3/grids/2
+          attachments:
+            href: /api/v3/grids/2/attachments
+          addAttachment:
+            href: /api/v3/grids/2/attachments
+            method: post
+          scope:
+            href: /my/page
+            type: text/html
+          updateImmediately:
+            href: /api/v3/grids/2
+            method: patch
+          update:
+            href: /api/v3/grids/2/form
+            method: post
+          delete:
+            href: /api/v3/grids/2
+            method: delete
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic

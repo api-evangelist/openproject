@@ -1,0 +1,1564 @@
+openapi: 3.1.2
+info:
+  description: "You're looking at the current **stable** documentation of the OpenProject APIv3. If you're interested in the current\ndevelopment version, please go to [github.com/opf](https://github.com/opf/openproject/tree/dev/docs/api/apiv3).\n\n## Introduction\n\nThe documentation for the APIv3 is written according to the [OpenAPI 3.1 Specification](https://swagger.io/specification/).\nYou can either view the static version of this documentation on the [website](https://www.openproject.org/docs/api/introduction/)\nor the interactive version, rendered with [OpenAPI Explorer](https://github.com/Rhosys/openapi-explorer/blob/main/README.md),\nin your OpenProject installation under `/api/docs`.\nIn the latter you can try out the various API endpoints directly interacting with our OpenProject data.\nMoreover you can access the specification source itself under `/api/v3/spec.json` and `/api/v3/spec.yml`\n(e.g. [here](https://community.openproject.org/api/v3/spec.yml)).\n\nThe APIv3 is a hypermedia REST API, a shorthand for \"Hypermedia As The Engine Of Application State\" (HATEOAS).\nThis means that each endpoint of this API will have links to other resources or actions defined in the resulting body.\n\nThese related resources and actions for any given resource will be context sensitive. For example, only actions that the\nauthenticated user can take are being rendered. This can be used to dynamically identify actions that the user might take for any\ngiven response.\n\nAs an example, if you fetch a work package through the [Work Package endpoint](https://www.openproject.org/docs/api/endpoints/work-packages/), the `update` link will only\nbe present when the user you authenticated has been granted a permission to update the work package in the assigned project.\n\n## HAL+JSON\n\nHAL is a simple format that gives a consistent and easy way to hyperlink between resources in your API.\nRead more in the following specification: [https://tools.ietf.org/html/draft-kelly-json-hal-08](https://tools.ietf.org/html/draft-kelly-json-hal-08)\n\n**OpenProject API implementation of HAL+JSON format** enriches JSON and introduces a few meta properties:\n\n- `_type` - specifies the type of the resource (e.g.: WorkPackage, Project)\n- `_links` - contains all related resource and action links available for the resource\n- `_embedded` - contains all embedded objects\n\nHAL does not guarantee that embedded resources are embedded in their full representation, they might as well be\npartially represented (e.g. some properties can be left out).\nHowever in this API you have the guarantee that whenever a resource is **embedded**, it is embedded in its **full representation**.\n\n## API response structure\n\nAll API responses contain a single HAL+JSON object, even collections of objects are technically represented by\na single HAL+JSON object that itself contains its members. More details on collections can be found\nin the [Collections Section](https://www.openproject.org/docs/api/collections/).\n\n## Authentication\n\nThe API supports the following authentication schemes:\n\n* Session-based authentication\n* API tokens\n    * passed as Bearer token\n    * passed via Basic auth\n* OAuth 2.0\n    * using built-in authorization server\n    * using an external authorization server (RFC 9068)\n\nDepending on the settings of the OpenProject instance many resources can be accessed without being authenticated.\nIn case the instance requires authentication on all requests the client will receive an **HTTP 401** status code\nin response to any request.\n\nOtherwise unauthenticated clients have all the permissions of the anonymous user.\n\n### Session-based authentication\n\nThis means you have to login to OpenProject via the Web-Interface to be authenticated in the API.\nThis method is well-suited for clients acting within the browser, like the Angular-Client built into OpenProject.\n\nIn this case, you always need to pass the HTTP header `X-Requested-With \"XMLHttpRequest\"` for authentication.\n\n### API token as bearer token\n\nUsers can authenticate towards the API v3 using an API token as a bearer token.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -H \"Authorization: Bearer $API_KEY\" https://community.openproject.org/api/v3/users/42\n```\n\nUsers can generate API tokens on their account page.\n\n### API token through Basic Auth\n\nAPI tokens can also be used with basic auth, using the user name `apikey` (NOT your login) and the API token as the password.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -u apikey:$API_KEY https://community.openproject.org/api/v3/users/42\n```\n\n### OAuth 2.0 authentication\n\nOpenProject allows authentication and authorization with OAuth2 with *Authorization code flow*, as well as *Client credentials* operation modes.\n\nTo get started, you first need to register an application in the OpenProject OAuth administration section of your installation.\nThis will save an entry for your application with a client unique identifier (`client_id`) and an accompanying secret key (`client_secret`).\n\nYou can then use one the following guides to perform the supported OAuth 2.0 flows:\n\n- [Authorization code flow](https://oauth.net/2/grant-types/authorization-code)\n\n- [Authorization code flow with PKCE](https://doorkeeper.gitbook.io/guides/ruby-on-rails/pkce-flow), recommended for clients unable to keep the client_secret confidential\n\n- [Client credentials](https://oauth.net/2/grant-types/client-credentials/) - Requires an application to be bound to an impersonating user for non-public access\n\n### OAuth 2.0 using an external authorization server\n\nThere is a possibility to use JSON Web Tokens (JWT) generated by an OIDC provider configured in OpenProject as a bearer token to do authenticated requests against the API.\nThe following requirements must be met:\n\n- OIDC provider must be configured in OpenProject with **jwks_uri**\n- JWT must be signed using RSA algorithm\n- JWT **iss** claim must be equal to OIDC provider **issuer**\n- JWT **aud** claim must contain the OpenProject **client ID** used at the OIDC provider\n- JWT **scope** claim must include a valid scope to access the desired API (e.g. `api_v3` for APIv3)\n- JWT must be actual (neither expired or too early to be used)\n- JWT must be passed in Authorization header like: `Authorization: Bearer {jwt}`\n- User from **sub** claim must be linked to OpenProject before (e.g. by logging in), otherwise it will be not authenticated\n\nIn more general terms, OpenProject should be compliant to [RFC 9068](https://www.rfc-editor.org/rfc/rfc9068) when validating access tokens.\n\n### Why not username and password?\n\nThe simplest way to do basic auth would be to use a user's username and password naturally.\nHowever, OpenProject already has supported API keys in the past for the API v2, though not through basic auth.\n\nUsing **username and password** directly would have some advantages:\n\n* It is intuitive for the user who then just has to provide those just as they would when logging into OpenProject.\n\n* No extra logic for token management necessary.\n\nOn the other hand using **API keys** has some advantages too, which is why we went for that:\n\n* If compromised while saved on an insecure client the user only has to regenerate the API key instead of changing their password, too.\n\n* They are naturally long and random which makes them invulnerable to dictionary attacks and harder to crack in general.\n\nMost importantly users may not actually have a password to begin with. Specifically when they have registered\nthrough an OpenID Connect provider.\n\n## Cross-Origin Resource Sharing (CORS)\n\nBy default, the OpenProject API is _not_ responding with any CORS headers.\nIf you want to allow cross-domain AJAX calls against your OpenProject instance, you need to enable CORS headers being returned.\n\nPlease see [our API settings documentation](https://www.openproject.org/docs/system-admin-guide/api-and-webhooks/) on\nhow to selectively enable CORS.\n\n## Allowed HTTP methods\n\n- `GET` - Get a single resource or collection of resources\n\n- `POST` - Create a new resource or perform\n\n- `PATCH` - Update a resource\n\n- `DELETE` - Delete a resource\n\n## Compression\n\nResponses are compressed if requested by the client. Currently [gzip](https://www.gzip.org/) and [deflate](https://tools.ietf.org/html/rfc1951)\nare supported. The client signals the desired compression by setting the [`Accept-Encoding` header](https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3).\nIf no `Accept-Encoding` header is send, `Accept-Encoding: identity` is assumed which will result in the API responding uncompressed."
+  title: OpenProject API V3 (Stable) Actions & Capabilities Versions API
+  version: '3'
+servers:
+- url: https://qa.openproject-edge.com
+  description: Edge QA instance
+- url: https://qa.openproject-stage.com
+  description: Staging instance
+- url: https://community.openproject.org
+  description: Community instance
+security:
+- BasicAuth: []
+tags:
+- description: 'Work Packages can be assigned to a version. As such, versions serve to group Work Packages into logical units where each group comprises all the work packages that needs to be finished in order for the version to be finished.
+
+
+    ## Actions
+
+
+    | Link                | Description                                                              | Condition                              |
+
+    |:-------------------:|--------------------------------------------------------------------------| ---------------------------------------|
+
+    | update              | Form endpoint that aids in preparing and performing edits on the version | **Permission**: manage versions        |
+
+    | updateImmediately   | Directly perform edits on the version                                    | **Permission**: manage versions        |
+
+
+    ## Linked Properties
+
+
+    |  Link               | Description                                | Type          | Constraints                                                    | Supported operations |
+
+    |:-------------------:|-----------------------------------------   | ------------- | -------------------------------------------------------------- | -------------------- |
+
+    | self                | This version                               | Version       | not null                                                       | READ                 |
+
+    | definingProject     | The workspace to which the version belongs | Workspace     | only present if the workspace is visible for the current user  | READ                 |
+
+    | availableInProjects | Workspaces where this version can be used  | Workspaces    | not null                                                       | READ                 |
+
+
+    Depending on custom fields defined for versions, additional linked properties might exist.
+
+
+    ## Local Properties
+
+
+    | Property    | Description                                   | Type        | Constraints                                        | Supported operations |
+
+    | :---------: | --------------------------------------------- | ----------- | -----------                                        | -------------------- |
+
+    | id          | Version id                                    | Integer     | x > 0                                              | READ                 |
+
+    | name        | Version name                                  | String      | not null, may not exceed 60 characters             | READ / WRITE         |
+
+    | description |                                               | Formattable |                                                    | READ / WRITE         |
+
+    | startDate   |                                               | Date        |                                                    | READ / WRITE         |
+
+    | endDate     |                                               | Date        |                                                    | READ / WRITE         |
+
+    | status      | The current status of the version             | String      | not null, only ''open'', ''finished'', ''closed''        | READ / WRITE         |
+
+    | sharing     | The current status of the version             | String      | not null, limited to fixed set as defined by form  | READ / WRITE         |
+
+    | createdAt   | Time of creation                              | DateTime    | not null                                           | READ                 |
+
+    | updatedAt   | Time of the most recent change to the version | DateTime    | not null                                           | READ                 |
+
+
+    Depending on custom fields defined for versions, additional properties might exist.'
+  name: Versions
+paths:
+  /api/v3/projects/{id}/versions:
+    get:
+      parameters:
+      - description: ID of the project whose versions will be listed
+        example: '1'
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              examples:
+                response:
+                  value:
+                    _embedded:
+                      elements:
+                      - _links:
+                          availableInProjects:
+                            href: /api/v3/versions/11/workspaces
+                          definingProject:
+                            href: /api/v3/projects/11
+                          self:
+                            href: /api/v3/versions/11
+                        _type: Version
+                        description:
+                          format: plain
+                          html: This version has a description
+                          raw: This version has a description
+                        endDate: null
+                        id: 11
+                        name: v3.0 Alpha
+                        startDate: '2014-11-20'
+                        status: Open
+                      - _links:
+                          availableInProjects:
+                            href: /api/v3/versions/12/workspaces
+                          definingProject:
+                            href: /api/v3/projects/11
+                          self:
+                            href: /api/v3/versions/12
+                        _type: Version
+                        description:
+                          format: plain
+                          html: ''
+                          raw: ''
+                        endDate: null
+                        id: 12
+                        name: v2.0
+                        startDate: null
+                        status: Closed
+                      - _links:
+                          availableInProjects:
+                            href: /api/v3/versions/10/workspaces
+                          definingProject:
+                            href: /api/v3/projects/11
+                          self:
+                            href: /api/v3/versions/10
+                        _type: Version
+                        description:
+                          format: plain
+                          html: ''
+                          raw: ''
+                        endDate: null
+                        id: 10
+                        name: v1.0
+                        startDate: null
+                        status: Open
+                    _links:
+                      self:
+                        href: /api/v3/projects/11/versions
+                    _type: Collection
+                    count: 3
+                    total: 3
+              schema:
+                $ref: '#/components/schemas/Versions_by_WorkspaceModel'
+          description: OK
+          headers: {}
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                    message: The specified project does not exist.
+          description: 'Returned if the project does not exist or the client does not have sufficient permissions
+
+            to see it.
+
+
+            **Required permission:** view work packages **or** manage versions (on given project)
+
+
+            *Note: A client without sufficient permissions shall not be able to test for the existence of a project.
+
+            That''s why a 404 is returned here, even if a 403 might be more appropriate.*'
+          headers: {}
+      tags:
+      - Versions
+      description: 'This endpoint lists the versions that are *available* in a given project.
+
+        Note that due to sharing this might be more than the versions *defined* by that project.
+
+
+        This endpoint is deprecated and replaced by [`/api/v3/workspaces/{id}/versions`](https://www.openproject.org/docs/api/endpoints/versions/#list-versions-available-in-a-workspace)'
+      operationId: List_versions_available_in_a_project
+      summary: List versions available in a project
+  /api/v3/versions:
+    get:
+      summary: List versions
+      operationId: list_versions
+      tags:
+      - Versions
+      description: 'Returns a collection of versions. The client can choose to filter the versions similar to how work packages are
+
+        filtered. In addition to the provided filters, the server will reduce the result set to only contain versions,
+
+        for which the requesting client has sufficient permissions (*view_work_packages*).'
+      parameters:
+      - name: filters
+        description: 'JSON specifying filter conditions. Accepts the same format as returned by
+
+          the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint. Currently supported
+
+          filters are:
+
+
+          - sharing: filters versions by how they are shared within the server (*none*, *descendants*, *hierarchy*, *tree*, *system*).
+
+          - name: filters versions by their name.'
+        example: '[{ "sharing": { "operator": "=", "values": ["system"] } }]'
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: sortBy
+        description: 'JSON specifying sort criteria. Accepts the same format as returned by
+
+          the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint. Currently supported
+
+          attributes are:
+
+
+          - id: Sort by the version id
+
+          - name: Sort by the version name using numeric collation, comparing sequences of decimal digits by their numeric value'
+        example: '[["name", "desc"]]'
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/VersionCollectionModel'
+    post:
+      summary: Create version
+      operationId: create_version
+      tags:
+      - Versions
+      description: 'Creates a new version applying the attributes provided in the body. Please note that while there is a fixed set
+
+        of attributes, custom fields can extend a version''s attributes and are accepted by the endpoint.
+
+
+        You can use the form and schema to be retrieve the valid attribute values and by that be guided towards
+
+        successful creation.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionWriteModel'
+            examples:
+              create version:
+                $ref: '#/components/examples/VersionCreateRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/VersionReadModel'
+              examples:
+                response:
+                  $ref: '#/components/examples/VersionSimpleResponse'
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** Manage versions'
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          description: 'Returned if:
+
+
+            * a constraint for a property was violated (`PropertyConstraintViolation`)'
+  /api/v3/versions/available_projects:
+    get:
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              examples:
+                response:
+                  value:
+                    _embedded:
+                      elements:
+                      - _links:
+                          categories:
+                            href: /api/v3/projects/6/categories
+                          createWorkPackage:
+                            href: /api/v3/projects/6/work_packages/form
+                            method: post
+                          createWorkPackageImmediate:
+                            href: /api/v3/projects/6/work_packages
+                            method: post
+                          editWorkPackage:
+                            href: /api/v3//work_packages/{id}/form
+                            method: post
+                            templated: true
+                          self:
+                            href: /api/v3/projects/6
+                            title: A project
+                          versions:
+                            href: /api/v3/projects/6/versions
+                        _type: Project
+                        createdAt: '2015-07-06T13:28:14+00:00'
+                        description: Eveniet molestias omnis quis aut qui eum adipisci. Atque aut aut in exercitationem adipisci amet. Nisi asperiores quia ratione veritatis enim exercitationem magnam. Aut fuga architecto adipisci nihil. Et repellat pariatur. Aliquam et sed perferendis nostrum quaerat. Fugit doloremque voluptatem.
+                        id: 6
+                        identifier: a_project
+                        name: A project
+                        type: Customer Project
+                        updatedAt: '2015-10-01T09:55:02+00:00'
+                      - _links:
+                          categories:
+                            href: /api/v3/projects/14/categories
+                          createWorkPackage:
+                            href: /api/v3/projects/14/work_packages/form
+                            method: post
+                          createWorkPackageImmediate:
+                            href: /api/v3/projects/14/work_packages
+                            method: post
+                          self:
+                            href: /api/v3/projects/14
+                            title: Another project
+                          versions:
+                            href: /api/v3/projects/14/versions
+                        _type: Project
+                        createdAt: '2016-02-29T12:50:20+00:00'
+                        description: ''
+                        id: 14
+                        identifier: another_project
+                        name: Another project
+                        type: null
+                        updatedAt: '2016-02-29T12:50:20+00:00'
+                    _links:
+                      self:
+                        href: /api/v3/versions/available_projects
+                    _type: Collection
+                    count: 2
+                    total: 2
+              schema:
+                $ref: '#/components/schemas/Available_projects_for_versionsModel'
+          description: OK
+          headers: {}
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** manage versions'
+          headers: {}
+      tags:
+      - Versions
+      description: Gets a list of projects in which a version can be created in. The list contains all projects in which the user issuing the request has the manage versions permissions.
+      operationId: Available_projects_for_versions
+      summary: Available projects for versions
+  /api/v3/versions/form:
+    post:
+      responses:
+        '200':
+          description: OK
+          headers: {}
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** manage versions in any project'
+          headers: {}
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+      tags:
+      - Versions
+      description: ''
+      operationId: Version_create_form
+      summary: Version create form
+  /api/v3/versions/schema:
+    get:
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              examples:
+                response:
+                  value:
+                    _dependencies: []
+                    _links:
+                      self:
+                        href: /api/v3/versions/schema
+                    _type: Schema
+                    createdAt:
+                      hasDefault: false
+                      name: Created on
+                      required: true
+                      type: DateTime
+                      writable: false
+                    customField14:
+                      hasDefault: false
+                      name: text CF
+                      required: false
+                      type: String
+                      visibility: default
+                      writable: true
+                    customField40:
+                      _links: {}
+                      hasDefault: false
+                      location: _links
+                      name: List CF
+                      required: false
+                      type: CustomOption
+                      visibility: default
+                      writable: true
+                    definingProject:
+                      _links: {}
+                      hasDefault: false
+                      name: Project
+                      required: true
+                      type: Project
+                      writable: true
+                    description:
+                      hasDefault: false
+                      name: Description
+                      required: false
+                      type: Formattable
+                      writable: true
+                    endDate:
+                      hasDefault: false
+                      name: Finish date
+                      required: false
+                      type: Date
+                      writable: false
+                    id:
+                      hasDefault: false
+                      name: ID
+                      required: true
+                      type: Integer
+                      writable: false
+                    name:
+                      hasDefault: false
+                      maxLength: 60
+                      minLength: 1
+                      name: Name
+                      required: true
+                      type: String
+                      writable: true
+                    sharing:
+                      _links: {}
+                      hasDefault: false
+                      name: Sharing
+                      required: true
+                      type: String
+                      visibility: default
+                      writable: true
+                    startDate:
+                      hasDefault: false
+                      name: Start date
+                      required: false
+                      type: Date
+                      writable: true
+                    status:
+                      _links: {}
+                      hasDefault: false
+                      name: Status
+                      required: true
+                      type: String
+                      visibility: default
+                      writable: true
+                    updatedAt:
+                      hasDefault: false
+                      name: Updated on
+                      required: true
+                      type: DateTime
+                      writable: false
+              schema:
+                $ref: '#/components/schemas/Version_schemaModel'
+          description: OK
+          headers: {}
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions to see the schema.
+
+
+            **Required permission:** view work packages or manage versions on any project'
+          headers: {}
+      tags:
+      - Versions
+      description: ''
+      operationId: View_version_schema
+      summary: View version schema
+  /api/v3/versions/{id}:
+    get:
+      summary: Get version
+      operationId: get_version
+      tags:
+      - Versions
+      description: Retrieves a version defined by its unique identifier.
+      parameters:
+      - description: Version id
+        example: '1'
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/VersionReadModel'
+              examples:
+                response:
+                  $ref: '#/components/examples/VersionSimpleResponse'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                    message: The requested resource could not be found.
+          description: 'Returned if the version does not exist or the client does not have sufficient permissions
+
+            to see it.
+
+
+            **Required permission:** view work packages **or** manage versions (any project where the version is available)
+
+
+            *Note: A client without sufficient permissions shall not be able to test for the existence of
+
+            a version. That''s why a 404 is returned here, even if a 403 might be more appropriate.*'
+    delete:
+      summary: Delete version
+      operationId: delete_Version
+      tags:
+      - Versions
+      description: Deletes the version. Entities associated to the version will no longer be assigned to it.
+      parameters:
+      - description: Version id
+        example: '1'
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Returned if the version was successfully deleted
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** manage versions'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                    message: The requested resource could not be found.
+          description: 'Returned if the version does not exist or the client does not have sufficient permissions
+
+            to see it.
+
+
+            **Required permission:** view work packages **or** manage versions (any project where the version is available)
+
+
+            *Note: A client without sufficient permissions shall not be able to test for the existence of
+
+            a version. That''s why a 404 is returned here, even if a 403 might be more appropriate.*'
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+    patch:
+      summary: Update Version
+      operationId: update_Version
+      tags:
+      - Versions
+      description: 'Updates the given version by applying the attributes provided in the body. Please note that while there is a fixed
+
+        set of attributes, custom fields can extend a version''s attributes and are accepted by the endpoint.'
+      parameters:
+      - description: Version id
+        example: '1'
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionWriteModel'
+            examples:
+              update name:
+                $ref: '#/components/examples/VersionUpdateNameRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/VersionReadModel'
+              examples:
+                response:
+                  $ref: '#/components/examples/VersionSimpleResponse'
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** Manage versions in the version''s project.'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                    message: The requested resource could not be found.
+          description: 'Returned if the version does not exist or the client does not have sufficient permissions
+
+            to see it.
+
+
+            **Required permission:** view work packages **or** manage versions (any project where the version is available)
+
+
+            *Note: A client without sufficient permissions shall not be able to test for the existence of
+
+            a version. That''s why a 404 is returned here, even if a 403 might be more appropriate.*'
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          description: 'Returned if:
+
+
+            * a constraint for a property was violated (`PropertyConstraintViolation`)'
+  /api/v3/versions/{id}/form:
+    post:
+      parameters:
+      - description: Project id
+        example: '1'
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          headers: {}
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** manage versions in the version''s project'
+          headers: {}
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+      tags:
+      - Versions
+      description: ''
+      operationId: Version_update_form
+      summary: Version update form
+  /api/v3/workspaces/{id}/versions:
+    get:
+      parameters:
+      - description: ID of the workspace whose versions will be listed
+        example: '1'
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              examples:
+                response:
+                  value:
+                    _embedded:
+                      elements:
+                      - _links:
+                          availableInProjects:
+                            href: /api/v3/versions/11/workspaces
+                          definingProject:
+                            href: /api/v3/projects/11
+                          self:
+                            href: /api/v3/versions/11
+                        _type: Version
+                        description:
+                          format: plain
+                          html: This version has a description
+                          raw: This version has a description
+                        endDate: null
+                        id: 11
+                        name: v3.0 Alpha
+                        startDate: '2014-11-20'
+                        status: Open
+                      - _links:
+                          availableInProjects:
+                            href: /api/v3/versions/12/workspaces
+                          definingProject:
+                            href: /api/v3/projects/11
+                          self:
+                            href: /api/v3/versions/12
+                        _type: Version
+                        description:
+                          format: plain
+                          html: ''
+                          raw: ''
+                        endDate: null
+                        id: 12
+                        name: v2.0
+                        startDate: null
+                        status: Closed
+                      - _links:
+                          availableInProjects:
+                            href: /api/v3/versions/10/workspaces
+                          definingProject:
+                            href: /api/v3/projects/11
+                          self:
+                            href: /api/v3/versions/10
+                        _type: Version
+                        description:
+                          format: plain
+                          html: ''
+                          raw: ''
+                        endDate: null
+                        id: 10
+                        name: v1.0
+                        startDate: null
+                        status: Open
+                    _links:
+                      self:
+                        href: /api/v3/workspaces/11/versions
+                    _type: Collection
+                    count: 3
+                    total: 3
+              schema:
+                $ref: '#/components/schemas/Versions_by_WorkspaceModel'
+          description: OK
+          headers: {}
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                    message: The specified project does not exist.
+          description: 'Returned if the workspace does not exist or the client does not have sufficient permissions
+
+            to see it.
+
+
+            **Required permission:** view work packages **or** manage versions (on given workspace)
+
+
+            *Note: A client without sufficient permissions shall not be able to test for the existence of a workspace.
+
+            That''s why a 404 is returned here, even if a 403 might be more appropriate.*'
+          headers: {}
+      tags:
+      - Versions
+      description: 'This endpoint lists the versions that are *available* in a given workspace.
+
+        Note that due to sharing this might be more than the versions *defined* by that workspace.'
+      operationId: List_versions_available_in_a_workspace
+      summary: List versions available in a workspace
+components:
+  schemas:
+    CollectionModel:
+      type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
+    Versions_by_WorkspaceModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The versions collection
+
+
+                    **Resource**: VersionsCollection'
+                  readOnly: true
+          _embedded:
+            type: object
+            properties:
+              elements:
+                type: array
+                readOnly: true
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/VersionReadModel'
+                  - description: Collection of Versions
+    VersionWriteModel:
+      allOf:
+      - $ref: '#/components/schemas/CustomFieldProperties'
+      - type: object
+        properties:
+          name:
+            type: string
+            description: Version name
+          description:
+            $ref: '#/components/schemas/Formattable'
+          startDate:
+            type:
+            - string
+            - 'null'
+            format: date
+          endDate:
+            type:
+            - string
+            - 'null'
+            format: date
+          status:
+            type: string
+            description: 'The current status of the version. This could be:
+
+
+              - *open*: if the version is available to be assigned to work packages in all shared projects
+
+              - *locked*: if the version is not finished, but locked for further assignments to work packages
+
+              - *closed*: if the version is finished'
+            enum:
+            - open
+            - locked
+            - closed
+          sharing:
+            type: string
+            description: 'The indicator of how the version is shared between projects. This could be:
+
+
+              - *none*: if the version is only available in the defining project
+
+              - *descendants*: if the version is shared with the descendants of the defining project
+
+              - *hierarchy*: if the version is shared with the descendants and the ancestors of the defining project
+
+              - *tree*: if the version is shared with the root project of the defining project and all descendants of the root project
+
+              - *system*: if the version is shared globally'
+            enum:
+            - none
+            - descendants
+            - hierarchy
+            - tree
+            - system
+          _links:
+            allOf:
+            - $ref: '#/components/schemas/CustomFieldLinkedProperties'
+            - type: object
+              properties:
+                definingProject:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'The workspace to which the version belongs
+
+
+                      **Resource**: Workspace'
+    VersionReadModel:
+      allOf:
+      - $ref: '#/components/schemas/CustomFieldProperties'
+      - type: object
+        required:
+        - id
+        - _type
+        - name
+        - description
+        - startDate
+        - endDate
+        - status
+        - sharing
+        - createdAt
+        - updatedAt
+        properties:
+          id:
+            type: integer
+            description: Version id
+            minimum: 1
+          _type:
+            type: string
+            enum:
+            - Version
+          name:
+            type: string
+            description: Version name
+          description:
+            $ref: '#/components/schemas/Formattable'
+          startDate:
+            type:
+            - string
+            - 'null'
+            format: date
+          endDate:
+            type:
+            - string
+            - 'null'
+            format: date
+          status:
+            type: string
+            description: 'The current status of the version. This could be:
+
+
+              - *open*: if the version is available to be assigned to work packages in all shared projects
+
+              - *locked*: if the version is not finished, but locked for further assignments to work packages
+
+              - *closed*: if the version is finished'
+            enum:
+            - open
+            - locked
+            - closed
+          sharing:
+            type: string
+            description: 'The indicator of how the version is shared between projects. This could be:
+
+
+              - *none*: if the version is only available in the defining project
+
+              - *descendants*: if the version is shared with the descendants of the defining project
+
+              - *hierarchy*: if the version is shared with the descendants and the ancestors of the defining project
+
+              - *tree*: if the version is shared with the root project of the defining project and all descendants of the root project
+
+              - *system*: if the version is shared globally'
+            enum:
+            - none
+            - descendants
+            - hierarchy
+            - tree
+            - system
+          createdAt:
+            type: string
+            format: date-time
+            description: Time of creation
+          updatedAt:
+            type: string
+            format: date-time
+            description: Time of the most recent change to the version
+          _links:
+            allOf:
+            - $ref: '#/components/schemas/CustomFieldLinkedProperties'
+            - type: object
+              required:
+              - self
+              - schema
+              - definingProject
+              - availableInProjects
+              properties:
+                self:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'This version
+
+
+                      **Resource**: Version'
+                schema:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'The schema of this version
+
+
+                      **Resource**: VersionSchema'
+                update:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'Form endpoint that aids in preparing and performing edits on the version
+
+
+                      # Conditions
+
+
+                      **Permission**: manage versions'
+                delete:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'Deletes this version
+
+
+                      # Conditions
+
+
+                      **Permission**: manage versions'
+                updateImmediately:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'Directly perform edits on the version
+
+
+                      # Conditions
+
+
+                      **Permission**: manage versions'
+                definingProject:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'The workspace to which the version belongs
+
+
+                      **Resource**: Workspace'
+                availableInProjects:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'Workspaces where this version can be used
+
+
+                      **Resource**: Workspace'
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
+    Formattable:
+      type: object
+      required:
+      - format
+      properties:
+        format:
+          type: string
+          enum:
+          - plain
+          - markdown
+          - custom
+          readOnly: true
+          description: Indicates the formatting language of the raw text
+          example: markdown
+        raw:
+          type: string
+          description: The raw text, as entered by the user
+          example: I **am** formatted!
+        html:
+          type: string
+          readOnly: true
+          description: The text converted to HTML according to the format
+          example: I <strong>am</strong> formatted!
+      example:
+        format: markdown
+        raw: I am formatted!
+        html: I am formatted!
+    Available_projects_for_versionsModel:
+      type: object
+      example:
+        _links:
+          self:
+            href: /api/v3/versions/available_projects
+        _type: Collection
+        total: 2
+        count: 2
+        _embedded:
+          elements:
+          - _type: Project
+            _links:
+              self:
+                href: /api/v3/projects/6
+                title: A project
+              editWorkPackage:
+                href: /api/v3/work_packages/{id}/form
+                templated: true
+                method: post
+              createWorkPackage:
+                href: /api/v3/projects/6/work_packages/form
+                method: post
+              createWorkPackageImmediate:
+                href: /api/v3/projects/6/work_packages
+                method: post
+              categories:
+                href: /api/v3/projects/6/categories
+              versions:
+                href: /api/v3/projects/6/versions
+            id: 6
+            identifier: a_project
+            name: A project
+            description: Eveniet molestias omnis quis aut qui eum adipisci. Atque aut aut in exercitationem adipisci amet. Nisi asperiores quia ratione veritatis enim exercitationem magnam. Aut fuga architecto adipisci nihil. Et repellat pariatur. Aliquam et sed perferendis nostrum quaerat. Fugit doloremque voluptatem.
+            createdAt: '2015-07-06T13:28:14+00:00'
+            updatedAt: '2015-10-01T09:55:02+00:00'
+            type: Customer Project
+          - _type: Project
+            _links:
+              self:
+                href: /api/v3/projects/14
+                title: Another project
+              createWorkPackage:
+                href: /api/v3/projects/14/work_packages/form
+                method: post
+              createWorkPackageImmediate:
+                href: /api/v3/projects/14/work_packages
+                method: post
+              categories:
+                href: /api/v3/projects/14/categories
+              versions:
+                href: /api/v3/projects/14/versions
+            id: 14
+            identifier: another_project
+            name: Another project
+            description: ''
+            createdAt: '2016-02-29T12:50:20+00:00'
+            updatedAt: '2016-02-29T12:50:20+00:00'
+            type: null
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    CustomFieldLinkedProperties:
+      type: object
+      patternProperties:
+        ^customField\d+$:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'A custom field value that belongs to a custom field of a reference type:
+
+
+              - Hierarchy
+
+              - List
+
+              - User
+
+              - Version
+
+              - Weighted item list'
+    Version_schemaModel:
+      type: object
+      example:
+        _type: Schema
+        _dependencies: []
+        id:
+          type: Integer
+          name: ID
+          required: true
+          hasDefault: false
+          writable: false
+        name:
+          type: String
+          name: Name
+          required: true
+          hasDefault: false
+          writable: true
+          minLength: 1
+          maxLength: 60
+        description:
+          type: Formattable
+          name: Description
+          required: false
+          hasDefault: false
+          writable: true
+        startDate:
+          type: Date
+          name: Start date
+          required: false
+          hasDefault: false
+          writable: true
+        endDate:
+          type: Date
+          name: Finish date
+          required: false
+          hasDefault: false
+          writable: false
+        status:
+          type: String
+          name: Status
+          required: true
+          hasDefault: false
+          writable: true
+          visibility: default
+          _links: {}
+        sharing:
+          type: String
+          name: Sharing
+          required: true
+          hasDefault: false
+          writable: true
+          visibility: default
+          _links: {}
+        createdAt:
+          type: DateTime
+          name: Created on
+          required: true
+          hasDefault: false
+          writable: false
+        updatedAt:
+          type: DateTime
+          name: Updated on
+          required: true
+          hasDefault: false
+          writable: false
+        definingProject:
+          type: Project
+          name: Project
+          required: true
+          hasDefault: false
+          writable: true
+          _links: {}
+        customField14:
+          type: String
+          name: text CF
+          required: false
+          hasDefault: false
+          writable: true
+          visibility: default
+        customField40:
+          type: CustomOption
+          name: List CF
+          required: false
+          hasDefault: false
+          writable: true
+          location: _links
+          visibility: default
+          _links: {}
+        _links:
+          self:
+            href: /api/v3/versions/schema
+    VersionCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This version collection
+
+
+                    **Resource**: Collection'
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VersionReadModel'
+    CustomFieldProperties:
+      type: object
+      patternProperties:
+        ^customField\d+$:
+          type:
+          - 'null'
+          - number
+          - boolean
+          - string
+          - object
+          description: 'A custom field value, that belongs to a custom field of a simple type:
+
+
+            - Boolean
+
+            - Date
+
+            - Float
+
+            - Integer
+
+            - Link (URL)
+
+            - Text
+
+            - Long text'
+  responses:
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
+    UnsupportedMediaType:
+      description: Occurs when the client sends an unsupported Content-Type header.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
+            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+    InvalidRequestBody:
+      description: Occurs when the client did not send a valid JSON object in the request body.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+            message: The request body was not a single JSON object.
+  examples:
+    VersionUpdateNameRequest:
+      description: Example request body to update the name of a version.
+      value:
+        name: v0.9.1-alpha
+    VersionCreateRequest:
+      description: Request to create a basic version with custom fields
+      value:
+        name: v0.9.1-alpha
+        startDate: '2026-02-02'
+        endDate: '2026-02-09'
+        status: open
+        sharing: tree
+        customField14: true
+        _links:
+          definingProject:
+            href: /api/v3/projects/10
+            title: Death Star
+          customField23:
+            href: /api/v3/users/18
+            title: Mara Jade
+    VersionSimpleResponse:
+      description: Simple response showing a single version
+      value:
+        _type: Version
+        id: 3
+        name: v0.9.1-alpha
+        description:
+          format: plain
+          raw: First draft of the energy weapon ... (behold, Alderaan *evil_laughter*)
+          html: <p>First draft of the energy weapon ... (behold, Alderaan *evil_laughter*)</p>
+        startDate: '2026-02-02'
+        endDate: '2026-02-09'
+        status: closed
+        sharing: none
+        createdAt: '2026-02-06T09:30:49.157Z'
+        updatedAt: '2026-02-10T09:53:21.620Z'
+        customField14: true
+        _links:
+          self:
+            href: /api/v3/versions/1
+            title: v0.1.0-alpha
+          schema:
+            href: /api/v3/versions/schema
+          update:
+            href: /api/v3/versions/1/form
+            method: post
+          updateImmediately:
+            href: /api/v3/versions/1
+            method: patch
+          delete:
+            href: /api/v3/versions/1
+            method: delete
+          availableInProjects:
+            href: /api/v3/versions/1/workspaces
+          definingProject:
+            href: /api/v3/projects/10
+            title: Death Star
+          customField23:
+            href: /api/v3/users/18
+            title: Mara Jade
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic

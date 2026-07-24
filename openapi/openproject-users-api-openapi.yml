@@ -1,0 +1,1436 @@
+openapi: 3.1.2
+info:
+  description: "You're looking at the current **stable** documentation of the OpenProject APIv3. If you're interested in the current\ndevelopment version, please go to [github.com/opf](https://github.com/opf/openproject/tree/dev/docs/api/apiv3).\n\n## Introduction\n\nThe documentation for the APIv3 is written according to the [OpenAPI 3.1 Specification](https://swagger.io/specification/).\nYou can either view the static version of this documentation on the [website](https://www.openproject.org/docs/api/introduction/)\nor the interactive version, rendered with [OpenAPI Explorer](https://github.com/Rhosys/openapi-explorer/blob/main/README.md),\nin your OpenProject installation under `/api/docs`.\nIn the latter you can try out the various API endpoints directly interacting with our OpenProject data.\nMoreover you can access the specification source itself under `/api/v3/spec.json` and `/api/v3/spec.yml`\n(e.g. [here](https://community.openproject.org/api/v3/spec.yml)).\n\nThe APIv3 is a hypermedia REST API, a shorthand for \"Hypermedia As The Engine Of Application State\" (HATEOAS).\nThis means that each endpoint of this API will have links to other resources or actions defined in the resulting body.\n\nThese related resources and actions for any given resource will be context sensitive. For example, only actions that the\nauthenticated user can take are being rendered. This can be used to dynamically identify actions that the user might take for any\ngiven response.\n\nAs an example, if you fetch a work package through the [Work Package endpoint](https://www.openproject.org/docs/api/endpoints/work-packages/), the `update` link will only\nbe present when the user you authenticated has been granted a permission to update the work package in the assigned project.\n\n## HAL+JSON\n\nHAL is a simple format that gives a consistent and easy way to hyperlink between resources in your API.\nRead more in the following specification: [https://tools.ietf.org/html/draft-kelly-json-hal-08](https://tools.ietf.org/html/draft-kelly-json-hal-08)\n\n**OpenProject API implementation of HAL+JSON format** enriches JSON and introduces a few meta properties:\n\n- `_type` - specifies the type of the resource (e.g.: WorkPackage, Project)\n- `_links` - contains all related resource and action links available for the resource\n- `_embedded` - contains all embedded objects\n\nHAL does not guarantee that embedded resources are embedded in their full representation, they might as well be\npartially represented (e.g. some properties can be left out).\nHowever in this API you have the guarantee that whenever a resource is **embedded**, it is embedded in its **full representation**.\n\n## API response structure\n\nAll API responses contain a single HAL+JSON object, even collections of objects are technically represented by\na single HAL+JSON object that itself contains its members. More details on collections can be found\nin the [Collections Section](https://www.openproject.org/docs/api/collections/).\n\n## Authentication\n\nThe API supports the following authentication schemes:\n\n* Session-based authentication\n* API tokens\n    * passed as Bearer token\n    * passed via Basic auth\n* OAuth 2.0\n    * using built-in authorization server\n    * using an external authorization server (RFC 9068)\n\nDepending on the settings of the OpenProject instance many resources can be accessed without being authenticated.\nIn case the instance requires authentication on all requests the client will receive an **HTTP 401** status code\nin response to any request.\n\nOtherwise unauthenticated clients have all the permissions of the anonymous user.\n\n### Session-based authentication\n\nThis means you have to login to OpenProject via the Web-Interface to be authenticated in the API.\nThis method is well-suited for clients acting within the browser, like the Angular-Client built into OpenProject.\n\nIn this case, you always need to pass the HTTP header `X-Requested-With \"XMLHttpRequest\"` for authentication.\n\n### API token as bearer token\n\nUsers can authenticate towards the API v3 using an API token as a bearer token.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -H \"Authorization: Bearer $API_KEY\" https://community.openproject.org/api/v3/users/42\n```\n\nUsers can generate API tokens on their account page.\n\n### API token through Basic Auth\n\nAPI tokens can also be used with basic auth, using the user name `apikey` (NOT your login) and the API token as the password.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -u apikey:$API_KEY https://community.openproject.org/api/v3/users/42\n```\n\n### OAuth 2.0 authentication\n\nOpenProject allows authentication and authorization with OAuth2 with *Authorization code flow*, as well as *Client credentials* operation modes.\n\nTo get started, you first need to register an application in the OpenProject OAuth administration section of your installation.\nThis will save an entry for your application with a client unique identifier (`client_id`) and an accompanying secret key (`client_secret`).\n\nYou can then use one the following guides to perform the supported OAuth 2.0 flows:\n\n- [Authorization code flow](https://oauth.net/2/grant-types/authorization-code)\n\n- [Authorization code flow with PKCE](https://doorkeeper.gitbook.io/guides/ruby-on-rails/pkce-flow), recommended for clients unable to keep the client_secret confidential\n\n- [Client credentials](https://oauth.net/2/grant-types/client-credentials/) - Requires an application to be bound to an impersonating user for non-public access\n\n### OAuth 2.0 using an external authorization server\n\nThere is a possibility to use JSON Web Tokens (JWT) generated by an OIDC provider configured in OpenProject as a bearer token to do authenticated requests against the API.\nThe following requirements must be met:\n\n- OIDC provider must be configured in OpenProject with **jwks_uri**\n- JWT must be signed using RSA algorithm\n- JWT **iss** claim must be equal to OIDC provider **issuer**\n- JWT **aud** claim must contain the OpenProject **client ID** used at the OIDC provider\n- JWT **scope** claim must include a valid scope to access the desired API (e.g. `api_v3` for APIv3)\n- JWT must be actual (neither expired or too early to be used)\n- JWT must be passed in Authorization header like: `Authorization: Bearer {jwt}`\n- User from **sub** claim must be linked to OpenProject before (e.g. by logging in), otherwise it will be not authenticated\n\nIn more general terms, OpenProject should be compliant to [RFC 9068](https://www.rfc-editor.org/rfc/rfc9068) when validating access tokens.\n\n### Why not username and password?\n\nThe simplest way to do basic auth would be to use a user's username and password naturally.\nHowever, OpenProject already has supported API keys in the past for the API v2, though not through basic auth.\n\nUsing **username and password** directly would have some advantages:\n\n* It is intuitive for the user who then just has to provide those just as they would when logging into OpenProject.\n\n* No extra logic for token management necessary.\n\nOn the other hand using **API keys** has some advantages too, which is why we went for that:\n\n* If compromised while saved on an insecure client the user only has to regenerate the API key instead of changing their password, too.\n\n* They are naturally long and random which makes them invulnerable to dictionary attacks and harder to crack in general.\n\nMost importantly users may not actually have a password to begin with. Specifically when they have registered\nthrough an OpenID Connect provider.\n\n## Cross-Origin Resource Sharing (CORS)\n\nBy default, the OpenProject API is _not_ responding with any CORS headers.\nIf you want to allow cross-domain AJAX calls against your OpenProject instance, you need to enable CORS headers being returned.\n\nPlease see [our API settings documentation](https://www.openproject.org/docs/system-admin-guide/api-and-webhooks/) on\nhow to selectively enable CORS.\n\n## Allowed HTTP methods\n\n- `GET` - Get a single resource or collection of resources\n\n- `POST` - Create a new resource or perform\n\n- `PATCH` - Update a resource\n\n- `DELETE` - Delete a resource\n\n## Compression\n\nResponses are compressed if requested by the client. Currently [gzip](https://www.gzip.org/) and [deflate](https://tools.ietf.org/html/rfc1951)\nare supported. The client signals the desired compression by setting the [`Accept-Encoding` header](https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3).\nIf no `Accept-Encoding` header is send, `Accept-Encoding: identity` is assumed which will result in the API responding uncompressed."
+  title: OpenProject API V3 (Stable) Actions & Capabilities Users API
+  version: '3'
+servers:
+- url: https://qa.openproject-edge.com
+  description: Edge QA instance
+- url: https://qa.openproject-stage.com
+  description: Staging instance
+- url: https://community.openproject.org
+  description: Community instance
+security:
+- BasicAuth: []
+tags:
+- name: Users
+  description: 'The users endpoints return collections or single entities of type `User`. The following tables list the different properties
+
+    of `User` entities.
+
+
+    ## Actions
+
+
+    | Link                | Description                                                          | Condition                                                        |
+
+    |:-------------------:| -------------------------------------------------------------------- | ---------------------------------------------------------------- |
+
+    | lock                | Restrict the user from logging in and performing any actions         | not locked; **Permission**: Administrator                        |
+
+    | show                | Link to the OpenProject user page (HTML)                             |                                                                  |
+
+    | unlock              | Allow a locked user to login and act again                           | locked; **Permission**: Administrator                            |
+
+    | updateImmediately   | Updates the user''s attributes.                                       | **Permission**: Administrator, manage_user global permission     |
+
+    | delete              | Permanently remove a user from the instance                          | **Permission**: Administrator, self-delete                       |
+
+
+    ## Linked Properties
+
+
+    |  Link       | Description                                                                                                                                                          | Type              | Constraints           | Supported operations | Condition                                                     |
+
+    |:-----------:|--------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | --------------------- | -------------------- | -----------------------------------------                     |
+
+    | self        | This user                                                                                                                                                            | User              | not null              | READ                 |                                                               |
+
+    | auth_source | Link to the user''s auth source (endpoint not yet implemented)                                                                                                        | LdapAuthSource    |                       | READ / WRITE         | **Permission**: Administrator                                 |
+
+    | members     | Link to collection of all the user''s memberships. The list will only include the memberships in projects in which the requesting user has the necessary permissions. | MemberCollection  |                       | READ                 | **Permission**: view members or manage members in any project |
+
+
+    Depending on custom fields defined for users, additional links might exist.
+
+
+    ## Local Properties
+
+
+    | Property     | Description                                               | Type     | Constraints                                          | Supported operations | Condition                                                                               |
+
+    | :----------: | --------------------------------------------------------- | -------- | ---------------------------------------------------- | -------------------- | -----------------------------------------------------------                             |
+
+    | id           | User''s id                                                 | Integer  | x > 0                                                | READ                 |                                                                                         |
+
+    | login        | User''s login name                                         | String   | unique, 256 max length                               | READ / WRITE         | **Permission**: Administrator, manage_user global permission                            |
+
+    | firstName    | User''s first name                                         | String   | 30 max length                                        | READ / WRITE         | **Permission**: Administrator, manage_user global permission                            |
+
+    | lastName     | User''s last name                                          | String   | 30 max length                                        | READ / WRITE         | **Permission**: Administrator, manage_user global permission                            |
+
+    | name         | User''s full name, formatting depends on instance settings | String   |                                                      | READ                 |                                                                                         |
+
+    | email        | User''s email address                                      | String   | unique, 60 max length                                | READ / WRITE         | E-Mail address not hidden, **Permission**: Administrator, manage_user global permission |
+
+    | admin        | Flag indicating whether or not the user is an admin       | Boolean  | in: [true, false]                                    | READ / WRITE         | **Permission**: Administrator                                                           |
+
+    | avatar       | URL to user''s avatar                                      | Url      |                                                      | READ                 |                                                                                         |
+
+    | status       | The current activation status of the user (see below)     | String   | in: ["active", "registered", "locked", "invited"]    | READ                 |                                                                                         |
+
+    | language     | User''s language                                           | String   | ISO 639-1                                            | READ / WRITE         | **Permission**: Administrator, manage_user global permission                            |
+
+    | password     | User''s password for the default password authentication   | String   |                                                      | WRITE                | **Permission**: Administrator                                                           |
+
+    | identity_url | User''s identity_url for OmniAuth authentication           | String   |                                                      | READ / WRITE         | **Permission**: Administrator                                                           |
+
+    | createdAt    | Time of creation                                          | DateTime |                                                      | READ                 |                                                                                         |
+
+    | updatedAt    | Time of the most recent change to the user                | DateTime |                                                      | READ                 |                                                                                         |
+
+
+    Depending on custom fields defined for users, additional properties might exist.
+
+
+    The `status` of a user can be one of:
+
+
+    * `active` - the user can log in with the account right away
+
+
+    * `invited` - the user is invited and is pending registration
+
+
+    If the user''s `status` is set to `active` during creation a means of authentication
+
+    has to be provided which is one of the following:
+
+
+    * `password` - The password with which the user logs in.
+
+
+    * `auth_source` - Link to an LDAP auth source.
+
+
+    * `identity_url` - The identity URL of an OmniAuth authentication provider.
+
+
+    If all of these are missing the creation will fail with an "missing password" error.
+
+
+    The `language` is limited to those activated in the system.
+
+
+    Due to data privacy, the user''s properties are limited to reveal as little about the user as possible.
+
+    Thus `login`, `firstName`, `lastName`, `language`, `createdAt` and `updatedAt` are hidden for all
+
+    users except for admins or the user themselves.
+
+
+    Please note that custom fields are not yet supported by the api although the backend supports them.'
+paths:
+  /api/v3/users:
+    get:
+      summary: List Users
+      operationId: list_Users
+      description: 'Lists users. Only administrators or users with the following global permission can access this resource:
+
+        - `manage_user`'
+      tags:
+      - Users
+      parameters:
+      - description: Page number inside the requested collection.
+        example: '25'
+        in: query
+        name: offset
+        required: false
+        schema:
+          default: 1
+          type: integer
+      - description: Number of elements to display per page.
+        example: '25'
+        in: query
+        name: pageSize
+        required: false
+        schema:
+          type: integer
+      - description: 'JSON specifying filter conditions.
+
+          Accepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)
+
+          endpoint. Currently supported filters are:
+
+
+          + status: Status the user has
+
+
+          + group: Name of the group in which to-be-listed users are members.
+
+
+          + name: Filter users in whose first or last names, or email addresses the given string occurs.
+
+
+          + login: User''s login'
+        example: '[{ "status": { "operator": "=", "values": ["invited"] } }, { "group": { "operator": "=", "values": ["1"] } }, { "name": { "operator": "=", "values": ["h.wurst@openproject.com"] } }]'
+        in: query
+        name: filters
+        required: false
+        schema:
+          type: string
+      - description: 'JSON specifying sort criteria.
+
+          Accepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint.'
+        example: '[["status", "asc"]]'
+        in: query
+        name: sortBy
+        required: false
+        schema:
+          type: string
+      - description: Comma separated list of properties to include.
+        example: total,elements/name,elements/self,self
+        in: query
+        name: select
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/UserCollectionModel'
+          description: OK
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                message: You are not allowed to list users.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** Administrator or any of: ''manage_members'', ''manage_user'', ''share_work_packages''.'
+    post:
+      summary: Create User
+      operationId: create_user
+      tags:
+      - Users
+      description: 'Creates a new user. Only administrators and users with manage_user global permission are allowed to do so.
+
+        When calling this endpoint the client provides a single object, containing at least the properties and links that are required, in the body.
+
+
+        Valid values for `status`:
+
+
+        1) "active" - In this case a password has to be provided in addition to the other attributes.
+
+
+        2) "invited" - In this case nothing but the email address is required. The rest is optional. An invitation will be sent to the user.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateModel'
+      responses:
+        '201':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/UserModel'
+          description: Created
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                message: You are not allowed to create new users.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** Administrator'
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _embedded:
+                  details:
+                    attribute: email
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+                message: The email address is already taken.
+          description: 'Returned if:
+
+
+            * a constraint for a property was violated (`PropertyConstraintViolation`)'
+  /api/v3/users/schema:
+    get:
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              examples:
+                response:
+                  value:
+                    _dependencies: []
+                    _links:
+                      self:
+                        href: /api/v3/users/schema
+                    _type: Schema
+                    admin:
+                      hasDefault: false
+                      name: Administrator
+                      options: {}
+                      required: false
+                      type: Boolean
+                      writable: true
+                    avatar:
+                      hasDefault: false
+                      name: Avatar
+                      options: {}
+                      required: false
+                      type: String
+                      writable: false
+                    createdAt:
+                      hasDefault: false
+                      name: Created on
+                      options: {}
+                      required: true
+                      type: DateTime
+                      writable: false
+                    customField1:
+                      hasDefault: false
+                      name: User String CF
+                      required: false
+                      type: String
+                      writable: true
+                    customField2:
+                      hasDefault: false
+                      location: _links
+                      name: User List cf
+                      required: false
+                      type: CustomOption
+                      writable: true
+                    firstName:
+                      hasDefault: false
+                      maxLength: 255
+                      minLength: 1
+                      name: First name
+                      options: {}
+                      required: true
+                      type: String
+                      writable: false
+                    id:
+                      hasDefault: false
+                      name: ID
+                      options: {}
+                      required: true
+                      type: Integer
+                      writable: false
+                    identityUrl:
+                      hasDefault: false
+                      name: Identity url
+                      options: {}
+                      required: false
+                      type: String
+                      writable: true
+                    language:
+                      hasDefault: false
+                      name: Language
+                      options: {}
+                      required: false
+                      type: String
+                      writable: true
+                    lastName:
+                      hasDefault: false
+                      maxLength: 255
+                      minLength: 1
+                      name: Last name
+                      options: {}
+                      required: true
+                      type: String
+                      writable: false
+                    login:
+                      hasDefault: false
+                      maxLength: 255
+                      minLength: 1
+                      name: Username
+                      options: {}
+                      required: true
+                      type: String
+                      writable: true
+                    mail:
+                      hasDefault: false
+                      maxLength: 255
+                      minLength: 1
+                      name: Email
+                      options: {}
+                      required: true
+                      type: String
+                      writable: true
+                    password:
+                      hasDefault: false
+                      name: Password
+                      options: {}
+                      required: false
+                      type: Password
+                      writable: false
+                    status:
+                      hasDefault: false
+                      name: Status
+                      options: {}
+                      required: false
+                      type: String
+                      writable: true
+                    updatedAt:
+                      hasDefault: false
+                      name: Updated on
+                      options: {}
+                      required: true
+                      type: DateTime
+                      writable: false
+              schema:
+                $ref: '#/components/schemas/View_user_schemaModel'
+          description: OK
+          headers: {}
+      tags:
+      - Users
+      description: The schema response use two exemplary custom fields that extend the schema response. Depending on your instance and custom field configuration, the response will look somewhat different.
+      operationId: View_user_schema
+      summary: View user schema
+  /api/v3/users/{id}:
+    delete:
+      summary: Delete user
+      operationId: delete_user
+      description: Permanently deletes the specified user account.
+      tags:
+      - Users
+      parameters:
+      - description: User id. Use `me` to reference current user, if any.
+        example: 1
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        '202':
+          description: 'Returned if the account was deleted successfully.
+
+
+            Note that the response body is empty as of now. In future versions of the API a body
+
+            *might* be returned, indicating the progress of deletion.'
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                message: You are not allowed to delete the account of this user.
+          description: 'Returned if the client does not have sufficient permissions or if deletion of users was disabled in the instance wide settings.
+
+
+            **Required permission:** Administrators only (exception: users might be able to delete their own accounts)'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The specified user does not exist.
+          description: Returned if the user does not exist.
+    get:
+      summary: View user
+      operationId: view_user
+      description: ''
+      tags:
+      - Users
+      parameters:
+      - description: User id. Use `me` to reference current user, if any.
+        example: 1
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/UserModel'
+              examples:
+                user response:
+                  $ref: '#/components/examples/UserResponse'
+          description: OK
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The specified user does not exist or you do not have permission to view them.
+          description: 'Returned if the user does not exist or if the API user does not have permission to view them.
+
+
+            **Required permission** The user needs to be locked in if the installation is configured to prevent anonymous access'
+    patch:
+      summary: Update user
+      operationId: update_user
+      tags:
+      - Users
+      description: 'Updates the user''s writable attributes.
+
+        When calling this endpoint the client provides a single object, containing at least the properties and links that are required, in the body.
+
+
+        Password updates for self-service account changes require both `password` and `currentPassword`.'
+      parameters:
+      - description: User id. Use `me` to reference current user, if any.
+        example: 1
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateModel'
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/UserModel'
+          description: OK
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                message: You are not allowed to update the account of this user.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** Administrators, manage_user global permission'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The specified user does not exist or you do not have permission to view them.
+          description: 'Returned if the user does not exist or if the API user does not have the necessary permissions to update it.
+
+
+            **Required permission:** Administrators only (exception: users may update their own accounts)'
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                email constraint violation:
+                  value:
+                    _embedded:
+                      details:
+                        attribute: email
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+                    message: The email address is already taken.
+                invalid current password:
+                  value:
+                    _embedded:
+                      details:
+                        attribute: currentPassword
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+                    message: Current password is invalid.
+          description: 'Returned if:
+
+
+            * the client tries to modify a read-only property (`PropertyIsReadOnly`)
+
+
+            * a constraint for a property was violated (`PropertyConstraintViolation`)'
+  /api/v3/users/{id}/form:
+    post:
+      parameters:
+      - description: User id. Use `me` to reference current user, if any.
+        example: 1
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          headers: {}
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not authorized to access this resource.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** manage_user global permission'
+          headers: {}
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                    message: The requested resource could not be found.
+          description: 'Returned if the request user can not be found.
+
+
+            *Note: A client without sufficient permissions shall not be able to test for the existence of
+
+            a membership. That''s why a 404 is returned here, even if a 403 might be more appropriate.*'
+          headers: {}
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+      tags:
+      - Users
+      description: 'Validates a user update payload.
+
+
+        For self password changes, provide both `password` and `currentPassword`.'
+      operationId: User_update_form
+      summary: User update form
+  /api/v3/users/{id}/lock:
+    delete:
+      summary: Unlock user
+      operationId: unlock_user
+      tags:
+      - Users
+      parameters:
+      - description: User id
+        example: 1
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/UserModel'
+          description: OK
+        '400':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:InvalidUserStatusTransition
+                message: The current user account status does not allow this operation.
+          description: 'Returned if the client tries to unlock a user account whose current status does not allow this transition.
+
+
+            **Required permission:** Administrators only'
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                message: You are not allowed to unlock the account of this user.
+          description: 'Returned if the client does not have sufficient permissions for unlocking a user.
+
+
+            **Required permission:** Administrators only'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The specified user does not exist.
+          description: Returned if the user does not exist.
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+    post:
+      summary: Lock user
+      operationId: lock_user
+      tags:
+      - Users
+      parameters:
+      - description: User id
+        example: 1
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/UserModel'
+          description: OK
+        '400':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:InvalidUserStatusTransition
+                message: The current user account status does not allow this operation.
+          description: 'Returned if the client tries to lock a user account whose current status does not allow this transition.
+
+
+            **Required permission:** Administrators only'
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                message: You are not allowed to lock the account of this user.
+          description: 'Returned if the client does not have sufficient permissions for locking a user.
+
+
+            **Required permission:** Administrators only'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The specified user does not exist.
+          description: Returned if the user does not exist.
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+components:
+  schemas:
+    CollectionModel:
+      type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
+    UserCreateModel:
+      type: object
+      required:
+      - admin
+      - email
+      - login
+      - firstName
+      - lastName
+      - language
+      properties:
+        admin:
+          type: boolean
+        email:
+          type: string
+          maxLength: 60
+        login:
+          type: string
+          maxLength: 256
+        password:
+          type: string
+          description: 'The user''s password.
+
+
+            *Conditions:*
+
+
+            Writable on create.
+
+
+            Writable on update only when:
+
+            - the caller updates their own account
+
+            - `currentPassword` is provided and valid'
+        currentPassword:
+          type: string
+          description: 'The user''s current password.
+
+
+            *Conditions:*
+
+
+            Required when changing `password` for a self update (`PATCH /api/v3/users/me` or `PATCH /api/v3/users/{id}` where `id` is the caller).
+
+
+            Ignored for non-self updates (for example, administrators updating other users).'
+        firstName:
+          type: string
+          maxLength: 30
+        lastName:
+          type: string
+          maxLength: 30
+        status:
+          type: string
+          description: 'The current activation status of the user.
+
+
+            *Conditions:*
+
+
+            Only writable on creation, not on update.'
+        language:
+          type: string
+      example:
+        login: j.sheppard
+        password: idestroyedsouvereign
+        currentPassword: iusedtobuildstarships
+        firstName: John
+        lastName: Sheppard
+        email: shep@mail.com
+        admin: true
+        status: active
+        language: en
+    View_user_schemaModel:
+      type: object
+      example:
+        _type: Schema
+        _dependencies: []
+        id:
+          type: Integer
+          name: ID
+          required: true
+          hasDefault: false
+          writable: false
+          options: {}
+        login:
+          type: String
+          name: Username
+          required: true
+          hasDefault: false
+          writable: true
+          minLength: 1
+          maxLength: 255
+          options: {}
+        admin:
+          type: Boolean
+          name: Administrator
+          required: false
+          hasDefault: false
+          writable: true
+          options: {}
+        mail:
+          type: String
+          name: Email
+          required: true
+          hasDefault: false
+          writable: true
+          minLength: 1
+          maxLength: 255
+          options: {}
+        firstName:
+          type: String
+          name: First name
+          required: true
+          hasDefault: false
+          writable: false
+          minLength: 1
+          maxLength: 255
+          options: {}
+        lastName:
+          type: String
+          name: Last name
+          required: true
+          hasDefault: false
+          writable: false
+          minLength: 1
+          maxLength: 255
+          options: {}
+        avatar:
+          type: String
+          name: Avatar
+          required: false
+          hasDefault: false
+          writable: false
+          options: {}
+        status:
+          type: String
+          name: Status
+          required: false
+          hasDefault: false
+          writable: true
+          options: {}
+        identityUrl:
+          type: String
+          name: Identity url
+          required: false
+          hasDefault: false
+          writable: true
+          options: {}
+        language:
+          type: String
+          name: Language
+          required: false
+          hasDefault: false
+          writable: true
+          options: {}
+        password:
+          type: Password
+          name: Password
+          required: false
+          hasDefault: false
+          writable: false
+          options: {}
+        createdAt:
+          type: DateTime
+          name: Created on
+          required: true
+          hasDefault: false
+          writable: false
+          options: {}
+        updatedAt:
+          type: DateTime
+          name: Updated on
+          required: true
+          hasDefault: false
+          writable: false
+          options: {}
+        customField1:
+          type: String
+          name: User String CF
+          required: false
+          hasDefault: false
+          writable: true
+        customField2:
+          type: CustomOption
+          name: User List cf
+          required: false
+          hasDefault: false
+          writable: true
+          location: _links
+        _links:
+          self:
+            href: /api/v3/users/schema
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
+    UserModel:
+      allOf:
+      - $ref: '#/components/schemas/PrincipalModel'
+      - $ref: '#/components/schemas/CustomFieldProperties'
+      - type: object
+        required:
+        - _type
+        - avatar
+        properties:
+          _type:
+            type: string
+            enum:
+            - User
+          avatar:
+            type:
+            - string
+            - 'null'
+            format: uri
+            description: URL to user's avatar
+          login:
+            type: string
+            description: 'The user''s login name
+
+
+              # Conditions
+
+
+              - User is self, or `create_user` or `manage_user` permission globally'
+            maxLength: 256
+          firstName:
+            type: string
+            description: 'The user''s first name
+
+
+              # Conditions
+
+
+              - User is self, or `create_user` or `manage_user` permission globally'
+            maxLength: 30
+          lastName:
+            type: string
+            description: 'The user''s last name
+
+
+              # Conditions
+
+
+              - User is self, or `create_user` or `manage_user` permission globally'
+            maxLength: 30
+          email:
+            type: string
+            description: 'The user''s email address
+
+
+              # Conditions
+
+
+              - E-Mail address not hidden
+
+              - User is not a new record
+
+              - User is self, or `create_user` or `manage_user` permission globally'
+            maxLength: 60
+          admin:
+            type: boolean
+            description: 'Flag indicating whether or not the user is an admin
+
+
+              # Conditions
+
+
+              - `admin`'
+          status:
+            type: string
+            description: 'The current activation status of the user.
+
+
+              # Conditions
+
+
+              - User is self, or `create_user` or `manage_user` permission globally'
+          language:
+            type: string
+            description: 'User''s language | ISO 639-1 format
+
+
+              # Conditions
+
+
+              - User is self, or `create_user` or `manage_user` permission globally'
+          identityUrl:
+            type:
+            - string
+            - 'null'
+            description: 'User''s identity_url for OmniAuth authentication.
+
+              **Deprecated:** It will be removed in the near future.
+
+
+              # Conditions
+
+
+              - User is self, or `create_user` or `manage_user` permission globally'
+            deprecated: true
+          createdAt:
+            type: string
+            format: date-time
+            description: Time of creation
+          updatedAt:
+            type: string
+            format: date-time
+            description: Time of the most recent change to the user
+          _links:
+            type: object
+            properties:
+              showUser:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'A relative path to show the user in the web application.
+
+
+                    # Condition
+
+
+                    - User is not a new record
+
+                    - User is not `locked`'
+              updateImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'A link to update the user resource.
+
+
+                    # Conditions
+
+
+                    - `admin`'
+              lock:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Restrict the user from logging in and performing any actions.
+
+
+                    # Conditions
+
+
+                    - User is not locked
+
+                    - `admin`'
+              unlock:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Allow a locked user to login and act again.
+
+
+                    # Conditions
+
+
+                    - User is not locked
+
+                    - `admin`'
+              delete:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: "Permanently remove a user from the instance\n\n# Conditions\n\neither:\n  - `admin`\n  - Setting `users_deletable_by_admin` is set\nor:\n  - User is self\n  - Setting `users_deletable_by_self` is set"
+              authSource:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Permanently remove a user from the instance
+
+
+                    # Conditions
+
+
+                    - LDAP authentication configured
+
+                    - `admin`'
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    UserCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This user collection
+
+
+                    **Resource**: Collection'
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserModel'
+      example:
+        _type: Collection
+        total: 2
+        count: 2
+        _links:
+          self:
+            href: /api/v3/users
+        _embedded:
+          elements:
+          - _abbreviated: User resource shortened for brevity
+            _type: User
+            id: 1337
+          - _abbreviated: User resource shortened for brevity
+            _type: User
+            id: 1338
+    PrincipalModel:
+      type: object
+      required:
+      - _type
+      - id
+      - name
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - User
+          - Group
+          - PlaceholderUser
+        id:
+          type: integer
+          description: The principal's unique identifier.
+          minimum: 1
+        name:
+          type: string
+          description: The principal's display name, layout depends on instance settings.
+        createdAt:
+          type: string
+          format: date-time
+          description: Time of creation
+        updatedAt:
+          type: string
+          format: date-time
+          description: Time of the most recent change to the principal
+        _links:
+          type: object
+          required:
+          - self
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This principal resource.
+
+
+                  **Resource**: User|Group|PlaceholderUser'
+            memberships:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'An href to the collection of the principal''s memberships.
+
+
+                  # Conditions:
+
+
+                  - user has permission `view_members` or `manage_members` in any project
+
+
+                  **Resource**: Collection'
+    CustomFieldProperties:
+      type: object
+      patternProperties:
+        ^customField\d+$:
+          type:
+          - 'null'
+          - number
+          - boolean
+          - string
+          - object
+          description: 'A custom field value, that belongs to a custom field of a simple type:
+
+
+            - Boolean
+
+            - Date
+
+            - Float
+
+            - Integer
+
+            - Link (URL)
+
+            - Text
+
+            - Long text'
+  examples:
+    UserResponse:
+      value:
+        _type: User
+        id: 14
+        name: Mara Jade
+        createdAt: '2022-04-04T08:07:22.910Z'
+        updatedAt: '2024-02-09T09:01:17.382Z'
+        login: member
+        admin: false
+        firstName: Mara
+        lastName: Jade
+        email: m.jade@empire.org
+        avatar: https://secure.gravatar.com/avatar/17dd23570f3bd129d06db9b48b7a41b8?default=404&secure=true
+        status: active
+        identityUrl: null
+        language: en
+        _links:
+          self:
+            href: /api/v3/users/14
+            title: Mara Jade
+          memberships:
+            href: /api/v3/memberships?filters=%5B%7B%22principal%22%3A%7B%22operator%22%3A%22%3D%22%2C%22values%22%3A%5B%2214%22%5D%7D%7D%5D
+            title: Memberships
+          showUser:
+            href: /users/14
+            type: text/html
+          updateImmediately:
+            href: /api/v3/users/14
+            title: Update member
+            method: patch
+          lock:
+            href: /api/v3/users/14/lock
+            title: Set lock on member
+            method: post
+          delete:
+            href: /api/v3/users/14
+            title: Delete member
+            method: delete
+  responses:
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
+    InvalidRequestBody:
+      description: Occurs when the client did not send a valid JSON object in the request body.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+            message: The request body was not a single JSON object.
+    UnsupportedMediaType:
+      description: Occurs when the client sends an unsupported Content-Type header.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
+            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic

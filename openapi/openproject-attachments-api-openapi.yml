@@ -1,0 +1,1671 @@
+openapi: 3.1.2
+info:
+  description: "You're looking at the current **stable** documentation of the OpenProject APIv3. If you're interested in the current\ndevelopment version, please go to [github.com/opf](https://github.com/opf/openproject/tree/dev/docs/api/apiv3).\n\n## Introduction\n\nThe documentation for the APIv3 is written according to the [OpenAPI 3.1 Specification](https://swagger.io/specification/).\nYou can either view the static version of this documentation on the [website](https://www.openproject.org/docs/api/introduction/)\nor the interactive version, rendered with [OpenAPI Explorer](https://github.com/Rhosys/openapi-explorer/blob/main/README.md),\nin your OpenProject installation under `/api/docs`.\nIn the latter you can try out the various API endpoints directly interacting with our OpenProject data.\nMoreover you can access the specification source itself under `/api/v3/spec.json` and `/api/v3/spec.yml`\n(e.g. [here](https://community.openproject.org/api/v3/spec.yml)).\n\nThe APIv3 is a hypermedia REST API, a shorthand for \"Hypermedia As The Engine Of Application State\" (HATEOAS).\nThis means that each endpoint of this API will have links to other resources or actions defined in the resulting body.\n\nThese related resources and actions for any given resource will be context sensitive. For example, only actions that the\nauthenticated user can take are being rendered. This can be used to dynamically identify actions that the user might take for any\ngiven response.\n\nAs an example, if you fetch a work package through the [Work Package endpoint](https://www.openproject.org/docs/api/endpoints/work-packages/), the `update` link will only\nbe present when the user you authenticated has been granted a permission to update the work package in the assigned project.\n\n## HAL+JSON\n\nHAL is a simple format that gives a consistent and easy way to hyperlink between resources in your API.\nRead more in the following specification: [https://tools.ietf.org/html/draft-kelly-json-hal-08](https://tools.ietf.org/html/draft-kelly-json-hal-08)\n\n**OpenProject API implementation of HAL+JSON format** enriches JSON and introduces a few meta properties:\n\n- `_type` - specifies the type of the resource (e.g.: WorkPackage, Project)\n- `_links` - contains all related resource and action links available for the resource\n- `_embedded` - contains all embedded objects\n\nHAL does not guarantee that embedded resources are embedded in their full representation, they might as well be\npartially represented (e.g. some properties can be left out).\nHowever in this API you have the guarantee that whenever a resource is **embedded**, it is embedded in its **full representation**.\n\n## API response structure\n\nAll API responses contain a single HAL+JSON object, even collections of objects are technically represented by\na single HAL+JSON object that itself contains its members. More details on collections can be found\nin the [Collections Section](https://www.openproject.org/docs/api/collections/).\n\n## Authentication\n\nThe API supports the following authentication schemes:\n\n* Session-based authentication\n* API tokens\n    * passed as Bearer token\n    * passed via Basic auth\n* OAuth 2.0\n    * using built-in authorization server\n    * using an external authorization server (RFC 9068)\n\nDepending on the settings of the OpenProject instance many resources can be accessed without being authenticated.\nIn case the instance requires authentication on all requests the client will receive an **HTTP 401** status code\nin response to any request.\n\nOtherwise unauthenticated clients have all the permissions of the anonymous user.\n\n### Session-based authentication\n\nThis means you have to login to OpenProject via the Web-Interface to be authenticated in the API.\nThis method is well-suited for clients acting within the browser, like the Angular-Client built into OpenProject.\n\nIn this case, you always need to pass the HTTP header `X-Requested-With \"XMLHttpRequest\"` for authentication.\n\n### API token as bearer token\n\nUsers can authenticate towards the API v3 using an API token as a bearer token.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -H \"Authorization: Bearer $API_KEY\" https://community.openproject.org/api/v3/users/42\n```\n\nUsers can generate API tokens on their account page.\n\n### API token through Basic Auth\n\nAPI tokens can also be used with basic auth, using the user name `apikey` (NOT your login) and the API token as the password.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -u apikey:$API_KEY https://community.openproject.org/api/v3/users/42\n```\n\n### OAuth 2.0 authentication\n\nOpenProject allows authentication and authorization with OAuth2 with *Authorization code flow*, as well as *Client credentials* operation modes.\n\nTo get started, you first need to register an application in the OpenProject OAuth administration section of your installation.\nThis will save an entry for your application with a client unique identifier (`client_id`) and an accompanying secret key (`client_secret`).\n\nYou can then use one the following guides to perform the supported OAuth 2.0 flows:\n\n- [Authorization code flow](https://oauth.net/2/grant-types/authorization-code)\n\n- [Authorization code flow with PKCE](https://doorkeeper.gitbook.io/guides/ruby-on-rails/pkce-flow), recommended for clients unable to keep the client_secret confidential\n\n- [Client credentials](https://oauth.net/2/grant-types/client-credentials/) - Requires an application to be bound to an impersonating user for non-public access\n\n### OAuth 2.0 using an external authorization server\n\nThere is a possibility to use JSON Web Tokens (JWT) generated by an OIDC provider configured in OpenProject as a bearer token to do authenticated requests against the API.\nThe following requirements must be met:\n\n- OIDC provider must be configured in OpenProject with **jwks_uri**\n- JWT must be signed using RSA algorithm\n- JWT **iss** claim must be equal to OIDC provider **issuer**\n- JWT **aud** claim must contain the OpenProject **client ID** used at the OIDC provider\n- JWT **scope** claim must include a valid scope to access the desired API (e.g. `api_v3` for APIv3)\n- JWT must be actual (neither expired or too early to be used)\n- JWT must be passed in Authorization header like: `Authorization: Bearer {jwt}`\n- User from **sub** claim must be linked to OpenProject before (e.g. by logging in), otherwise it will be not authenticated\n\nIn more general terms, OpenProject should be compliant to [RFC 9068](https://www.rfc-editor.org/rfc/rfc9068) when validating access tokens.\n\n### Why not username and password?\n\nThe simplest way to do basic auth would be to use a user's username and password naturally.\nHowever, OpenProject already has supported API keys in the past for the API v2, though not through basic auth.\n\nUsing **username and password** directly would have some advantages:\n\n* It is intuitive for the user who then just has to provide those just as they would when logging into OpenProject.\n\n* No extra logic for token management necessary.\n\nOn the other hand using **API keys** has some advantages too, which is why we went for that:\n\n* If compromised while saved on an insecure client the user only has to regenerate the API key instead of changing their password, too.\n\n* They are naturally long and random which makes them invulnerable to dictionary attacks and harder to crack in general.\n\nMost importantly users may not actually have a password to begin with. Specifically when they have registered\nthrough an OpenID Connect provider.\n\n## Cross-Origin Resource Sharing (CORS)\n\nBy default, the OpenProject API is _not_ responding with any CORS headers.\nIf you want to allow cross-domain AJAX calls against your OpenProject instance, you need to enable CORS headers being returned.\n\nPlease see [our API settings documentation](https://www.openproject.org/docs/system-admin-guide/api-and-webhooks/) on\nhow to selectively enable CORS.\n\n## Allowed HTTP methods\n\n- `GET` - Get a single resource or collection of resources\n\n- `POST` - Create a new resource or perform\n\n- `PATCH` - Update a resource\n\n- `DELETE` - Delete a resource\n\n## Compression\n\nResponses are compressed if requested by the client. Currently [gzip](https://www.gzip.org/) and [deflate](https://tools.ietf.org/html/rfc1951)\nare supported. The client signals the desired compression by setting the [`Accept-Encoding` header](https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3).\nIf no `Accept-Encoding` header is send, `Accept-Encoding: identity` is assumed which will result in the API responding uncompressed."
+  title: OpenProject API V3 (Stable) Actions & Capabilities Attachments API
+  version: '3'
+servers:
+- url: https://qa.openproject-edge.com
+  description: Edge QA instance
+- url: https://qa.openproject-stage.com
+  description: Staging instance
+- url: https://community.openproject.org
+  description: Community instance
+security:
+- BasicAuth: []
+tags:
+- description: 'Attachments are files that were uploaded to OpenProject. Each attachment belongs to a single
+
+    container (e.g. a work package or a board message).
+
+
+    ## Actions
+
+
+    | Link                | Description                                                          | Condition                                                                                          |
+
+    |:-------------------:|----------------------------------------------------------------------| --------------------------------------------                                                       |
+
+    | delete              | Deletes this attachment                                              | **Permission**: edit on attachment container or being the author for attachments without container |
+
+
+    ## Linked Properties
+
+
+    |  Link            | Description                                         | Type          | Constraints | Supported operations |
+
+    |:----------------:| --------------------------------------------------- | ------------- | ----------- | -------------------- |
+
+    | self             | This attachment                                     | Attachment    | not null    | READ                 |
+
+    | container        | The object (e.g. WorkPackage) housing the attachment| Anything      | not null    | READ                 |
+
+    | author           | The user who uploaded the attachment                | User          | not null    | READ                 |
+
+    | downloadLocation | Direct download link to the attachment              | -             | not null    | READ                 |
+
+
+    ## Local Properties
+
+
+    | Property     | Description                                     | Type        | Constraints | Supported operations |
+
+    |:------------:| ----------------------------------------------- | ----------- | ----------- | -------------------- |
+
+    | id           | Attachment''s id                                 | Integer     | x > 0       | READ                 |
+
+    | title        | The name of the file                            | String      | not null    | READ                 |
+
+    | fileName     | The name of the uploaded file                   | String      | not null    | READ                 |
+
+    | fileSize     | The size of the uploaded file in Bytes          | Integer     | x >= 0      | READ                 |
+
+    | description  | A user provided description of the file         | Formattable | not null    | READ                 |
+
+    | contentType  | The files MIME-Type as determined by the server | String      | not null    | READ                 |
+
+    | digest       | A checksum for the files content                | Digest      | not null    | READ                 |
+
+    | createdAt    | Time of creation                                | DateTime    | not null    | READ                 |'
+  name: Attachments
+paths:
+  /api/v3/activities/{id}/attachments:
+    get:
+      summary: List attachments by activity
+      operationId: list_activity_attachments
+      tags:
+      - Attachments
+      description: List all attachments of a single activity.
+      parameters:
+      - name: id
+        description: ID of the activity whose attachments will be listed
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/Attachments_Model'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                    message: The requested resource could not be found.
+          description: "Returned if the activity does not exist or the client does not have sufficient permissions\nto see it.\n\n**Required permission:** \n- `view_work_packages`\n- for internal comments: `view_internal_comments`\n\n*Note: A client without sufficient permissions shall not be able to test for the existence of an activity.\nThat's why a 404 is returned here, even if a 403 might be more appropriate.*"
+    post:
+      summary: Add attachment to activity
+      operationId: create_activity_attachment
+      tags:
+      - Attachments
+      description: Adds an attachment to the specified activity.
+      parameters:
+      - name: id
+        description: ID of the activity to receive the attachment
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FileUploadForm'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/AttachmentModel'
+        '400':
+          description: 'Returned if the client sends a not understandable request. Reasons include:
+
+
+            * Omitting one of the required parts (metadata and file)
+
+
+            * sending unparsable JSON in the metadata part'
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+                    message: The request could not be parsed as JSON.
+        '403':
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** view_work_packages or view_internal_comments (for internal comments)
+
+
+            *Note that you will only receive this error, if you are at least allowed to see the activity*'
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not allowed to add attachments to this activity.
+        '404':
+          description: 'Returned if the activity does not exist or the client does not have sufficient permissions
+
+            to see it.
+
+
+            **Required permission:** view_work_packages or view_internal_comments (for internal comments)
+
+
+            *Note: A client without sufficient permissions shall not be able to test for the existence of an activity.
+
+            That''s why a 404 is returned here, even if a 403 might be more appropriate.*'
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                    message: The requested resource could not be found.
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          description: 'Returned if the client tries to send an invalid attachment.
+
+            Reasons are:
+
+
+            * Omitting the file name (`fileName` property of metadata part)
+
+
+            * Sending a file that is too large'
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+                    message: File is too large (maximum size is 5242880 Bytes).
+  /api/v3/attachments:
+    post:
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/AttachmentModel'
+          description: OK
+        '400':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+                message: The request could not be parsed as JSON.
+          description: 'Returned if the client sends a not understandable request. Reasons include:
+
+
+            * Omitting one of the required parts (metadata and file)
+
+
+            * sending unparsable JSON in the metadata part'
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                message: You are not allowed to delete this attachment.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** At least one permission in any project: edit work package, add work package, edit messages, edit wiki pages (plugins might extend this list)'
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+                message: File is too large (maximum size is 5242880 Bytes).
+          description: 'Returned if the client tries to send an invalid attachment.
+
+            Reasons are:
+
+
+            * Omitting the file name (`fileName` property of metadata part)
+
+
+            * Sending a file that is too large'
+      tags:
+      - Attachments
+      description: 'Clients can create attachments without a container first and attach them later on.
+
+        This is useful if the container does not exist at the time the attachment is uploaded.
+
+        After the upload, the client can then claim such containerless attachments for any resource eligible (e.g. WorkPackage) on subsequent requests.
+
+        The upload and the claiming *must* be done for the same user account. Attachments uploaded by another user cannot be claimed and
+
+        once claimed for a resource, they cannot be claimed by another.
+
+
+        The upload request must be of type `multipart/form-data` with exactly two parts.
+
+
+        The first part *must* be called `metadata`. Its content type is expected to be `application/json`,
+
+        the body *must* be a single JSON object, containing at least the `fileName` and optionally the attachments `description`.
+
+
+        The second part *must* be called `file`, its content type *should* match the mime type of the file.
+
+        The body *must* be the raw content of the file.
+
+        Note that a `filename` *must* be indicated in the `Content-Disposition` of this part, although it will be ignored.
+
+        Instead the `fileName` inside the JSON of the metadata part will be used.'
+      operationId: create_attachment
+      summary: Create Attachment
+  /api/v3/attachments/{id}:
+    delete:
+      parameters:
+      - description: Attachment id
+        example: 1
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: 'Returned if the attachment was deleted successfully.
+
+
+            Note that the response body is empty as of now. In future versions of the API a body
+
+            *might* be returned along with an appropriate HTTP status.'
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                message: You are not allowed to delete this attachment.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** edit permission for the container of the attachment or being the author for attachments without container
+
+
+            *Note that you will only receive this error, if you are at least allowed to see the attachment.*'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The specified attachment does not exist.
+          description: 'Returned if the attachment does not exist or the client does not have sufficient permissions
+
+            to see it.
+
+
+            **Required permission:** view permission for the container of the attachment or being the author for attachments without container
+
+
+            *Note: A client without sufficient permissions shall not be able to test for the existence of an attachment.
+
+            That''s why a 404 is returned here, even if a 403 might be more appropriate.*'
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+      tags:
+      - Attachments
+      description: Permanently deletes the specified attachment.
+      operationId: delete_attachment
+      summary: Delete attachment
+    get:
+      parameters:
+      - description: Attachment id
+        example: 1
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/AttachmentModel'
+          description: OK
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The specified attachment does not exist.
+          description: 'Returned if the attachment does not exist or the client does not have sufficient permissions
+
+            to see it.
+
+
+            **Required permission:** view permission for the container of the attachment or being the author for attachments without container
+
+
+            *Note: A client without sufficient permissions shall not be able to test for the existence of an attachment.
+
+            That''s why a 404 is returned here, even if a 403 might be more appropriate.*'
+      tags:
+      - Attachments
+      description: ''
+      operationId: view_attachment
+      summary: View attachment
+  /api/v3/meetings/{id}/attachments:
+    get:
+      parameters:
+      - description: ID of the meeting whose attachments will be listed
+        example: 1
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              examples:
+                response:
+                  value:
+                    _embedded:
+                      elements:
+                      - _links:
+                          author:
+                            href: /api/v3/users/1
+                            title: OpenProject Admin
+                          container:
+                            href: /api/v3/meetings/72
+                            title: meeting
+                          delete:
+                            href: /api/v3/attachments/376
+                            method: delete
+                          downloadLocation:
+                            href: /api/v3/attachments/376/content
+                          self:
+                            href: /api/v3/attachments/376
+                            title: 200.gif
+                        _type: Attachment
+                        contentType: image/gif
+                        createdAt: '2018-06-01T07:24:19.896Z'
+                        description:
+                          format: plain
+                          html: ''
+                          raw: ''
+                        digest:
+                          algorithm: md5
+                          hash: 7ac9c97ef73d47127f590788b84c0c1c
+                        fileName: some.gif
+                        fileSize: 3521772
+                        id: 376
+                    _links:
+                      self:
+                        href: /api/v3/meetings/72/attachments
+                    _type: Collection
+                    count: 1
+                    total: 1
+              schema:
+                $ref: '#/components/schemas/Attachments_Model'
+          description: OK
+          headers: {}
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                    message: The requested resource could not be found.
+          description: 'Returned if the meeting does not exist or the client does not have sufficient permissions
+
+            to see it.
+
+
+            **Required permission:** view meetings
+
+
+            *Note: A client without sufficient permissions shall not be able to test for the existence of a meeting.
+
+            That''s why a 404 is returned here, even if a 403 might be more appropriate.*'
+          headers: {}
+      tags:
+      - Attachments
+      description: ''
+      operationId: List_attachments_by_meeting
+      summary: List attachments by meeting
+    post:
+      parameters:
+      - description: ID of the meeting to receive the attachment
+        example: 1
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              examples:
+                response:
+                  value:
+                    _embedded:
+                      author:
+                        _links:
+                          lock:
+                            href: /api/v3/users/1/lock
+                            method: post
+                            title: Set lock on admin
+                          self:
+                            href: /api/v3/users/1
+                            title: OpenProject Admin
+                          showUser:
+                            href: /users/1
+                            type: text/html
+                          updateImmediately:
+                            href: /api/v3/users/1
+                            method: patch
+                            title: Update admin
+                        _type: User
+                        admin: true
+                        avatar: ''
+                        createdAt: '2015-03-20T12:56:52.343Z'
+                        email: null
+                        firstName: OpenProject
+                        id: 1
+                        identityUrl: null
+                        lastName: Admin
+                        login: admin
+                        name: OpenProject Admin
+                        status: active
+                        updatedAt: '2018-05-29T13:57:44.662Z'
+                      container:
+                        _links:
+                          addAttachment:
+                            href: /api/v3/meetings/72/attachments
+                            method: post
+                          attachments:
+                            href: /api/v3/meetings/72/attachments
+                          project:
+                            href: /api/v3/projects/12
+                            title: Demo project
+                          self:
+                            href: /api/v3/meetings/72
+                        _type: Meeting
+                        id: 72
+                        title: meeting
+                    _links:
+                      author:
+                        href: /api/v3/users/1
+                        title: OpenProject Admin
+                      container:
+                        href: /api/v3/meetings/72
+                        title: meeting
+                      delete:
+                        href: /api/v3/attachments/376
+                        method: delete
+                      downloadLocation:
+                        href: /api/v3/attachments/376/content
+                      self:
+                        href: /api/v3/attachments/376
+                        title: 200.gif
+                    _type: Attachment
+                    contentType: image/gif
+                    createdAt: '2018-06-01T07:24:19.896Z'
+                    description:
+                      format: plain
+                      html: ''
+                      raw: ''
+                    digest:
+                      algorithm: md5
+                      hash: 7ac9c97ef73d47127f590788b84c0c1c
+                    fileName: some.gif
+                    fileSize: 3521772
+                    id: 376
+          description: OK
+          headers: {}
+        '400':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+                    message: The request could not be parsed as JSON.
+          description: 'Returned if the client sends a not understandable request. Reasons include:
+
+
+            * Omitting one of the required parts (metadata and file)
+
+
+            * sending unparsable JSON in the metadata part'
+          headers: {}
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not allowed to delete this attachment.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** edit meetings
+
+
+            *Note that you will only receive this error, if you are at least allowed to see the meeting*'
+          headers: {}
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                    message: The requested resource could not be found.
+          description: 'Returned if the meeting does not exist or the client does not have sufficient permissions
+
+            to see it.
+
+
+            **Required permission:** view meetings
+
+
+            *Note: A client without sufficient permissions shall not be able to test for the existence of a meeting
+
+            That''s why a 404 is returned here, even if a 403 might be more appropriate.*'
+          headers: {}
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+                    message: File is too large (maximum size is 5242880 Bytes).
+          description: 'Returned if the client tries to send an invalid attachment.
+
+            Reasons are:
+
+
+            * Omitting the file name (`fileName` property of metadata part)
+
+
+            * Sending a file that is too large'
+          headers: {}
+      tags:
+      - Attachments
+      description: Adds an attachment with the meeting as its container.
+      operationId: Add_attachment_to_meeting
+      summary: Add attachment to meeting
+  /api/v3/posts/{id}/attachments:
+    get:
+      parameters:
+      - description: ID of the post whose attachments will be listed
+        example: '1'
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              examples:
+                response:
+                  value:
+                    _embedded:
+                      elements:
+                      - _links:
+                          author:
+                            href: /api/v3/users/1
+                            title: OpenProject Admin
+                          container:
+                            href: /api/v3/posts/72
+                            title: wiki
+                          delete:
+                            href: /api/v3/attachments/376
+                            method: delete
+                          downloadLocation:
+                            href: /api/v3/attachments/376/content
+                          self:
+                            href: /api/v3/attachments/376
+                            title: 200.gif
+                        _type: Attachment
+                        contentType: image/gif
+                        createdAt: '2018-06-01T07:24:19.706Z'
+                        description:
+                          format: plain
+                          html: ''
+                          raw: ''
+                        digest:
+                          algorithm: md5
+                          hash: 7ac9c97ef73d47127f590788b84c0c1c
+                        fileName: some.gif
+                        fileSize: 3521772
+                        id: 376
+                    _links:
+                      self:
+                        href: /api/v3/posts/72/attachments
+                    _type: Collection
+                    count: 1
+                    total: 1
+              schema:
+                $ref: '#/components/schemas/Attachments_Model'
+          description: OK
+          headers: {}
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                    message: The requested resource could not be found.
+          description: 'Returned if the post does not exist or the client does not have sufficient permissions
+
+            to see it.
+
+
+            **Required permission:** view messages
+
+
+            *Note: A client without sufficient permissions shall not be able to test for the existence of a post.
+
+            That''s why a 404 is returned here, even if a 403 might be more appropriate.*'
+          headers: {}
+      tags:
+      - Attachments
+      description: ''
+      operationId: List_attachments_by_post
+      summary: List attachments by post
+    post:
+      parameters:
+      - description: ID of the post to receive the attachment
+        example: '1'
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              examples:
+                response:
+                  value:
+                    _embedded:
+                      author:
+                        _links:
+                          lock:
+                            href: /api/v3/users/1/lock
+                            method: post
+                            title: Set lock on admin
+                          self:
+                            href: /api/v3/users/1
+                            title: OpenProject Admin
+                          showUser:
+                            href: /users/1
+                            type: text/html
+                          updateImmediately:
+                            href: /api/v3/users/1
+                            method: patch
+                            title: Update admin
+                        _type: User
+                        admin: true
+                        avatar: ''
+                        createdAt: '2015-03-20T12:56:52.850Z'
+                        email: null
+                        firstName: OpenProject
+                        id: 1
+                        identityUrl: null
+                        lastName: Admin
+                        login: admin
+                        name: OpenProject Admin
+                        status: active
+                        updatedAt: '2018-05-29T13:57:44.604Z'
+                      container:
+                        _links:
+                          addAttachment:
+                            href: /api/v3/posts/150/attachments
+                            method: post
+                          attachments:
+                            href: /api/v3/posts/150/attachments
+                          project:
+                            href: /api/v3/projects/12
+                            title: Demo project
+                          self:
+                            href: /api/v3/posts/150
+                        _type: Post
+                        id: 150
+                        subject: sfsdfsdfsdfsdf
+                    _links:
+                      author:
+                        href: /api/v3/users/1
+                        title: OpenProject Admin
+                      container:
+                        href: /api/v3/posts/150
+                        title: sfsdfsdfsdfsdf
+                      delete:
+                        href: /api/v3/attachments/377
+                        method: delete
+                      downloadLocation:
+                        href: /api/v3/attachments/377/content
+                      self:
+                        href: /api/v3/attachments/377
+                        title: 200.gif
+                    _type: Attachment
+                    contentType: image/gif
+                    createdAt: '2018-06-01T07:53:36.831Z'
+                    description:
+                      format: plain
+                      html: ''
+                      raw: ''
+                    digest:
+                      algorithm: md5
+                      hash: 7ac9c97ef73d47127f590788b84c0c1c
+                    fileName: some.gif
+                    fileSize: 3521772
+                    id: 377
+          description: OK
+          headers: {}
+        '400':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+                    message: The request could not be parsed as JSON.
+          description: 'Returned if the client sends a not understandable request. Reasons include:
+
+
+            * Omitting one of the required parts (metadata and file)
+
+
+            * sending unparsable JSON in the metadata part'
+          headers: {}
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not allowed to delete this attachment.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** edit messages
+
+
+            *Note that you will only receive this error, if you are at least allowed to see the wiki page*'
+          headers: {}
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                    message: The requested resource could not be found.
+          description: 'Returned if the post does not exist or the client does not have sufficient permissions
+
+            to see it.
+
+
+            **Required permission:** view messages
+
+
+            *Note: A client without sufficient permissions shall not be able to test for the existence of a post.
+
+            That''s why a 404 is returned here, even if a 403 might be more appropriate.*'
+          headers: {}
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+                    message: File is too large (maximum size is 5242880 Bytes).
+          description: 'Returned if the client tries to send an invalid attachment.
+
+            Reasons are:
+
+
+            * Omitting the file name (`fileName` property of metadata part)
+
+
+            * Sending a file that is too large'
+          headers: {}
+      tags:
+      - Attachments
+      description: Adds an attachment with the post as its container.
+      operationId: Add_attachment_to_post
+      summary: Add attachment to post
+  /api/v3/wiki_pages/{id}/attachments:
+    get:
+      parameters:
+      - description: ID of the wiki page whose attachments will be listed
+        example: '1'
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              examples:
+                response:
+                  value:
+                    _embedded:
+                      elements:
+                      - _links:
+                          author:
+                            href: /api/v3/users/1
+                            title: OpenProject Admin
+                          container:
+                            href: /api/v3/wiki_pages/72
+                            title: wiki
+                          delete:
+                            href: /api/v3/attachments/376
+                            method: delete
+                          downloadLocation:
+                            href: /api/v3/attachments/376/content
+                          self:
+                            href: /api/v3/attachments/376
+                            title: 200.gif
+                        _type: Attachment
+                        contentType: image/gif
+                        createdAt: '2018-06-01T07:24:19.896Z'
+                        description:
+                          format: plain
+                          html: ''
+                          raw: ''
+                        digest:
+                          algorithm: md5
+                          hash: 7ac9c97ef73d47127f590788b84c0c1c
+                        fileName: some.gif
+                        fileSize: 3521772
+                        id: 376
+                    _links:
+                      self:
+                        href: /api/v3/wiki_pages/72/attachments
+                    _type: Collection
+                    count: 1
+                    total: 1
+              schema:
+                $ref: '#/components/schemas/Attachments_Model'
+          description: OK
+          headers: {}
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                    message: The requested resource could not be found.
+          description: 'Returned if the wiki page does not exist or the client does not have sufficient permissions
+
+            to see it.
+
+
+            **Required permission:** view wiki pages
+
+
+            *Note: A client without sufficient permissions shall not be able to test for the existence of a work package.
+
+            That''s why a 404 is returned here, even if a 403 might be more appropriate.*'
+          headers: {}
+      tags:
+      - Attachments
+      description: ''
+      operationId: List_attachments_by_wiki_page
+      summary: List attachments by wiki page
+    post:
+      parameters:
+      - description: ID of the wiki page to receive the attachment
+        example: '1'
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              examples:
+                response:
+                  value:
+                    _embedded:
+                      author:
+                        _links:
+                          lock:
+                            href: /api/v3/users/1/lock
+                            method: post
+                            title: Set lock on admin
+                          self:
+                            href: /api/v3/users/1
+                            title: OpenProject Admin
+                          showUser:
+                            href: /users/1
+                            type: text/html
+                          updateImmediately:
+                            href: /api/v3/users/1
+                            method: patch
+                            title: Update admin
+                        _type: User
+                        admin: true
+                        avatar: ''
+                        createdAt: '2015-03-20T12:56:52.343Z'
+                        email: null
+                        firstName: OpenProject
+                        id: 1
+                        identityUrl: null
+                        lastName: Admin
+                        login: admin
+                        name: OpenProject Admin
+                        status: active
+                        updatedAt: '2018-05-29T13:57:44.662Z'
+                      container:
+                        _links:
+                          addAttachment:
+                            href: /api/v3/wiki_pages/72/attachments
+                            method: post
+                          attachments:
+                            href: /api/v3/wiki_pages/72/attachments
+                          project:
+                            href: /api/v3/projects/12
+                            title: Demo project
+                          self:
+                            href: /api/v3/wiki_pages/72
+                        _type: WikiPage
+                        id: 72
+                        title: wiki
+                    _links:
+                      author:
+                        href: /api/v3/users/1
+                        title: OpenProject Admin
+                      container:
+                        href: /api/v3/wiki_pages/72
+                        title: wiki
+                      delete:
+                        href: /api/v3/attachments/376
+                        method: delete
+                      downloadLocation:
+                        href: /api/v3/attachments/376/content
+                      self:
+                        href: /api/v3/attachments/376
+                        title: 200.gif
+                    _type: Attachment
+                    contentType: image/gif
+                    createdAt: '2018-06-01T07:24:19.896Z'
+                    description:
+                      format: plain
+                      html: ''
+                      raw: ''
+                    digest:
+                      algorithm: md5
+                      hash: 7ac9c97ef73d47127f590788b84c0c1c
+                    fileName: some.gif
+                    fileSize: 3521772
+                    id: 376
+          description: OK
+          headers: {}
+        '400':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+                    message: The request could not be parsed as JSON.
+          description: 'Returned if the client sends a not understandable request. Reasons include:
+
+
+            * Omitting one of the required parts (metadata and file)
+
+
+            * sending unparsable JSON in the metadata part'
+          headers: {}
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not allowed to delete this attachment.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** edit wiki pages
+
+
+            *Note that you will only receive this error, if you are at least allowed to see the wiki page*'
+          headers: {}
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                    message: The requested resource could not be found.
+          description: 'Returned if the wiki page does not exist or the client does not have sufficient permissions
+
+            to see it.
+
+
+            **Required permission:** view wiki pages
+
+
+            *Note: A client without sufficient permissions shall not be able to test for the existence of a wiki page
+
+            That''s why a 404 is returned here, even if a 403 might be more appropriate.*'
+          headers: {}
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+                    message: File is too large (maximum size is 5242880 Bytes).
+          description: 'Returned if the client tries to send an invalid attachment.
+
+            Reasons are:
+
+
+            * Omitting the file name (`fileName` property of metadata part)
+
+
+            * Sending a file that is too large'
+          headers: {}
+      tags:
+      - Attachments
+      description: Adds an attachment with the wiki page as its container.
+      operationId: Add_attachment_to_wiki_page
+      summary: Add attachment to wiki page
+  /api/v3/work_packages/{id}/attachments:
+    get:
+      parameters:
+      - description: ID of the work package whose attachments will be listed
+        example: 1
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/Attachments_Model'
+          description: OK
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The specified work package does not exist.
+          description: 'Returned if the work package does not exist or the client does not have sufficient permissions
+
+            to see it.
+
+
+            **Required permission:** view work package
+
+
+            *Note: A client without sufficient permissions shall not be able to test for the existence of a work package.
+
+            That''s why a 404 is returned here, even if a 403 might be more appropriate.*'
+      tags:
+      - Attachments
+      description: ''
+      operationId: list_work_package_attachments
+      summary: List attachments by work package
+    post:
+      parameters:
+      - description: ID of the work package to receive the attachment
+        example: 1
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/AttachmentModel'
+          description: OK
+        '400':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+                message: The request could not be parsed as JSON.
+          description: 'Returned if the client sends a not understandable request. Reasons include:
+
+
+            * Omitting one of the required parts (metadata and file)
+
+
+            * sending unparsable JSON in the metadata part'
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                message: You are not allowed to delete this attachment.
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** edit work package or add work package
+
+
+            *Note that you will only receive this error, if you are at least allowed to see the work package.*'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The specified work package does not exist.
+          description: 'Returned if the work package does not exist or the client does not have sufficient permissions
+
+            to see it.
+
+
+            **Required permission:** view work package
+
+
+            *Note: A client without sufficient permissions shall not be able to test for the existence of a work package.
+
+            That''s why a 404 is returned here, even if a 403 might be more appropriate.*'
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+                message: File is too large (maximum size is 5242880 Bytes).
+          description: 'Returned if the client tries to send an invalid attachment.
+
+            Reasons are:
+
+
+            * Omitting the file name (`fileName` property of metadata part)
+
+
+            * Sending a file that is too large'
+      tags:
+      - Attachments
+      description: 'To add an attachment to a work package, a client needs to issue a request of type `multipart/form-data`
+
+        with exactly two parts.
+
+
+        The first part *must* be called `metadata`. Its content type is expected to be `application/json`,
+
+        the body *must* be a single JSON object, containing at least the `fileName` and optionally the attachments `description`.
+
+
+        The second part *must* be called `file`, its content type *should* match the mime type of the file.
+
+        The body *must* be the raw content of the file.
+
+        Note that a `filename` must be indicated in the `Content-Disposition` of this part, however it will be ignored.
+
+        Instead the `fileName` inside the JSON of the metadata part will be used.'
+      operationId: create_work_package_attachment
+      summary: Create work package attachment
+components:
+  schemas:
+    CollectionModel:
+      type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
+    AttachmentModel:
+      type: object
+      required:
+      - fileName
+      - description
+      - status
+      - contentType
+      - digest
+      - createdAt
+      properties:
+        id:
+          type: integer
+          description: Attachment's id
+          minimum: 1
+        fileName:
+          type: string
+          description: The name of the uploaded file
+        fileSize:
+          type: integer
+          description: The size of the uploaded file in Bytes
+          minimum: 0
+        description:
+          allOf:
+          - $ref: '#/components/schemas/Formattable'
+          - description: A user provided description of the file
+        status:
+          type: string
+          enum:
+          - uploaded
+          - prepared
+          - scanned
+          - quarantined
+          - rescan
+        contentType:
+          type: string
+          description: The files MIME-Type as determined by the server
+        digest:
+          type: object
+          description: A checksum for the files content
+          required:
+          - algorithm
+          - hash
+          properties:
+            algorithm:
+              type: string
+              description: The algorithm used to generate the digest.
+            hash:
+              type: string
+              description: The hexadecimal representation of the digested hash value.
+        createdAt:
+          type: string
+          format: date-time
+          description: Time of creation
+        _links:
+          type: object
+          required:
+          - self
+          - container
+          - author
+          - downloadLocation
+          properties:
+            delete:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'Deletes this attachment
+
+
+                  # Conditions
+
+
+                  **Permission**: edit on attachment container or being the author for attachments without container'
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This attachment
+
+
+                  **Resource**: Attachment'
+            container:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The object (e.g. WorkPackage) housing the attachment
+
+
+                  **Resource**: Anything'
+            author:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The user who uploaded the attachment
+
+
+                  **Resource**: User'
+            downloadLocation:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'Direct download link to the attachment
+
+
+                  **Resource**: -'
+      example:
+        _type: Attachment
+        _links:
+          self:
+            href: /api/v3/attachments/1
+          container:
+            href: /api/v3/work_packages/1
+          author:
+            href: /api/v3/users/1
+          staticDownloadLocation:
+            href: /api/v3/attachments/1/content
+          downloadLocation:
+            href: /some/remote/aws/url/image.png
+        id: 1
+        fileName: cat.png
+        filesize: 24
+        status: uploaded
+        description:
+          format: plain
+          raw: A picture of a cute cat
+          html: <p>A picture of a cute cat</p>
+        contentType: image/png
+        digest:
+          algorithm: md5
+          hash: 64c26a8403cd796ea4cf913cda2ee4a9
+        createdAt: '2014-05-21T08:51:20.396Z'
+    FileUploadForm:
+      type: object
+      properties:
+        metadata:
+          type: object
+          properties:
+            fileName:
+              type: string
+        file:
+          type: string
+          format: binary
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
+    Formattable:
+      type: object
+      required:
+      - format
+      properties:
+        format:
+          type: string
+          enum:
+          - plain
+          - markdown
+          - custom
+          readOnly: true
+          description: Indicates the formatting language of the raw text
+          example: markdown
+        raw:
+          type: string
+          description: The raw text, as entered by the user
+          example: I **am** formatted!
+        html:
+          type: string
+          readOnly: true
+          description: The text converted to HTML according to the format
+          example: I <strong>am</strong> formatted!
+      example:
+        format: markdown
+        raw: I am formatted!
+        html: I am formatted!
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
+    Attachments_Model:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The attachments collection
+
+
+                    **Resource**: AttachmentsCollection'
+                  readOnly: true
+          _embedded:
+            type: object
+            properties:
+              elements:
+                type: array
+                readOnly: true
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/AttachmentModel'
+                  - description: Collection of Attachments
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+  responses:
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
+    UnsupportedMediaType:
+      description: Occurs when the client sends an unsupported Content-Type header.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
+            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic

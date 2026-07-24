@@ -1,0 +1,1034 @@
+openapi: 3.1.2
+info:
+  description: "You're looking at the current **stable** documentation of the OpenProject APIv3. If you're interested in the current\ndevelopment version, please go to [github.com/opf](https://github.com/opf/openproject/tree/dev/docs/api/apiv3).\n\n## Introduction\n\nThe documentation for the APIv3 is written according to the [OpenAPI 3.1 Specification](https://swagger.io/specification/).\nYou can either view the static version of this documentation on the [website](https://www.openproject.org/docs/api/introduction/)\nor the interactive version, rendered with [OpenAPI Explorer](https://github.com/Rhosys/openapi-explorer/blob/main/README.md),\nin your OpenProject installation under `/api/docs`.\nIn the latter you can try out the various API endpoints directly interacting with our OpenProject data.\nMoreover you can access the specification source itself under `/api/v3/spec.json` and `/api/v3/spec.yml`\n(e.g. [here](https://community.openproject.org/api/v3/spec.yml)).\n\nThe APIv3 is a hypermedia REST API, a shorthand for \"Hypermedia As The Engine Of Application State\" (HATEOAS).\nThis means that each endpoint of this API will have links to other resources or actions defined in the resulting body.\n\nThese related resources and actions for any given resource will be context sensitive. For example, only actions that the\nauthenticated user can take are being rendered. This can be used to dynamically identify actions that the user might take for any\ngiven response.\n\nAs an example, if you fetch a work package through the [Work Package endpoint](https://www.openproject.org/docs/api/endpoints/work-packages/), the `update` link will only\nbe present when the user you authenticated has been granted a permission to update the work package in the assigned project.\n\n## HAL+JSON\n\nHAL is a simple format that gives a consistent and easy way to hyperlink between resources in your API.\nRead more in the following specification: [https://tools.ietf.org/html/draft-kelly-json-hal-08](https://tools.ietf.org/html/draft-kelly-json-hal-08)\n\n**OpenProject API implementation of HAL+JSON format** enriches JSON and introduces a few meta properties:\n\n- `_type` - specifies the type of the resource (e.g.: WorkPackage, Project)\n- `_links` - contains all related resource and action links available for the resource\n- `_embedded` - contains all embedded objects\n\nHAL does not guarantee that embedded resources are embedded in their full representation, they might as well be\npartially represented (e.g. some properties can be left out).\nHowever in this API you have the guarantee that whenever a resource is **embedded**, it is embedded in its **full representation**.\n\n## API response structure\n\nAll API responses contain a single HAL+JSON object, even collections of objects are technically represented by\na single HAL+JSON object that itself contains its members. More details on collections can be found\nin the [Collections Section](https://www.openproject.org/docs/api/collections/).\n\n## Authentication\n\nThe API supports the following authentication schemes:\n\n* Session-based authentication\n* API tokens\n    * passed as Bearer token\n    * passed via Basic auth\n* OAuth 2.0\n    * using built-in authorization server\n    * using an external authorization server (RFC 9068)\n\nDepending on the settings of the OpenProject instance many resources can be accessed without being authenticated.\nIn case the instance requires authentication on all requests the client will receive an **HTTP 401** status code\nin response to any request.\n\nOtherwise unauthenticated clients have all the permissions of the anonymous user.\n\n### Session-based authentication\n\nThis means you have to login to OpenProject via the Web-Interface to be authenticated in the API.\nThis method is well-suited for clients acting within the browser, like the Angular-Client built into OpenProject.\n\nIn this case, you always need to pass the HTTP header `X-Requested-With \"XMLHttpRequest\"` for authentication.\n\n### API token as bearer token\n\nUsers can authenticate towards the API v3 using an API token as a bearer token.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -H \"Authorization: Bearer $API_KEY\" https://community.openproject.org/api/v3/users/42\n```\n\nUsers can generate API tokens on their account page.\n\n### API token through Basic Auth\n\nAPI tokens can also be used with basic auth, using the user name `apikey` (NOT your login) and the API token as the password.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -u apikey:$API_KEY https://community.openproject.org/api/v3/users/42\n```\n\n### OAuth 2.0 authentication\n\nOpenProject allows authentication and authorization with OAuth2 with *Authorization code flow*, as well as *Client credentials* operation modes.\n\nTo get started, you first need to register an application in the OpenProject OAuth administration section of your installation.\nThis will save an entry for your application with a client unique identifier (`client_id`) and an accompanying secret key (`client_secret`).\n\nYou can then use one the following guides to perform the supported OAuth 2.0 flows:\n\n- [Authorization code flow](https://oauth.net/2/grant-types/authorization-code)\n\n- [Authorization code flow with PKCE](https://doorkeeper.gitbook.io/guides/ruby-on-rails/pkce-flow), recommended for clients unable to keep the client_secret confidential\n\n- [Client credentials](https://oauth.net/2/grant-types/client-credentials/) - Requires an application to be bound to an impersonating user for non-public access\n\n### OAuth 2.0 using an external authorization server\n\nThere is a possibility to use JSON Web Tokens (JWT) generated by an OIDC provider configured in OpenProject as a bearer token to do authenticated requests against the API.\nThe following requirements must be met:\n\n- OIDC provider must be configured in OpenProject with **jwks_uri**\n- JWT must be signed using RSA algorithm\n- JWT **iss** claim must be equal to OIDC provider **issuer**\n- JWT **aud** claim must contain the OpenProject **client ID** used at the OIDC provider\n- JWT **scope** claim must include a valid scope to access the desired API (e.g. `api_v3` for APIv3)\n- JWT must be actual (neither expired or too early to be used)\n- JWT must be passed in Authorization header like: `Authorization: Bearer {jwt}`\n- User from **sub** claim must be linked to OpenProject before (e.g. by logging in), otherwise it will be not authenticated\n\nIn more general terms, OpenProject should be compliant to [RFC 9068](https://www.rfc-editor.org/rfc/rfc9068) when validating access tokens.\n\n### Why not username and password?\n\nThe simplest way to do basic auth would be to use a user's username and password naturally.\nHowever, OpenProject already has supported API keys in the past for the API v2, though not through basic auth.\n\nUsing **username and password** directly would have some advantages:\n\n* It is intuitive for the user who then just has to provide those just as they would when logging into OpenProject.\n\n* No extra logic for token management necessary.\n\nOn the other hand using **API keys** has some advantages too, which is why we went for that:\n\n* If compromised while saved on an insecure client the user only has to regenerate the API key instead of changing their password, too.\n\n* They are naturally long and random which makes them invulnerable to dictionary attacks and harder to crack in general.\n\nMost importantly users may not actually have a password to begin with. Specifically when they have registered\nthrough an OpenID Connect provider.\n\n## Cross-Origin Resource Sharing (CORS)\n\nBy default, the OpenProject API is _not_ responding with any CORS headers.\nIf you want to allow cross-domain AJAX calls against your OpenProject instance, you need to enable CORS headers being returned.\n\nPlease see [our API settings documentation](https://www.openproject.org/docs/system-admin-guide/api-and-webhooks/) on\nhow to selectively enable CORS.\n\n## Allowed HTTP methods\n\n- `GET` - Get a single resource or collection of resources\n\n- `POST` - Create a new resource or perform\n\n- `PATCH` - Update a resource\n\n- `DELETE` - Delete a resource\n\n## Compression\n\nResponses are compressed if requested by the client. Currently [gzip](https://www.gzip.org/) and [deflate](https://tools.ietf.org/html/rfc1951)\nare supported. The client signals the desired compression by setting the [`Accept-Encoding` header](https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3).\nIf no `Accept-Encoding` header is send, `Accept-Encoding: identity` is assumed which will result in the API responding uncompressed."
+  title: OpenProject API V3 (Stable) Actions & Capabilities Time entry activities API
+  version: '3'
+servers:
+- url: https://qa.openproject-edge.com
+  description: Edge QA instance
+- url: https://qa.openproject-stage.com
+  description: Staging instance
+- url: https://community.openproject.org
+  description: Community instance
+security:
+- BasicAuth: []
+tags:
+- description: 'Time entries are classified by an activity which is one item of a set of user defined activities (e.g. Design, Specification, Development).
+
+
+    ## Actions
+
+
+    None
+
+
+    ## Linked Properties
+
+
+    | Link          | Description                                                    | Type                | Constraints           | Supported operations | Condition                                 |
+
+    | :-----------: | -------------------------------------------------------------- | -------------       | --------------------- | -------------------- | ----------------------------------------- |
+
+    | self          | This time entry activity                                       | TimeEntriesActivity | not null              | READ                 |                                           |
+
+    | projects      | List of projects the time entry is active in                   | []Project           | not null              | READ / WRITE         |                                           |
+
+
+    ## Local Properties
+
+
+    | Property     | Description                                                  | Type     | Constraints                                          | Supported operations | Condition                                                   |
+
+    | :----------: | ---------------------------------------------------------    | -------- | ---------------------------------------------------- | -------------------- | ----------------------------------------------------------- |
+
+    | id           | Time entries'' id                                             | Integer  | x > 0                                                | READ                 |                                                             |
+
+    | name         | The human readable name chosen for this activity             | String   | max 30 characters                                    | READ                 |                                                             |
+
+    | position     | The rank the activity has in a list of activities            | Date     |                                                      | READ                 |                                                             |
+
+    | default      | Flag to signal whether this activity is the default activity | Boolean  |                                                      | READ                 |                                                             |'
+  name: Time entry activities
+paths:
+  /api/v3/time_entries/activity/{id}:
+    get:
+      summary: View time entries activity
+      operationId: get_time_entries_activity
+      tags:
+      - Time entry activities
+      description: Fetches the time entry activity resource by the given id.
+      parameters:
+      - name: id
+        description: Time entries activity id
+        in: path
+        example: 1
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/TimeEntryActivityModel'
+        '404':
+          description: 'Returned if the activity does not exist or if the user does not have permission to view them.
+
+
+            **Required permission** `view time entries`, `log time`, `edit time entries`, `edit own time entries` or
+
+            `manage project activities` in any project'
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                    message: The requested resource could not be found.
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    Formattable:
+      type: object
+      required:
+      - format
+      properties:
+        format:
+          type: string
+          enum:
+          - plain
+          - markdown
+          - custom
+          readOnly: true
+          description: Indicates the formatting language of the raw text
+          example: markdown
+        raw:
+          type: string
+          description: The raw text, as entered by the user
+          example: I **am** formatted!
+        html:
+          type: string
+          readOnly: true
+          description: The text converted to HTML according to the format
+          example: I <strong>am</strong> formatted!
+      example:
+        format: markdown
+        raw: I am formatted!
+        html: I am formatted!
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
+    TimeEntryActivityModel:
+      type: object
+      required:
+      - _type
+      - id
+      - name
+      - position
+      - default
+      - _embedded
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - TimeEntriesActivity
+        id:
+          type: integer
+          description: Time entry id
+          minimum: 1
+        name:
+          type: string
+          description: The human readable name chosen for this activity
+        position:
+          type: integer
+          description: The rank the activity has in a list of activities
+        default:
+          type: boolean
+          description: Flag to signal whether this activity is the default activity
+        _embedded:
+          type: object
+          required:
+          - projects
+          properties:
+            projects:
+              type: array
+              items:
+                oneOf:
+                - $ref: '#/components/schemas/ProjectModel'
+                - $ref: '#/components/schemas/ProgramModel'
+                - $ref: '#/components/schemas/PortfolioModel'
+        _links:
+          type: object
+          required:
+          - self
+          - projects
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This time entry activity
+
+
+                  **Resource**: TimeEntriesActivity'
+            projects:
+              type: array
+              items:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'One of the projects the time entry is active in.
+
+
+                    **Resource**: Project'
+      example:
+        _type: TimeEntriesActivity
+        id: 18
+        name: Management
+        position: 8
+        default: false
+        _embedded:
+          projects: []
+        _links:
+          self:
+            href: /api/v3/time_entries/activities/18
+            title: Management
+          projects:
+          - href: /api/v3/projects/death_star_v2
+            title: DeathStarV2
+          - href: /api/v3/projects/star_killer_base
+            title: StarKillerBase
+    CustomCommentProperties:
+      type: object
+      patternProperties:
+        ^customComment\d+$:
+          type:
+          - 'null'
+          - string
+          description: 'A plain-text comment associated with a project custom field that has comments enabled.
+
+
+            The property is only present when the corresponding `customField{N}` has `has_comment` set to `true`.'
+    PortfolioModel:
+      allOf:
+      - $ref: '#/components/schemas/CustomFieldProperties'
+      - $ref: '#/components/schemas/CustomCommentProperties'
+      - type: object
+        properties:
+          _type:
+            type: string
+            enum:
+            - Portfolio
+          id:
+            type: integer
+            description: Portfolios' id
+            minimum: 1
+          identifier:
+            type: string
+          name:
+            type: string
+          active:
+            type: boolean
+            description: Indicates whether the portfolio is currently active or already archived
+          favorited:
+            type: boolean
+            description: Indicates whether the portfolio is favorited by the current user
+          statusExplanation:
+            allOf:
+            - $ref: '#/components/schemas/Formattable'
+            - description: A text detailing and explaining why the portfolio has the reported status
+          public:
+            type: boolean
+            description: Indicates whether the portfolio is accessible for everybody
+          description:
+            $ref: '#/components/schemas/Formattable'
+          createdAt:
+            type: string
+            format: date-time
+            description: Time of creation. Can be writable by admins with the `apiv3_write_readonly_attributes` setting enabled.
+          updatedAt:
+            type: string
+            format: date-time
+            description: Time of the most recent change to the portfolio
+          _links:
+            type: object
+            required:
+            - self
+            - categories
+            properties:
+              update:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Form endpoint that aids in updating this portfolio
+
+
+                    # Conditions
+
+
+                    **Permission**: edit workspace'
+              updateImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Directly update this portfolio
+
+
+                    # Conditions
+
+
+                    **Permission**: edit workspace'
+              delete:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Delete this portfolio
+
+
+                    # Conditions
+
+
+                    **Permission**: admin'
+              favor:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Mark this portfolio as favorited by the current user
+
+
+                    # Conditions
+
+
+                    Only present if the portfolio is not yet favorited
+
+
+                    Permission**: none but login is required'
+              disfavor:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Mark this portfolio as not favorited by the current user
+
+
+                    # Conditions
+
+                    Only present if the portfolio is favorited by the current user
+
+
+                    Permission**: none but login is required'
+              createWorkPackage:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Form endpoint that aids in preparing and creating a work package
+
+
+                    # Conditions
+
+
+                    **Permission**: add work packages'
+              createWorkPackageImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Directly creates a work package in the portfolio
+
+
+                    # Conditions
+
+
+                    **Permission**: add work packages'
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This portfolio
+
+
+                    **Resource**: Portfolio'
+              categories:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Categories available in this portfolio
+
+
+                    **Resource**: Collection'
+              types:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Types available in this portfolio
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view work packages or manage types'
+              versions:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Versions available in this portfolio
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view work packages or manage versions'
+              memberships:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Memberships in the  portfolio
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view members'
+              workPackages:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Work Packages of this portfolio
+
+
+                    **Resource**: Collection'
+              parent:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Parent of the portfolio
+
+
+                    **Resource**: Portfolio
+
+
+                    # Conditions
+
+
+                    **Permission** edit workspace'
+              status:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Denotes the status of the portfolio, so whether the portfolio is on track, at risk or is having trouble.
+
+
+                    **Resource**: ProjectStatus
+
+
+                    # Conditions
+
+
+                    **Permission** edit workspace'
+              storages:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'The link to a storage that is active for this portfolio.
+
+
+                      **Resource**: Storage
+
+
+                      # Conditions
+
+
+                      **Permission**: view_file_links'
+              projectStorages:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The project storage collection of this portfolio.
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view_file_links'
+              ancestors:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'A collection of links to the ancestor portfolios.
+
+
+                      **Resource**: Portfolio'
+    ProjectModel:
+      allOf:
+      - $ref: '#/components/schemas/CustomFieldProperties'
+      - $ref: '#/components/schemas/CustomCommentProperties'
+      - type: object
+        properties:
+          _type:
+            type: string
+            enum:
+            - Project
+          id:
+            type: integer
+            description: Projects' id
+            minimum: 1
+          identifier:
+            type: string
+          name:
+            type: string
+          active:
+            type: boolean
+            description: Indicates whether the project is currently active or already archived
+          favorited:
+            type: boolean
+            description: Indicates whether the project is favorited by the current user
+          statusExplanation:
+            allOf:
+            - $ref: '#/components/schemas/Formattable'
+            - description: A text detailing and explaining why the project has the reported status
+          public:
+            type: boolean
+            description: Indicates whether the project is accessible for everybody
+          description:
+            $ref: '#/components/schemas/Formattable'
+          createdAt:
+            type: string
+            format: date-time
+            description: Time of creation. Can be writable by admins with the `apiv3_write_readonly_attributes` setting enabled.
+          updatedAt:
+            type: string
+            format: date-time
+            description: Time of the most recent change to the project
+          _links:
+            type: object
+            required:
+            - self
+            - categories
+            properties:
+              update:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Form endpoint that aids in updating this project
+
+
+                    # Conditions
+
+
+                    **Permission**: edit workspace'
+              updateImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Directly update this project
+
+
+                    # Conditions
+
+
+                    **Permission**: edit workspace'
+              delete:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Delete this project
+
+
+                    # Conditions
+
+
+                    **Permission**: admin'
+              favor:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Mark this project as favorited by the current user
+
+
+                    # Conditions
+
+
+                    Only present if the project is not yet favorited
+
+
+                    Permission**: none but login is required'
+              disfavor:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Mark this project as not favorited by the current user
+
+
+                    # Conditions
+
+                    Only present if the project is favorited by the current user
+
+
+                    Permission**: none but login is required'
+              createWorkPackage:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Form endpoint that aids in preparing and creating a work package
+
+
+                    # Conditions
+
+
+                    **Permission**: add work packages'
+              createWorkPackageImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Directly creates a work package in the project
+
+
+                    # Conditions
+
+
+                    **Permission**: add work packages'
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This project
+
+
+                    **Resource**: Project'
+              categories:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Categories available in this project
+
+
+                    **Resource**: Collection'
+              types:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Types available in this project
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view work packages or manage types'
+              versions:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Versions available in this project
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view work packages or manage versions'
+              memberships:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Memberships in the project
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view members'
+              workPackages:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Work Packages of this project
+
+
+                    **Resource**: Collection'
+              parent:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Parent of the project
+
+
+                    **Resource**: Workspace
+
+
+                    # Conditions
+
+
+                    **Permission** edit workspace'
+              status:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Denotes the status of the project, so whether the project is on track, at risk or is having trouble.
+
+
+                    **Resource**: ProjectStatus
+
+
+                    # Conditions
+
+
+                    **Permission** edit workspace'
+              storages:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'The link to a storage that is active for this project.
+
+
+                      **Resource**: Storage
+
+
+                      # Conditions
+
+
+                      **Permission**: view_file_links'
+              projectStorages:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The project storage collection of this project.
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view_file_links'
+              ancestors:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'A collection of links to the ancestor workspaces.
+
+
+                      **Resource**: Workspace'
+    ProgramModel:
+      allOf:
+      - $ref: '#/components/schemas/CustomFieldProperties'
+      - $ref: '#/components/schemas/CustomCommentProperties'
+      - type: object
+        properties:
+          _type:
+            type: string
+            enum:
+            - Program
+          id:
+            type: integer
+            description: Programs' id
+            minimum: 1
+          identifier:
+            type: string
+          name:
+            type: string
+          active:
+            type: boolean
+            description: Indicates whether the program is currently active or already archived
+          favorited:
+            type: boolean
+            description: Indicates whether the program is favorited by the current user
+          statusExplanation:
+            allOf:
+            - $ref: '#/components/schemas/Formattable'
+            - description: A text detailing and explaining why the program has the reported status
+          public:
+            type: boolean
+            description: Indicates whether the program is accessible for everybody
+          description:
+            $ref: '#/components/schemas/Formattable'
+          createdAt:
+            type: string
+            format: date-time
+            description: Time of creation. Can be writable by admins with the `apiv3_write_readonly_attributes` setting enabled.
+          updatedAt:
+            type: string
+            format: date-time
+            description: Time of the most recent change to the program
+          _links:
+            type: object
+            required:
+            - self
+            - categories
+            properties:
+              update:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Form endpoint that aids in updating this program
+
+
+                    # Conditions
+
+
+                    **Permission**: edit workspace'
+              updateImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Directly update this program
+
+
+                    # Conditions
+
+
+                    **Permission**: edit workspace'
+              delete:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Delete this program
+
+
+                    # Conditions
+
+
+                    **Permission**: admin'
+              favor:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Mark this program as favorited by the current user
+
+
+                    # Conditions
+
+
+                    Only present if the program is not yet favorited
+
+
+                    Permission**: none but login is required'
+              disfavor:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Mark this program as not favorited by the current user
+
+
+                    # Conditions
+
+                    Only present if the program is favorited by the current user
+
+
+                    Permission**: none but login is required'
+              createWorkPackage:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Form endpoint that aids in preparing and creating a work package
+
+
+                    # Conditions
+
+
+                    **Permission**: add work packages'
+              createWorkPackageImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Directly creates a work package in the program
+
+
+                    # Conditions
+
+
+                    **Permission**: add work packages'
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This program
+
+
+                    **Resource**: Program'
+              categories:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Categories available in this program
+
+
+                    **Resource**: Collection'
+              types:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Types available in this program
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view work packages or manage types'
+              versions:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Versions available in this program
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view work packages or manage versions'
+              memberships:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Memberships in the  program
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view members'
+              workPackages:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Work Packages of this program
+
+
+                    **Resource**: Collection'
+              parent:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Parent of the program
+
+
+                    **Resource**: Program
+
+
+                    # Conditions
+
+
+                    **Permission** edit workspace'
+              status:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Denotes the status of the program, so whether the program is on track, at risk or is having trouble.
+
+
+                    **Resource**: ProjectStatus
+
+
+                    # Conditions
+
+
+                    **Permission** edit workspace'
+              storages:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'The link to a storage that is active for this program.
+
+
+                      **Resource**: Storage
+
+
+                      # Conditions
+
+
+                      **Permission**: view_file_links'
+              projectStorages:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The project storage collection of this program.
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view_file_links'
+              ancestors:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'A collection of links to the ancestor workspace.
+
+
+                      **Resource**: Workspace'
+    CustomFieldProperties:
+      type: object
+      patternProperties:
+        ^customField\d+$:
+          type:
+          - 'null'
+          - number
+          - boolean
+          - string
+          - object
+          description: 'A custom field value, that belongs to a custom field of a simple type:
+
+
+            - Boolean
+
+            - Date
+
+            - Float
+
+            - Integer
+
+            - Link (URL)
+
+            - Text
+
+            - Long text'
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic

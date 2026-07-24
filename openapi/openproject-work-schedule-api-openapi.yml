@@ -1,0 +1,1041 @@
+openapi: 3.1.2
+info:
+  description: "You're looking at the current **stable** documentation of the OpenProject APIv3. If you're interested in the current\ndevelopment version, please go to [github.com/opf](https://github.com/opf/openproject/tree/dev/docs/api/apiv3).\n\n## Introduction\n\nThe documentation for the APIv3 is written according to the [OpenAPI 3.1 Specification](https://swagger.io/specification/).\nYou can either view the static version of this documentation on the [website](https://www.openproject.org/docs/api/introduction/)\nor the interactive version, rendered with [OpenAPI Explorer](https://github.com/Rhosys/openapi-explorer/blob/main/README.md),\nin your OpenProject installation under `/api/docs`.\nIn the latter you can try out the various API endpoints directly interacting with our OpenProject data.\nMoreover you can access the specification source itself under `/api/v3/spec.json` and `/api/v3/spec.yml`\n(e.g. [here](https://community.openproject.org/api/v3/spec.yml)).\n\nThe APIv3 is a hypermedia REST API, a shorthand for \"Hypermedia As The Engine Of Application State\" (HATEOAS).\nThis means that each endpoint of this API will have links to other resources or actions defined in the resulting body.\n\nThese related resources and actions for any given resource will be context sensitive. For example, only actions that the\nauthenticated user can take are being rendered. This can be used to dynamically identify actions that the user might take for any\ngiven response.\n\nAs an example, if you fetch a work package through the [Work Package endpoint](https://www.openproject.org/docs/api/endpoints/work-packages/), the `update` link will only\nbe present when the user you authenticated has been granted a permission to update the work package in the assigned project.\n\n## HAL+JSON\n\nHAL is a simple format that gives a consistent and easy way to hyperlink between resources in your API.\nRead more in the following specification: [https://tools.ietf.org/html/draft-kelly-json-hal-08](https://tools.ietf.org/html/draft-kelly-json-hal-08)\n\n**OpenProject API implementation of HAL+JSON format** enriches JSON and introduces a few meta properties:\n\n- `_type` - specifies the type of the resource (e.g.: WorkPackage, Project)\n- `_links` - contains all related resource and action links available for the resource\n- `_embedded` - contains all embedded objects\n\nHAL does not guarantee that embedded resources are embedded in their full representation, they might as well be\npartially represented (e.g. some properties can be left out).\nHowever in this API you have the guarantee that whenever a resource is **embedded**, it is embedded in its **full representation**.\n\n## API response structure\n\nAll API responses contain a single HAL+JSON object, even collections of objects are technically represented by\na single HAL+JSON object that itself contains its members. More details on collections can be found\nin the [Collections Section](https://www.openproject.org/docs/api/collections/).\n\n## Authentication\n\nThe API supports the following authentication schemes:\n\n* Session-based authentication\n* API tokens\n    * passed as Bearer token\n    * passed via Basic auth\n* OAuth 2.0\n    * using built-in authorization server\n    * using an external authorization server (RFC 9068)\n\nDepending on the settings of the OpenProject instance many resources can be accessed without being authenticated.\nIn case the instance requires authentication on all requests the client will receive an **HTTP 401** status code\nin response to any request.\n\nOtherwise unauthenticated clients have all the permissions of the anonymous user.\n\n### Session-based authentication\n\nThis means you have to login to OpenProject via the Web-Interface to be authenticated in the API.\nThis method is well-suited for clients acting within the browser, like the Angular-Client built into OpenProject.\n\nIn this case, you always need to pass the HTTP header `X-Requested-With \"XMLHttpRequest\"` for authentication.\n\n### API token as bearer token\n\nUsers can authenticate towards the API v3 using an API token as a bearer token.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -H \"Authorization: Bearer $API_KEY\" https://community.openproject.org/api/v3/users/42\n```\n\nUsers can generate API tokens on their account page.\n\n### API token through Basic Auth\n\nAPI tokens can also be used with basic auth, using the user name `apikey` (NOT your login) and the API token as the password.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -u apikey:$API_KEY https://community.openproject.org/api/v3/users/42\n```\n\n### OAuth 2.0 authentication\n\nOpenProject allows authentication and authorization with OAuth2 with *Authorization code flow*, as well as *Client credentials* operation modes.\n\nTo get started, you first need to register an application in the OpenProject OAuth administration section of your installation.\nThis will save an entry for your application with a client unique identifier (`client_id`) and an accompanying secret key (`client_secret`).\n\nYou can then use one the following guides to perform the supported OAuth 2.0 flows:\n\n- [Authorization code flow](https://oauth.net/2/grant-types/authorization-code)\n\n- [Authorization code flow with PKCE](https://doorkeeper.gitbook.io/guides/ruby-on-rails/pkce-flow), recommended for clients unable to keep the client_secret confidential\n\n- [Client credentials](https://oauth.net/2/grant-types/client-credentials/) - Requires an application to be bound to an impersonating user for non-public access\n\n### OAuth 2.0 using an external authorization server\n\nThere is a possibility to use JSON Web Tokens (JWT) generated by an OIDC provider configured in OpenProject as a bearer token to do authenticated requests against the API.\nThe following requirements must be met:\n\n- OIDC provider must be configured in OpenProject with **jwks_uri**\n- JWT must be signed using RSA algorithm\n- JWT **iss** claim must be equal to OIDC provider **issuer**\n- JWT **aud** claim must contain the OpenProject **client ID** used at the OIDC provider\n- JWT **scope** claim must include a valid scope to access the desired API (e.g. `api_v3` for APIv3)\n- JWT must be actual (neither expired or too early to be used)\n- JWT must be passed in Authorization header like: `Authorization: Bearer {jwt}`\n- User from **sub** claim must be linked to OpenProject before (e.g. by logging in), otherwise it will be not authenticated\n\nIn more general terms, OpenProject should be compliant to [RFC 9068](https://www.rfc-editor.org/rfc/rfc9068) when validating access tokens.\n\n### Why not username and password?\n\nThe simplest way to do basic auth would be to use a user's username and password naturally.\nHowever, OpenProject already has supported API keys in the past for the API v2, though not through basic auth.\n\nUsing **username and password** directly would have some advantages:\n\n* It is intuitive for the user who then just has to provide those just as they would when logging into OpenProject.\n\n* No extra logic for token management necessary.\n\nOn the other hand using **API keys** has some advantages too, which is why we went for that:\n\n* If compromised while saved on an insecure client the user only has to regenerate the API key instead of changing their password, too.\n\n* They are naturally long and random which makes them invulnerable to dictionary attacks and harder to crack in general.\n\nMost importantly users may not actually have a password to begin with. Specifically when they have registered\nthrough an OpenID Connect provider.\n\n## Cross-Origin Resource Sharing (CORS)\n\nBy default, the OpenProject API is _not_ responding with any CORS headers.\nIf you want to allow cross-domain AJAX calls against your OpenProject instance, you need to enable CORS headers being returned.\n\nPlease see [our API settings documentation](https://www.openproject.org/docs/system-admin-guide/api-and-webhooks/) on\nhow to selectively enable CORS.\n\n## Allowed HTTP methods\n\n- `GET` - Get a single resource or collection of resources\n\n- `POST` - Create a new resource or perform\n\n- `PATCH` - Update a resource\n\n- `DELETE` - Delete a resource\n\n## Compression\n\nResponses are compressed if requested by the client. Currently [gzip](https://www.gzip.org/) and [deflate](https://tools.ietf.org/html/rfc1951)\nare supported. The client signals the desired compression by setting the [`Accept-Encoding` header](https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3).\nIf no `Accept-Encoding` header is send, `Accept-Encoding: identity` is assumed which will result in the API responding uncompressed."
+  title: OpenProject API V3 (Stable) Actions & Capabilities Work Schedule API
+  version: '3'
+servers:
+- url: https://qa.openproject-edge.com
+  description: Edge QA instance
+- url: https://qa.openproject-stage.com
+  description: Staging instance
+- url: https://community.openproject.org
+  description: Community instance
+security:
+- BasicAuth: []
+tags:
+- name: Work Schedule
+  description: "The work schedule defines if days are working days or non-working days.\n\nA day can be a non-working day if any of these two conditions are met:\n\n  - the day is a recurring non-working week day: a weekend day. For instance\n    Sunday is not worked in most countries;\n  - the day has been defined as a non-working day: national bank holidays or\n    other days deemed special. For instance the 1st of January is New Year's\n    day and is a bank holiday in most countries.\n\nEndpoints can define which week days are working/non-working days, and which\ndates are non-working days.\n\nTo represent the work schedule, `Day`, `WeekDay`, and `NonWorkingDay` models are used.\n\n## Day Actions\n\nNone\n\n## Day Linked Properties\n\n| Link              | Description                                                      | Type                      | Constraints | Supported operations |\n| :---------------: | ---------------------------------------------------------------- | ------------------------- | ----------- | -------------------- |\n| self              | This day                                                         | Day                       | not null    | READ                 |\n| nonWorkingReasons | A list of resources describing why this day is a non-working day | (WeekDay/NonWorkingDay)[] |             | READ                 |\n| weekDay           | The week day for this day                                        | WeekDay                   | not null    | READ                 |\n\n## Day Local Properties\n\n| Property   | Description                                 | Type    | Constraints    | Supported operations |\n| :--------: | ------------------------------------------- | ------- | -------------- | -------------------- |\n| date       | The date in ISO8601 format (YYYY-MM-DD)     | Date    | not null       | READ                 |\n| name       | The name of the day                         | String  | not null       | READ                 |\n| working    | `true` for a working day, `false` otherwise | Boolean | not null       | READ                 |\n\n\n## WeekDay Actions\n\n| Link   | Description          | Condition                          |\n| :----: | -------------------- | ---------------------------------- |\n| update | Update this week day | **Permission**: edit work schedule |\n\n## WeekDay Linked Properties\n\n| Link | Description   | Type    | Constraints | Supported operations |\n| :--: | ------------- | ------- | ----------- | -------------------- |\n| self | This week day | WeekDay | not null    | READ                 |\n\n## WeekDay Local Properties\n\n| Property | Description                                         | Type    | Constraints    | Supported operations |\n| :------: | --------------------------------------------------- | ------- | -------------- | -------------------- |\n| day      | The week day from 1 to 7. 1 is Monday. 7 is Sunday. | Integer | x >= 1, x <= 7 | READ                 |\n| name     | The name of the week day                            | String  | not null       | READ                 |\n| working  | `true` for a working week day, `false` otherwise    | Boolean | not null       | READ/WRITE           |\n\n\n## NonWorkingDay Actions\n\n| Link   | Description                 | Condition                          |\n| :----: | --------------------------- | ---------------------------------- |\n| update | Update this non-working day | **Permission**: edit work schedule |\n\n## NonWorkingDay Linked Properties\n\n| Link | Description          | Type          | Constraints | Supported operations |\n| :--: | -------------------- | ------------- | ----------- | -------------------- |\n| self | This non-working day | NonWorkingDay | not null    | READ                 |\n\n## NonWorkingDay Local Properties\n\n| Property | Description                             | Type   | Constraints | Supported operations |\n| :------: | --------------------------------------- | ------ | ----------- | -------------------- |\n| date     | The date in ISO8601 format (YYYY-MM-DD) | Date   | not null    | READ                 |\n| name     | The name of the non-working day day     | String | not null    | READ/WRITE           |"
+paths:
+  /api/v3/days/non_working:
+    get:
+      summary: Lists all non working days
+      operationId: list_non_working_days
+      tags:
+      - Work Schedule
+      description: 'Lists all one-time non working days, such as holidays.
+
+        It does not lists the non working weekdays, such as each Saturday, Sunday.
+
+        For listing the weekends, the `/api/v3/days` endpoint should be used.
+
+
+        All days from current year are returned by default.'
+      parameters:
+      - name: filters
+        in: query
+        description: "JSON specifying filter conditions.\n\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)\nendpoint. Currently supported filters are:\n\n+ date: the inclusive date interval to scope days to look up. When\n  unspecified, default is from the beginning to the end of current year.\n\n  Example: `{ \"date\": { \"operator\": \"<>d\", \"values\": [\"2022-05-02\",\"2022-05-26\"] } }`\n  would return days between May 5 and May 26 2022, inclusive."
+        example: '[{ "date": { "operator": "<>d", "values": ["2022-05-02","2022-05-26"] } }]'
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/NonWorkingDayCollectionModel'
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+    post:
+      summary: Creates a non-working day (NOT IMPLEMENTED)
+      operationId: create_non_working_day
+      tags:
+      - Work Schedule
+      description: '**(NOT IMPLEMENTED)**
+
+        Marks a day as being a non-working day.
+
+
+        Note: creating a non-working day will not affect the start and finish dates
+
+        of work packages but will affect their duration.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NonWorkingDayModel'
+            example:
+              _type: NonWorkingDay
+              date: '2022-12-25'
+              name: Christmas
+      responses:
+        '201':
+          description: Non-working day created.
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/NonWorkingDayModel'
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '403':
+          description: Returned if the client does not have sufficient permissions.
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:InvalidQuery
+                message: You are not authorized to access this resource.
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+  /api/v3/days/non_working/{date}:
+    get:
+      summary: View a non-working day
+      operationId: view_non_working_day
+      tags:
+      - Work Schedule
+      description: Returns the non-working day information for a given date.
+      parameters:
+      - name: date
+        in: path
+        required: true
+        description: The date of the non-working day to view in ISO 8601 format.
+        schema:
+          type: string
+          format: date
+        example: '2022-05-06'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/NonWorkingDayModel'
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '404':
+          description: Returned if the given date is not a non-working day.
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The requested resource could not be found.
+    patch:
+      summary: Update a non-working day attributes (NOT IMPLEMENTED)
+      operationId: update_non_working_day
+      tags:
+      - Work Schedule
+      description: '**(NOT IMPLEMENTED)**
+
+        Update the non-working day information for a given date.'
+      parameters:
+      - name: date
+        in: path
+        required: true
+        description: The date of the non-working day to view in ISO 8601 format.
+        schema:
+          type: string
+          format: date
+        example: '2022-05-06'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NonWorkingDayModel'
+            example:
+              _type: NonWorkingDay
+              date: '2022-05-01'
+              name: Labour day
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/NonWorkingDayModel'
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '404':
+          description: Returned if the given date is not a non-working day.
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The requested resource could not be found.
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+    delete:
+      summary: Removes a non-working day (NOT IMPLEMENTED)
+      operationId: delete_non_working_day
+      tags:
+      - Work Schedule
+      description: '**(NOT IMPLEMENTED)**
+
+        Removes the non-working day at the given date.
+
+
+        Note: deleting a non-working day will not affect the start and finish dates
+
+        of work packages but will affect their duration.'
+      parameters:
+      - name: date
+        in: path
+        required: true
+        description: The date of the non-working day to view in ISO 8601 format.
+        schema:
+          type: string
+          format: date
+        example: '2022-05-06'
+      responses:
+        '204':
+          description: 'No Content.
+
+
+            The operation succeeded.'
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '404':
+          description: Returned if the given date is not a non-working day.
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The requested resource could not be found.
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+  /api/v3/days/week:
+    get:
+      summary: Lists week days
+      operationId: list_week_days
+      tags:
+      - Work Schedule
+      description: Lists week days with work schedule information.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/WeekDayCollectionModel'
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+    patch:
+      summary: Update week days (NOT IMPLEMENTED)
+      operationId: update_week_days
+      tags:
+      - Work Schedule
+      description: '**(NOT IMPLEMENTED)**
+
+        Update multiple week days with work schedule information.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WeekDayCollectionWriteModel'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/WeekDayCollectionModel'
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '404':
+          description: Returned if a week day resource can not be found.
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:InvalidQuery
+                message: The requested resource could not be found.
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+  /api/v3/days/week/{day}:
+    get:
+      summary: View a week day
+      operationId: view_week_day
+      tags:
+      - Work Schedule
+      description: View a week day and its attributes.
+      parameters:
+      - name: day
+        in: path
+        required: true
+        description: The week day from 1 to 7. 1 is Monday. 7 is Sunday.
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 7
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/WeekDayModel'
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '404':
+          description: Returned if the day is out of the 1-7 range.
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The requested resource could not be found.
+    patch:
+      summary: Update a week day attributes (NOT IMPLEMENTED)
+      operationId: update_week_day
+      description: '**(NOT IMPLEMENTED)**
+
+        Makes a week day a working or non-working day.
+
+
+        Note: changing a week day working attribute will not affect the start and
+
+        finish dates of work packages but will affect their duration attribute.'
+      tags:
+      - Work Schedule
+      parameters:
+      - name: day
+        in: path
+        required: true
+        description: The week day from 1 to 7. 1 is Monday. 7 is Sunday.
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 7
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WeekDayWriteModel'
+            example:
+              _type: WeekDay
+              working: false
+      responses:
+        '200':
+          description: 'Update succeeded.
+
+
+            Response will include the week day with updated attributes.'
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/WeekDayModel'
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '403':
+          description: Returned if the client does not have sufficient permissions.
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:InvalidQuery
+                message: You are not authorized to access this resource.
+        '404':
+          description: Returned if the day is out of the 1-7 range.
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:InvalidQuery
+                message: The requested resource could not be found.
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+  /api/v3/days:
+    get:
+      summary: Lists days
+      operationId: list_days
+      tags:
+      - Work Schedule
+      description: 'Lists days information for a given date interval.
+
+
+        All days from the beginning of current month to the end of following month
+
+        are returned by default.'
+      parameters:
+      - name: filters
+        in: query
+        description: "JSON specifying filter conditions.\n\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)\nendpoint. Currently supported filters are:\n\n+ date: the inclusive date interval to scope days to look up. When\n  unspecified, default is from the beginning of current month to the end\n  of following month.\n\n  Example: `{ \"date\": { \"operator\": \"<>d\", \"values\": [\"2022-05-02\",\"2022-05-26\"] } }`\n  would return days between May 5 and May 26 2022, inclusive.\n\n+ working: when `true`, returns only the working days. When `false`,\n  returns only the non-working days (weekend days and non-working days).\n  When unspecified, returns both working and non-working days.\n\n  Example: `{ \"working\": { \"operator\": \"=\", \"values\": [\"t\"] } }`\n  would exclude non-working days from the response."
+        example: '[{ "date": { "operator": "<>d", "values": ["2022-05-02","2022-05-26"] } }, { "working": { "operator": "=", "values": ["f"] } }]'
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/DayCollectionModel'
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+  /api/v3/days/{date}:
+    get:
+      summary: View day
+      operationId: view_day
+      tags:
+      - Work Schedule
+      description: View the day information for a given date.
+      parameters:
+      - name: date
+        in: path
+        required: true
+        description: The date of the non-working day to view in ISO 8601 format.
+        schema:
+          type: string
+          format: date
+        example: '2022-05-06'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/DayModel'
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+components:
+  schemas:
+    DayModel:
+      type: object
+      required:
+      - _type
+      - date
+      - name
+      - working
+      properties:
+        _type:
+          type: string
+          enum:
+          - Day
+        date:
+          type: string
+          format: date
+          description: Date of the day.
+        name:
+          type: string
+          description: Descriptive name for the day.
+        working:
+          type: boolean
+          description: '`true` for a working day, `false` otherwise.'
+        _links:
+          type: object
+          required:
+          - self
+          properties:
+            self:
+              $ref: '#/components/schemas/Link'
+            nonWorkingReasons:
+              type: array
+              description: 'A list of resources describing why this day is a non-working day.
+
+                Linked resources can be `NonWorkingDay` and `WeekDay` resources.
+
+                This property is absent for working days.'
+              items:
+                $ref: '#/components/schemas/Link'
+            weekDay:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: The week day for this day.
+      example:
+        _type: Day
+        date: '2022-12-25'
+        name: Sunday (Christmas)
+        working: false
+        _links:
+          self:
+            href: /api/v3/days/2022-12-25
+          nonWorkingReasons:
+          - href: /api/v3/days/week/7
+            title: Sunday
+          - href: /api/v3/days/non_working/2022-12-25
+            title: Christmas
+          weekday:
+            href: /api/v3/days/week/7
+            title: Sunday
+    CollectionModel:
+      type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
+    DayCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This days collection
+
+
+                    **Resource**: DayCollectionModel'
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                description: 'The array of days. Each day has a name and a working status
+
+                  indicating if it is a working or a non-working day.'
+                items:
+                  $ref: '#/components/schemas/DayModel'
+      example:
+        _type: Collection
+        total: 5
+        count: 5
+        _links:
+          self:
+            href: /api/v3/days?filters=[{"interval":{"operator":"<>d","values":["2022-04-29","2022-05-03"]}}]
+        _embedded:
+          elements:
+          - _type: Day
+            date: '2022-04-29'
+            name: Friday
+            working: true
+            _links:
+              self:
+                href: /api/v3/days/2022-04-29
+              weekday:
+                href: /api/v3/days/week/5
+                title: Friday
+          - _type: Day
+            date: '2022-04-30'
+            name: Saturday
+            working: false
+            _links:
+              self:
+                href: /api/v3/days/2022-04-30
+              nonWorkingReasons:
+              - href: /api/v3/days/week/6
+                title: Saturday
+              weekday:
+                href: /api/v3/days/week/6
+                title: Saturday
+          - _type: Day
+            date: '2022-05-01'
+            name: Sunday (Labour day)
+            working: false
+            _links:
+              self:
+                href: /api/v3/days/2022-05-01
+              nonWorkingReasons:
+              - href: /api/v3/days/week/7
+                title: Sunday
+              - href: /api/v3/days/non_working/2022-05-01
+                title: Labour day
+              weekday:
+                href: /api/v3/days/week/7
+                title: Sunday
+          - _type: Day
+            date: '2022-05-02'
+            name: Monday
+            working: true
+            _links:
+              self:
+                href: /api/v3/days/2022-05-02
+              weekday:
+                href: /api/v3/days/week/1
+                title: Monday
+          - _type: Day
+            date: '2022-05-03'
+            name: Tuesday
+            working: true
+            _links:
+              self:
+                href: /api/v3/days/2022-05-03
+              weekday:
+                href: /api/v3/days/week/2
+                title: Tuesday
+    WeekDayCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This week days collection
+
+
+                    **Resource**: WeekDayCollectionModel'
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                description: The array of week days.
+                minItems: 7
+                maxItems: 7
+                items:
+                  $ref: '#/components/schemas/WeekDayModel'
+      example:
+        _type: Collection
+        total: 7
+        count: 7
+        _links:
+          self:
+            href: /api/v3/days/week
+        _embedded:
+          elements:
+          - _type: WeekDay
+            day: 1
+            name: Monday
+            working: true
+            _links:
+              self:
+                href: /api/v3/days/week/1
+                title: Monday
+          - _type: WeekDay
+            day: 2
+            name: Tuesday
+            working: true
+            _links:
+              self:
+                href: /api/v3/days/week/2
+                title: Tuesday
+          - _type: WeekDay
+            day: 3
+            name: Wednesday
+            working: true
+            _links:
+              self:
+                href: /api/v3/days/week/3
+                title: Wednesday
+          - _type: WeekDay
+            day: 4
+            name: Thursday
+            working: true
+            _links:
+              self:
+                href: /api/v3/days/week/4
+                title: Thursday
+          - _type: WeekDay
+            day: 5
+            name: Friday
+            working: true
+            _links:
+              self:
+                href: /api/v3/days/week/5
+                title: Friday
+          - _type: WeekDay
+            day: 6
+            name: Saturday
+            working: false
+            _links:
+              self:
+                href: /api/v3/days/week/6
+                title: Saturday
+          - _type: WeekDay
+            day: 7
+            name: Sunday
+            working: false
+            _links:
+              self:
+                href: /api/v3/days/week/7
+                title: Sunday
+    NonWorkingDayModel:
+      type: object
+      required:
+      - _type
+      - date
+      - name
+      properties:
+        _type:
+          type: string
+          enum:
+          - NonWorkingDay
+        date:
+          type: string
+          format: date
+          description: Date of the non-working day.
+        name:
+          type: string
+          description: Descriptive name for the non-working day.
+        _links:
+          type: object
+          required:
+          - self
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This non-working day.
+
+
+                  **Resource**: NonWorkingDay'
+      example:
+        _type: NonWorkingDay
+        date: '2022-12-25'
+        name: Christmas
+        _links:
+          self:
+            href: /api/v3/days/non_working/2022-12-25
+            title: Christmas
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
+    WeekDayModel:
+      type: object
+      required:
+      - _type
+      - day
+      - name
+      - working
+      properties:
+        _type:
+          type: string
+          enum:
+          - WeekDay
+        day:
+          type: integer
+          description: The week day from 1 to 7. 1 is Monday. 7 is Sunday.
+          readOnly: true
+          minimum: 1
+          maximum: 7
+        name:
+          type: string
+          description: The week day name.
+        working:
+          type: boolean
+          description: '`true` for a working week day, `false` otherwise.'
+        _links:
+          allOf:
+          - $ref: '#/components/schemas/WeekDaySelfLinkModel'
+      example:
+        _type: WeekDay
+        day: 5
+        name: Friday
+        working: false
+        _links:
+          self:
+            href: /api/v3/day/week/5
+            title: Friday
+    WeekDayWriteModel:
+      type: object
+      description: Describes a week day as a working day or a non-working day (weekend).
+      required:
+      - _type
+      - working
+      properties:
+        _type:
+          type: string
+          enum:
+          - WeekDay
+        working:
+          type: boolean
+          description: '`true` for a working day. `false` for a weekend day.'
+      example:
+        _type: WeekDay
+        working: false
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
+    WeekDaySelfLinkModel:
+      type: object
+      description: Identify a particular week day by its href.
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This week day resource link.
+
+
+              **Resource**: WeekDay'
+            readOnly: true
+      example:
+        self:
+          href: /api/v3/days/week/3
+          title: Wednesday
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    NonWorkingDayCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This non working days collection
+
+
+                    **Resource**: NonWorkingDayCollectionModel'
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                description: The array of non working days. Each day has a name and a date.
+                items:
+                  $ref: '#/components/schemas/NonWorkingDayModel'
+      example:
+        _type: Collection
+        total: 2
+        count: 2
+        _links:
+          self:
+            href: /api/v3/non_working?filters=[{"interval":{"operator":"<>d","values":["2022-04-29","2022-12-24"]}}]
+        _embedded:
+          elements:
+          - _type: NonWorkingDay
+            date: '2022-12-24'
+            name: Christmas Evening
+            _links:
+              self:
+                href: /api/v3/days/non_working/2022-04-24
+              weekday:
+                href: /api/v3/days/week/6
+                title: Saturday
+          - _type: NonWorkingDay
+            date: '2022-05-01'
+            name: Labour day
+            _links:
+              self:
+                href: /api/v3/days/non_working/2022-05-01
+              weekday:
+                href: /api/v3/days/week/7
+                title: Sunday
+    WeekDayCollectionWriteModel:
+      type: object
+      required:
+      - _type
+      - _embedded
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        _embedded:
+          type: object
+          required:
+          - elements
+          properties:
+            elements:
+              type: array
+              description: The array of week days.
+              minItems: 1
+              maxItems: 7
+              items:
+                allOf:
+                - $ref: '#/components/schemas/WeekDayWriteModel'
+                - type: object
+                  required:
+                  - _links
+                  properties:
+                    _links:
+                      allOf:
+                      - $ref: '#/components/schemas/WeekDaySelfLinkModel'
+      example:
+        _type: Collection
+        _embedded:
+          elements:
+          - _type: WeekDay
+            working: true
+            _links:
+              self:
+                href: /api/v3/days/week/1
+          - _type: WeekDay
+            working: true
+            _links:
+              self:
+                href: /api/v3/days/week/2
+          - _type: WeekDay
+            working: true
+            _links:
+              self:
+                href: /api/v3/days/week/4
+          - _type: WeekDay
+            working: false
+            _links:
+              self:
+                href: /api/v3/days/week/6
+          - _type: WeekDay
+            working: false
+            _links:
+              self:
+                href: /api/v3/days/week/7
+  responses:
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
+    InvalidRequestBody:
+      description: Occurs when the client did not send a valid JSON object in the request body.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+            message: The request body was not a single JSON object.
+    UnsupportedMediaType:
+      description: Occurs when the client sends an unsupported Content-Type header.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
+            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic

@@ -1,0 +1,2014 @@
+openapi: 3.1.2
+info:
+  description: "You're looking at the current **stable** documentation of the OpenProject APIv3. If you're interested in the current\ndevelopment version, please go to [github.com/opf](https://github.com/opf/openproject/tree/dev/docs/api/apiv3).\n\n## Introduction\n\nThe documentation for the APIv3 is written according to the [OpenAPI 3.1 Specification](https://swagger.io/specification/).\nYou can either view the static version of this documentation on the [website](https://www.openproject.org/docs/api/introduction/)\nor the interactive version, rendered with [OpenAPI Explorer](https://github.com/Rhosys/openapi-explorer/blob/main/README.md),\nin your OpenProject installation under `/api/docs`.\nIn the latter you can try out the various API endpoints directly interacting with our OpenProject data.\nMoreover you can access the specification source itself under `/api/v3/spec.json` and `/api/v3/spec.yml`\n(e.g. [here](https://community.openproject.org/api/v3/spec.yml)).\n\nThe APIv3 is a hypermedia REST API, a shorthand for \"Hypermedia As The Engine Of Application State\" (HATEOAS).\nThis means that each endpoint of this API will have links to other resources or actions defined in the resulting body.\n\nThese related resources and actions for any given resource will be context sensitive. For example, only actions that the\nauthenticated user can take are being rendered. This can be used to dynamically identify actions that the user might take for any\ngiven response.\n\nAs an example, if you fetch a work package through the [Work Package endpoint](https://www.openproject.org/docs/api/endpoints/work-packages/), the `update` link will only\nbe present when the user you authenticated has been granted a permission to update the work package in the assigned project.\n\n## HAL+JSON\n\nHAL is a simple format that gives a consistent and easy way to hyperlink between resources in your API.\nRead more in the following specification: [https://tools.ietf.org/html/draft-kelly-json-hal-08](https://tools.ietf.org/html/draft-kelly-json-hal-08)\n\n**OpenProject API implementation of HAL+JSON format** enriches JSON and introduces a few meta properties:\n\n- `_type` - specifies the type of the resource (e.g.: WorkPackage, Project)\n- `_links` - contains all related resource and action links available for the resource\n- `_embedded` - contains all embedded objects\n\nHAL does not guarantee that embedded resources are embedded in their full representation, they might as well be\npartially represented (e.g. some properties can be left out).\nHowever in this API you have the guarantee that whenever a resource is **embedded**, it is embedded in its **full representation**.\n\n## API response structure\n\nAll API responses contain a single HAL+JSON object, even collections of objects are technically represented by\na single HAL+JSON object that itself contains its members. More details on collections can be found\nin the [Collections Section](https://www.openproject.org/docs/api/collections/).\n\n## Authentication\n\nThe API supports the following authentication schemes:\n\n* Session-based authentication\n* API tokens\n    * passed as Bearer token\n    * passed via Basic auth\n* OAuth 2.0\n    * using built-in authorization server\n    * using an external authorization server (RFC 9068)\n\nDepending on the settings of the OpenProject instance many resources can be accessed without being authenticated.\nIn case the instance requires authentication on all requests the client will receive an **HTTP 401** status code\nin response to any request.\n\nOtherwise unauthenticated clients have all the permissions of the anonymous user.\n\n### Session-based authentication\n\nThis means you have to login to OpenProject via the Web-Interface to be authenticated in the API.\nThis method is well-suited for clients acting within the browser, like the Angular-Client built into OpenProject.\n\nIn this case, you always need to pass the HTTP header `X-Requested-With \"XMLHttpRequest\"` for authentication.\n\n### API token as bearer token\n\nUsers can authenticate towards the API v3 using an API token as a bearer token.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -H \"Authorization: Bearer $API_KEY\" https://community.openproject.org/api/v3/users/42\n```\n\nUsers can generate API tokens on their account page.\n\n### API token through Basic Auth\n\nAPI tokens can also be used with basic auth, using the user name `apikey` (NOT your login) and the API token as the password.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -u apikey:$API_KEY https://community.openproject.org/api/v3/users/42\n```\n\n### OAuth 2.0 authentication\n\nOpenProject allows authentication and authorization with OAuth2 with *Authorization code flow*, as well as *Client credentials* operation modes.\n\nTo get started, you first need to register an application in the OpenProject OAuth administration section of your installation.\nThis will save an entry for your application with a client unique identifier (`client_id`) and an accompanying secret key (`client_secret`).\n\nYou can then use one the following guides to perform the supported OAuth 2.0 flows:\n\n- [Authorization code flow](https://oauth.net/2/grant-types/authorization-code)\n\n- [Authorization code flow with PKCE](https://doorkeeper.gitbook.io/guides/ruby-on-rails/pkce-flow), recommended for clients unable to keep the client_secret confidential\n\n- [Client credentials](https://oauth.net/2/grant-types/client-credentials/) - Requires an application to be bound to an impersonating user for non-public access\n\n### OAuth 2.0 using an external authorization server\n\nThere is a possibility to use JSON Web Tokens (JWT) generated by an OIDC provider configured in OpenProject as a bearer token to do authenticated requests against the API.\nThe following requirements must be met:\n\n- OIDC provider must be configured in OpenProject with **jwks_uri**\n- JWT must be signed using RSA algorithm\n- JWT **iss** claim must be equal to OIDC provider **issuer**\n- JWT **aud** claim must contain the OpenProject **client ID** used at the OIDC provider\n- JWT **scope** claim must include a valid scope to access the desired API (e.g. `api_v3` for APIv3)\n- JWT must be actual (neither expired or too early to be used)\n- JWT must be passed in Authorization header like: `Authorization: Bearer {jwt}`\n- User from **sub** claim must be linked to OpenProject before (e.g. by logging in), otherwise it will be not authenticated\n\nIn more general terms, OpenProject should be compliant to [RFC 9068](https://www.rfc-editor.org/rfc/rfc9068) when validating access tokens.\n\n### Why not username and password?\n\nThe simplest way to do basic auth would be to use a user's username and password naturally.\nHowever, OpenProject already has supported API keys in the past for the API v2, though not through basic auth.\n\nUsing **username and password** directly would have some advantages:\n\n* It is intuitive for the user who then just has to provide those just as they would when logging into OpenProject.\n\n* No extra logic for token management necessary.\n\nOn the other hand using **API keys** has some advantages too, which is why we went for that:\n\n* If compromised while saved on an insecure client the user only has to regenerate the API key instead of changing their password, too.\n\n* They are naturally long and random which makes them invulnerable to dictionary attacks and harder to crack in general.\n\nMost importantly users may not actually have a password to begin with. Specifically when they have registered\nthrough an OpenID Connect provider.\n\n## Cross-Origin Resource Sharing (CORS)\n\nBy default, the OpenProject API is _not_ responding with any CORS headers.\nIf you want to allow cross-domain AJAX calls against your OpenProject instance, you need to enable CORS headers being returned.\n\nPlease see [our API settings documentation](https://www.openproject.org/docs/system-admin-guide/api-and-webhooks/) on\nhow to selectively enable CORS.\n\n## Allowed HTTP methods\n\n- `GET` - Get a single resource or collection of resources\n\n- `POST` - Create a new resource or perform\n\n- `PATCH` - Update a resource\n\n- `DELETE` - Delete a resource\n\n## Compression\n\nResponses are compressed if requested by the client. Currently [gzip](https://www.gzip.org/) and [deflate](https://tools.ietf.org/html/rfc1951)\nare supported. The client signals the desired compression by setting the [`Accept-Encoding` header](https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3).\nIf no `Accept-Encoding` header is send, `Accept-Encoding: identity` is assumed which will result in the API responding uncompressed."
+  title: OpenProject API V3 (Stable) Actions & Capabilities Activities API
+  version: '3'
+servers:
+- url: https://qa.openproject-edge.com
+  description: Edge QA instance
+- url: https://qa.openproject-stage.com
+  description: Staging instance
+- url: https://community.openproject.org
+  description: Community instance
+security:
+- BasicAuth: []
+tags:
+- description: '## Local Properties
+
+
+    | Property    | Description      | Type                 | Constraints | Supported operations |
+
+    | :---------: | -------------    | ----                 | ----------- | -------------------- |
+
+    | id          | Activity id      | Integer              | x > 0       | READ                 |
+
+    | version     | Activity version | Integer              | x > 0       | READ                 |
+
+    | comment     |                  | Formattable          |             | READ / WRITE         |
+
+    | details     |                  | Array of Formattable |             | READ                 |
+
+    | createdAt   | Time of creation | DateTime             |             | READ                 |
+
+    | updatedAt   | Time of update   | DateTime             |             | READ                 |
+
+
+    Activity can be either _type `Activity` or _type `Activity::Comment`.'
+  name: Activities
+paths:
+  /api/v3/activities/{id}:
+    get:
+      summary: Get an activity
+      operationId: get_activity
+      tags:
+      - Activities
+      description: Returns the requested activity resource identified by its unique id.
+      parameters:
+      - name: id
+        description: Activity id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ActivityModel'
+              examples:
+                response:
+                  $ref: '#/components/examples/ActivityResponse'
+    patch:
+      summary: Update activity
+      operationId: update_activity
+      tags:
+      - Activities
+      description: Updates an activity's comment and, on success, returns the updated activity.
+      parameters:
+      - name: id
+        description: Activity id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActivityCommentWriteModel'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ActivityModel'
+              examples:
+                response:
+                  $ref: '#/components/examples/ActivityResponse'
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '403':
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** edit journals'
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not allowed to edit the comment of this journal entry.
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          description: Returned if the client tries to modify a read-only property.
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:PropertyIsReadOnly
+                    message: The ID of an activity can't be changed.
+  /api/v3/activities/{id}/attachments:
+    get:
+      summary: List attachments by activity
+      operationId: list_activity_attachments
+      tags:
+      - Activities
+      description: List all attachments of a single activity.
+      parameters:
+      - name: id
+        description: ID of the activity whose attachments will be listed
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/Attachments_Model'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                    message: The requested resource could not be found.
+          description: "Returned if the activity does not exist or the client does not have sufficient permissions\nto see it.\n\n**Required permission:** \n- `view_work_packages`\n- for internal comments: `view_internal_comments`\n\n*Note: A client without sufficient permissions shall not be able to test for the existence of an activity.\nThat's why a 404 is returned here, even if a 403 might be more appropriate.*"
+    post:
+      summary: Add attachment to activity
+      operationId: create_activity_attachment
+      tags:
+      - Activities
+      description: Adds an attachment to the specified activity.
+      parameters:
+      - name: id
+        description: ID of the activity to receive the attachment
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FileUploadForm'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/AttachmentModel'
+        '400':
+          description: 'Returned if the client sends a not understandable request. Reasons include:
+
+
+            * Omitting one of the required parts (metadata and file)
+
+
+            * sending unparsable JSON in the metadata part'
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+                    message: The request could not be parsed as JSON.
+        '403':
+          description: 'Returned if the client does not have sufficient permissions.
+
+
+            **Required permission:** view_work_packages or view_internal_comments (for internal comments)
+
+
+            *Note that you will only receive this error, if you are at least allowed to see the activity*'
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not allowed to add attachments to this activity.
+        '404':
+          description: 'Returned if the activity does not exist or the client does not have sufficient permissions
+
+            to see it.
+
+
+            **Required permission:** view_work_packages or view_internal_comments (for internal comments)
+
+
+            *Note: A client without sufficient permissions shall not be able to test for the existence of an activity.
+
+            That''s why a 404 is returned here, even if a 403 might be more appropriate.*'
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                    message: The requested resource could not be found.
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          description: 'Returned if the client tries to send an invalid attachment.
+
+            Reasons are:
+
+
+            * Omitting the file name (`fileName` property of metadata part)
+
+
+            * Sending a file that is too large'
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+                    message: File is too large (maximum size is 5242880 Bytes).
+  /api/v3/activities/{id}/emoji_reactions:
+    get:
+      summary: List emoji reactions by activity
+      operationId: list_activity_emoji_reactions
+      tags:
+      - Activities
+      description: List all emoji reactions of a single activity.
+      parameters:
+      - name: id
+        description: ID of the activity whose emoji reactions will be listed
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: '1'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/EmojiReactions_Model'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                    message: The requested resource could not be found.
+          description: 'Returned if the activity does not exist or the client does not have sufficient permissions
+
+            to see it.
+
+
+            **Required permission:**
+
+            - `view_work_packages`
+
+            - for internal comments: `view_internal_comments`
+
+
+            *Note: A client without sufficient permissions shall not be able to test for the existence of an activity.
+
+            That''s why a 404 is returned here, even if a 403 might be more appropriate.*'
+    patch:
+      summary: Toggle emoji reaction for an activity
+      operationId: toggle_activity_emoji_reaction
+      tags:
+      - Activities
+      description: 'Toggle an emoji reaction for a given activity. If the user has already reacted with the given emoji,
+
+        the reaction will be removed. Otherwise, a new reaction will be created.
+
+
+        **Note:** The response contains the complete collection of all emoji reactions for this activity.
+
+
+        **Required permission:**
+
+        - `add_work_package_comments`
+
+        - for internal comments: `add_internal_comments`'
+      parameters:
+      - name: id
+        description: ID of the activity to toggle emoji reaction for
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: '1'
+      requestBody:
+        required: true
+        content:
+          application/hal+json:
+            schema:
+              type: object
+              required:
+              - reaction
+              properties:
+                reaction:
+                  type: string
+                  description: The emoji reaction identifier
+                  example: thumbs_up
+                  enum:
+                  - thumbs_up
+                  - thumbs_down
+                  - grinning_face_with_smiling_eyes
+                  - confused_face
+                  - heart
+                  - party_popper
+                  - rocket
+                  - eyes
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/EmojiReactionModel'
+        '400':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:BadRequest
+                    message: 'Bad request: reaction does not have a valid value'
+          description: Returned if the request is invalid. For example, if the reaction is not valid.
+        '403':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                    message: You are not authorized to access this resource.
+          description: Returned if the client does not have sufficient permissions to toggle the emoji reaction for the activity.
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                    message: The requested resource could not be found.
+          description: 'Returned if the activity does not exist or the client does not have sufficient permissions
+
+            to see it.'
+  /api/v3/work_packages/{id}/activities_emoji_reactions:
+    get:
+      summary: List emoji reactions by work package activities
+      operationId: list_work_package_activities_emoji_reactions
+      tags:
+      - Activities
+      description: List all emoji reactions of all activities of a single work package.
+      parameters:
+      - name: id
+        description: ID of the work package whose activities' emoji reactions will be listed
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/EmojiReactions_Model'
+        '404':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                    message: The requested resource could not be found.
+          description: 'Returned if the work package does not exist or the client does not have sufficient permissions
+
+            to see it.
+
+
+            **Required permission:**
+
+            - `view_work_packages`
+
+            - for internal comments: `view_internal_comments`
+
+
+            *Note: A client without sufficient permissions shall not be able to test for the existence of a work package.
+
+            That''s why a 404 is returned here, even if a 403 might be more appropriate.*'
+components:
+  schemas:
+    ActivityModel:
+      type: object
+      properties:
+        _type:
+          type: string
+          enum:
+          - Activity::Comment
+        id:
+          type: integer
+          description: Activity id
+          minimum: 1
+        version:
+          type: integer
+          description: Activity version
+          minimum: 1
+        comment:
+          $ref: '#/components/schemas/Formattable'
+        details:
+          type: array
+          items:
+            $ref: '#/components/schemas/Formattable'
+        internal:
+          type: boolean
+          description: Whether this activity is internal (only visible to users with view_internal_comments permission)
+        createdAt:
+          type: string
+          format: date-time
+          description: Time of creation
+        updatedAt:
+          type: string
+          format: date-time
+          description: Time of update
+        _embedded:
+          type: object
+          properties:
+            attachments:
+              allOf:
+              - $ref: '#/components/schemas/Attachments_Model'
+              - description: Collection of attachments for this activity
+            workPackage:
+              allOf:
+              - $ref: '#/components/schemas/WorkPackageModel'
+              - description: 'The work package this activity belongs to
+
+
+                  # Conditions
+
+
+                  Only embedded when the `journable` of the activity is a work package'
+            emojiReactions:
+              allOf:
+              - $ref: '#/components/schemas/EmojiReactions_Model'
+              - description: Collection of emoji reactions for this activity
+        _links:
+          type: object
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This activity
+
+
+                  **Resource**: Activity'
+            workPackage:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The work package this activity belongs to
+
+
+                  **Resource**: WorkPackage'
+            user:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The user who created this activity
+
+
+                  **Resource**: Principal'
+            update:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: Update this activity
+            attachments:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The attachment collection of this activity
+
+
+                  **Resource**: Attachments'
+            addAttachment:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'Attach a file to the activity
+
+
+                  # Conditions
+
+
+                  **Permissions**:
+
+                  - `add_work_package_comments`
+
+                  - for internal comments: `add_internal_comments`'
+            emojiReactions:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The emoji reactions collection of this activity
+
+
+                  **Resource**: EmojiReactions'
+      example:
+        id: 1
+        _type: Activity::Comment
+        _embedded:
+          attachments:
+            _type: Collection
+            total: 1
+            count: 1
+            _embedded:
+              elements:
+              - _type: Attachment
+                id: 30388
+                fileName: Task_Ensure_financing___4___OpenProject_DEV.jpeg
+                fileSize: 540992
+                description:
+                  format: plain
+                  raw: ''
+                  html: ''
+                status: uploaded
+                contentType: image/jpeg
+                digest:
+                  algorithm: md5
+                  hash: d02d312b25383b595a9fa10f1a8999fe
+                createdAt: '2025-04-08T15:37:19.275Z'
+                _links:
+                  self:
+                    href: /api/v3/attachments/30388
+                    title: Task_Ensure_financing___4___OpenProject_DEV.jpeg
+                  author:
+                    href: /api/v3/users/435
+                    title: Firstname
+                  container:
+                    href: /api/v3/activities/79090
+                  staticDownloadLocation:
+                    href: /api/v3/attachments/30388/content
+                  downloadLocation:
+                    href: /api/v3/attachments/30388/content
+                  delete:
+                    href: /api/v3/attachments/30388
+                    method: delete
+            _links:
+              self:
+                href: /api/v3/activities/79090/attachments
+          emojiReactions:
+            _type: Collection
+            total: 2
+            count: 2
+            _embedded:
+              elements:
+              - _type: EmojiReaction
+                id: 1-thumbs_up
+                reaction: thumbs_up
+                emoji: 👍
+                reactionsCount: 3
+                firstReactionAt: '2024-04-08T15:37:19.275Z'
+                _links:
+                  self:
+                    href: /api/v3/emoji_reactions/1-thumbs_up
+                  reactable:
+                    href: /api/v3/activities/1
+                  reactingUsers:
+                  - href: /api/v3/users/435
+                    title: John Doe
+                  - href: /api/v3/users/436
+                    title: Jane Smith
+                  - href: /api/v3/users/437
+                    title: Bob Johnson
+              - _type: EmojiReaction
+                id: 1-heart
+                reaction: heart
+                emoji: ❤️
+                reactionsCount: 1
+                firstReactionAt: '2024-04-08T15:38:19.275Z'
+                _links:
+                  self:
+                    href: /api/v3/emoji_reactions/1-heart
+                  reactable:
+                    href: /api/v3/activities/1
+                  reactingUsers:
+                  - href: /api/v3/users/435
+                    title: John Doe
+            _links:
+              self:
+                href: /api/v3/activities/1/emoji_reactions
+          workPackage:
+            _type: WorkPackage
+            id: 10403
+            lockVersion: 2
+            subject: Ensure financing
+            description:
+              format: markdown
+              raw: Lorem ipsum dolor sit amet.
+              html: <p>Lorem ipsum dolor sit amet.</p>
+            scheduleManually: true
+            startDate: null
+            dueDate: null
+            derivedStartDate: null
+            derivedDueDate: null
+            estimatedTime: null
+            derivedEstimatedTime: null
+            derivedRemainingTime: null
+            duration: null
+            ignoreNonWorkingDays: false
+            percentageDone: null
+            derivedPercentageDone: null
+            createdAt: '2025-03-24T13:11:09.480Z'
+            updatedAt: '2025-04-14T11:00:02.411Z'
+            _links:
+              self:
+                href: /api/v3/work_packages/10403
+                title: Ensure financing
+              type:
+                href: /api/v3/types/1
+                title: Task
+              status:
+                href: /api/v3/statuses/1
+                title: New
+              project:
+                href: /api/v3/projects/918
+                title: RVC Test
+              schema:
+                href: /api/v3/work_packages/schemas/11-2
+              author:
+                href: /api/v3/users/1
+                title: OpenProject Admin - admin
+              priority:
+                href: /api/v3/priorities/2
+                title: Normal
+              ancestors: []
+        _links:
+          self:
+            href: /api/v3/activity/1
+            title: Priority changed from High to Low
+          workPackage:
+            href: /api/v3/work_packages/1
+            title: quis numquam qui voluptatum quia praesentium blanditiis nisi
+          user:
+            href: /api/v3/users/1
+            title: John Sheppard - admin
+          attachments:
+            href: /api/v3/activities/1/attachments
+          emojiReactions:
+            href: /api/v3/activities/1/emoji_reactions
+          addAttachment:
+            href: /api/v3/activities/1/attachments
+            method: post
+          update:
+            href: /api/v3/activities/1
+            method: patch
+        details:
+        - format: markdown
+          raw: Lorem ipsum dolor sit amet.
+          html: <p>Lorem ipsum dolor sit amet.</p>
+        comment:
+          format: markdown
+          raw: Lorem ipsum dolor sit amet.
+          html: <p>Lorem ipsum dolor sit amet.</p>
+        createdAt: '2014-05-21T08:51:20.721Z'
+        updatedAt: '2014-05-21T09:14:02.929Z'
+        version: 31
+    CollectionModel:
+      type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
+    AttachmentModel:
+      type: object
+      required:
+      - fileName
+      - description
+      - status
+      - contentType
+      - digest
+      - createdAt
+      properties:
+        id:
+          type: integer
+          description: Attachment's id
+          minimum: 1
+        fileName:
+          type: string
+          description: The name of the uploaded file
+        fileSize:
+          type: integer
+          description: The size of the uploaded file in Bytes
+          minimum: 0
+        description:
+          allOf:
+          - $ref: '#/components/schemas/Formattable'
+          - description: A user provided description of the file
+        status:
+          type: string
+          enum:
+          - uploaded
+          - prepared
+          - scanned
+          - quarantined
+          - rescan
+        contentType:
+          type: string
+          description: The files MIME-Type as determined by the server
+        digest:
+          type: object
+          description: A checksum for the files content
+          required:
+          - algorithm
+          - hash
+          properties:
+            algorithm:
+              type: string
+              description: The algorithm used to generate the digest.
+            hash:
+              type: string
+              description: The hexadecimal representation of the digested hash value.
+        createdAt:
+          type: string
+          format: date-time
+          description: Time of creation
+        _links:
+          type: object
+          required:
+          - self
+          - container
+          - author
+          - downloadLocation
+          properties:
+            delete:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'Deletes this attachment
+
+
+                  # Conditions
+
+
+                  **Permission**: edit on attachment container or being the author for attachments without container'
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This attachment
+
+
+                  **Resource**: Attachment'
+            container:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The object (e.g. WorkPackage) housing the attachment
+
+
+                  **Resource**: Anything'
+            author:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The user who uploaded the attachment
+
+
+                  **Resource**: User'
+            downloadLocation:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'Direct download link to the attachment
+
+
+                  **Resource**: -'
+      example:
+        _type: Attachment
+        _links:
+          self:
+            href: /api/v3/attachments/1
+          container:
+            href: /api/v3/work_packages/1
+          author:
+            href: /api/v3/users/1
+          staticDownloadLocation:
+            href: /api/v3/attachments/1/content
+          downloadLocation:
+            href: /some/remote/aws/url/image.png
+        id: 1
+        fileName: cat.png
+        filesize: 24
+        status: uploaded
+        description:
+          format: plain
+          raw: A picture of a cute cat
+          html: <p>A picture of a cute cat</p>
+        contentType: image/png
+        digest:
+          algorithm: md5
+          hash: 64c26a8403cd796ea4cf913cda2ee4a9
+        createdAt: '2014-05-21T08:51:20.396Z'
+    FileUploadForm:
+      type: object
+      properties:
+        metadata:
+          type: object
+          properties:
+            fileName:
+              type: string
+        file:
+          type: string
+          format: binary
+    ActivityCommentWriteModel:
+      type: object
+      properties:
+        comment:
+          type: object
+          properties:
+            raw:
+              type: string
+              description: The raw content of the comment
+        internal:
+          type: boolean
+          description: 'Determines whether this comment is internal. This is only available to users
+
+            with `add_internal_comments` permission. It defaults to `false`, if unset.'
+          default: false
+      example:
+        comment:
+          raw: I think this is awesome!
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
+    Formattable:
+      type: object
+      required:
+      - format
+      properties:
+        format:
+          type: string
+          enum:
+          - plain
+          - markdown
+          - custom
+          readOnly: true
+          description: Indicates the formatting language of the raw text
+          example: markdown
+        raw:
+          type: string
+          description: The raw text, as entered by the user
+          example: I **am** formatted!
+        html:
+          type: string
+          readOnly: true
+          description: The text converted to HTML according to the format
+          example: I <strong>am</strong> formatted!
+      example:
+        format: markdown
+        raw: I am formatted!
+        html: I am formatted!
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
+    Attachments_Model:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The attachments collection
+
+
+                    **Resource**: AttachmentsCollection'
+                  readOnly: true
+          _embedded:
+            type: object
+            properties:
+              elements:
+                type: array
+                readOnly: true
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/AttachmentModel'
+                  - description: Collection of Attachments
+    WorkPackageModel:
+      allOf:
+      - $ref: '#/components/schemas/CustomFieldProperties'
+      - type: object
+        required:
+        - subject
+        - _links
+        properties:
+          id:
+            type: integer
+            description: Work package id
+            readOnly: true
+            minimum: 1
+          lockVersion:
+            type: integer
+            description: The version of the item as used for optimistic locking
+            readOnly: true
+          subject:
+            type: string
+            description: Work package subject
+          _type:
+            type: string
+            enum:
+            - WorkPackage
+            readOnly: true
+          description:
+            allOf:
+            - $ref: '#/components/schemas/Formattable'
+            - description: The work package description
+          scheduleManually:
+            type: boolean
+            description: 'Uses manual scheduling mode when true (default). Uses automatic scheduling
+
+              mode when false. Can be automatic only when predecessors or children are
+
+              present.'
+          readonly:
+            type: boolean
+            description: If true, the work package is in a readonly status so with the exception of the status, no other property can be altered.
+          startDate:
+            type:
+            - string
+            - 'null'
+            format: date
+            description: Scheduled beginning of a work package
+          dueDate:
+            type:
+            - string
+            - 'null'
+            format: date
+            description: Scheduled end of a work package
+          date:
+            type:
+            - string
+            - 'null'
+            format: date
+            description: Date on which a milestone is achieved
+          derivedStartDate:
+            type:
+            - string
+            - 'null'
+            format: date
+            description: Similar to start date but is not set by a client but rather deduced by the work packages' descendants. If manual scheduleManually is active, the two dates can deviate.
+            readOnly: true
+          derivedDueDate:
+            type:
+            - string
+            - 'null'
+            format: date
+            description: Similar to due date but is not set by a client but rather deduced by the work packages' descendants. If manual scheduleManually is active, the two dates can deviate.
+            readOnly: true
+          duration:
+            type:
+            - string
+            - 'null'
+            format: duration
+            description: '**(NOT IMPLEMENTED)** The amount of time in hours the work package needs to be completed.
+
+              Not available for milestone type of work packages.'
+            readOnly: true
+          estimatedTime:
+            type:
+            - string
+            - 'null'
+            format: duration
+            description: Time a work package likely needs to be completed excluding its descendants
+          derivedEstimatedTime:
+            type:
+            - string
+            - 'null'
+            format: duration
+            description: Time a work package likely needs to be completed including its descendants
+            readOnly: true
+          ignoreNonWorkingDays:
+            type: boolean
+            description: '**(NOT IMPLEMENTED)** When scheduling, whether or not to ignore the non working days being defined.
+
+              A work package with the flag set to true will be allowed to be scheduled to a non working day.'
+            readOnly: true
+          position:
+            type:
+            - integer
+            - 'null'
+            description: 'The position this work package has in a version configured to be backlog (sprint or product).
+
+
+              # Conditions
+
+
+              **Permission** Backlogs needs to be enabled in the work package''s project and the work package''s type is configured to be a backlog type.'
+            readOnly: true
+          spentTime:
+            type: string
+            format: duration
+            description: 'The time booked for this work package by users working on it
+
+
+              # Conditions
+
+
+              **Permission** view time entries'
+            readOnly: true
+          storyPoints:
+            type:
+            - integer
+            - 'null'
+            description: 'The estimation in story points on how long this work package will take to complete
+
+
+              # Conditions
+
+
+              **Permission** Backlogs needs to be enabled in the work package''s project and the work package''s type is configured to be a backlog type.'
+            readOnly: false
+          percentageDone:
+            type:
+            - integer
+            - 'null'
+            description: Amount of total completion for a work package
+            minimum: 0
+            maximum: 100
+          derivedPercentageDone:
+            type:
+            - integer
+            - 'null'
+            description: Amount of total completion for a work package derived from itself and its descendant work packages
+            readOnly: true
+            minimum: 0
+            maximum: 100
+          createdAt:
+            type: string
+            format: date-time
+            description: Time of creation. Can be writable by admins with the `apiv3_write_readonly_attributes` setting enabled.
+            readOnly: true
+          updatedAt:
+            type: string
+            format: date-time
+            description: Time of the most recent change to the work package.
+            readOnly: true
+          _links:
+            type: object
+            required:
+            - self
+            - schema
+            - ancestors
+            - author
+            - priority
+            - project
+            - status
+            - type
+            properties:
+              addComment:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Post comment to WP
+
+
+                    # Conditions
+
+
+                    **Permission**: add work package notes'
+                  readOnly: true
+              addRelation:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Adds a relation to this work package.
+
+
+                    # Conditions
+
+
+                    **Permission**: manage wp relations'
+                  readOnly: true
+              addWatcher:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Add any user to WP watchers
+
+
+                    # Conditions
+
+
+                    **Permission**: add watcher'
+                  readOnly: true
+              customActions:
+                type: array
+                readOnly: true
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'A predefined action that can be applied to the work package.
+
+
+                      **Resource**: CustomAction'
+                    readOnly: true
+              previewMarkup:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: Post markup (in markdown) here to receive an HTML-rendered response
+                  readOnly: true
+              removeWatcher:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Remove any user from WP watchers
+
+
+                    # Conditions
+
+
+                    **Permission**: delete watcher'
+                  readOnly: true
+              delete:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Delete this work package
+
+
+                    # Conditions
+
+
+                    **Permission**: delete_work_packages'
+                  readOnly: true
+              logTime:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Create time entries on the work package
+
+
+                    # Conditions
+
+
+                    **Permission**: log_time or log_own_time'
+                  readOnly: true
+              move:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Link to page for moving this work package
+
+
+                    # Conditions
+
+
+                    **Permission**: move_work_packages'
+                  readOnly: true
+              copy:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Link to page for copying this work package
+
+
+                    # Conditions
+
+
+                    **Permission**: add_work_packages'
+                  readOnly: true
+              unwatch:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Remove current user from WP watchers
+
+
+                    # Conditions
+
+
+                    logged in; watching'
+                  readOnly: true
+              update:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Form endpoint that aids in preparing and performing edits on a work package
+
+
+                    # Conditions
+
+
+                    **Permission**: edit work package'
+                  readOnly: true
+              updateImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Directly perform edits on a work package
+
+
+                    # Conditions
+
+
+                    **Permission**: edit work package'
+                  readOnly: true
+              watch:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Add current user to WP watchers
+
+
+                    # Conditions
+
+
+                    logged in; not watching'
+                  readOnly: true
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This work package
+
+
+                    **Resource**: WorkPackage'
+                  readOnly: true
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The schema of this work package
+
+
+                    **Resource**: Schema'
+                  readOnly: true
+              ancestors:
+                type: array
+                readOnly: true
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'A visible ancestor work package of the current work package.
+
+
+                      **Resource**: WorkPackage
+
+
+                      # Conditions
+
+
+                      **Permission** view work packages'
+                    readOnly: true
+              attachments:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The files attached to this work package
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    - **Setting**: deactivate_work_package_attachments set to false in related workspace'
+              addAttachment:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Attach a file to the work package
+
+
+                    # Conditions
+
+
+                    - **Permission**: edit work package'
+                  readOnly: true
+              prepareAttachment:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Attach a file to the work package
+
+
+                    # Conditions
+
+
+                    - **Setting**: direct uploads enabled'
+                  readOnly: true
+              author:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The person that created the work package
+
+
+                    **Resource**: User'
+                  readOnly: true
+              assignee:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The person that is intended to work on the work package
+
+
+                    **Resource**: User'
+              availableWatchers:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'All users that can be added to the work package as watchers.
+
+
+                    **Resource**: User
+
+
+                    # Conditions
+
+
+                    **Permission** add work package watchers'
+                  readOnly: true
+              budget:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The budget this work package is associated to
+
+
+                    **Resource**: Budget
+
+
+                    # Conditions
+
+
+                    **Permission** view cost objects'
+              category:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The category of the work package
+
+
+                    **Resource**: Category'
+              children:
+                type: array
+                readOnly: true
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'A visible child work package of the current work package.
+
+
+                      **Resource**: WorkPackage
+
+
+                      # Conditions
+
+
+                      **Permission** view work packages'
+                    readOnly: true
+              addFileLink:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Add a file link to the work package
+
+
+                    # Conditions
+
+
+                    **Permission**: manage_file_links'
+              fileLinks:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Gets the file link collection of this work package
+
+
+                    # Conditions
+
+
+                    **Permission**: view_file_links'
+              parent:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Parent work package
+
+
+                    **Resource**: WorkPackage'
+              priority:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The priority of the work package
+
+
+                    **Resource**: Priority'
+              project:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The workspace to which the work package belongs
+
+
+                    **Resource**: Workspace'
+              projectPhase:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The project phase to which the work package belongs
+
+
+                    **Resource**: ProjectPhase'
+              projectPhaseDefinition:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The definition of the project phase the work package belongs to
+
+
+                    **Resource**: ProjectPhaseDefinition'
+              responsible:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The person that is responsible for the overall outcome
+
+
+                    **Resource**: User'
+              relations:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Relations this work package is involved in
+
+
+                    **Resource**: Relation
+
+
+                    # Conditions
+
+
+                    **Permission** view work packages'
+                  readOnly: true
+              revisions:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Revisions that are referencing the work package
+
+
+                    **Resource**: Revision
+
+
+                    # Conditions
+
+
+                    **Permission** view changesets'
+                  readOnly: true
+              status:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The current status of the work package
+
+
+                    **Resource**: Status'
+              sprint:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The sprint the work package is assigned to
+
+
+                    **Resource**: Sprint
+
+
+                    # Conditions
+
+
+                    **Permission** view sprints'
+              timeEntries:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'All time entries logged on the work package. Please note that this is a link to an HTML resource for now and as such, the link is subject to change.
+
+
+                    **Resource**: N/A
+
+
+                    # Conditions
+
+
+                    **Permission** view time entries'
+                  readOnly: true
+              type:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The type of the work package
+
+
+                    **Resource**: Type'
+              version:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The version associated to the work package
+
+
+                    **Resource**: Version'
+              watchers:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'All users that are currently watching this work package
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission** view work package watchers'
+                  readOnly: true
+      example:
+        _type: WorkPackage
+        _links:
+          self:
+            href: /api/v3/work_packages/1528
+            title: Develop API
+          schema:
+            href: /api/v3/work_packages/schemas/11-2
+          update:
+            href: /api/v3/work_packages/1528
+            method: patch
+            title: Update Develop API
+          delete:
+            href: /work_packages/bulk?ids=1528
+            method: delete
+            title: Delete Develop API
+          logTime:
+            href: /work_packages/1528/time_entries/new
+            type: text/html
+            title: Log time on Develop API
+          move:
+            href: /work_packages/1528/move/new
+            type: text/html
+            title: Move Develop API
+          attachments:
+            href: /api/v3/work_packages/1528/attachments
+          addAttachment:
+            href: /api/v3/work_packages/1528/attachments
+            method: post
+          author:
+            href: /api/v3/users/1
+            title: OpenProject Admin - admin
+          customActions:
+          - href: /api/v3/work_packages/1528/custom_actions/153/execute
+            method: post
+            title: Reset
+          - href: /api/v3/work_packages/1528/custom_actions/94/execute
+            method: post
+            title: Forward to accounting
+          responsible:
+            href: /api/v3/users/23
+            title: Laron Leuschke - Alaina5788
+          relations:
+            href: /api/v3/work_packages/1528/relations
+            title: Show relations
+          revisions:
+            href: /api/v3/work_packages/1528/revisions
+          assignee:
+            href: /api/v3/users/11
+            title: Emmie Okuneva - Adele5450
+          priority:
+            href: /api/v3/priorities/2
+            title: Normal
+          project:
+            href: /api/v3/portfolio/1
+            title: A Test Portfolio
+          status:
+            href: /api/v3/statuses/1
+            title: New
+          type:
+            href: /api/v3/types/1
+            title: A Type
+          version:
+            href: /api/v3/versions/1
+            title: Version 1
+          availableWatchers:
+            href: /api/v3/work_packages/1528/available_watchers
+          watch:
+            href: /api/v3/work_packages/1528/watchers
+            method: post
+            payload:
+              user:
+                href: /api/v3/users/1
+          addWatcher:
+            href: /api/v3/work_packages/1528/watchers
+            method: post
+            payload:
+              user:
+                href: /api/v3/users/{user_id}
+            templated: true
+          removeWatcher:
+            href: /api/v3/work_packages/1528/watchers/{user_id}
+            method: delete
+            templated: true
+          addRelation:
+            href: /api/v3/relations
+            method: post
+            title: Add relation
+          changeParent:
+            href: /api/v3/work_packages/694
+            method: patch
+            title: Change parent of Bug in OpenProject
+          addComment:
+            href: /api/v3/work_packages/1528/activities
+            method: post
+            title: Add comment
+          parent:
+            href: /api/v3/work_packages/1298
+            title: nisi eligendi officiis eos delectus quis voluptas dolores
+          category:
+            href: /api/v3/categories/1298
+            title: eligend isi
+          children:
+          - href: /api/v3/work_packages/1529
+            title: Write API documentation
+          ancestors:
+          - href: /api/v3/work_packages/1290
+            title: Root node of hierarchy
+          - href: /api/v3/work_packages/1291
+            title: Intermediate node of hierarchy
+          - href: /api/v3/work_packages/1298
+            title: nisi eligendi officiis eos delectus quis voluptas dolores
+          timeEntries:
+            href: /work_packages/1528/time_entries
+            type: text/html
+            title: Time entries
+          watchers:
+            href: /api/v3/work_packages/1528/watchers
+          customField3:
+            href: api/v3/users/14
+        id: 1528
+        subject: Develop API
+        description:
+          format: markdown
+          raw: Develop super cool OpenProject API.
+          html: <p>Develop super cool OpenProject API.</p>
+        scheduleManually: false
+        readonly: false
+        startDate: null
+        dueDate: null
+        derivedStartDate: null
+        derivedDueDate: null
+        estimatedTime: PT2H
+        derivedEstimatedTime: PT10H
+        percentageDone: 0
+        customField1: Foo
+        customField2: 42
+        createdAt: '2014-08-29T12:40:53.373Z'
+        updatedAt: '2014-08-29T12:44:41.981Z'
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    EmojiReactionModel:
+      type: object
+      properties:
+        _type:
+          type: string
+          enum:
+          - EmojiReaction
+        id:
+          type: string
+          description: 'Emoji reaction id (format: reactable_id-reaction)'
+          example: 1-thumbs_up
+        reaction:
+          type: string
+          description: The reaction identifier
+          example: thumbs_up
+        emoji:
+          type: string
+          description: The emoji character
+          example: 👍
+        reactionsCount:
+          type: integer
+          description: Number of users who reacted with this emoji
+          minimum: 1
+          example: 3
+        firstReactionAt:
+          type: string
+          format: date-time
+          description: Time of the first reaction
+        _links:
+          type: object
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: This emoji reaction
+            reactable:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: The activity this emoji reaction belongs to
+            reactingUsers:
+              type: array
+              items:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: The users who reacted with this emoji
+      example:
+        _type: EmojiReaction
+        id: 1-thumbs_up
+        reaction: thumbs_up
+        emoji: 👍
+        reactionsCount: 3
+        firstReactionAt: '2024-04-08T15:37:19.275Z'
+        _links:
+          self:
+            href: /api/v3/emoji_reactions/1-thumbs_up
+          reactable:
+            href: /api/v3/activities/1
+          reactingUsers:
+          - href: /api/v3/users/435
+            title: John Doe
+          - href: /api/v3/users/436
+            title: Jane Smith
+          - href: /api/v3/users/437
+            title: Bob Johnson
+    CustomFieldProperties:
+      type: object
+      patternProperties:
+        ^customField\d+$:
+          type:
+          - 'null'
+          - number
+          - boolean
+          - string
+          - object
+          description: 'A custom field value, that belongs to a custom field of a simple type:
+
+
+            - Boolean
+
+            - Date
+
+            - Float
+
+            - Integer
+
+            - Link (URL)
+
+            - Text
+
+            - Long text'
+    EmojiReactions_Model:
+      type: object
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: Total number of emoji reactions
+          minimum: 0
+        count:
+          type: integer
+          description: Number of emoji reactions in this response
+          minimum: 0
+        _embedded:
+          type: object
+          properties:
+            elements:
+              type: array
+              items:
+                $ref: '#/components/schemas/EmojiReactionModel'
+        _links:
+          type: object
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: This collection
+      example:
+        _type: Collection
+        total: 2
+        count: 2
+        _embedded:
+          elements:
+          - _type: EmojiReaction
+            id: 1-thumbs_up
+            reaction: thumbs_up
+            emoji: 👍
+            reactionsCount: 3
+            firstReactionAt: '2024-04-08T15:37:19.275Z'
+            _links:
+              self:
+                href: /api/v3/emoji_reactions/1-thumbs_up
+              reactable:
+                href: /api/v3/activities/1
+              reactingUsers:
+              - href: /api/v3/users/435
+                title: John Doe
+              - href: /api/v3/users/436
+                title: Jane Smith
+              - href: /api/v3/users/437
+                title: Bob Johnson
+          - _type: EmojiReaction
+            id: 1-heart
+            reaction: heart
+            emoji: ❤️
+            reactionsCount: 1
+            firstReactionAt: '2024-04-08T15:38:19.275Z'
+            _links:
+              self:
+                href: /api/v3/emoji_reactions/1-heart
+              reactable:
+                href: /api/v3/activities/1
+              reactingUsers:
+              - href: /api/v3/users/435
+                title: John Doe
+        _links:
+          self:
+            href: /api/v3/activities/1/emoji_reactions
+  examples:
+    ActivityResponse:
+      description: A simple response example for an activity comment.
+      value:
+        _type: Activity::Comment
+        id: 1478
+        comment:
+          format: markdown
+          raw: I can give you a CR70 corvette, you have to make do, Leia...
+          html: <p class="op-uc-p">I can give you a CR70 corvette, you have to make do, Leia...</p>
+        details: []
+        version: 4
+        internal: false
+        createdAt: '2025-04-17T13:54:40.737Z'
+        updatedAt: '2025-04-17T13:54:40.737Z'
+        _embedded:
+          attachments:
+            _type: Collection
+            total: 1
+            count: 1
+            _abbreviated: Attachments resource shortened for brevity.
+          workPackage:
+            id: 207
+            _type: WorkPackage
+            _abbreviated: Work package resource shortened for brevity.
+          emojiReactions:
+            _type: Collection
+            total: 1
+            count: 1
+            _abbreviated: Emoji reactions resource shortened for brevity.
+        _links:
+          attachments:
+            href: /api/v3/activities/1478/attachments
+          addAttachment:
+            href: /api/v3/activities/1478/attachments
+            method: post
+          self:
+            href: /api/v3/activities/1478
+          workPackage:
+            href: /api/v3/work_packages/207
+            title: Recover Death Star blueprints
+          user:
+            href: /api/v3/users/33
+          update:
+            href: /api/v3/activities/1478
+            method: patch
+  responses:
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
+    InvalidRequestBody:
+      description: Occurs when the client did not send a valid JSON object in the request body.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+            message: The request body was not a single JSON object.
+    UnsupportedMediaType:
+      description: Occurs when the client sends an unsupported Content-Type header.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
+            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
