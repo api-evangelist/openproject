@@ -1,0 +1,67 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Custom actions API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Custom actions",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get a custom action",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/custom_actions/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "42",
+                "type": "path",
+                "description": "The id of the custom action to fetch"
+              }
+            ]
+          },
+          "docs": "Retrieves a custom action by id."
+        },
+        {
+          "info": {
+            "name": "Execute custom action",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/custom_actions/:id/execute",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "The id of the custom action to execute"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "A POST to this endpoint executes the custom action on the work package provided in the payload. The altered work package will be returned. In order to avoid executing\n the custom action unbeknown to a change that has already taken place, the client has to provide the work package's current lockVersion."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

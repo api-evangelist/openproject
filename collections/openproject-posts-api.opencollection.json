@@ -1,0 +1,44 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Posts API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Posts",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "View Post",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/posts/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Post's identifier"
+              }
+            ]
+          },
+          "docs": "Retrieve an individual post as identified by the id parameter"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

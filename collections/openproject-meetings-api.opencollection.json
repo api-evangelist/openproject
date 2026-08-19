@@ -1,0 +1,55 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Meetings API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Meetings",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List all visible meetings",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/meetings"
+          },
+          "docs": "Retrieve a paginated collection of meetings visible to the authenticated user."
+        },
+        {
+          "info": {
+            "name": "Get a meeting",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/meetings/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Meeting identifier"
+              }
+            ]
+          },
+          "docs": "Retrieve an individual meeting as identified by the id parameter"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

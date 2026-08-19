@@ -1,0 +1,86 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Views API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Views",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List views",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/views",
+            "params": [
+              {
+                "name": "filters",
+                "value": "[{ \"project_id\": { \"operator\": \"!*\", \"values\": null }\" }]",
+                "type": "query",
+                "description": "JSON specifying filter conditions.\nCurrently supported filters are:\n\n+ project: filters views by the project their associated query is assigned to. If the project filter is passed with the `!*` (not any) operator, global views are returned.\n\n+ id: filters views based on their id\n\n+ type: filters views based on their type"
+              }
+            ]
+          },
+          "docs": "Returns a collection of Views. The collection can be filtered via query parameters similar to how work packages are filtered."
+        },
+        {
+          "info": {
+            "name": "View view",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/views/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "42",
+                "type": "path",
+                "description": "View id"
+              }
+            ]
+          },
+          "docs": "View view"
+        },
+        {
+          "info": {
+            "name": "Create view",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/views/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "The view identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "When calling this endpoint the client provides a single object, containing at least the properties and links that are required, in the body.\nThe required fields of a View can be found in its schema, which is embedded in the respective form.\nNote that it is only allowed to provide properties or links supporting the write operation.\n\nThere are different subtypes of `Views` (e.g. `Views::WorkPackagesTable`) with each having its own\nendpoint for creating that subtype e.g.\n\n* `/api/v3/views/work_pack"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

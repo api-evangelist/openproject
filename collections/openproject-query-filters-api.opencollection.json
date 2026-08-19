@@ -1,0 +1,44 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Query Filters API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Query Filters",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "View Query Filter",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/queries/filters/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "status",
+                "type": "path",
+                "description": "QueryFilter identifier"
+              }
+            ]
+          },
+          "docs": "Retrieve an individual QueryFilter as identified by the id parameter."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

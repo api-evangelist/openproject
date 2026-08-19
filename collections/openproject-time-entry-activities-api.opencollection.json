@@ -1,0 +1,44 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Time entry activities API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Time entry activities",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "View time entries activity",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/time_entries/activity/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Time entries activity id"
+              }
+            ]
+          },
+          "docs": "Fetches the time entry activity resource by the given id."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

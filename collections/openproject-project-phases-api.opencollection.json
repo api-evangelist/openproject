@@ -1,0 +1,44 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Project Phases API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Project Phases",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get a project phase",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/project_phases/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1337",
+                "type": "path",
+                "description": "Project phase id"
+              }
+            ]
+          },
+          "docs": "Gets a project phase resource. This resource contains an instance of a ProjectPhaseDefinition within a project which can\nthen have project specific dates."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

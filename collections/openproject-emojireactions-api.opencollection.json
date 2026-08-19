@@ -1,0 +1,86 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities EmojiReactions API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "EmojiReactions",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List emoji reactions by activity",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/activities/:id/emoji_reactions",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "ID of the activity whose emoji reactions will be listed"
+              }
+            ]
+          },
+          "docs": "List all emoji reactions of a single activity."
+        },
+        {
+          "info": {
+            "name": "Toggle emoji reaction for an activity",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://qa.openproject-edge.com/api/v3/activities/:id/emoji_reactions",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "ID of the activity to toggle emoji reaction for"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Toggle an emoji reaction for a given activity. If the user has already reacted with the given emoji,\nthe reaction will be removed. Otherwise, a new reaction will be created.\n\n**Note:** The response contains the complete collection of all emoji reactions for this activity.\n\n**Required permission:**\n- `add_work_package_comments`\n- for internal comments: `add_internal_comments`"
+        },
+        {
+          "info": {
+            "name": "List emoji reactions by work package activities",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/work_packages/:id/activities_emoji_reactions",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "ID of the work package whose activities' emoji reactions will be listed"
+              }
+            ]
+          },
+          "docs": "List all emoji reactions of all activities of a single work package."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

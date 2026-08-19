@@ -1,0 +1,51 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities UserPreferences API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "UserPreferences",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Show my preferences",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/my_preferences"
+          },
+          "docs": "Show my preferences"
+        },
+        {
+          "info": {
+            "name": "Update my preferences",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://qa.openproject-edge.com/api/v3/my_preferences",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "When calling this endpoint the client provides a single object, containing the properties that it wants to change, in the body."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

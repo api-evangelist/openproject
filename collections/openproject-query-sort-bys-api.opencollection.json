@@ -1,0 +1,44 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Query Sort Bys API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Query Sort Bys",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "View Query Sort By",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/queries/sort_bys/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "status-asc",
+                "type": "path",
+                "description": "QuerySortBy identifier. The identifier is a combination of the column identifier and the direction."
+              }
+            ]
+          },
+          "docs": "Retrieve an individual QuerySortBy as identified by the id parameter."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

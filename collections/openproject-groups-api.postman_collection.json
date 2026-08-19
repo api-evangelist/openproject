@@ -1,0 +1,1530 @@
+{
+  "item": [
+    {
+      "id": "aca1ad3d-52ae-4eb5-bed1-b27f393fc7f5",
+      "name": "Groups",
+      "description": {
+        "content": "Groups are collections of users. They support assigning/unassigning multiple users to/from a project in one operation.\n\nThis resource does not yet have the form and schema endpoints. But as all properties are static, clients should still be able\nto work with this resource.\n\n## Actions\n\n## Actions\n\n| Link                | Description                                                          | Condition                                                        |\n|:-------------------:| -------------------------------------------------------------------- | ---------------------------------------------------------------- |\n| delete              | Deletes the group.                                                   | **Permission**: Administrator                                    |\n| updateImmediately   | Updates the group's attributes.                                      | **Permission**: Administrator                                    |\n\n## Linked Properties\n\n|  Link              | Description                                                                                                                                                           | Type              | Constraints           | Supported operations | Condition                                                                |\n|:-----------:       |--------------------------------------------------------------                                                                                                         | -------------     | --------------------- | -------------------- | -----------------------------------------                                |\n| self               | This group                                                                                                                                                            | Group             | not null              | READ                 |                                                                          |\n| memberships        | Link to collection of all the group's memberships. The list will only include the memberships in projects in which the requesting user has the necessary permissions. | MemberCollection  |                       | READ                 | **Permission**: view members or manage members in any project            |\n| members            | The list all all the users that are members of the group                                                                                                              | UserCollection    |                       | READ/WRITE           | **Permission**: manage members in any project to read & admin to write   |\n\nDepending on custom fields defined for versions, additional linked properties might exist.\n\n## Local Properties\n\n| Property     | Description                                                | Type     | Constraints                                          | Supported operations | Condition                                                      |\n| :----------: | ---------------------------------------------------------  | -------- | ---------------------------------------------------- | -------------------- | -----------------------------------------------------------    |\n| id           | Group's id                                                 | Integer  | x > 0                                                | READ                 |                                                                |\n| name         | Group's full name, formatting depends on instance settings | String   |                                                      | READ/WRITE           | Admin to write                                                 |\n| createdAt    | Time of creation                                           | DateTime |                                                      | READ                 | Only visible by admins                                         |\n| updatedAt    | Time of the most recent change to the user                 | DateTime |                                                      | READ                 | Only visible by admins                                         |\n\nDepending on custom fields defined for versions, additional properties might exist.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "96cb40c7-d658-437b-ba5a-5122c869f649",
+          "name": "List groups",
+          "request": {
+            "name": "List groups",
+            "description": {
+              "content": "Returns a collection of groups. The client can choose to filter the\ngroups similar to how work packages are filtered. In addition to the provided\nfilters, the server will reduce the result set to only contain groups, for which\nthe requesting client has sufficient permissions (*view_members*, *manage_members*).",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "groups"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "sortBy",
+                  "value": "[[\"id\", \"asc\"]]",
+                  "description": "JSON specifying sort criteria.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint. Currently supported sorts are:\n\n+ id: Sort by primary key\n\n+ created_at: Sort by group creation datetime\n\n+ updated_at: Sort by the time the group was updated last"
+                },
+                {
+                  "disabled": false,
+                  "key": "select",
+                  "value": "<string>",
+                  "description": "Comma separated list of properties to include."
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "4b1ccd08-78b7-4b69-8263-596dcbd305ae",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "groups"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "sortBy",
+                      "value": "[[\"id\", \"asc\"]]"
+                    },
+                    {
+                      "key": "select",
+                      "value": "total,elements/name,elements/self,self"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_embedded\": {\n    \"elements\": [\n      {\n        \"_embedded\": {\n          \"members\": [\n            {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            }\n          ]\n        },\n        \"_links\": {\n          \"self\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"This group resource\\n\\n**Resource**: Group\"\n          },\n          \"memberships\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"An collection of all memberships of the group.\\n\\n**Resource**: MembershipCollection\"\n          },\n          \"members\": [\n            {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            }\n          ],\n          \"delete\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"An href to delete the group.\\n\\n# Conditions:\\n\\n- `admin`\"\n          },\n          \"updateImmediately\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"An href to update the group.\\n\\n# Conditions:\\n\\n- `admin`\\n\\n**Resource**: Group\"\n          }\n        },\n        \"_type\": \"Group\",\n        \"id\": 5606,\n        \"name\": \"string\",\n        \"createdAt\": \"2002-07-22T08:06:16.587Z\",\n        \"updatedAt\": \"1962-08-01T00:26:05.160Z\",\n        \"customField002942873\": null\n      },\n      {\n        \"_embedded\": {\n          \"members\": [\n            {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            }\n          ]\n        },\n        \"_links\": {\n          \"self\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"This group resource\\n\\n**Resource**: Group\"\n          },\n          \"memberships\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"An collection of all memberships of the group.\\n\\n**Resource**: MembershipCollection\"\n          },\n          \"members\": [\n            {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            }\n          ],\n          \"delete\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"An href to delete the group.\\n\\n# Conditions:\\n\\n- `admin`\"\n          },\n          \"updateImmediately\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"An href to update the group.\\n\\n# Conditions:\\n\\n- `admin`\\n\\n**Resource**: Group\"\n          }\n        },\n        \"_type\": \"User\",\n        \"id\": 3480,\n        \"name\": \"string\",\n        \"createdAt\": \"1964-06-10T14:51:06.234Z\",\n        \"updatedAt\": \"1990-12-25T11:44:05.678Z\",\n        \"customField152870\": null\n      }\n    ]\n  },\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    }\n  },\n  \"_type\": \"Collection\",\n  \"count\": 88,\n  \"total\": 3443\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "c240f141-f275-4462-9397-0e1b468b32cf",
+              "name": "Returned if the client does not have sufficient permissions.\n\n**Required permission:** View members or manage members in any project",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "groups"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "sortBy",
+                      "value": "[[\"id\", \"asc\"]]"
+                    },
+                    {
+                      "key": "select",
+                      "value": "total,elements/name,elements/self,self"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:MissingPermission\",\n  \"message\": \"You are not authorized to access this resource.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "735c2092-2f59-46b2-bddb-24a37bcfb830",
+          "name": "Create group",
+          "request": {
+            "name": "Create group",
+            "description": {
+              "content": "Creates a new group applying the attributes provided in the body.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "groups"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"<string>\",\n  \"_links\": {\n    \"members\": [\n      {\n        \"href\": \"<string,null>\",\n        \"title\": \"<string>\",\n        \"templated\": false,\n        \"method\": \"GET\",\n        \"payload\": \"<object>\",\n        \"identifier\": \"<string>\",\n        \"type\": \"<string>\"\n      },\n      {\n        \"href\": \"<string,null>\",\n        \"title\": \"<string>\",\n        \"templated\": false,\n        \"method\": \"GET\",\n        \"payload\": \"<object>\",\n        \"identifier\": \"<string>\",\n        \"type\": \"<string>\"\n      }\n    ]\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "f361a997-23b1-40fb-aa78-46ef0c2d6831",
+              "name": "Created",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "groups"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\",\n  \"_links\": {\n    \"members\": [\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      },\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      }\n    ]\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_embedded\": {\n    \"members\": [\n      {\n        \"_links\": {\n          \"self\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"memberships\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"showUser\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"A relative path to show the user in the web application.\\n\\n# Condition\\n\\n- User is not a new record\\n- User is not `locked`\"\n          },\n          \"updateImmediately\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"A link to update the user resource.\\n\\n# Conditions\\n\\n- `admin`\"\n          },\n          \"lock\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"Restrict the user from logging in and performing any actions.\\n\\n# Conditions\\n\\n- User is not locked\\n- `admin`\"\n          },\n          \"unlock\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"Allow a locked user to login and act again.\\n\\n# Conditions\\n\\n- User is not locked\\n- `admin`\"\n          },\n          \"delete\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"Permanently remove a user from the instance\\n\\n# Conditions\\n\\neither:\\n  - `admin`\\n  - Setting `users_deletable_by_admin` is set\\nor:\\n  - User is self\\n  - Setting `users_deletable_by_self` is set\"\n          },\n          \"authSource\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"Permanently remove a user from the instance\\n\\n# Conditions\\n\\n- LDAP authentication configured\\n- `admin`\"\n          }\n        },\n        \"_type\": \"Group\",\n        \"avatar\": \"http://DtvxOkegs.jpmzuv7DEQSZc\",\n        \"id\": 9565,\n        \"name\": \"string\",\n        \"createdAt\": \"1967-10-06T20:54:11.999Z\",\n        \"updatedAt\": \"1969-03-16T12:53:57.896Z\",\n        \"login\": \"string\",\n        \"firstName\": \"string\",\n        \"lastName\": \"string\",\n        \"email\": \"string\",\n        \"admin\": true,\n        \"status\": \"string\",\n        \"language\": \"string\",\n        \"identityUrl\": \"string\",\n        \"customField96488377\": false\n      },\n      {\n        \"_links\": {\n          \"self\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"memberships\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"showUser\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"A relative path to show the user in the web application.\\n\\n# Condition\\n\\n- User is not a new record\\n- User is not `locked`\"\n          },\n          \"updateImmediately\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"A link to update the user resource.\\n\\n# Conditions\\n\\n- `admin`\"\n          },\n          \"lock\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"Restrict the user from logging in and performing any actions.\\n\\n# Conditions\\n\\n- User is not locked\\n- `admin`\"\n          },\n          \"unlock\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"Allow a locked user to login and act again.\\n\\n# Conditions\\n\\n- User is not locked\\n- `admin`\"\n          },\n          \"delete\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"Permanently remove a user from the instance\\n\\n# Conditions\\n\\neither:\\n  - `admin`\\n  - Setting `users_deletable_by_admin` is set\\nor:\\n  - User is self\\n  - Setting `users_deletable_by_self` is set\"\n          },\n          \"authSource\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"Permanently remove a user from the instance\\n\\n# Conditions\\n\\n- LDAP authentication configured\\n- `admin`\"\n          }\n        },\n        \"_type\": \"User\",\n        \"avatar\": \"http://qXqlxpXfBByUgkZeFmzucNgpCjjwAD.lcsLsJRum,gbLYUYsIDstKDo2wKcw3yI,m,fEQ,I,It1Xsbv98\",\n        \"id\": 1893,\n        \"name\": \"string\",\n        \"createdAt\": \"2002-09-17T07:01:30.885Z\",\n        \"updatedAt\": \"1988-06-19T19:15:55.188Z\",\n        \"login\": \"string\",\n        \"firstName\": \"string\",\n        \"lastName\": \"string\",\n        \"email\": \"string\",\n        \"admin\": true,\n        \"status\": \"string\",\n        \"language\": \"string\",\n        \"identityUrl\": \"string\",\n        \"customField816\": 2292.4363612745547\n      }\n    ]\n  },\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"memberships\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"members\": [\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      },\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      }\n    ],\n    \"delete\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"updateImmediately\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    }\n  },\n  \"_type\": \"User\",\n  \"id\": 1425,\n  \"name\": \"string\",\n  \"createdAt\": \"1950-06-27T00:01:37.387Z\",\n  \"updatedAt\": \"1956-12-13T21:44:54.667Z\",\n  \"customField99172\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "960cb546-c4f3-454a-ae71-2b0675fb7f7e",
+              "name": "Occurs when the client did not send a valid JSON object in the request body.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "groups"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\",\n  \"_links\": {\n    \"members\": [\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      },\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      }\n    ]\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:InvalidRequestBody\",\n  \"message\": \"The request body was not a single JSON object.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "2961b8d4-8954-4fc9-aa23-febe30820adc",
+              "name": "Returned if the client does not have sufficient permissions.\n\n**Required permission:** Administrator",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "groups"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\",\n  \"_links\": {\n    \"members\": [\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      },\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      }\n    ]\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:MissingPermission\",\n  \"message\": \"You are not authorized to access this resource.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "2d4e8cbc-c963-4c50-93da-ebdf2e2d48da",
+              "name": "Occurs when the client did not send a Content-Type header",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "groups"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "text/plain"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\",\n  \"_links\": {\n    \"members\": [\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      },\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      }\n    ]\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Acceptable",
+              "code": 406,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "Missing content-type header",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "6ba74535-f17e-4d5f-acc0-fc8115e3e896",
+              "name": "Occurs when the client sends an unsupported Content-Type header.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "groups"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\",\n  \"_links\": {\n    \"members\": [\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      },\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      }\n    ]\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unsupported Media Type",
+              "code": 415,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:TypeNotSupported\",\n  \"message\": \"Expected CONTENT-TYPE to be (expected value) but got (actual value).\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "1b8fa680-43a5-4079-8b5e-7e1ebb13b603",
+              "name": "Returned if:\n\n* a constraint for a property was violated (`PropertyConstraintViolation`)",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "groups"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\",\n  \"_links\": {\n    \"members\": [\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      },\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      }\n    ]\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
+              "code": 422,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_embedded\": {\n    \"details\": {\n      \"attribute\": \"name\"\n    }\n  },\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:PropertyConstraintViolation\",\n  \"message\": \"Name can't be blank.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "58286a35-94ca-4cf6-830a-2f07caf2ca0d",
+          "name": "Delete group",
+          "request": {
+            "name": "Delete group",
+            "description": {
+              "content": "Deletes the group.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "groups",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<integer>",
+                  "key": "id",
+                  "description": "(Required) Group id"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "DELETE",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "72be3010-379d-407d-823a-32f8c245de69",
+              "name": "Returned if the group was marked for deletion.\n\nNote that the response body is empty as of now. In future versions of the API a body\n*might* be returned, indicating the progress of deletion.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "groups",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Group id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Accepted",
+              "code": 202,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "e2a01025-f39f-499c-ae7e-2c7d02e4d8e0",
+              "name": "Returned if the client does not have sufficient permissions.\n\n**Required permission:** Administrator",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "groups",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Group id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:MissingPermission\",\n  \"message\": \"You are not authorized to access this resource.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "2857374e-decd-474c-ab43-35609f9383f1",
+              "name": "Returned if the group does not exist or the client does not have sufficient permissions\nto see it.\n\n**Required permission:** Administrator\n\n*Note: A client without sufficient permissions shall not be able to test for the existence of\na version. That's why a 404 is returned here, even if a 403 might be more appropriate.*",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "groups",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Group id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:NotFound\",\n  \"message\": \"The requested resource could not be found.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "2c4db000-4b3a-460b-a5f4-441b3a4d9335",
+              "name": "Occurs when the client did not send a Content-Type header",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "groups",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Group id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "text/plain"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Not Acceptable",
+              "code": 406,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "Missing content-type header",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "2aa4050f-fc9c-4551-8b5c-0e80f7be4acc",
+              "name": "Occurs when the client sends an unsupported Content-Type header.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "groups",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Group id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Unsupported Media Type",
+              "code": 415,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:TypeNotSupported\",\n  \"message\": \"Expected CONTENT-TYPE to be (expected value) but got (actual value).\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "e9dce621-7e34-4985-be3a-28fde177328a",
+          "name": "Get group",
+          "request": {
+            "name": "Get group",
+            "description": {
+              "content": "Fetches a group resource.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "groups",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<integer>",
+                  "key": "id",
+                  "description": "(Required) Group id"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "1c254c0e-87c8-42ed-9adb-96b46b1358c0",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "groups",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Group id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Group\",\n  \"id\": 26,\n  \"name\": \"Force Users\",\n  \"createdAt\": \"2024-01-11T15:54:16.542Z\",\n  \"updatedAt\": \"2024-01-11T15:58:02.237Z\",\n  \"_embedded\": {\n    \"members\": [\n      {\n        \"_type\": \"User\",\n        \"id\": 23,\n        \"name\": \"Grogu Jarin\",\n        \"_abbreviated\": \"Principal resource shortened for brevity\"\n      },\n      {\n        \"_type\": \"User\",\n        \"id\": 14,\n        \"name\": \"Mara Jade\",\n        \"_abbreviated\": \"Principal resource shortened for brevity\"\n      },\n      {\n        \"_type\": \"User\",\n        \"id\": 3,\n        \"name\": \"Darth Vader\",\n        \"_abbreviated\": \"Principal resource shortened for brevity\"\n      }\n    ]\n  },\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/groups/26\",\n      \"title\": \"Force Users\"\n    },\n    \"memberships\": {\n      \"href\": \"/api/v3/memberships?filters=%5B%7B%22principal%22%3A%7B%22operator%22%3A%22%3D%22%2C%22values%22%3A%5B%2226%22%5D%7D%7D%5D\",\n      \"title\": \"Memberships\"\n    },\n    \"delete\": {\n      \"href\": \"/api/v3/groups/26\",\n      \"method\": \"delete\"\n    },\n    \"updateImmediately\": {\n      \"href\": \"/api/v3/groups/26\",\n      \"method\": \"patch\"\n    },\n    \"members\": [\n      {\n        \"href\": \"/api/v3/users/23\",\n        \"title\": \"Grogu Jarin\"\n      },\n      {\n        \"href\": \"/api/v3/users/14\",\n        \"title\": \"Mara Jade\"\n      },\n      {\n        \"href\": \"/api/v3/users/3\",\n        \"title\": \"Darth Vader\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "3d50844b-57fd-4b55-9148-59bd4aa790f5",
+              "name": "Returned if the group does not exist or if the API user does not have permission to view them.\n\n**Required permission** If the user has the *manage members* permission in at least one project the user will be able to query all groups. If not, the user\nwill be able to query all groups which are members in projects, he has the *view members* permission in.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "groups",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Group id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:NotFound\",\n  \"message\": \"The requested resource could not be found.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "074db06b-439b-46a5-b0c0-cc6fcfbf8c32",
+          "name": "Update group",
+          "request": {
+            "name": "Update group",
+            "description": {
+              "content": "Updates the given group by applying the attributes provided in the body.\n\nPlease note that the `members` array provided will override the existing set of members (similar to a PUT). A\nclient thus has to provide the complete list of members the group is to have after the PATCH even if only one\nmember is to be added.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "groups",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<integer>",
+                  "key": "id",
+                  "description": "(Required) Group id"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "PATCH",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"<string>\",\n  \"_links\": {\n    \"members\": [\n      {\n        \"href\": \"<string,null>\",\n        \"title\": \"<string>\",\n        \"templated\": false,\n        \"method\": \"GET\",\n        \"payload\": \"<object>\",\n        \"identifier\": \"<string>\",\n        \"type\": \"<string>\"\n      },\n      {\n        \"href\": \"<string,null>\",\n        \"title\": \"<string>\",\n        \"templated\": false,\n        \"method\": \"GET\",\n        \"payload\": \"<object>\",\n        \"identifier\": \"<string>\",\n        \"type\": \"<string>\"\n      }\n    ]\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "d1ecf2dc-0b6b-4b35-aab0-1a549b1e8ceb",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "groups",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Group id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\",\n  \"_links\": {\n    \"members\": [\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      },\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      }\n    ]\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_embedded\": {\n    \"members\": [\n      {\n        \"_links\": {\n          \"self\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"memberships\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"showUser\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"A relative path to show the user in the web application.\\n\\n# Condition\\n\\n- User is not a new record\\n- User is not `locked`\"\n          },\n          \"updateImmediately\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"A link to update the user resource.\\n\\n# Conditions\\n\\n- `admin`\"\n          },\n          \"lock\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"Restrict the user from logging in and performing any actions.\\n\\n# Conditions\\n\\n- User is not locked\\n- `admin`\"\n          },\n          \"unlock\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"Allow a locked user to login and act again.\\n\\n# Conditions\\n\\n- User is not locked\\n- `admin`\"\n          },\n          \"delete\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"Permanently remove a user from the instance\\n\\n# Conditions\\n\\neither:\\n  - `admin`\\n  - Setting `users_deletable_by_admin` is set\\nor:\\n  - User is self\\n  - Setting `users_deletable_by_self` is set\"\n          },\n          \"authSource\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"Permanently remove a user from the instance\\n\\n# Conditions\\n\\n- LDAP authentication configured\\n- `admin`\"\n          }\n        },\n        \"_type\": \"Group\",\n        \"avatar\": \"http://DtvxOkegs.jpmzuv7DEQSZc\",\n        \"id\": 9565,\n        \"name\": \"string\",\n        \"createdAt\": \"1967-10-06T20:54:11.999Z\",\n        \"updatedAt\": \"1969-03-16T12:53:57.896Z\",\n        \"login\": \"string\",\n        \"firstName\": \"string\",\n        \"lastName\": \"string\",\n        \"email\": \"string\",\n        \"admin\": true,\n        \"status\": \"string\",\n        \"language\": \"string\",\n        \"identityUrl\": \"string\",\n        \"customField96488377\": false\n      },\n      {\n        \"_links\": {\n          \"self\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"memberships\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"showUser\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"A relative path to show the user in the web application.\\n\\n# Condition\\n\\n- User is not a new record\\n- User is not `locked`\"\n          },\n          \"updateImmediately\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"A link to update the user resource.\\n\\n# Conditions\\n\\n- `admin`\"\n          },\n          \"lock\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"Restrict the user from logging in and performing any actions.\\n\\n# Conditions\\n\\n- User is not locked\\n- `admin`\"\n          },\n          \"unlock\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"Allow a locked user to login and act again.\\n\\n# Conditions\\n\\n- User is not locked\\n- `admin`\"\n          },\n          \"delete\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"Permanently remove a user from the instance\\n\\n# Conditions\\n\\neither:\\n  - `admin`\\n  - Setting `users_deletable_by_admin` is set\\nor:\\n  - User is self\\n  - Setting `users_deletable_by_self` is set\"\n          },\n          \"authSource\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"Permanently remove a user from the instance\\n\\n# Conditions\\n\\n- LDAP authentication configured\\n- `admin`\"\n          }\n        },\n        \"_type\": \"User\",\n        \"avatar\": \"http://qXqlxpXfBByUgkZeFmzucNgpCjjwAD.lcsLsJRum,gbLYUYsIDstKDo2wKcw3yI,m,fEQ,I,It1Xsbv98\",\n        \"id\": 1893,\n        \"name\": \"string\",\n        \"createdAt\": \"2002-09-17T07:01:30.885Z\",\n        \"updatedAt\": \"1988-06-19T19:15:55.188Z\",\n        \"login\": \"string\",\n        \"firstName\": \"string\",\n        \"lastName\": \"string\",\n        \"email\": \"string\",\n        \"admin\": true,\n        \"status\": \"string\",\n        \"language\": \"string\",\n        \"identityUrl\": \"string\",\n        \"customField816\": 2292.4363612745547\n      }\n    ]\n  },\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"memberships\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"members\": [\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      },\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      }\n    ],\n    \"delete\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"updateImmediately\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    }\n  },\n  \"_type\": \"User\",\n  \"id\": 1425,\n  \"name\": \"string\",\n  \"createdAt\": \"1950-06-27T00:01:37.387Z\",\n  \"updatedAt\": \"1956-12-13T21:44:54.667Z\",\n  \"customField99172\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "5360ce4f-b387-47dd-a8b9-c6c5f676c7b0",
+              "name": "Occurs when the client did not send a valid JSON object in the request body.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "groups",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Group id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\",\n  \"_links\": {\n    \"members\": [\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      },\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      }\n    ]\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:InvalidRequestBody\",\n  \"message\": \"The request body was not a single JSON object.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "4f68493f-82f9-429b-a908-438220c84766",
+              "name": "Returned if the client does not have sufficient permissions.\n\n**Required permission:** Administrator",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "groups",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Group id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\",\n  \"_links\": {\n    \"members\": [\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      },\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      }\n    ]\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:MissingPermission\",\n  \"message\": \"You are not authorized to access this resource.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "7d3c7026-72e2-4a0d-9bcf-1aadd5ef6eea",
+              "name": "Returned if the group does not exist or the client does not have sufficient permissions\nto see it.\n\n**Required permission** If the user has the *manage members* permission in at least one project the user will be able to query all groups. If not, the user\nwill be able to query all groups which are members in projects, he has the *view members* permission in.\n\n*Note: A client without sufficient permissions shall not be able to test for the existence of\na version. That's why a 404 is returned here, even if a 403 might be more appropriate.*",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "groups",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Group id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\",\n  \"_links\": {\n    \"members\": [\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      },\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      }\n    ]\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:NotFound\",\n  \"message\": \"The requested resource could not be found.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "e751257d-f780-4ca3-9872-ca4a84495bfa",
+              "name": "Occurs when the client did not send a Content-Type header",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "groups",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Group id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "text/plain"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\",\n  \"_links\": {\n    \"members\": [\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      },\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      }\n    ]\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Acceptable",
+              "code": 406,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "Missing content-type header",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "1d567036-f6d5-4c4c-8950-338839f17aa7",
+              "name": "Occurs when the client sends an unsupported Content-Type header.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "groups",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Group id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\",\n  \"_links\": {\n    \"members\": [\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      },\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      }\n    ]\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unsupported Media Type",
+              "code": 415,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:TypeNotSupported\",\n  \"message\": \"Expected CONTENT-TYPE to be (expected value) but got (actual value).\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "3b552c7b-29c2-456a-bfeb-e5f7167bceb1",
+              "name": "Returned if:\n\n* a constraint for a property was violated (`PropertyConstraintViolation`)",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "groups",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Group id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\",\n  \"_links\": {\n    \"members\": [\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      },\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      }\n    ]\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
+              "code": 422,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_embedded\": {\n    \"details\": {\n      \"attribute\": \"members\"\n    }\n  },\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:PropertyConstraintViolation\",\n  \"message\": \"Member is already taken.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://qa.openproject-edge.com",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {
+        "key": "username",
+        "value": "{{basicAuthUsername}}"
+      },
+      {
+        "key": "password",
+        "value": "{{basicAuthPassword}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "be700b09-0b22-4bd7-8591-2b6ee8dee01f",
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Groups API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "You're looking at the current **stable** documentation of the OpenProject APIv3. If you're interested in the current\ndevelopment version, please go to [github.com/opf](https://github.com/opf/openproject/tree/dev/docs/api/apiv3).\n\n## Introduction\n\nThe documentation for the APIv3 is written according to the [OpenAPI 3.1 Specification](https://swagger.io/specification/).\nYou can either view the static version of this documentation on the [website](https://www.openproject.org/docs/api/introduction/)\nor the interactive version, rendered with [OpenAPI Explorer](https://github.com/Rhosys/openapi-explorer/blob/main/README.md),\nin your OpenProject installation under `/api/docs`.\nIn the latter you can try out the various API endpoints directly interacting with our OpenProject data.\nMoreover you can access the specification source itself under `/api/v3/spec.json` and `/api/v3/spec.yml`\n(e.g. [here](https://community.openproject.org/api/v3/spec.yml)).\n\nThe APIv3 is a hypermedia REST API, a shorthand for \"Hypermedia As The Engine Of Application State\" (HATEOAS).\nThis means that each endpoint of this API will have links to other resources or actions defined in the resulting body.\n\nThese related resources and actions for any given resource will be context sensitive. For example, only actions that the\nauthenticated user can take are being rendered. This can be used to dynamically identify actions that the user might take for any\ngiven response.\n\nAs an example, if you fetch a work package through the [Work Package endpoint](https://www.openproject.org/docs/api/endpoints/work-packages/), the `update` link will only\nbe present when the user you authenticated has been granted a permission to update the work package in the assigned project.\n\n## HAL+JSON\n\nHAL is a simple format that gives a consistent and easy way to hyperlink between resources in your API.\nRead more in the following specification: [https://tools.ietf.org/html/draft-kelly-json-hal-08](https://tools.ietf.org/html/draft-kelly-json-hal-08)\n\n**OpenProject API implementation of HAL+JSON format** enriches JSON and introduces a few meta properties:\n\n- `_type` - specifies the type of the resource (e.g.: WorkPackage, Project)\n- `_links` - contains all related resource and action links available for the resource\n- `_embedded` - contains all embedded objects\n\nHAL does not guarantee that embedded resources are embedded in their full representation, they might as well be\npartially represented (e.g. some properties can be left out).\nHowever in this API you have the guarantee that whenever a resource is **embedded**, it is embedded in its **full representation**.\n\n## API response structure\n\nAll API responses contain a single HAL+JSON object, even collections of objects are technically represented by\na single HAL+JSON object that itself contains its members. More details on collections can be found\nin the [Collections Section](https://www.openproject.org/docs/api/collections/).\n\n## Authentication\n\nThe API supports the following authentication schemes:\n\n* Session-based authentication\n* API tokens\n    * passed as Bearer token\n    * passed via Basic auth\n* OAuth 2.0\n    * using built-in authorization server\n    * using an external authorization server (RFC 9068)\n\nDepending on the settings of the OpenProject instance many resources can be accessed without being authenticated.\nIn case the instance requires authentication on all requests the client will receive an **HTTP 401** status code\nin response to any request.\n\nOtherwise unauthenticated clients have all the permissions of the anonymous user.\n\n### Session-based authentication\n\nThis means you have to login to OpenProject via the Web-Interface to be authenticated in the API.\nThis method is well-suited for clients acting within the browser, like the Angular-Client built into OpenProject.\n\nIn this case, you always need to pass the HTTP header `X-Requested-With \"XMLHttpRequest\"` for authentication.\n\n### API token as bearer token\n\nUsers can authenticate towards the API v3 using an API token as a bearer token.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -H \"Authorization: Bearer $API_KEY\" https://community.openproject.org/api/v3/users/42\n```\n\nUsers can generate API tokens on their account page.\n\n### API token through Basic Auth\n\nAPI tokens can also be used with basic auth, using the user name `apikey` (NOT your login) and the API token as the password.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -u apikey:$API_KEY https://community.openproject.org/api/v3/users/42\n```\n\n### OAuth 2.0 authentication\n\nOpenProject allows authentication and authorization with OAuth2 with *Authorization code flow*, as well as *Client credentials* operation modes.\n\nTo get started, you first need to register an application in the OpenProject OAuth administration section of your installation.\nThis will save an entry for your application with a client unique identifier (`client_id`) and an accompanying secret key (`client_secret`).\n\nYou can then use one the following guides to perform the supported OAuth 2.0 flows:\n\n- [Authorization code flow](https://oauth.net/2/grant-types/authorization-code)\n\n- [Authorization code flow with PKCE](https://doorkeeper.gitbook.io/guides/ruby-on-rails/pkce-flow), recommended for clients unable to keep the client_secret confidential\n\n- [Client credentials](https://oauth.net/2/grant-types/client-credentials/) - Requires an application to be bound to an impersonating user for non-public access\n\n### OAuth 2.0 using an external authorization server\n\nThere is a possibility to use JSON Web Tokens (JWT) generated by an OIDC provider configured in OpenProject as a bearer token to do authenticated requests against the API.\nThe following requirements must be met:\n\n- OIDC provider must be configured in OpenProject with **jwks_uri**\n- JWT must be signed using RSA algorithm\n- JWT **iss** claim must be equal to OIDC provider **issuer**\n- JWT **aud** claim must contain the OpenProject **client ID** used at the OIDC provider\n- JWT **scope** claim must include a valid scope to access the desired API (e.g. `api_v3` for APIv3)\n- JWT must be actual (neither expired or too early to be used)\n- JWT must be passed in Authorization header like: `Authorization: Bearer {jwt}`\n- User from **sub** claim must be linked to OpenProject before (e.g. by logging in), otherwise it will be not authenticated\n\nIn more general terms, OpenProject should be compliant to [RFC 9068](https://www.rfc-editor.org/rfc/rfc9068) when validating access tokens.\n\n### Why not username and password?\n\nThe simplest way to do basic auth would be to use a user's username and password naturally.\nHowever, OpenProject already has supported API keys in the past for the API v2, though not through basic auth.\n\nUsing **username and password** directly would have some advantages:\n\n* It is intuitive for the user who then just has to provide those just as they would when logging into OpenProject.\n\n* No extra logic for token management necessary.\n\nOn the other hand using **API keys** has some advantages too, which is why we went for that:\n\n* If compromised while saved on an insecure client the user only has to regenerate the API key instead of changing their password, too.\n\n* They are naturally long and random which makes them invulnerable to dictionary attacks and harder to crack in general.\n\nMost importantly users may not actually have a password to begin with. Specifically when they have registered\nthrough an OpenID Connect provider.\n\n## Cross-Origin Resource Sharing (CORS)\n\nBy default, the OpenProject API is _not_ responding with any CORS headers.\nIf you want to allow cross-domain AJAX calls against your OpenProject instance, you need to enable CORS headers being returned.\n\nPlease see [our API settings documentation](https://www.openproject.org/docs/system-admin-guide/api-and-webhooks/) on\nhow to selectively enable CORS.\n\n## Allowed HTTP methods\n\n- `GET` - Get a single resource or collection of resources\n\n- `POST` - Create a new resource or perform\n\n- `PATCH` - Update a resource\n\n- `DELETE` - Delete a resource\n\n## Compression\n\nResponses are compressed if requested by the client. Currently [gzip](https://www.gzip.org/) and [deflate](https://tools.ietf.org/html/rfc1951)\nare supported. The client signals the desired compression by setting the [`Accept-Encoding` header](https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3).\nIf no `Accept-Encoding` header is send, `Accept-Encoding: identity` is assumed which will result in the API responding uncompressed.",
+      "type": "text/plain"
+    }
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Custom Fields API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Custom Fields",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get the custom field hierarchy items",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/custom_fields/:id/items",
+            "params": [
+              {
+                "name": "id",
+                "value": "42",
+                "type": "path",
+                "description": "The custom field's unique identifier"
+              },
+              {
+                "name": "parent",
+                "value": "1337",
+                "type": "query",
+                "description": "The identifier of the parent hierarchy item"
+              },
+              {
+                "name": "depth",
+                "value": "1",
+                "type": "query",
+                "description": "The level of hierarchy depth"
+              }
+            ]
+          },
+          "docs": "Retrieves the hierarchy of custom fields.\n\nThe hierarchy is a tree structure of hierarchy items. It is represented as a flat list of items, where each item\nhas a reference to its parent and children. The list is ordered in a depth-first manner. The first item is the\nrequested parent. If parent was unset, the root item is returned as first element.\n\nPassing the `depth` query parameter allows to limit the depth of the hierarchy. If the depth is unset, the full\nhierarchy tree is returned. If the de"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

@@ -1,0 +1,63 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Roles API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Roles",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List roles",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/roles",
+            "params": [
+              {
+                "name": "filters",
+                "value": "[{ \"unit\": { \"operator\": \"=\", \"values\": [\"system\"] }\" }]",
+                "type": "query",
+                "description": "JSON specifying filter conditions.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint.\nCurrently supported filters are:\n\n+ grantable: filters roles based on whether they are selectable for a membership\n\n+ unit: filters roles based on the unit ('project' or 'system') for which they are selectable for a membership"
+              }
+            ]
+          },
+          "docs": "List all defined roles. This includes built in roles like 'Anonymous' and 'Non member'."
+        },
+        {
+          "info": {
+            "name": "View role",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/roles/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Role id"
+              }
+            ]
+          },
+          "docs": "Fetch an individual role."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

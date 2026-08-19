@@ -1,0 +1,93 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Workspaces API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Workspaces",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Favorite Workspace",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/workspaces/:id/favorite",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Workspace id"
+              }
+            ]
+          },
+          "docs": "Adds the workspace to the current user's favorites."
+        },
+        {
+          "info": {
+            "name": "Unfavorite Workspace",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://qa.openproject-edge.com/api/v3/workspaces/:id/favorite",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Workspace id"
+              }
+            ]
+          },
+          "docs": "Removes the workspace from the current user's favorites."
+        },
+        {
+          "info": {
+            "name": "List types available in a workspace",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/workspaces/:id/types",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "ID of the workspace whose types will be listed"
+              }
+            ]
+          },
+          "docs": "This endpoint lists the types that are *available* in a given workspace."
+        },
+        {
+          "info": {
+            "name": "View workspace schema",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/workspaces/schema"
+          },
+          "docs": "View workspace schema"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

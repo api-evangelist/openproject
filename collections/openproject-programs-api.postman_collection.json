@@ -1,0 +1,1601 @@
+{
+  "item": [
+    {
+      "id": "ee0b9c29-ae58-4d14-981a-f12d72625e36",
+      "name": "Programs",
+      "description": {
+        "content": "Programs are one of the types of [workspaces](https://www.openproject.org/docs/api/endpoints/workspaces) in OpenProject structuring the information \n(e.g. work packages, wikis) into smaller sets. They are typically used to group, structure and manage projects that \ntarget similar strategic goals of the organization and belong to a portfolio. \n\nAs containers, they also control behaviour of the elements within them. One of the most important aspects of this is that programs limit permissions by having members with a certain permission set (roles) assigned to them.\n\n## Actions\n\n| Link                         | Description                                                          | Condition                                                                                    |\n|:--------------------------:  |----------------------------------------------------------------------| ---------------------------------                                                            |\n| update                       | Form endpoint that aids in updating this program                     | **Permission**: edit workspace                                                               |\n| updateImmediately            | Directly update this program                                         | **Permission**: edit workspace                                                               |\n| delete                       | Delete this program                                                  | **Permission**: admin                                                                        |\n| favor                        | Mark this program as favorited by the current user                   | **Permission**: none but login is required, only present if the program is not yet favorited |\n| disfavor                     | Mark this program as no longer favorited by the current user         | **Permission**: none but login is required, only present if the program is favorited         |\n| createWorkPackage            | Form endpoint that aids in preparing and creating a work package     | **Permission**: add work packages                                                            |\n| createWorkPackageImmediately | Directly creates a work package in the program                       | **Permission**: add work packages                                                            |\n\n## Linked Properties\n\n| Link         | Description                                                                                                     | Type          | Constraints | Supported operations |Condition                                                                                        |\n| :----------: | -------------                                                                                                   | ----          | ----------- | -------------------- |-----------------------------------------                                                        |\n| self         | This program                                                                                                    | Program       | not null    | READ                 |                                                                                                 |\n| ancestors    | Array of all ancestors of the program, down from the root node (first element) to the parent (last element).    | Collection    | not null    | READ                 | **Permission** view program on the ancestor program. Non visible programs will be omitted |\n| categories   | Categories available in this program                                                                            | Collection    | not null    | READ                 |                                                                                                 |\n| types        | Types available in this program                                                                                 | Collection    | not null    | READ                 | **Permission**: view work packages or manage types                                              |\n| versions     | Versions available in this program                                                                              | Collection    | not null    | READ                 | **Permission**: view work packages or manage versions                                           |\n| memberships  | Memberships in the program                                                                                      | Collection    | not null    | READ                 | **Permission**: view members                                                                    |\n| workPackages | Work Packages of this program                                                                                   | Collection    | not null    | READ                 |                                                                                                 |\n| parent       | Parent program of the program                                                                                   | Program       |             | READ/WRITE           | **Permission** edit workspace                                                                   |\n| status       | Denotes the status of the program, so whether the program is on track, at risk or is having trouble.            | ProgramStatus |             | READ/WRITE           | **Permission** edit workspace                                                                   |\n\nDepending on custom fields defined for programs, additional links might exist.\n\nNote, that the parent and ancestor links may contain the \"undisclosed uri\" `urn:openprogram-org:api:v3:undisclosed` in case an\nancestor program is defined but the client lacks permission to see it. See the\n[general introduction into links' properties](https://www.openproject.org/docs/api/basic-objects/#local-properties) for more information.\n\n## Local Properties\n\n| Property               | Description                                                                                         | Type              | Constraints                          | Supported operations |\n| :---------------------:| -------------                                                                                       | ----              | -----------                          | -------------------- |\n| id                     | Programs' id                                                                                        | Integer           | x > 0                                | READ/WRITE           |\n| identifier             |                                                                                                     | String            |                                      | READ/WRITE           |\n| name                   |                                                                                                     | String            |                                      | READ/WRITE           |\n| active                 | Indicates whether the program is currently active or already archived                               | Boolean           |                                      | READ/WRITE           |\n| favorited              | Indicates whether the program is favorited by the current user                                      | Boolean           |                                      | READ                 |\n| statusExplanation      | A text detailing and explaining why the program has the reported status                             | Formattable       |                                      | READ/WRITE           |\n| public                 | Indicates whether the program is accessible for everybody                                           | Boolean           |                                      | READ/WRITE           |\n| description            |                                                                                                     | Formattable       |                                      | READ/WRITE           |\n| createdAt              | Time of creation                                                                                    | DateTime          |                                      | READ                 |\n| updatedAt              | Time of the most recent change to the program                                                       | DateTime          |                                      | READ                 |\n\nDepending on custom fields defined for programs, additional properties might exist.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "e8f4fa45-84fe-4014-a14e-aa2de0eaa326",
+          "name": "List programs",
+          "request": {
+            "name": "List programs",
+            "description": {
+              "content": "Returns a collection of programs. The collection can be filtered via query parameters similar to how work packages are filtered. In addition to the provided filter, the result set is always limited to only contain programs the client is allowed to see.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "programs"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "filters",
+                  "value": "<string>",
+                  "description": "JSON specifying filter conditions.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint.\nCurrently supported filters are:\n\n+ active: based on the active property of the program\n+ ancestor: filters programs by their ancestor. A program is not considered to be its own ancestor.\n+ available_project_attributes: filters programs based on the activated project attributes.\n+ created_at: based on the time the program was created\n+ favorited: based on the favorited property of the program\n+ id: based on programs' id.\n+ latest_activity_at: based on the time the last activity was registered on a program.\n+ name_and_identifier: based on both the name and the identifier.\n+ parent_id: filters programs by their parent.\n+ principal: based on members of the program.\n+ project_phase_any: based on the project phases active in a program.\n+ project_status_code: based on status code of the program\n+ storage_id: filters programs by linked storages\n+ storage_url: filters programs by linked storages identified by the host url\n+ type_id: based on the types active in a program.\n+ user_action: based on the actions the current user has in the program.\n+ visible: based on the visibility for the user (id) provided as the filter value. This filter is useful for admins to identify the programs visible to a user.\n\nThere might also be additional filters based on the custom fields that have been configured.\n\nEach defined lifecycle step will also define a filter in this list endpoint. Given that the elements are not\nstatic but rather dynamically created on each OpenProject instance, a list cannot be provided. Those filters follow the schema:\n+ project_start_gate_[id]: a filter on a project phase's start gate active in a program. The id is the id of the phase the gate belongs to.\n+ project_finish_gate_[id]: a filter on a project phase's finish gate active in a program. The id is the id of the phase the gate belongs to.\n+ project_phase_[id]: a filter on a project phase active in a program. The id is the id of the phase queried for."
+                },
+                {
+                  "disabled": false,
+                  "key": "sortBy",
+                  "value": "<string>",
+                  "description": "JSON specifying sort criteria.\nCurrently supported orders are:\n\n+ id\n+ name\n+ typeahead (sorting by hierarchy and name)\n+ created_at\n+ public\n+ latest_activity_at\n+ required_disk_space\n\nThere might also be additional orders based on the custom fields that have been configured."
+                },
+                {
+                  "disabled": false,
+                  "key": "select",
+                  "value": "<string>",
+                  "description": "Comma separated list of properties to include."
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "04171d8b-90d5-4ee2-b740-39363b1fe938",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "programs"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "filters",
+                      "value": "[{ \"ancestor\": { \"operator\": \"=\", \"values\": [\"1\"] }\" }]"
+                    },
+                    {
+                      "key": "sortBy",
+                      "value": "[[\"id\", \"asc\"]]"
+                    },
+                    {
+                      "key": "select",
+                      "value": "total,elements/identifier,elements/name"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Collection\",\n  \"count\": 2,\n  \"total\": 2,\n  \"pageSize\": 20,\n  \"offset\": 1,\n  \"_embedded\": {\n    \"elements\": [\n      {\n        \"_hint\": \"Program resource shortened for brevity\",\n        \"id\": 1,\n        \"identifier\": \"initialprogram\",\n        \"name\": \"DeathStar construction\",\n        \"active\": true,\n        \"public\": true\n      },\n      {\n        \"_hint\": \"Program resource shortened for brevity\",\n        \"id\": 2,\n        \"identifier\": \"mysecret\",\n        \"name\": \"Palpatine's secret plan\",\n        \"active\": true,\n        \"public\": false\n      }\n    ]\n  },\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/programs?filters=%5B%5D&offset=1&pageSize=20\"\n    },\n    \"jumpTo\": {\n      \"href\": \"/api/v3/programs?filters=%5B%5D&offset=%7Boffset%7D&pageSize=20\",\n      \"templated\": true\n    },\n    \"changeSize\": {\n      \"href\": \"/api/v3/programs?filters=%5B%5D&offset=1&pageSize=%7Bsize%7D\",\n      \"templated\": true\n    },\n    \"representations\": [\n      {\n        \"href\": \"/programs.csv?filters=%5B%5D&offset=1&pageSize=20\",\n        \"identifier\": \"csv\",\n        \"type\": \"text/csv\",\n        \"title\": \"CSV\"\n      },\n      {\n        \"href\": \"/programs.xls?filters=%5B%5D&offset=1&pageSize=20\",\n        \"identifier\": \"xls\",\n        \"type\": \"application/vnd.ms-excel\",\n        \"title\": \"XLS\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b3893e13-c458-468b-b86f-6972e70b992c",
+              "name": "Returned if the client sends invalid request parameters e.g. filters",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "programs"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "filters",
+                      "value": "[{ \"ancestor\": { \"operator\": \"=\", \"values\": [\"1\"] }\" }]"
+                    },
+                    {
+                      "key": "sortBy",
+                      "value": "[[\"id\", \"asc\"]]"
+                    },
+                    {
+                      "key": "select",
+                      "value": "total,elements/identifier,elements/name"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:InvalidQuery\",\n  \"message\": \"Filters Invalid filter does not exist.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "183dd10f-b2ec-4f51-9f96-7d7af64dbaac",
+          "name": "View program",
+          "request": {
+            "name": "View program",
+            "description": {
+              "content": "",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "programs",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<integer>",
+                  "key": "id",
+                  "description": "(Required) Program id"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "ccfba0ac-bcb8-4fcc-9e9e-0c5e14c8d9e7",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "programs",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Program id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Program\",\n  \"id\": 9746,\n  \"identifier\": \"string\",\n  \"name\": \"string\",\n  \"active\": false,\n  \"favorited\": false,\n  \"statusExplanation\": {\n    \"format\": \"markdown\",\n    \"raw\": \"I am formatted!\",\n    \"html\": \"I am formatted!\"\n  },\n  \"public\": false,\n  \"description\": {\n    \"format\": \"markdown\",\n    \"raw\": \"I am formatted!\",\n    \"html\": \"I am formatted!\"\n  },\n  \"createdAt\": \"2006-05-20T23:54:40.862Z\",\n  \"updatedAt\": \"1983-12-31T02:47:43.240Z\",\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"categories\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"update\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"updateImmediately\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"delete\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"favor\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"disfavor\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"createWorkPackage\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"createWorkPackageImmediately\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"types\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"versions\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"memberships\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"workPackages\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"parent\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"status\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"storages\": [\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      },\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      }\n    ],\n    \"projectStorages\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"ancestors\": [\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      },\n      {\n        \"href\": \"/api/v3/work_packages\",\n        \"method\": \"POST\"\n      }\n    ]\n  },\n  \"customField43597095\": 2365.9532767900414,\n  \"customComment66\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "8f226cbd-d5db-405a-8f0c-212fad6e69ee",
+              "name": "Returned if the program does not exist or the client does not have sufficient permissions\nto see it.\n\n**Required permission:** any permission in the program\n\n*Note: A client without sufficient permissions shall not be able to test for the existence of a program.\nThat's why a 404 is returned here, even if a 403 might be more appropriate.*",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "programs",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Program id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:NotFound\",\n  \"message\": \"The requested resource could not be found.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "d37cb155-529a-41d0-8a10-3fcd7642022b",
+          "name": "Update Program",
+          "request": {
+            "name": "Update Program",
+            "description": {
+              "content": "Updates the given program by applying the attributes provided in the body.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "programs",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<integer>",
+                  "key": "id",
+                  "description": "(Required) Program id"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "PATCH",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "<object>",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "1138ea64-5051-475c-9035-1c39db7d8dbe",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "programs",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Program id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Program example\",\n  \"statusExplanation\": {\n    \"raw\": \"Everything **fine**\"\n  },\n  \"description\": {\n    \"raw\": \"Lorem **ipsum** dolor sit amet\"\n  },\n  \"customField123\": 123,\n  \"customComment123\": \"Because it is 123!\",\n  \"_links\": {\n    \"parent\": {\n      \"href\": \"/api/v3/programs/123\"\n    },\n    \"customField456\": {\n      \"href\": \"/api/v3/programs/315\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Program\",\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/programs/1\",\n      \"title\": \"Lorem\"\n    },\n    \"createWorkPackage\": {\n      \"href\": \"/api/v3/programs/1/work_packages/form\",\n      \"method\": \"post\"\n    },\n    \"createWorkPackageImmediate\": {\n      \"href\": \"/api/v3/programs/1/work_packages\",\n      \"method\": \"post\"\n    },\n    \"categories\": {\n      \"href\": \"/api/v3/programs/1/categories\"\n    },\n    \"types\": {\n      \"href\": \"/api/v3/programs/1/types\"\n    },\n    \"versions\": {\n      \"href\": \"/api/v3/programs/1/versions\"\n    },\n    \"workPackages\": {\n      \"href\": \"/api/v3/programs/1/work_packages\"\n    },\n    \"memberships\": {\n      \"href\": \"/api/v3/memberships?filters=[{\\\"project\\\":{\\\"operator\\\":\\\"=\\\",\\\"values\\\":[\\\"1\\\"]}}]\"\n    },\n    \"customField456\": {\n      \"href\": \"/api/v3/users/315\",\n      \"title\": \"A user\"\n    },\n    \"parent\": {\n      \"href\": \"/api/v3/portfolio/123\",\n      \"title\": \"Parent portfolio\"\n    },\n    \"ancestors\": [\n      {\n        \"href\": \"/api/v3/portfolios/2\",\n        \"title\": \"Root portfolio\"\n      },\n      {\n        \"href\": \"/api/v3/portfolios/12\",\n        \"title\": \"Grandparent portfolio\"\n      },\n      {\n        \"href\": \"/api/v3/portfolios/123\",\n        \"title\": \"Parent portfolio\"\n      }\n    ],\n    \"status\": {\n      \"href\": \"/api/v3/project_statuses/on_track\",\n      \"title\": \"On track\"\n    }\n  },\n  \"id\": 1,\n  \"identifier\": \"program_example\",\n  \"name\": \"Program example\",\n  \"active\": true,\n  \"public\": false,\n  \"statusExplanation\": {\n    \"format\": \"markdown\",\n    \"raw\": \"Everything **fine**\",\n    \"html\": \"<p>Everything <strong>fine</strong></p>\"\n  },\n  \"description\": {\n    \"format\": \"markdown\",\n    \"raw\": \"Lorem **ipsum** dolor sit amet\",\n    \"html\": \"<p>Lorem <strong>ipsum</strong> dolor sit amet</p>\"\n  },\n  \"createdAt\": \"2014-05-21T08:51:20.396Z\",\n  \"updatedAt\": \"2014-05-21T08:51:20.396Z\",\n  \"customField123\": 123,\n  \"customComment123\": \"Why is the value 123?\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "d9e9d2a8-311d-408d-87dd-9d853904fec9",
+              "name": "Occurs when the client did not send a valid JSON object in the request body.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "programs",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Program id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Program example\",\n  \"statusExplanation\": {\n    \"raw\": \"Everything **fine**\"\n  },\n  \"description\": {\n    \"raw\": \"Lorem **ipsum** dolor sit amet\"\n  },\n  \"customField123\": 123,\n  \"customComment123\": \"Because it is 123!\",\n  \"_links\": {\n    \"parent\": {\n      \"href\": \"/api/v3/programs/123\"\n    },\n    \"customField456\": {\n      \"href\": \"/api/v3/programs/315\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:InvalidRequestBody\",\n  \"message\": \"The request body was not a single JSON object.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "ee67ef27-69c0-4a4a-99e6-923c7001209f",
+              "name": "Returned if the client does not have sufficient permissions.\n\n**Required permission:** edit project for the program to be altered",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "programs",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Program id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Program example\",\n  \"statusExplanation\": {\n    \"raw\": \"Everything **fine**\"\n  },\n  \"description\": {\n    \"raw\": \"Lorem **ipsum** dolor sit amet\"\n  },\n  \"customField123\": 123,\n  \"customComment123\": \"Because it is 123!\",\n  \"_links\": {\n    \"parent\": {\n      \"href\": \"/api/v3/programs/123\"\n    },\n    \"customField456\": {\n      \"href\": \"/api/v3/programs/315\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:MissingPermission\",\n  \"message\": \"You are not authorized to access this resource.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "e0897eff-ec5a-4e63-ad73-8c8cb3b91ba6",
+              "name": "Returned if the program does not exist or the client does not have sufficient permissions\nto see it.\n\n**Required permission:** view project\n\n*Note: A client without sufficient permissions shall not be able to test for the existence of\na version. That's why a 404 is returned here, even if a 403 might be more appropriate.*",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "programs",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Program id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Program example\",\n  \"statusExplanation\": {\n    \"raw\": \"Everything **fine**\"\n  },\n  \"description\": {\n    \"raw\": \"Lorem **ipsum** dolor sit amet\"\n  },\n  \"customField123\": 123,\n  \"customComment123\": \"Because it is 123!\",\n  \"_links\": {\n    \"parent\": {\n      \"href\": \"/api/v3/programs/123\"\n    },\n    \"customField456\": {\n      \"href\": \"/api/v3/programs/315\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:NotFound\",\n  \"message\": \"The requested resource could not be found.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b59a4829-8d66-43b6-95e6-8dda539f7569",
+              "name": "Occurs when the client did not send a Content-Type header",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "programs",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Program id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "text/plain"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Program example\",\n  \"statusExplanation\": {\n    \"raw\": \"Everything **fine**\"\n  },\n  \"description\": {\n    \"raw\": \"Lorem **ipsum** dolor sit amet\"\n  },\n  \"customField123\": 123,\n  \"customComment123\": \"Because it is 123!\",\n  \"_links\": {\n    \"parent\": {\n      \"href\": \"/api/v3/programs/123\"\n    },\n    \"customField456\": {\n      \"href\": \"/api/v3/programs/315\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Acceptable",
+              "code": 406,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "Missing content-type header",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "a78f5df4-69d7-4046-9997-23f08d68ed57",
+              "name": "Occurs when the client sends an unsupported Content-Type header.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "programs",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Program id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Program example\",\n  \"statusExplanation\": {\n    \"raw\": \"Everything **fine**\"\n  },\n  \"description\": {\n    \"raw\": \"Lorem **ipsum** dolor sit amet\"\n  },\n  \"customField123\": 123,\n  \"customComment123\": \"Because it is 123!\",\n  \"_links\": {\n    \"parent\": {\n      \"href\": \"/api/v3/programs/123\"\n    },\n    \"customField456\": {\n      \"href\": \"/api/v3/programs/315\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unsupported Media Type",
+              "code": 415,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:TypeNotSupported\",\n  \"message\": \"Expected CONTENT-TYPE to be (expected value) but got (actual value).\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "4658ef0a-cfc3-4f5d-9749-d66c24d01366",
+              "name": "Returned if:\n\n* a constraint for a property was violated (`PropertyConstraintViolation`)",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "programs",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Program id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Program example\",\n  \"statusExplanation\": {\n    \"raw\": \"Everything **fine**\"\n  },\n  \"description\": {\n    \"raw\": \"Lorem **ipsum** dolor sit amet\"\n  },\n  \"customField123\": 123,\n  \"customComment123\": \"Because it is 123!\",\n  \"_links\": {\n    \"parent\": {\n      \"href\": \"/api/v3/programs/123\"\n    },\n    \"customField456\": {\n      \"href\": \"/api/v3/programs/315\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
+              "code": 422,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_embedded\": {\n    \"details\": {\n      \"attribute\": \"name\"\n    }\n  },\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:PropertyConstraintViolation\",\n  \"message\": \"Name can't be blank.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "6bf0b8b8-5773-4bd0-982e-5e1f7728bfd8",
+          "name": "Delete Program",
+          "request": {
+            "name": "Delete Program",
+            "description": {
+              "content": "Deletes the program permanently. As this is a lengthy process, the actual deletion is carried out asynchronously.\nSo the program might exist well after the request has returned successfully. To prevent unwanted changes to\nthe program scheduled for deletion, it is archived at once.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "programs",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<integer>",
+                  "key": "id",
+                  "description": "(Required) Program id"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "DELETE",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "cdb36c04-ad06-4643-bdc2-6179a8d49394",
+              "name": "Returned if the program was successfully deleted. There is currently no endpoint to query for the actual deletion status.\nSuch an endpoint _might_ be added in the future.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "programs",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Program id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "No Content",
+              "code": 204,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "609c928f-1105-440c-b856-804d1a5d85d0",
+              "name": "Returned if the client does not have sufficient permissions.\n\n**Required permission:** admin",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "programs",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Program id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:MissingPermission\",\n  \"message\": \"You are not authorized to access this resource.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "57b612a7-7746-4b0b-bed0-6efa5b8cc374",
+              "name": "Returned if the program does not exist or the client does not have sufficient permissions\nto see it.\n\n**Required permission:** any permission in the program\n\n*Note: A client without sufficient permissions shall not be able to test for the existence of\na version. That's why a 404 is returned here, even if a 403 might be more appropriate.*",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "programs",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Program id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:NotFound\",\n  \"message\": \"The requested resource could not be found.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "a6647ce8-f8a2-4dac-82c8-5200e98a3995",
+              "name": "Occurs when the client did not send a Content-Type header",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "programs",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Program id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "text/plain"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Not Acceptable",
+              "code": 406,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "Missing content-type header",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "a431a1d3-fa8f-411a-9dc0-7d399e61c840",
+              "name": "Occurs when the client sends an unsupported Content-Type header.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "programs",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Program id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Unsupported Media Type",
+              "code": 415,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:TypeNotSupported\",\n  \"message\": \"Expected CONTENT-TYPE to be (expected value) but got (actual value).\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "62784991-0626-44b9-8cc9-b1780d94a9af",
+              "name": "Returned if the program cannot be deleted. This can happen when there are still references to the program in other workspaces\nthat need to be severed at first.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "programs",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Program id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
+              "code": 422,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_embedded\": {\n    \"details\": {\n      \"attribute\": \"base\"\n    }\n  },\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:PropertyConstraintViolation\",\n  \"message\": \"Work packages in non descendant projects reference versions of the program or its descendants.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "16a63e37-274f-4d48-aebc-121c1d45bd39",
+          "name": "Program update form",
+          "request": {
+            "name": "Program update form",
+            "description": {
+              "content": "",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "programs",
+                ":id",
+                "form"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<integer>",
+                  "key": "id",
+                  "description": "(Required) Program id"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "<object>",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "d7fac8ef-a335-4b76-869a-de845c82fc08",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "programs",
+                    ":id",
+                    "form"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Program id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Program example\",\n  \"statusExplanation\": {\n    \"raw\": \"Everything **fine**\"\n  },\n  \"description\": {\n    \"raw\": \"Lorem **ipsum** dolor sit amet\"\n  },\n  \"customField123\": 123,\n  \"customComment123\": \"Because it is 123!\",\n  \"_links\": {\n    \"parent\": {\n      \"href\": \"/api/v3/programs/123\"\n    },\n    \"customField456\": {\n      \"href\": \"/api/v3/programs/315\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "af43d84b-d197-4e9c-9483-d44e1d1817a4",
+              "name": "Occurs when the client did not send a valid JSON object in the request body.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "programs",
+                    ":id",
+                    "form"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Program id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Program example\",\n  \"statusExplanation\": {\n    \"raw\": \"Everything **fine**\"\n  },\n  \"description\": {\n    \"raw\": \"Lorem **ipsum** dolor sit amet\"\n  },\n  \"customField123\": 123,\n  \"customComment123\": \"Because it is 123!\",\n  \"_links\": {\n    \"parent\": {\n      \"href\": \"/api/v3/programs/123\"\n    },\n    \"customField456\": {\n      \"href\": \"/api/v3/programs/315\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:InvalidRequestBody\",\n  \"message\": \"The request body was not a single JSON object.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "98e16ef0-79b7-4464-a79b-677e2138ed50",
+              "name": "Returned if the client does not have sufficient permissions.\n\n**Required permission:** edit workspace in the program",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "programs",
+                    ":id",
+                    "form"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Program id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Program example\",\n  \"statusExplanation\": {\n    \"raw\": \"Everything **fine**\"\n  },\n  \"description\": {\n    \"raw\": \"Lorem **ipsum** dolor sit amet\"\n  },\n  \"customField123\": 123,\n  \"customComment123\": \"Because it is 123!\",\n  \"_links\": {\n    \"parent\": {\n      \"href\": \"/api/v3/programs/123\"\n    },\n    \"customField456\": {\n      \"href\": \"/api/v3/programs/315\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:MissingPermission\",\n  \"message\": \"You are not authorized to access this resource.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "88fb39c4-4520-43e1-b7f5-6d36923d956a",
+              "name": "Occurs when the client did not send a Content-Type header",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "programs",
+                    ":id",
+                    "form"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Program id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "text/plain"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Program example\",\n  \"statusExplanation\": {\n    \"raw\": \"Everything **fine**\"\n  },\n  \"description\": {\n    \"raw\": \"Lorem **ipsum** dolor sit amet\"\n  },\n  \"customField123\": 123,\n  \"customComment123\": \"Because it is 123!\",\n  \"_links\": {\n    \"parent\": {\n      \"href\": \"/api/v3/programs/123\"\n    },\n    \"customField456\": {\n      \"href\": \"/api/v3/programs/315\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Acceptable",
+              "code": 406,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "Missing content-type header",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "7ec65f9e-a155-435c-af80-8db1af1f2ab8",
+              "name": "Occurs when the client sends an unsupported Content-Type header.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "programs",
+                    ":id",
+                    "form"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Program id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Program example\",\n  \"statusExplanation\": {\n    \"raw\": \"Everything **fine**\"\n  },\n  \"description\": {\n    \"raw\": \"Lorem **ipsum** dolor sit amet\"\n  },\n  \"customField123\": 123,\n  \"customComment123\": \"Because it is 123!\",\n  \"_links\": {\n    \"parent\": {\n      \"href\": \"/api/v3/programs/123\"\n    },\n    \"customField456\": {\n      \"href\": \"/api/v3/programs/315\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unsupported Media Type",
+              "code": 415,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:TypeNotSupported\",\n  \"message\": \"Expected CONTENT-TYPE to be (expected value) but got (actual value).\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://qa.openproject-edge.com",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {
+        "key": "username",
+        "value": "{{basicAuthUsername}}"
+      },
+      {
+        "key": "password",
+        "value": "{{basicAuthPassword}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "a0b96f72-eef8-4a44-93c3-ddc947651c00",
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Programs API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "You're looking at the current **stable** documentation of the OpenProject APIv3. If you're interested in the current\ndevelopment version, please go to [github.com/opf](https://github.com/opf/openproject/tree/dev/docs/api/apiv3).\n\n## Introduction\n\nThe documentation for the APIv3 is written according to the [OpenAPI 3.1 Specification](https://swagger.io/specification/).\nYou can either view the static version of this documentation on the [website](https://www.openproject.org/docs/api/introduction/)\nor the interactive version, rendered with [OpenAPI Explorer](https://github.com/Rhosys/openapi-explorer/blob/main/README.md),\nin your OpenProject installation under `/api/docs`.\nIn the latter you can try out the various API endpoints directly interacting with our OpenProject data.\nMoreover you can access the specification source itself under `/api/v3/spec.json` and `/api/v3/spec.yml`\n(e.g. [here](https://community.openproject.org/api/v3/spec.yml)).\n\nThe APIv3 is a hypermedia REST API, a shorthand for \"Hypermedia As The Engine Of Application State\" (HATEOAS).\nThis means that each endpoint of this API will have links to other resources or actions defined in the resulting body.\n\nThese related resources and actions for any given resource will be context sensitive. For example, only actions that the\nauthenticated user can take are being rendered. This can be used to dynamically identify actions that the user might take for any\ngiven response.\n\nAs an example, if you fetch a work package through the [Work Package endpoint](https://www.openproject.org/docs/api/endpoints/work-packages/), the `update` link will only\nbe present when the user you authenticated has been granted a permission to update the work package in the assigned project.\n\n## HAL+JSON\n\nHAL is a simple format that gives a consistent and easy way to hyperlink between resources in your API.\nRead more in the following specification: [https://tools.ietf.org/html/draft-kelly-json-hal-08](https://tools.ietf.org/html/draft-kelly-json-hal-08)\n\n**OpenProject API implementation of HAL+JSON format** enriches JSON and introduces a few meta properties:\n\n- `_type` - specifies the type of the resource (e.g.: WorkPackage, Project)\n- `_links` - contains all related resource and action links available for the resource\n- `_embedded` - contains all embedded objects\n\nHAL does not guarantee that embedded resources are embedded in their full representation, they might as well be\npartially represented (e.g. some properties can be left out).\nHowever in this API you have the guarantee that whenever a resource is **embedded**, it is embedded in its **full representation**.\n\n## API response structure\n\nAll API responses contain a single HAL+JSON object, even collections of objects are technically represented by\na single HAL+JSON object that itself contains its members. More details on collections can be found\nin the [Collections Section](https://www.openproject.org/docs/api/collections/).\n\n## Authentication\n\nThe API supports the following authentication schemes:\n\n* Session-based authentication\n* API tokens\n    * passed as Bearer token\n    * passed via Basic auth\n* OAuth 2.0\n    * using built-in authorization server\n    * using an external authorization server (RFC 9068)\n\nDepending on the settings of the OpenProject instance many resources can be accessed without being authenticated.\nIn case the instance requires authentication on all requests the client will receive an **HTTP 401** status code\nin response to any request.\n\nOtherwise unauthenticated clients have all the permissions of the anonymous user.\n\n### Session-based authentication\n\nThis means you have to login to OpenProject via the Web-Interface to be authenticated in the API.\nThis method is well-suited for clients acting within the browser, like the Angular-Client built into OpenProject.\n\nIn this case, you always need to pass the HTTP header `X-Requested-With \"XMLHttpRequest\"` for authentication.\n\n### API token as bearer token\n\nUsers can authenticate towards the API v3 using an API token as a bearer token.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -H \"Authorization: Bearer $API_KEY\" https://community.openproject.org/api/v3/users/42\n```\n\nUsers can generate API tokens on their account page.\n\n### API token through Basic Auth\n\nAPI tokens can also be used with basic auth, using the user name `apikey` (NOT your login) and the API token as the password.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -u apikey:$API_KEY https://community.openproject.org/api/v3/users/42\n```\n\n### OAuth 2.0 authentication\n\nOpenProject allows authentication and authorization with OAuth2 with *Authorization code flow*, as well as *Client credentials* operation modes.\n\nTo get started, you first need to register an application in the OpenProject OAuth administration section of your installation.\nThis will save an entry for your application with a client unique identifier (`client_id`) and an accompanying secret key (`client_secret`).\n\nYou can then use one the following guides to perform the supported OAuth 2.0 flows:\n\n- [Authorization code flow](https://oauth.net/2/grant-types/authorization-code)\n\n- [Authorization code flow with PKCE](https://doorkeeper.gitbook.io/guides/ruby-on-rails/pkce-flow), recommended for clients unable to keep the client_secret confidential\n\n- [Client credentials](https://oauth.net/2/grant-types/client-credentials/) - Requires an application to be bound to an impersonating user for non-public access\n\n### OAuth 2.0 using an external authorization server\n\nThere is a possibility to use JSON Web Tokens (JWT) generated by an OIDC provider configured in OpenProject as a bearer token to do authenticated requests against the API.\nThe following requirements must be met:\n\n- OIDC provider must be configured in OpenProject with **jwks_uri**\n- JWT must be signed using RSA algorithm\n- JWT **iss** claim must be equal to OIDC provider **issuer**\n- JWT **aud** claim must contain the OpenProject **client ID** used at the OIDC provider\n- JWT **scope** claim must include a valid scope to access the desired API (e.g. `api_v3` for APIv3)\n- JWT must be actual (neither expired or too early to be used)\n- JWT must be passed in Authorization header like: `Authorization: Bearer {jwt}`\n- User from **sub** claim must be linked to OpenProject before (e.g. by logging in), otherwise it will be not authenticated\n\nIn more general terms, OpenProject should be compliant to [RFC 9068](https://www.rfc-editor.org/rfc/rfc9068) when validating access tokens.\n\n### Why not username and password?\n\nThe simplest way to do basic auth would be to use a user's username and password naturally.\nHowever, OpenProject already has supported API keys in the past for the API v2, though not through basic auth.\n\nUsing **username and password** directly would have some advantages:\n\n* It is intuitive for the user who then just has to provide those just as they would when logging into OpenProject.\n\n* No extra logic for token management necessary.\n\nOn the other hand using **API keys** has some advantages too, which is why we went for that:\n\n* If compromised while saved on an insecure client the user only has to regenerate the API key instead of changing their password, too.\n\n* They are naturally long and random which makes them invulnerable to dictionary attacks and harder to crack in general.\n\nMost importantly users may not actually have a password to begin with. Specifically when they have registered\nthrough an OpenID Connect provider.\n\n## Cross-Origin Resource Sharing (CORS)\n\nBy default, the OpenProject API is _not_ responding with any CORS headers.\nIf you want to allow cross-domain AJAX calls against your OpenProject instance, you need to enable CORS headers being returned.\n\nPlease see [our API settings documentation](https://www.openproject.org/docs/system-admin-guide/api-and-webhooks/) on\nhow to selectively enable CORS.\n\n## Allowed HTTP methods\n\n- `GET` - Get a single resource or collection of resources\n\n- `POST` - Create a new resource or perform\n\n- `PATCH` - Update a resource\n\n- `DELETE` - Delete a resource\n\n## Compression\n\nResponses are compressed if requested by the client. Currently [gzip](https://www.gzip.org/) and [deflate](https://tools.ietf.org/html/rfc1951)\nare supported. The client signals the desired compression by setting the [`Accept-Encoding` header](https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3).\nIf no `Accept-Encoding` header is send, `Accept-Encoding: identity` is assumed which will result in the API responding uncompressed.",
+      "type": "text/plain"
+    }
+  }
+}

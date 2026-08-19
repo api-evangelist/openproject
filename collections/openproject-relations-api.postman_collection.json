@@ -1,0 +1,1601 @@
+{
+  "item": [
+    {
+      "id": "c3778420-6f58-4062-93be-08ac1d49d85f",
+      "name": "Relations",
+      "description": {
+        "content": "Work packages may be related to each other in different ways.\n\n```\n+--------------+                            +--------------+\n|              | 1                        1 |              |\n| Work package +-------------+--------------+ Work package |\n|              | from        |           to |              |\n+--------------+             |              +--------------+\n                      +------+-------+\n                      |   Relation   |\n                      +--------------+\n                      | type         |\n                      | reverseType  |\n                      | description  |\n                      | lag        |\n                      +--------------+\n```\n\n## Actions\n\n| Link                | Description                                                          | Condition                                     |\n|:-------------------:| -------------------------------------------------------------------- | --------------------------------------------- |\n| update              | Updates the relation between two work packages via a form            | **Permission**: manage work package relations |\n| updateImmediately   | Updates the relation between two work packages                       | **Permission**: manage work package relations |\n| delete              | Destroys the relation between the two work packages                  | **Permission**: manage work package relations |\n\n## Linked Properties\n\n| Link          | Description                           | Type          | Constraints | Supported operations | Condition                                     |\n|:-------------:|-------------------------------------- | ------------- | ----------- | -------------------- | --------------------------------------------- |\n| self          | This relation                         | Relation      | not null    | READ                 | **Permission**: view work packages            |\n| schema        | The schema of this relation           | Schema        | not null    | READ                 |                                               |\n| from          | The emanating work package            | WorkPackage   | not null    | READ                 | **Permission**: view work packages            |\n| to            | The work package the relation ends in | WorkPackage   | not null    | READ                 | **Permission**: view work packages            |\n\n## Local Properties\n\n| Property         | Description                                                   | Type    | Constraints                                                                                                   | Supported operations |\n| :---------------:| ------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------- | -------------------- |\n| id               | Relation ID                                                   | Integer | x > 0                                                                                                         | READ                 |\n| name             | The internationalized name of this kind of relation           | String  |                                                                                                               | READ\n| type             | Which kind of relation (blocks, precedes, etc.)               | String  | in: relates, duplicates, duplicated, blocks, blocked, precedes, follows, includes, partof, requires, required | READ / WRITE         |\n| reverseType      | The kind of relation from the other WP's perspective          | String  | in: relates, duplicates, duplicated, blocks, blocked, precedes, follows, includes, partof, requires, required | READ                 |\n| description      | Short text further describing the relation                    | String  |                                                                                                               | READ / WRITE         |\n| lag*             | The number of days between closing of `from` and start of `to`| Integer | x >= 0                                                                                                        | READ / WRITE         |\n\n\\* Only applicable for some relation types such as \"follows\". You can check using the relation by schema\nendpoint at `/api/v3/relations/schema/{type}`.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "876e891d-1e34-4210-940b-189a7d3a3753",
+          "name": "List Relations",
+          "request": {
+            "name": "List Relations",
+            "description": {
+              "content": "Lists all relations according to the given (optional, logically conjunctive) filters and ordered by ID.\nThe response only includes relations between work packages which the user is allowed to see.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "relations"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "filters",
+                  "value": "<string>",
+                  "description": "JSON specifying filter conditions. Accepts the same format as returned by\nthe [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint. Valid fields to filter by are:\n\n- id - ID of relation\n- from - ID of work package from which the filtered relations emanates.\n- to - ID of work package to which this related points.\n- involved - ID of either the `from` or the `to` work package.\n- type - The type of relation to filter by, e.g. \"follows\"."
+                },
+                {
+                  "disabled": false,
+                  "key": "sortBy",
+                  "value": "<string>",
+                  "description": "JSON specifying sort criteria.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint."
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "2ac3394c-81df-4b04-931a-35f9db6541c4",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "relations"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "filters",
+                      "value": "[{ \"from\": { \"operator\": \"=\", \"values\": 42 }\" }]"
+                    },
+                    {
+                      "key": "sortBy",
+                      "value": "[[\"type\", \"asc\"]]"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Collection\",\n  \"total\": 40,\n  \"count\": 20,\n  \"pageSize\": 20,\n  \"offset\": 1,\n  \"_embedded\": {\n    \"elements\": [\n      {\n        \"_type\": \"Relation\",\n        \"id\": 650,\n        \"name\": \"duplicated by\",\n        \"type\": \"duplicated\",\n        \"reverseType\": \"duplicates\",\n        \"lag\": null,\n        \"description\": \"Those are the same... stupid Stormtroopers!\",\n        \"_links\": {\n          \"self\": {\n            \"href\": \"/api/v3/relations/650\"\n          },\n          \"updateImmediately\": {\n            \"href\": \"/api/v3/relations/650\",\n            \"method\": \"patch\"\n          },\n          \"delete\": {\n            \"href\": \"/api/v3/relations/650\",\n            \"method\": \"delete,\",\n            \"title\": \"Remove relation\"\n          },\n          \"from\": {\n            \"href\": \"/api/v3/work_packages/108\",\n            \"title\": \"Destroy Rebel Base\"\n          },\n          \"to\": {\n            \"href\": \"/api/v3/work_packages/78\",\n            \"title\": \"Annihilate Yavin 4\"\n          }\n        }\n      },\n      {\n        \"_type\": \"Relation\",\n        \"id\": 652,\n        \"name\": \"relates to\",\n        \"type\": \"relates\",\n        \"reverseType\": \"relates\",\n        \"_hint\": \"Relation resource shortened for brevity.\"\n      },\n      {\n        \"_hint\": \"Further relation resources shortened for brevity.\"\n      }\n    ]\n  },\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/relations?filters=%5B%5D&offset=1&pageSize=20\"\n    },\n    \"jumpTo\": {\n      \"href\": \"/api/v3/relations?filters=%5B%5D&offset=%7Boffset%7D&pageSize=20\",\n      \"templated\": true\n    },\n    \"changeSize\": {\n      \"href\": \"/api/v3/relations?filters=%5B%5D&offset=1&pageSize=%7Bsize%7D\",\n      \"templated\": true\n    },\n    \"nextByOffset\": {\n      \"href\": \"/api/v3/relations?filters=%5B%5D&offset=2&pageSize=20\"\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "fc73fecd-1b60-47f0-904b-e11bd52ee7cc",
+              "name": "Returned if the client provides invalid filter parameters.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "relations"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "filters",
+                      "value": "[{ \"from\": { \"operator\": \"=\", \"values\": 42 }\" }]"
+                    },
+                    {
+                      "key": "sortBy",
+                      "value": "[[\"type\", \"asc\"]]"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:InvalidQuery\",\n  \"message\": [\n    \"Filters Type filter has invalid values.\"\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "13956747-7985-4408-8360-c90a7dad0437",
+          "name": "Get Relation",
+          "request": {
+            "name": "Get Relation",
+            "description": {
+              "content": "Get a single relation specified by its unique identifier.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "relations",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<integer>",
+                  "key": "id",
+                  "description": "(Required) Relation id"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "dd288216-7c4e-4197-91c4-ec8e366ada38",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "relations",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Relation id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Relation\",\n  \"id\": 650,\n  \"name\": \"duplicated by\",\n  \"type\": \"duplicated\",\n  \"reverseType\": \"duplicates\",\n  \"lag\": null,\n  \"description\": \"Those are the same... stupid Stormtroopers!\",\n  \"_embedded\": {\n    \"from\": {\n      \"id\": 108,\n      \"_type\": \"WorkPackage\",\n      \"_abbreviated\": \"Work package resource shortened for brevity.\"\n    },\n    \"to\": {\n      \"id\": 78,\n      \"_type\": \"WorkPackage\",\n      \"_abbreviated\": \"Work package resource shortened for brevity.\"\n    }\n  },\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/relations/650\"\n    },\n    \"updateImmediately\": {\n      \"href\": \"/api/v3/relations/650\",\n      \"method\": \"patch\"\n    },\n    \"delete\": {\n      \"href\": \"/api/v3/relations/650\",\n      \"method\": \"delete,\",\n      \"title\": \"Remove relation\"\n    },\n    \"from\": {\n      \"href\": \"/api/v3/work_packages/108\",\n      \"title\": \"Destroy Rebel Base\"\n    },\n    \"to\": {\n      \"href\": \"/api/v3/work_packages/78\",\n      \"title\": \"Annihilate Yavin 4\"\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "29790e44-f1e8-4344-a99b-f3ff81f0234f",
+              "name": "Returned if the relation does not exist or the client does not have sufficient permissions to see it.\n\n**Required permission:** view work packages for the involved work packages",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "relations",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Relation id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:NotFound\",\n  \"message\": \"The specified relation does not exist.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "0c7ab201-9ddd-4822-933b-ed5d286625e5",
+          "name": "Delete Relation",
+          "request": {
+            "name": "Delete Relation",
+            "description": {
+              "content": "Deletes the relation.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "relations",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<integer>",
+                  "key": "id",
+                  "description": "(Required) The unique identifier of the relation resource"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "DELETE",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "577fd29a-7ba5-48d6-a348-0a3d51ba61b7",
+              "name": "Returned if the relation was deleted successfully. The response body is empty.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "relations",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) The unique identifier of the relation resource"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "No Content",
+              "code": 204,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "8bd53807-cddc-4551-9deb-618e6540914c",
+              "name": "Returned if the client does not have sufficient permissions.\n\n**Required permission:** manage work package relations",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "relations",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) The unique identifier of the relation resource"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:MissingPermission\",\n  \"message\": \"You are not allowed to delete this relation.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "ebc80fce-08ca-449b-b799-d80db7c1ccd2",
+              "name": "Returned if the relation does not exist or the client does not have sufficient permissions to see it.\n\n**Required permission:** view work packages",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "relations",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) The unique identifier of the relation resource"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:NotFound\",\n  \"message\": \"The specified relation does not exist.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b1d28603-1ea1-46c7-9db8-b885a508e6d3",
+              "name": "Occurs when the client did not send a Content-Type header",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "relations",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) The unique identifier of the relation resource"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "text/plain"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Not Acceptable",
+              "code": 406,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "Missing content-type header",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "9098ecbb-7783-4d27-aa3e-6fd07f0cfab2",
+              "name": "Occurs when the client sends an unsupported Content-Type header.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "relations",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) The unique identifier of the relation resource"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Unsupported Media Type",
+              "code": 415,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:TypeNotSupported\",\n  \"message\": \"Expected CONTENT-TYPE to be (expected value) but got (actual value).\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "11056f12-e26a-4034-9ed2-8cabb4f72303",
+          "name": "Update Relation",
+          "request": {
+            "name": "Update Relation",
+            "description": {
+              "content": "When calling this endpoint the client provides a single object, containing the properties and links that it wants\nto change, in the body. It is only allowed to provide properties or links supporting the **write** operation.\n\nNote that changing the `type` of a relation invariably also changes the respective `reverseType` as well as the\n\"name\" of it. The returned Relation object will reflect that change. For instance if you change a Relation's\n`type` to \"follows\" then the `reverseType` will be changed to `precedes`.\n\nIt is not allowed to change a relation's involved work packages.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "relations",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<integer>",
+                  "key": "id",
+                  "description": "(Required) Relation ID"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "PATCH",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"_links\": {\n    \"to\": {\n      \"href\": \"<string,null>\",\n      \"title\": \"<string>\",\n      \"templated\": false,\n      \"method\": \"GET\",\n      \"payload\": \"<object>\",\n      \"identifier\": \"<string>\",\n      \"type\": \"<string>\"\n    }\n  },\n  \"type\": \"<string>\",\n  \"description\": \"<string,null>\",\n  \"lag\": \"<integer,null>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "3f2e826e-9588-442a-8db6-fc5aa9dfc265",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "relations",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Relation ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"description\": \"This is the new description.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Relation\",\n  \"id\": 650,\n  \"name\": \"duplicated by\",\n  \"type\": \"duplicated\",\n  \"reverseType\": \"duplicates\",\n  \"lag\": null,\n  \"description\": \"Those are the same... stupid Stormtroopers!\",\n  \"_embedded\": {\n    \"from\": {\n      \"id\": 108,\n      \"_type\": \"WorkPackage\",\n      \"_abbreviated\": \"Work package resource shortened for brevity.\"\n    },\n    \"to\": {\n      \"id\": 78,\n      \"_type\": \"WorkPackage\",\n      \"_abbreviated\": \"Work package resource shortened for brevity.\"\n    }\n  },\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/relations/650\"\n    },\n    \"updateImmediately\": {\n      \"href\": \"/api/v3/relations/650\",\n      \"method\": \"patch\"\n    },\n    \"delete\": {\n      \"href\": \"/api/v3/relations/650\",\n      \"method\": \"delete,\",\n      \"title\": \"Remove relation\"\n    },\n    \"from\": {\n      \"href\": \"/api/v3/work_packages/108\",\n      \"title\": \"Destroy Rebel Base\"\n    },\n    \"to\": {\n      \"href\": \"/api/v3/work_packages/78\",\n      \"title\": \"Annihilate Yavin 4\"\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "5c511d86-c647-4bc6-956d-edb8b686b6eb",
+              "name": "Occurs when the client did not send a valid JSON object in the request body.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "relations",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Relation ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"description\": \"This is the new description.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:InvalidRequestBody\",\n  \"message\": \"The request body was not a single JSON object.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "931f9a4a-e359-4488-a261-a3bfa68024cc",
+              "name": "Returned if the relation does not exist or the client does not have sufficient permissions to see it.\n\n**Required permission:** view work packages",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "relations",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Relation ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"description\": \"This is the new description.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:NotFound\",\n  \"message\": \"The specified relation does not exist.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "668e60f1-4196-4bfb-bb30-05a45db15479",
+              "name": "Occurs when the client did not send a Content-Type header",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "relations",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Relation ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "text/plain"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"description\": \"This is the new description.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Acceptable",
+              "code": 406,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "Missing content-type header",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "6898d57b-51e7-45a5-bdb1-8df8209b5498",
+              "name": "Occurs when the client sends an unsupported Content-Type header.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "relations",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Relation ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"description\": \"This is the new description.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unsupported Media Type",
+              "code": 415,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:TypeNotSupported\",\n  \"message\": \"Expected CONTENT-TYPE to be (expected value) but got (actual value).\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "09d53918-d6ae-4983-9bd0-577dd9bc4334",
+              "name": "Returned if:\n\n- the client tries to modify a read-only property (`PropertyIsReadOnly`)\n- a constraint for a property was violated (`PropertyConstraintViolation`)\n- the client provides a link to an invalid resource (`ResourceTypeMismatch`) or a\n  work package that does not exist or for which the client does not have sufficient permissions\n  to see it (**required permissions**: `view work packages` for the involved work packages).",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "relations",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Relation ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"description\": \"This is the new description.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
+              "code": 422,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_embedded\": {\n    \"details\": {\n      \"attribute\": \"lag\"\n    }\n  },\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:PropertyConstraintViolation\",\n  \"message\": \"Lag must be a number greater than or equal to 0\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "cae79112-e067-4018-a20d-f920f252bf23",
+          "name": "Create relation",
+          "request": {
+            "name": "Create relation",
+            "description": {
+              "content": "Create a work package relation on the given work package. A successful creation will result in a relation between\ntwo work packages, thus appearing on both involved work package resources.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "work_packages",
+                ":id",
+                "relations"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<integer>",
+                  "key": "id",
+                  "description": "(Required) Work package id"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"_links\": {\n    \"to\": {\n      \"href\": \"<string,null>\",\n      \"title\": \"<string>\",\n      \"templated\": false,\n      \"method\": \"GET\",\n      \"payload\": \"<object>\",\n      \"identifier\": \"<string>\",\n      \"type\": \"<string>\"\n    }\n  },\n  \"type\": \"<string>\",\n  \"description\": \"<string,null>\",\n  \"lag\": \"<integer,null>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "90c428c8-e712-417f-9e70-ae0e214e3818",
+              "name": "Created",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "work_packages",
+                    ":id",
+                    "relations"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Work package id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"type\": \"follows\",\n  \"lag\": 2,\n  \"description\": \"Build hangar AFTER improving external skeleton of Death Star.\",\n  \"_links\": {\n    \"to\": {\n      \"href\": \"/api/v3/work_packages/1337\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Relation\",\n  \"id\": 650,\n  \"name\": \"duplicated by\",\n  \"type\": \"duplicated\",\n  \"reverseType\": \"duplicates\",\n  \"lag\": null,\n  \"description\": \"Those are the same... stupid Stormtroopers!\",\n  \"_embedded\": {\n    \"from\": {\n      \"id\": 108,\n      \"_type\": \"WorkPackage\",\n      \"_abbreviated\": \"Work package resource shortened for brevity.\"\n    },\n    \"to\": {\n      \"id\": 78,\n      \"_type\": \"WorkPackage\",\n      \"_abbreviated\": \"Work package resource shortened for brevity.\"\n    }\n  },\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/relations/650\"\n    },\n    \"updateImmediately\": {\n      \"href\": \"/api/v3/relations/650\",\n      \"method\": \"patch\"\n    },\n    \"delete\": {\n      \"href\": \"/api/v3/relations/650\",\n      \"method\": \"delete,\",\n      \"title\": \"Remove relation\"\n    },\n    \"from\": {\n      \"href\": \"/api/v3/work_packages/108\",\n      \"title\": \"Destroy Rebel Base\"\n    },\n    \"to\": {\n      \"href\": \"/api/v3/work_packages/78\",\n      \"title\": \"Annihilate Yavin 4\"\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "bec2845a-3148-4543-83da-9d91b2ddbce2",
+              "name": "Occurs when the client did not send a valid JSON object in the request body.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "work_packages",
+                    ":id",
+                    "relations"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Work package id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"type\": \"follows\",\n  \"lag\": 2,\n  \"description\": \"Build hangar AFTER improving external skeleton of Death Star.\",\n  \"_links\": {\n    \"to\": {\n      \"href\": \"/api/v3/work_packages/1337\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:InvalidRequestBody\",\n  \"message\": \"The request body was not a single JSON object.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "35882159-834f-4aa5-a477-ca7f80d89bc8",
+              "name": "Returned if the client does not have sufficient permissions.\n\n**Required permission:** manage work package relations",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "work_packages",
+                    ":id",
+                    "relations"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Work package id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"type\": \"follows\",\n  \"lag\": 2,\n  \"description\": \"Build hangar AFTER improving external skeleton of Death Star.\",\n  \"_links\": {\n    \"to\": {\n      \"href\": \"/api/v3/work_packages/1337\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:MissingPermission\",\n  \"message\": \"You are not allowed to create a relation.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "aa5287f3-531d-4a38-8271-8a183df9be55",
+              "name": "Occurs when the client did not send a Content-Type header",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "work_packages",
+                    ":id",
+                    "relations"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Work package id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "text/plain"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"type\": \"follows\",\n  \"lag\": 2,\n  \"description\": \"Build hangar AFTER improving external skeleton of Death Star.\",\n  \"_links\": {\n    \"to\": {\n      \"href\": \"/api/v3/work_packages/1337\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Acceptable",
+              "code": 406,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "Missing content-type header",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "5875e438-fe3f-4fcc-a5e4-58f064733819",
+              "name": "Returned if there already exists a relation between the given work packages of **any** type\nor if the relation is not allowed.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "work_packages",
+                    ":id",
+                    "relations"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Work package id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"type\": \"follows\",\n  \"lag\": 2,\n  \"description\": \"Build hangar AFTER improving external skeleton of Death Star.\",\n  \"_links\": {\n    \"to\": {\n      \"href\": \"/api/v3/work_packages/1337\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:UpdateConflict\",\n  \"message\": \"Couldn't update the resource because of conflicting modifications.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "e4a76a18-3ce1-4239-97b4-79256d26f87f",
+              "name": "Occurs when the client sends an unsupported Content-Type header.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "work_packages",
+                    ":id",
+                    "relations"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Work package id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"type\": \"follows\",\n  \"lag\": 2,\n  \"description\": \"Build hangar AFTER improving external skeleton of Death Star.\",\n  \"_links\": {\n    \"to\": {\n      \"href\": \"/api/v3/work_packages/1337\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unsupported Media Type",
+              "code": 415,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:TypeNotSupported\",\n  \"message\": \"Expected CONTENT-TYPE to be (expected value) but got (actual value).\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "33d83d45-4b80-4dd7-bea4-1f8050c082f8",
+              "name": "Returned if:\n\n- the client tries to write a read-only property (`PropertyIsReadOnly`)\n- a constraint for a property was violated (`PropertyConstraintViolation`)\n- the client provides a link to an invalid resource (`ResourceTypeMismatch`)",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "work_packages",
+                    ":id",
+                    "relations"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Work package id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"type\": \"follows\",\n  \"lag\": 2,\n  \"description\": \"Build hangar AFTER improving external skeleton of Death Star.\",\n  \"_links\": {\n    \"to\": {\n      \"href\": \"/api/v3/work_packages/1337\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
+              "code": 422,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_embedded\": {\n    \"details\": {\n      \"attribute\": \"lag\"\n    }\n  },\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:PropertyConstraintViolation\",\n  \"message\": \"Lag must be a number greater than or equal to 0\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://qa.openproject-edge.com",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {
+        "key": "username",
+        "value": "{{basicAuthUsername}}"
+      },
+      {
+        "key": "password",
+        "value": "{{basicAuthPassword}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "b7dec5ed-7152-4eb7-8c76-280b3b17c4f8",
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Relations API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "You're looking at the current **stable** documentation of the OpenProject APIv3. If you're interested in the current\ndevelopment version, please go to [github.com/opf](https://github.com/opf/openproject/tree/dev/docs/api/apiv3).\n\n## Introduction\n\nThe documentation for the APIv3 is written according to the [OpenAPI 3.1 Specification](https://swagger.io/specification/).\nYou can either view the static version of this documentation on the [website](https://www.openproject.org/docs/api/introduction/)\nor the interactive version, rendered with [OpenAPI Explorer](https://github.com/Rhosys/openapi-explorer/blob/main/README.md),\nin your OpenProject installation under `/api/docs`.\nIn the latter you can try out the various API endpoints directly interacting with our OpenProject data.\nMoreover you can access the specification source itself under `/api/v3/spec.json` and `/api/v3/spec.yml`\n(e.g. [here](https://community.openproject.org/api/v3/spec.yml)).\n\nThe APIv3 is a hypermedia REST API, a shorthand for \"Hypermedia As The Engine Of Application State\" (HATEOAS).\nThis means that each endpoint of this API will have links to other resources or actions defined in the resulting body.\n\nThese related resources and actions for any given resource will be context sensitive. For example, only actions that the\nauthenticated user can take are being rendered. This can be used to dynamically identify actions that the user might take for any\ngiven response.\n\nAs an example, if you fetch a work package through the [Work Package endpoint](https://www.openproject.org/docs/api/endpoints/work-packages/), the `update` link will only\nbe present when the user you authenticated has been granted a permission to update the work package in the assigned project.\n\n## HAL+JSON\n\nHAL is a simple format that gives a consistent and easy way to hyperlink between resources in your API.\nRead more in the following specification: [https://tools.ietf.org/html/draft-kelly-json-hal-08](https://tools.ietf.org/html/draft-kelly-json-hal-08)\n\n**OpenProject API implementation of HAL+JSON format** enriches JSON and introduces a few meta properties:\n\n- `_type` - specifies the type of the resource (e.g.: WorkPackage, Project)\n- `_links` - contains all related resource and action links available for the resource\n- `_embedded` - contains all embedded objects\n\nHAL does not guarantee that embedded resources are embedded in their full representation, they might as well be\npartially represented (e.g. some properties can be left out).\nHowever in this API you have the guarantee that whenever a resource is **embedded**, it is embedded in its **full representation**.\n\n## API response structure\n\nAll API responses contain a single HAL+JSON object, even collections of objects are technically represented by\na single HAL+JSON object that itself contains its members. More details on collections can be found\nin the [Collections Section](https://www.openproject.org/docs/api/collections/).\n\n## Authentication\n\nThe API supports the following authentication schemes:\n\n* Session-based authentication\n* API tokens\n    * passed as Bearer token\n    * passed via Basic auth\n* OAuth 2.0\n    * using built-in authorization server\n    * using an external authorization server (RFC 9068)\n\nDepending on the settings of the OpenProject instance many resources can be accessed without being authenticated.\nIn case the instance requires authentication on all requests the client will receive an **HTTP 401** status code\nin response to any request.\n\nOtherwise unauthenticated clients have all the permissions of the anonymous user.\n\n### Session-based authentication\n\nThis means you have to login to OpenProject via the Web-Interface to be authenticated in the API.\nThis method is well-suited for clients acting within the browser, like the Angular-Client built into OpenProject.\n\nIn this case, you always need to pass the HTTP header `X-Requested-With \"XMLHttpRequest\"` for authentication.\n\n### API token as bearer token\n\nUsers can authenticate towards the API v3 using an API token as a bearer token.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -H \"Authorization: Bearer $API_KEY\" https://community.openproject.org/api/v3/users/42\n```\n\nUsers can generate API tokens on their account page.\n\n### API token through Basic Auth\n\nAPI tokens can also be used with basic auth, using the user name `apikey` (NOT your login) and the API token as the password.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -u apikey:$API_KEY https://community.openproject.org/api/v3/users/42\n```\n\n### OAuth 2.0 authentication\n\nOpenProject allows authentication and authorization with OAuth2 with *Authorization code flow*, as well as *Client credentials* operation modes.\n\nTo get started, you first need to register an application in the OpenProject OAuth administration section of your installation.\nThis will save an entry for your application with a client unique identifier (`client_id`) and an accompanying secret key (`client_secret`).\n\nYou can then use one the following guides to perform the supported OAuth 2.0 flows:\n\n- [Authorization code flow](https://oauth.net/2/grant-types/authorization-code)\n\n- [Authorization code flow with PKCE](https://doorkeeper.gitbook.io/guides/ruby-on-rails/pkce-flow), recommended for clients unable to keep the client_secret confidential\n\n- [Client credentials](https://oauth.net/2/grant-types/client-credentials/) - Requires an application to be bound to an impersonating user for non-public access\n\n### OAuth 2.0 using an external authorization server\n\nThere is a possibility to use JSON Web Tokens (JWT) generated by an OIDC provider configured in OpenProject as a bearer token to do authenticated requests against the API.\nThe following requirements must be met:\n\n- OIDC provider must be configured in OpenProject with **jwks_uri**\n- JWT must be signed using RSA algorithm\n- JWT **iss** claim must be equal to OIDC provider **issuer**\n- JWT **aud** claim must contain the OpenProject **client ID** used at the OIDC provider\n- JWT **scope** claim must include a valid scope to access the desired API (e.g. `api_v3` for APIv3)\n- JWT must be actual (neither expired or too early to be used)\n- JWT must be passed in Authorization header like: `Authorization: Bearer {jwt}`\n- User from **sub** claim must be linked to OpenProject before (e.g. by logging in), otherwise it will be not authenticated\n\nIn more general terms, OpenProject should be compliant to [RFC 9068](https://www.rfc-editor.org/rfc/rfc9068) when validating access tokens.\n\n### Why not username and password?\n\nThe simplest way to do basic auth would be to use a user's username and password naturally.\nHowever, OpenProject already has supported API keys in the past for the API v2, though not through basic auth.\n\nUsing **username and password** directly would have some advantages:\n\n* It is intuitive for the user who then just has to provide those just as they would when logging into OpenProject.\n\n* No extra logic for token management necessary.\n\nOn the other hand using **API keys** has some advantages too, which is why we went for that:\n\n* If compromised while saved on an insecure client the user only has to regenerate the API key instead of changing their password, too.\n\n* They are naturally long and random which makes them invulnerable to dictionary attacks and harder to crack in general.\n\nMost importantly users may not actually have a password to begin with. Specifically when they have registered\nthrough an OpenID Connect provider.\n\n## Cross-Origin Resource Sharing (CORS)\n\nBy default, the OpenProject API is _not_ responding with any CORS headers.\nIf you want to allow cross-domain AJAX calls against your OpenProject instance, you need to enable CORS headers being returned.\n\nPlease see [our API settings documentation](https://www.openproject.org/docs/system-admin-guide/api-and-webhooks/) on\nhow to selectively enable CORS.\n\n## Allowed HTTP methods\n\n- `GET` - Get a single resource or collection of resources\n\n- `POST` - Create a new resource or perform\n\n- `PATCH` - Update a resource\n\n- `DELETE` - Delete a resource\n\n## Compression\n\nResponses are compressed if requested by the client. Currently [gzip](https://www.gzip.org/) and [deflate](https://tools.ietf.org/html/rfc1951)\nare supported. The client signals the desired compression by setting the [`Accept-Encoding` header](https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3).\nIf no `Accept-Encoding` header is send, `Accept-Encoding: identity` is assumed which will result in the API responding uncompressed.",
+      "type": "text/plain"
+    }
+  }
+}

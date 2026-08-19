@@ -1,0 +1,273 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities User Working Times API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "User Working Times",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List personal non-working times for a user",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/users/:id/non_working_times",
+            "params": [
+              {
+                "name": "id",
+                "value": "42",
+                "type": "path",
+                "description": "User id. Use `me` to reference the current user."
+              },
+              {
+                "name": "year",
+                "value": "2025",
+                "type": "query",
+                "description": "Filter results to the given year. Defaults to the current year if not provided."
+              }
+            ]
+          },
+          "docs": "Returns all personal non-working times for the given user, ordered by start date ascending.\n\nPersonal non-working times mark date ranges as non-working for a user\n(e.g., a local holiday or personal day off not covered by the system-wide non-working days).\n\n**Required permissions:**\n- Administrators can view non-working days for any user.\n- Users with the global `manage_own_working_times` permission can view their own records.\n- Users with the global `manage_working_times` permission can view non"
+        },
+        {
+          "info": {
+            "name": "Create a personal non-working day for a user",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/users/:id/non_working_times",
+            "params": [
+              {
+                "name": "id",
+                "value": "42",
+                "type": "path",
+                "description": "User id. Use `me` to reference the current user."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a personal non-working time range for the given user.\n\nThe date range must not overlap with an existing non-working time record for the same user.\n\n**Required permissions:**\n- Administrators can create non-working days for any user.\n- Users with the global `manage_own_working_times` permission can create records for themselves.\n- Users with the global `manage_working_times` permission can create non-working days for any user.\n\nUse `me` as the `id` to reference the current user."
+        },
+        {
+          "info": {
+            "name": "View a personal non-working time record",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/users/:id/non_working_times/:non_working_time_id",
+            "params": [
+              {
+                "name": "id",
+                "value": "42",
+                "type": "path",
+                "description": "User id. Use `me` to reference the current user."
+              },
+              {
+                "name": "non_working_time_id",
+                "value": "7",
+                "type": "path",
+                "description": "The id of the personal non-working time record."
+              }
+            ]
+          },
+          "docs": "Returns a single personal non-working time record for the given user.\n\n**Required permissions:**\n- Administrators can view non-working time records for any user.\n- Users with the global `manage_own_working_times` permission can view their own records.\n- Users with the global `manage_working_times` permission can view non-working time records for any user.\n\nUse `me` as the `id` to reference the current user."
+        },
+        {
+          "info": {
+            "name": "Update a personal non-working time record",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://qa.openproject-edge.com/api/v3/users/:id/non_working_times/:non_working_time_id",
+            "params": [
+              {
+                "name": "id",
+                "value": "42",
+                "type": "path",
+                "description": "User id. Use `me` to reference the current user."
+              },
+              {
+                "name": "non_working_time_id",
+                "value": "7",
+                "type": "path",
+                "description": "The id of the personal non-working time record."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates the given personal non-working time record.\n\n**Required permissions:**\n- Administrators can update non-working time records for any user.\n- Users with the global `manage_own_working_times` permission can update their own records.\n- Users with the global `manage_working_times` permission can update non-working time records for any user.\n\nUse `me` as the `id` to reference the current user."
+        },
+        {
+          "info": {
+            "name": "Delete a personal non-working time record",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://qa.openproject-edge.com/api/v3/users/:id/non_working_times/:non_working_time_id",
+            "params": [
+              {
+                "name": "id",
+                "value": "42",
+                "type": "path",
+                "description": "User id. Use `me` to reference the current user."
+              },
+              {
+                "name": "non_working_time_id",
+                "value": "7",
+                "type": "path",
+                "description": "The id of the personal non-working time record."
+              }
+            ]
+          },
+          "docs": "Removes the personal non-working time record for the given user.\n\n**Required permissions:**\n- Administrators can delete non-working time records for any user.\n- Users with the global `manage_own_working_times` permission can delete their own records.\n- Users with the global `manage_working_times` permission can delete non-working time records for any user.\n\nUse `me` as the `id` to reference the current user."
+        },
+        {
+          "info": {
+            "name": "List working hours for a user",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/users/:id/working_hours",
+            "params": [
+              {
+                "name": "id",
+                "value": "42",
+                "type": "path",
+                "description": "User id. Use `me` to reference the current user."
+              }
+            ]
+          },
+          "docs": "Returns all working hours records for the given user, ordered by `validFrom` descending.\n\nMultiple records may exist for a user; each represents a period of their working time\nconfiguration. The most recently effective record (the one with the latest `validFrom`\nthat is not in the future) is used for capacity calculations.\n\n**Required permissions:**\n- Administrators can view working hours for any user.\n- Users with the global `manage_working_times` permission can view working hours for any user."
+        },
+        {
+          "info": {
+            "name": "Create a working hours record for a user",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/users/:id/working_hours",
+            "params": [
+              {
+                "name": "id",
+                "value": "42",
+                "type": "path",
+                "description": "User id. Use `me` to reference the current user."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new working hours record for the given user, effective from the given date.\n\n**Required permissions:**\n- Administrators can create working hours records for any user.\n- Users with the global `manage_own_working_times` permission can create records for themselves.\n- Users with the global `manage_working_times` permission can create working hours records for any user.\n\nUse `me` as the `id` to reference the current user."
+        },
+        {
+          "info": {
+            "name": "View a working hours record",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/users/:id/working_hours/:working_hours_id",
+            "params": [
+              {
+                "name": "id",
+                "value": "42",
+                "type": "path",
+                "description": "User id."
+              },
+              {
+                "name": "working_hours_id",
+                "value": "1",
+                "type": "path",
+                "description": "Working hours record id."
+              }
+            ]
+          },
+          "docs": "Returns a single working hours record for the given user.\n\n**Required permissions:**\n- Administrators can view working hours records for any user.\n- Users with the global `manage_working_times` permission can view working hours for any user.\n- Any user can view their own working hours records."
+        },
+        {
+          "info": {
+            "name": "Update a working hours record",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://qa.openproject-edge.com/api/v3/users/:id/working_hours/:working_hours_id",
+            "params": [
+              {
+                "name": "id",
+                "value": "42",
+                "type": "path",
+                "description": "User id."
+              },
+              {
+                "name": "working_hours_id",
+                "value": "2",
+                "type": "path",
+                "description": "Working hours record id."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates the given working hours record.\n\nOnly records that have not yet taken effect (i.e., `validFrom` is in the future) can be\nupdated. Attempting to update a record that is already in effect will return a `422` error.\n\n**Required permissions:**\n- Administrators can update working hours records for any user.\n- Users with the global `manage_own_working_times` permission can update their own records.\n- Users with the global `manage_working_times` permission can update working hours for any user."
+        },
+        {
+          "info": {
+            "name": "Delete a working hours record",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://qa.openproject-edge.com/api/v3/users/:id/working_hours/:working_hours_id",
+            "params": [
+              {
+                "name": "id",
+                "value": "42",
+                "type": "path",
+                "description": "User id."
+              },
+              {
+                "name": "working_hours_id",
+                "value": "2",
+                "type": "path",
+                "description": "Working hours record id."
+              }
+            ]
+          },
+          "docs": "Deletes the given working hours record.\n\n**Required permissions:**\n- Administrators can delete working hours records for any user.\n- Users with the global `manage_own_working_times` permission can delete their own records.\n- Users with the global `manage_working_times` permission can delete working hours records for any user."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

@@ -1,0 +1,124 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Actions & Capabilities",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List actions",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/actions",
+            "params": [
+              {
+                "name": "filters",
+                "value": "[{ \"id\": { \"operator\": \"=\", \"values\": [\"memberships/create\"] }\" }]",
+                "type": "query",
+                "description": "JSON specifying filter conditions.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint.\nCurrently supported filters are:\n\n+ id: Returns only the action having the id or all actions except those having the id(s)."
+              },
+              {
+                "name": "sortBy",
+                "value": "[[\"id\", \"asc\"]]",
+                "type": "query",
+                "description": "JSON specifying sort criteria.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint. Currently supported sorts are:\n\n+ *No sort supported yet*"
+              }
+            ]
+          },
+          "docs": "Returns a collection of actions. The client can choose to filter the actions similar to how work packages are filtered.\nIn addition to the provided filters, the server will reduce the result set to only contain actions, for which the requesting client\nhas sufficient permissions."
+        },
+        {
+          "info": {
+            "name": "View action",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/actions/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "work_packages/create",
+                "type": "path",
+                "description": "action id which is the name of the action"
+              }
+            ]
+          },
+          "docs": "Returns an individual action."
+        },
+        {
+          "info": {
+            "name": "List capabilities",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/capabilities",
+            "params": [
+              {
+                "name": "filters",
+                "value": "[{ \"principal\": { \"operator\": \"=\", \"values\": [\"1\"] }\" }]",
+                "type": "query",
+                "description": "JSON specifying filter conditions.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint.\n\n+ action: Get all capabilities of a certain action\n\n+ principal: Get all capabilities of a principal\n\n+ context: Get all capabilities within a context. Note that for a workspace context the client needs to\n  provide `w{id}`, e.g. `w5` and for the global context a `g`.\n\n  + **Deprecation**: The now deprecated context `p` for project still works, but must eventually be replaced\n    with the `w` for the workspace context."
+              },
+              {
+                "name": "sortBy",
+                "value": "[[\"id\", \"asc\"]]",
+                "type": "query",
+                "description": "JSON specifying sort criteria.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint. Currently supported sorts are:\n\n+ id: Sort by the capabilities id"
+              }
+            ]
+          },
+          "docs": "Returns a collection of actions assigned to a principal in a context. The client can choose to filter the actions similar to how work packages are filtered. In addition to the provided filters, the server will reduce the result set to only contain actions, for which the requesting client has sufficient permissions"
+        },
+        {
+          "info": {
+            "name": "View global context",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/capabilities/context/global"
+          },
+          "docs": "Returns the global capability context. This context is necessary to consistently link to a context even if the context is not a project."
+        },
+        {
+          "info": {
+            "name": "View capabilities",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/capabilities/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "work_packages/create/p123-567",
+                "type": "path",
+                "description": "capability id"
+              }
+            ]
+          },
+          "docs": "View capabilities"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

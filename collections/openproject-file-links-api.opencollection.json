@@ -1,0 +1,412 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities File Links API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "File Links",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Gets a list of project storages",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/project_storages",
+            "params": [
+              {
+                "name": "filters",
+                "value": "[{ \"project_id\": { \"operator\": \"=\", \"values\": [\"42\"] }}, { \"storage_id\": { \"operator\": \"=\", \"values\": [\"1337\"] }}]",
+                "type": "query",
+                "description": "JSON specifying filter conditions.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)\nendpoint. Currently supported filters are:\n\n- project_id\n- storage_id\n- storage_url"
+              }
+            ]
+          },
+          "docs": "Gets a collection of all project storages that meet the provided filters and the user has permission to see them."
+        },
+        {
+          "info": {
+            "name": "Gets a project storage",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/project_storages/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1337",
+                "type": "path",
+                "description": "Project storage id"
+              }
+            ]
+          },
+          "docs": "Gets a project storage resource. This resource contains all data that is applicable on the relation between a\nstorage and a project."
+        },
+        {
+          "info": {
+            "name": "Open the project storage",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/project_storages/:id/open",
+            "params": [
+              {
+                "name": "id",
+                "value": "1337",
+                "type": "path",
+                "description": "Project storage id"
+              }
+            ]
+          },
+          "docs": "Gets a redirect to the location of the project storage's remote origin. If the project storage has a project\nfolder, it is opened at this location. If not, the storage root is opened."
+        },
+        {
+          "info": {
+            "name": "Open the storage",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/storages/:id/open",
+            "params": [
+              {
+                "name": "id",
+                "value": "1337",
+                "type": "path",
+                "description": "Storage id"
+              }
+            ]
+          },
+          "docs": "Gets a redirect to the location of the storage's remote origin. The storage's files root should be the target\nlocation."
+        },
+        {
+          "info": {
+            "name": "Gets a file link.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/file_links/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "42",
+                "type": "path",
+                "description": "File link id"
+              }
+            ]
+          },
+          "docs": "Gets a single file link resource of a work package."
+        },
+        {
+          "info": {
+            "name": "Removes a file link.",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://qa.openproject-edge.com/api/v3/file_links/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "42",
+                "type": "path",
+                "description": "File link id"
+              }
+            ]
+          },
+          "docs": "Removes a file link on a work package.\n\nThe request contains only the file link identifier as a path parameter. No request body is needed."
+        },
+        {
+          "info": {
+            "name": "Creates an opening uri of the linked file.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/file_links/:id/open",
+            "params": [
+              {
+                "name": "id",
+                "value": "42",
+                "type": "path",
+                "description": "File link id"
+              },
+              {
+                "name": "location",
+                "value": "true",
+                "type": "query",
+                "description": "Boolean flag indicating, if the file should be opened directly or rather the directory location."
+              }
+            ]
+          },
+          "docs": "Creates a uri to open the origin file linked by the given file link. This uri depends on the storage type and\nis always located on the origin storage itself."
+        },
+        {
+          "info": {
+            "name": "Creates a download uri of the linked file.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/file_links/:id/download",
+            "params": [
+              {
+                "name": "id",
+                "value": "42",
+                "type": "path",
+                "description": "File link id"
+              }
+            ]
+          },
+          "docs": "Creates a uri to download the origin file linked by the given file link. This uri depends on the storage type and\nis always located on the origin storage itself."
+        },
+        {
+          "info": {
+            "name": "Get Storages",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/storages"
+          },
+          "docs": "Returns a collection of storages."
+        },
+        {
+          "info": {
+            "name": "Creates a storage.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/storages",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a storage resource. When creating a storage, a confidential OAuth 2 provider application is created\nautomatically. The oauth client id and secret of the created OAuth application are returned in the response.\n\n**IMPORTANT:** This is the only time, the oauth client secret is visible to the consumer. After that, the secret is\nhidden.\n\nTo update the storage with OAuth client credentials, which enable the storage resource to behave as an OAuth 2\nclient against an external OAuth 2 provider ap"
+        },
+        {
+          "info": {
+            "name": "Get a storage",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/storages/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1337",
+                "type": "path",
+                "description": "Storage id"
+              }
+            ]
+          },
+          "docs": "Gets a storage resource. As a side effect, a live connection to the storages origin is established to retrieve\nconnection state data."
+        },
+        {
+          "info": {
+            "name": "Update a storage",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://qa.openproject-edge.com/api/v3/storages/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1337",
+                "type": "path",
+                "description": "Storage id"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates a storage resource. Only data that is not generated by the server can be updated. This excludes the OAuth 2\napplication data."
+        },
+        {
+          "info": {
+            "name": "Delete a storage",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://qa.openproject-edge.com/api/v3/storages/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1337",
+                "type": "path",
+                "description": "Storage id"
+              }
+            ]
+          },
+          "docs": "Deletes a storage resource. This also deletes all related records, like the created oauth application, client, and\nany file links created within this storage."
+        },
+        {
+          "info": {
+            "name": "Gets files of a storage.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/storages/:id/files",
+            "params": [
+              {
+                "name": "id",
+                "value": "1337",
+                "type": "path",
+                "description": "Storage id"
+              },
+              {
+                "name": "parent",
+                "value": "/my/data",
+                "type": "query",
+                "description": "Parent file identification"
+              }
+            ]
+          },
+          "docs": "Gets a collection of files from a storage.\n\nIf no `parent` context is given, the result is the content of the document root. With `parent` context given, the\nresult contains the collections of files/directories from within the given parent file id.\n\nIf given `parent` context is no directory, `400 Bad Request` is returned."
+        },
+        {
+          "info": {
+            "name": "Preparation of a direct upload of a file to the given storage.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/storages/:id/files/prepare_upload",
+            "params": [
+              {
+                "name": "id",
+                "value": "1337",
+                "type": "path",
+                "description": "Storage id"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Executes a request that prepares a link for a direct upload to the storage.\n\nThe background here is, that the client needs to make a direct request to the storage instance for file uploading,\nbut should not get access to the credentials, which are stored in the backend. The response contains a link object,\nthat enables the client to execute a file upload without the real credentials."
+        },
+        {
+          "info": {
+            "name": "Creation of a new folder",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/storages/:id/folders",
+            "params": [
+              {
+                "name": "id",
+                "value": "1337",
+                "type": "path",
+                "description": "Storage id"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new folder under the given parent"
+        },
+        {
+          "info": {
+            "name": "Creates an oauth client credentials object for a storage.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/storages/:id/oauth_client_credentials",
+            "params": [
+              {
+                "name": "id",
+                "value": "1337",
+                "type": "path",
+                "description": "Storage id"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Inserts the OAuth 2 credentials into the storage, to allow the storage to act as an OAuth 2 client. Calling this\nendpoint on a storage that already contains OAuth 2 client credentials will replace them."
+        },
+        {
+          "info": {
+            "name": "Gets all file links of a work package",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/work_packages/:id/file_links",
+            "params": [
+              {
+                "name": "id",
+                "value": "1337",
+                "type": "path",
+                "description": "Work package id"
+              },
+              {
+                "name": "filters",
+                "value": "[{\"storage\":{\"operator\":\"=\",\"values\":[\"42\"]}}]",
+                "type": "query",
+                "description": "JSON specifying filter conditions.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)\nendpoint. The following filters are supported:\n\n- storage"
+              }
+            ]
+          },
+          "docs": "Gets all file links of a work package.\n\nAs a side effect, for every file link a request is sent to the storage's origin to fetch live data and patch\nthe file link's data before returning, as well as retrieving permissions of the user on this origin file. "
+        },
+        {
+          "info": {
+            "name": "Creates file links.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/work_packages/:id/file_links",
+            "params": [
+              {
+                "name": "id",
+                "value": "1337",
+                "type": "path",
+                "description": "Work package id"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates file links on a work package.\n\nThe request is interpreted as a bulk insert, where every element of the collection is validated separately. Each\nelement contains the origin meta data and a link to the storage, the file link is about to point to. The storage\nlink can be provided as a resource link with id or as the host url.\n\nThe file's id and name are considered mandatory information. The rest of the origin meta data SHOULD be provided\nby the client. The _mimeType_ SHOULD be a standard mi"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

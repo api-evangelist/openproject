@@ -1,0 +1,55 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Help texts API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Help texts",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List help texts",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/help_texts"
+          },
+          "docs": "List the complete collection of help texts."
+        },
+        {
+          "info": {
+            "name": "Get help text",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/help_texts/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Help text id"
+              }
+            ]
+          },
+          "docs": "Fetches the help text from the given id."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

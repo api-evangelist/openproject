@@ -1,0 +1,2624 @@
+{
+  "item": [
+    {
+      "id": "872844b0-e382-4a99-808d-2d796b13f3d8",
+      "name": "Versions",
+      "description": {
+        "content": "Work Packages can be assigned to a version. As such, versions serve to group Work Packages into logical units where each group comprises all the work packages that needs to be finished in order for the version to be finished.\n\n## Actions\n\n| Link                | Description                                                              | Condition                              |\n|:-------------------:|--------------------------------------------------------------------------| ---------------------------------------|\n| update              | Form endpoint that aids in preparing and performing edits on the version | **Permission**: manage versions        |\n| updateImmediately   | Directly perform edits on the version                                    | **Permission**: manage versions        |\n\n## Linked Properties\n\n|  Link               | Description                                | Type          | Constraints                                                    | Supported operations |\n|:-------------------:|-----------------------------------------   | ------------- | -------------------------------------------------------------- | -------------------- |\n| self                | This version                               | Version       | not null                                                       | READ                 |\n| definingProject     | The workspace to which the version belongs | Workspace     | only present if the workspace is visible for the current user  | READ                 |\n| availableInProjects | Workspaces where this version can be used  | Workspaces    | not null                                                       | READ                 |\n\nDepending on custom fields defined for versions, additional linked properties might exist.\n\n## Local Properties\n\n| Property    | Description                                   | Type        | Constraints                                        | Supported operations |\n| :---------: | --------------------------------------------- | ----------- | -----------                                        | -------------------- |\n| id          | Version id                                    | Integer     | x > 0                                              | READ                 |\n| name        | Version name                                  | String      | not null, may not exceed 60 characters             | READ / WRITE         |\n| description |                                               | Formattable |                                                    | READ / WRITE         |\n| startDate   |                                               | Date        |                                                    | READ / WRITE         |\n| endDate     |                                               | Date        |                                                    | READ / WRITE         |\n| status      | The current status of the version             | String      | not null, only 'open', 'finished', 'closed'        | READ / WRITE         |\n| sharing     | The current status of the version             | String      | not null, limited to fixed set as defined by form  | READ / WRITE         |\n| createdAt   | Time of creation                              | DateTime    | not null                                           | READ                 |\n| updatedAt   | Time of the most recent change to the version | DateTime    | not null                                           | READ                 |\n\nDepending on custom fields defined for versions, additional properties might exist.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "7b3fff43-5143-436b-a11d-5f34c719119c",
+          "name": "List versions available in a project",
+          "request": {
+            "name": "List versions available in a project",
+            "description": {
+              "content": "This endpoint lists the versions that are *available* in a given project.\nNote that due to sharing this might be more than the versions *defined* by that project.\n\nThis endpoint is deprecated and replaced by [`/api/v3/workspaces/{id}/versions`](https://www.openproject.org/docs/api/endpoints/versions/#list-versions-available-in-a-workspace)",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "projects",
+                ":id",
+                "versions"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<integer>",
+                  "key": "id",
+                  "description": "(Required) ID of the project whose versions will be listed"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "79cf24d2-62e1-439f-b91f-ca9da140e4a2",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "projects",
+                    ":id",
+                    "versions"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) ID of the project whose versions will be listed"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_embedded\": {\n    \"elements\": [\n      {\n        \"_links\": {\n          \"availableInProjects\": {\n            \"href\": \"/api/v3/versions/11/workspaces\"\n          },\n          \"definingProject\": {\n            \"href\": \"/api/v3/projects/11\"\n          },\n          \"self\": {\n            \"href\": \"/api/v3/versions/11\"\n          }\n        },\n        \"_type\": \"Version\",\n        \"description\": {\n          \"format\": \"plain\",\n          \"html\": \"This version has a description\",\n          \"raw\": \"This version has a description\"\n        },\n        \"endDate\": null,\n        \"id\": 11,\n        \"name\": \"v3.0 Alpha\",\n        \"startDate\": \"2014-11-20\",\n        \"status\": \"Open\"\n      },\n      {\n        \"_links\": {\n          \"availableInProjects\": {\n            \"href\": \"/api/v3/versions/12/workspaces\"\n          },\n          \"definingProject\": {\n            \"href\": \"/api/v3/projects/11\"\n          },\n          \"self\": {\n            \"href\": \"/api/v3/versions/12\"\n          }\n        },\n        \"_type\": \"Version\",\n        \"description\": {\n          \"format\": \"plain\",\n          \"html\": \"\",\n          \"raw\": \"\"\n        },\n        \"endDate\": null,\n        \"id\": 12,\n        \"name\": \"v2.0\",\n        \"startDate\": null,\n        \"status\": \"Closed\"\n      },\n      {\n        \"_links\": {\n          \"availableInProjects\": {\n            \"href\": \"/api/v3/versions/10/workspaces\"\n          },\n          \"definingProject\": {\n            \"href\": \"/api/v3/projects/11\"\n          },\n          \"self\": {\n            \"href\": \"/api/v3/versions/10\"\n          }\n        },\n        \"_type\": \"Version\",\n        \"description\": {\n          \"format\": \"plain\",\n          \"html\": \"\",\n          \"raw\": \"\"\n        },\n        \"endDate\": null,\n        \"id\": 10,\n        \"name\": \"v1.0\",\n        \"startDate\": null,\n        \"status\": \"Open\"\n      }\n    ]\n  },\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/projects/11/versions\"\n    }\n  },\n  \"_type\": \"Collection\",\n  \"count\": 3,\n  \"total\": 3\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f1d79344-a494-4e5a-9a5c-c1e20030aa4c",
+              "name": "Returned if the project does not exist or the client does not have sufficient permissions\nto see it.\n\n**Required permission:** view work packages **or** manage versions (on given project)\n\n*Note: A client without sufficient permissions shall not be able to test for the existence of a project.\nThat's why a 404 is returned here, even if a 403 might be more appropriate.*",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "projects",
+                    ":id",
+                    "versions"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) ID of the project whose versions will be listed"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:NotFound\",\n  \"message\": \"The specified project does not exist.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "06a7b9ce-b738-447b-96da-6cb93d413c8a",
+          "name": "List versions",
+          "request": {
+            "name": "List versions",
+            "description": {
+              "content": "Returns a collection of versions. The client can choose to filter the versions similar to how work packages are\nfiltered. In addition to the provided filters, the server will reduce the result set to only contain versions,\nfor which the requesting client has sufficient permissions (*view_work_packages*).",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "versions"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "filters",
+                  "value": "<string>",
+                  "description": "JSON specifying filter conditions. Accepts the same format as returned by\nthe [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint. Currently supported\nfilters are:\n\n- sharing: filters versions by how they are shared within the server (*none*, *descendants*, *hierarchy*, *tree*, *system*).\n- name: filters versions by their name."
+                },
+                {
+                  "disabled": false,
+                  "key": "sortBy",
+                  "value": "<string>",
+                  "description": "JSON specifying sort criteria. Accepts the same format as returned by\nthe [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint. Currently supported\nattributes are:\n\n- id: Sort by the version id\n- name: Sort by the version name using numeric collation, comparing sequences of decimal digits by their numeric value"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "f209b244-7732-4ba5-990f-70230bc3681e",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "filters",
+                      "value": "[{ \"sharing\": { \"operator\": \"=\", \"values\": [\"system\"] } }]"
+                    },
+                    {
+                      "key": "sortBy",
+                      "value": "[[\"name\", \"desc\"]]"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_embedded\": {\n    \"elements\": [\n      {\n        \"id\": 8848,\n        \"_type\": \"Version\",\n        \"name\": \"string\",\n        \"description\": {\n          \"format\": \"markdown\",\n          \"raw\": \"I am formatted!\",\n          \"html\": \"I am formatted!\"\n        },\n        \"startDate\": \"1950-06-15\",\n        \"endDate\": \"1958-04-03\",\n        \"status\": \"open\",\n        \"sharing\": \"descendants\",\n        \"createdAt\": \"1997-06-16T07:00:49.796Z\",\n        \"updatedAt\": \"1950-12-19T06:20:36.389Z\",\n        \"_links\": {\n          \"self\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"schema\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"definingProject\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"availableInProjects\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"update\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"delete\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"updateImmediately\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"customField43\": \"\"\n        },\n        \"customField4\": 9558.845052336392\n      },\n      {\n        \"id\": 4506,\n        \"_type\": \"Version\",\n        \"name\": \"string\",\n        \"description\": {\n          \"format\": \"markdown\",\n          \"raw\": \"I am formatted!\",\n          \"html\": \"I am formatted!\"\n        },\n        \"startDate\": \"2011-10-31\",\n        \"endDate\": \"1961-11-17\",\n        \"status\": \"locked\",\n        \"sharing\": \"none\",\n        \"createdAt\": \"1999-12-24T10:46:46.881Z\",\n        \"updatedAt\": \"1965-07-28T02:48:16.554Z\",\n        \"_links\": {\n          \"self\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"schema\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"definingProject\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"availableInProjects\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"update\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"delete\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"updateImmediately\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"customField290809\": \"\"\n        },\n        \"customField31\": true\n      }\n    ]\n  },\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    }\n  },\n  \"_type\": \"Collection\",\n  \"count\": 8361,\n  \"total\": 7388\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "5b056e55-1328-40db-852b-3784370317ba",
+          "name": "Create version",
+          "request": {
+            "name": "Create version",
+            "description": {
+              "content": "Creates a new version applying the attributes provided in the body. Please note that while there is a fixed set\nof attributes, custom fields can extend a version's attributes and are accepted by the endpoint.\n\nYou can use the form and schema to be retrieve the valid attribute values and by that be guided towards\nsuccessful creation.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "versions"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "<object>",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "629c3226-9141-403b-9e0e-bb6f150d1dfd",
+              "name": "Created",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"v0.9.1-alpha\",\n  \"startDate\": \"2026-02-02\",\n  \"endDate\": \"2026-02-09\",\n  \"status\": \"open\",\n  \"sharing\": \"tree\",\n  \"customField14\": true,\n  \"_links\": {\n    \"definingProject\": {\n      \"href\": \"/api/v3/projects/10\",\n      \"title\": \"Death Star\"\n    },\n    \"customField23\": {\n      \"href\": \"/api/v3/users/18\",\n      \"title\": \"Mara Jade\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Version\",\n  \"id\": 3,\n  \"name\": \"v0.9.1-alpha\",\n  \"description\": {\n    \"format\": \"plain\",\n    \"raw\": \"First draft of the energy weapon ... (behold, Alderaan *evil_laughter*)\",\n    \"html\": \"<p>First draft of the energy weapon ... (behold, Alderaan *evil_laughter*)</p>\"\n  },\n  \"startDate\": \"2026-02-02\",\n  \"endDate\": \"2026-02-09\",\n  \"status\": \"closed\",\n  \"sharing\": \"none\",\n  \"createdAt\": \"2026-02-06T09:30:49.157Z\",\n  \"updatedAt\": \"2026-02-10T09:53:21.620Z\",\n  \"customField14\": true,\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/versions/1\",\n      \"title\": \"v0.1.0-alpha\"\n    },\n    \"schema\": {\n      \"href\": \"/api/v3/versions/schema\"\n    },\n    \"update\": {\n      \"href\": \"/api/v3/versions/1/form\",\n      \"method\": \"post\"\n    },\n    \"updateImmediately\": {\n      \"href\": \"/api/v3/versions/1\",\n      \"method\": \"patch\"\n    },\n    \"delete\": {\n      \"href\": \"/api/v3/versions/1\",\n      \"method\": \"delete\"\n    },\n    \"availableInProjects\": {\n      \"href\": \"/api/v3/versions/1/workspaces\"\n    },\n    \"definingProject\": {\n      \"href\": \"/api/v3/projects/10\",\n      \"title\": \"Death Star\"\n    },\n    \"customField23\": {\n      \"href\": \"/api/v3/users/18\",\n      \"title\": \"Mara Jade\"\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "4d31fb63-f760-480a-a463-52e2400e57e4",
+              "name": "Occurs when the client did not send a valid JSON object in the request body.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"v0.9.1-alpha\",\n  \"startDate\": \"2026-02-02\",\n  \"endDate\": \"2026-02-09\",\n  \"status\": \"open\",\n  \"sharing\": \"tree\",\n  \"customField14\": true,\n  \"_links\": {\n    \"definingProject\": {\n      \"href\": \"/api/v3/projects/10\",\n      \"title\": \"Death Star\"\n    },\n    \"customField23\": {\n      \"href\": \"/api/v3/users/18\",\n      \"title\": \"Mara Jade\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:InvalidRequestBody\",\n  \"message\": \"The request body was not a single JSON object.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "7d7c5169-4b4f-434b-aa34-92b3b4a91413",
+              "name": "Returned if the client does not have sufficient permissions.\n\n**Required permission:** Manage versions",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"v0.9.1-alpha\",\n  \"startDate\": \"2026-02-02\",\n  \"endDate\": \"2026-02-09\",\n  \"status\": \"open\",\n  \"sharing\": \"tree\",\n  \"customField14\": true,\n  \"_links\": {\n    \"definingProject\": {\n      \"href\": \"/api/v3/projects/10\",\n      \"title\": \"Death Star\"\n    },\n    \"customField23\": {\n      \"href\": \"/api/v3/users/18\",\n      \"title\": \"Mara Jade\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:MissingPermission\",\n  \"message\": \"You are not authorized to access this resource.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "057b71ce-c688-4022-ba90-1f59a2011020",
+              "name": "Occurs when the client did not send a Content-Type header",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "text/plain"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"v0.9.1-alpha\",\n  \"startDate\": \"2026-02-02\",\n  \"endDate\": \"2026-02-09\",\n  \"status\": \"open\",\n  \"sharing\": \"tree\",\n  \"customField14\": true,\n  \"_links\": {\n    \"definingProject\": {\n      \"href\": \"/api/v3/projects/10\",\n      \"title\": \"Death Star\"\n    },\n    \"customField23\": {\n      \"href\": \"/api/v3/users/18\",\n      \"title\": \"Mara Jade\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Acceptable",
+              "code": 406,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "Missing content-type header",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "501e47aa-331e-4b89-8ca3-64f29001bbfe",
+              "name": "Occurs when the client sends an unsupported Content-Type header.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"v0.9.1-alpha\",\n  \"startDate\": \"2026-02-02\",\n  \"endDate\": \"2026-02-09\",\n  \"status\": \"open\",\n  \"sharing\": \"tree\",\n  \"customField14\": true,\n  \"_links\": {\n    \"definingProject\": {\n      \"href\": \"/api/v3/projects/10\",\n      \"title\": \"Death Star\"\n    },\n    \"customField23\": {\n      \"href\": \"/api/v3/users/18\",\n      \"title\": \"Mara Jade\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unsupported Media Type",
+              "code": 415,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:TypeNotSupported\",\n  \"message\": \"Expected CONTENT-TYPE to be (expected value) but got (actual value).\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "5ca550c6-a182-4117-b419-6bde039d66f1",
+              "name": "Returned if:\n\n* a constraint for a property was violated (`PropertyConstraintViolation`)",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"v0.9.1-alpha\",\n  \"startDate\": \"2026-02-02\",\n  \"endDate\": \"2026-02-09\",\n  \"status\": \"open\",\n  \"sharing\": \"tree\",\n  \"customField14\": true,\n  \"_links\": {\n    \"definingProject\": {\n      \"href\": \"/api/v3/projects/10\",\n      \"title\": \"Death Star\"\n    },\n    \"customField23\": {\n      \"href\": \"/api/v3/users/18\",\n      \"title\": \"Mara Jade\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
+              "code": 422,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "2e386208-0113-40b2-9a8e-d71b102c1788",
+          "name": "Available projects for versions",
+          "request": {
+            "name": "Available projects for versions",
+            "description": {
+              "content": "Gets a list of projects in which a version can be created in. The list contains all projects in which the user issuing the request has the manage versions permissions.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "versions",
+                "available_projects"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "2692d3e3-5f2a-4840-b8fe-639ee0e86065",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions",
+                    "available_projects"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_embedded\": {\n    \"elements\": [\n      {\n        \"_links\": {\n          \"categories\": {\n            \"href\": \"/api/v3/projects/6/categories\"\n          },\n          \"createWorkPackage\": {\n            \"href\": \"/api/v3/projects/6/work_packages/form\",\n            \"method\": \"post\"\n          },\n          \"createWorkPackageImmediate\": {\n            \"href\": \"/api/v3/projects/6/work_packages\",\n            \"method\": \"post\"\n          },\n          \"editWorkPackage\": {\n            \"href\": \"/api/v3//work_packages/{id}/form\",\n            \"method\": \"post\",\n            \"templated\": true\n          },\n          \"self\": {\n            \"href\": \"/api/v3/projects/6\",\n            \"title\": \"A project\"\n          },\n          \"versions\": {\n            \"href\": \"/api/v3/projects/6/versions\"\n          }\n        },\n        \"_type\": \"Project\",\n        \"createdAt\": \"2015-07-06T13:28:14+00:00\",\n        \"description\": \"Eveniet molestias omnis quis aut qui eum adipisci. Atque aut aut in exercitationem adipisci amet. Nisi asperiores quia ratione veritatis enim exercitationem magnam. Aut fuga architecto adipisci nihil. Et repellat pariatur. Aliquam et sed perferendis nostrum quaerat. Fugit doloremque voluptatem.\",\n        \"id\": 6,\n        \"identifier\": \"a_project\",\n        \"name\": \"A project\",\n        \"type\": \"Customer Project\",\n        \"updatedAt\": \"2015-10-01T09:55:02+00:00\"\n      },\n      {\n        \"_links\": {\n          \"categories\": {\n            \"href\": \"/api/v3/projects/14/categories\"\n          },\n          \"createWorkPackage\": {\n            \"href\": \"/api/v3/projects/14/work_packages/form\",\n            \"method\": \"post\"\n          },\n          \"createWorkPackageImmediate\": {\n            \"href\": \"/api/v3/projects/14/work_packages\",\n            \"method\": \"post\"\n          },\n          \"self\": {\n            \"href\": \"/api/v3/projects/14\",\n            \"title\": \"Another project\"\n          },\n          \"versions\": {\n            \"href\": \"/api/v3/projects/14/versions\"\n          }\n        },\n        \"_type\": \"Project\",\n        \"createdAt\": \"2016-02-29T12:50:20+00:00\",\n        \"description\": \"\",\n        \"id\": 14,\n        \"identifier\": \"another_project\",\n        \"name\": \"Another project\",\n        \"type\": null,\n        \"updatedAt\": \"2016-02-29T12:50:20+00:00\"\n      }\n    ]\n  },\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/versions/available_projects\"\n    }\n  },\n  \"_type\": \"Collection\",\n  \"count\": 2,\n  \"total\": 2\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "caa9dd13-c50b-4d2f-a918-697e7c4e0676",
+              "name": "Returned if the client does not have sufficient permissions.\n\n**Required permission:** manage versions",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions",
+                    "available_projects"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:MissingPermission\",\n  \"message\": \"You are not authorized to access this resource.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "bd577f87-b0d6-4e84-a041-1c7f00ae8aca",
+          "name": "Version create form",
+          "request": {
+            "name": "Version create form",
+            "description": {
+              "content": "",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "versions",
+                "form"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "POST",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "68ead2b6-7d91-4e84-bd03-d2c41fe1b37a",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions",
+                    "form"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "e1e78550-aa17-48fd-a791-5e3ed42956fd",
+              "name": "Occurs when the client did not send a valid JSON object in the request body.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions",
+                    "form"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:InvalidRequestBody\",\n  \"message\": \"The request body was not a single JSON object.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "3a2de71a-e6b1-45e5-b45f-153fcdc1143f",
+              "name": "Returned if the client does not have sufficient permissions.\n\n**Required permission:** manage versions in any project",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions",
+                    "form"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:MissingPermission\",\n  \"message\": \"You are not authorized to access this resource.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "25f108a7-a259-4e3b-bf85-139c2a26e5d6",
+              "name": "Occurs when the client did not send a Content-Type header",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions",
+                    "form"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "text/plain"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Not Acceptable",
+              "code": 406,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "Missing content-type header",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "059dccf3-7d8a-4318-875e-5267c3590625",
+              "name": "Occurs when the client sends an unsupported Content-Type header.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions",
+                    "form"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Unsupported Media Type",
+              "code": 415,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:TypeNotSupported\",\n  \"message\": \"Expected CONTENT-TYPE to be (expected value) but got (actual value).\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "e04e883c-a4e4-4036-8d56-29ab120a1136",
+          "name": "View version schema",
+          "request": {
+            "name": "View version schema",
+            "description": {
+              "content": "",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "versions",
+                "schema"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "e3e59f56-3463-411a-93ba-2a03a861d42d",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions",
+                    "schema"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_dependencies\": [],\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/versions/schema\"\n    }\n  },\n  \"_type\": \"Schema\",\n  \"createdAt\": {\n    \"hasDefault\": false,\n    \"name\": \"Created on\",\n    \"required\": true,\n    \"type\": \"DateTime\",\n    \"writable\": false\n  },\n  \"customField14\": {\n    \"hasDefault\": false,\n    \"name\": \"text CF\",\n    \"required\": false,\n    \"type\": \"String\",\n    \"visibility\": \"default\",\n    \"writable\": true\n  },\n  \"customField40\": {\n    \"_links\": {},\n    \"hasDefault\": false,\n    \"location\": \"_links\",\n    \"name\": \"List CF\",\n    \"required\": false,\n    \"type\": \"CustomOption\",\n    \"visibility\": \"default\",\n    \"writable\": true\n  },\n  \"definingProject\": {\n    \"_links\": {},\n    \"hasDefault\": false,\n    \"name\": \"Project\",\n    \"required\": true,\n    \"type\": \"Project\",\n    \"writable\": true\n  },\n  \"description\": {\n    \"hasDefault\": false,\n    \"name\": \"Description\",\n    \"required\": false,\n    \"type\": \"Formattable\",\n    \"writable\": true\n  },\n  \"endDate\": {\n    \"hasDefault\": false,\n    \"name\": \"Finish date\",\n    \"required\": false,\n    \"type\": \"Date\",\n    \"writable\": false\n  },\n  \"id\": {\n    \"hasDefault\": false,\n    \"name\": \"ID\",\n    \"required\": true,\n    \"type\": \"Integer\",\n    \"writable\": false\n  },\n  \"name\": {\n    \"hasDefault\": false,\n    \"maxLength\": 60,\n    \"minLength\": 1,\n    \"name\": \"Name\",\n    \"required\": true,\n    \"type\": \"String\",\n    \"writable\": true\n  },\n  \"sharing\": {\n    \"_links\": {},\n    \"hasDefault\": false,\n    \"name\": \"Sharing\",\n    \"required\": true,\n    \"type\": \"String\",\n    \"visibility\": \"default\",\n    \"writable\": true\n  },\n  \"startDate\": {\n    \"hasDefault\": false,\n    \"name\": \"Start date\",\n    \"required\": false,\n    \"type\": \"Date\",\n    \"writable\": true\n  },\n  \"status\": {\n    \"_links\": {},\n    \"hasDefault\": false,\n    \"name\": \"Status\",\n    \"required\": true,\n    \"type\": \"String\",\n    \"visibility\": \"default\",\n    \"writable\": true\n  },\n  \"updatedAt\": {\n    \"hasDefault\": false,\n    \"name\": \"Updated on\",\n    \"required\": true,\n    \"type\": \"DateTime\",\n    \"writable\": false\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "5d902721-3175-4a5b-964d-1c6714fc2a20",
+              "name": "Returned if the client does not have sufficient permissions to see the schema.\n\n**Required permission:** view work packages or manage versions on any project",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions",
+                    "schema"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:MissingPermission\",\n  \"message\": \"You are not authorized to access this resource.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "bd63abe0-23b1-4bd4-a769-44c12987ba80",
+          "name": "Get version",
+          "request": {
+            "name": "Get version",
+            "description": {
+              "content": "Retrieves a version defined by its unique identifier.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "versions",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<integer>",
+                  "key": "id",
+                  "description": "(Required) Version id"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "f30a6e88-cf6a-400c-b907-df7025f6fb0f",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Version id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Version\",\n  \"id\": 3,\n  \"name\": \"v0.9.1-alpha\",\n  \"description\": {\n    \"format\": \"plain\",\n    \"raw\": \"First draft of the energy weapon ... (behold, Alderaan *evil_laughter*)\",\n    \"html\": \"<p>First draft of the energy weapon ... (behold, Alderaan *evil_laughter*)</p>\"\n  },\n  \"startDate\": \"2026-02-02\",\n  \"endDate\": \"2026-02-09\",\n  \"status\": \"closed\",\n  \"sharing\": \"none\",\n  \"createdAt\": \"2026-02-06T09:30:49.157Z\",\n  \"updatedAt\": \"2026-02-10T09:53:21.620Z\",\n  \"customField14\": true,\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/versions/1\",\n      \"title\": \"v0.1.0-alpha\"\n    },\n    \"schema\": {\n      \"href\": \"/api/v3/versions/schema\"\n    },\n    \"update\": {\n      \"href\": \"/api/v3/versions/1/form\",\n      \"method\": \"post\"\n    },\n    \"updateImmediately\": {\n      \"href\": \"/api/v3/versions/1\",\n      \"method\": \"patch\"\n    },\n    \"delete\": {\n      \"href\": \"/api/v3/versions/1\",\n      \"method\": \"delete\"\n    },\n    \"availableInProjects\": {\n      \"href\": \"/api/v3/versions/1/workspaces\"\n    },\n    \"definingProject\": {\n      \"href\": \"/api/v3/projects/10\",\n      \"title\": \"Death Star\"\n    },\n    \"customField23\": {\n      \"href\": \"/api/v3/users/18\",\n      \"title\": \"Mara Jade\"\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "2f3d1311-5539-4154-adad-ed433bdee522",
+              "name": "Returned if the version does not exist or the client does not have sufficient permissions\nto see it.\n\n**Required permission:** view work packages **or** manage versions (any project where the version is available)\n\n*Note: A client without sufficient permissions shall not be able to test for the existence of\na version. That's why a 404 is returned here, even if a 403 might be more appropriate.*",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Version id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:NotFound\",\n  \"message\": \"The requested resource could not be found.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "0f1bea9f-2793-46b2-887d-3f35ed56ef78",
+          "name": "Delete version",
+          "request": {
+            "name": "Delete version",
+            "description": {
+              "content": "Deletes the version. Entities associated to the version will no longer be assigned to it.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "versions",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<integer>",
+                  "key": "id",
+                  "description": "(Required) Version id"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "DELETE",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "39447470-087e-46b1-bd80-5f11630b6393",
+              "name": "Returned if the version was successfully deleted",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Version id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "No Content",
+              "code": 204,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "607a003a-7df9-4b1f-97e2-b6cd6562c144",
+              "name": "Returned if the client does not have sufficient permissions.\n\n**Required permission:** manage versions",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Version id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:MissingPermission\",\n  \"message\": \"You are not authorized to access this resource.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f58fb566-04db-4e01-8020-7cc5e93c0481",
+              "name": "Returned if the version does not exist or the client does not have sufficient permissions\nto see it.\n\n**Required permission:** view work packages **or** manage versions (any project where the version is available)\n\n*Note: A client without sufficient permissions shall not be able to test for the existence of\na version. That's why a 404 is returned here, even if a 403 might be more appropriate.*",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Version id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:NotFound\",\n  \"message\": \"The requested resource could not be found.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f5d03e62-579d-457a-a892-41af5c69afb5",
+              "name": "Occurs when the client did not send a Content-Type header",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Version id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "text/plain"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Not Acceptable",
+              "code": 406,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "Missing content-type header",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "294f8ecb-cbd2-4b86-a28e-aa62f1352e8f",
+              "name": "Occurs when the client sends an unsupported Content-Type header.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Version id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Unsupported Media Type",
+              "code": 415,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:TypeNotSupported\",\n  \"message\": \"Expected CONTENT-TYPE to be (expected value) but got (actual value).\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "6ab48e4a-a977-46c4-878f-f03a642ba201",
+          "name": "Update Version",
+          "request": {
+            "name": "Update Version",
+            "description": {
+              "content": "Updates the given version by applying the attributes provided in the body. Please note that while there is a fixed\nset of attributes, custom fields can extend a version's attributes and are accepted by the endpoint.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "versions",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<integer>",
+                  "key": "id",
+                  "description": "(Required) Version id"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "PATCH",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "<object>",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "8c6c4676-12be-49de-8172-f07c38f922da",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Version id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"v0.9.1-alpha\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Version\",\n  \"id\": 3,\n  \"name\": \"v0.9.1-alpha\",\n  \"description\": {\n    \"format\": \"plain\",\n    \"raw\": \"First draft of the energy weapon ... (behold, Alderaan *evil_laughter*)\",\n    \"html\": \"<p>First draft of the energy weapon ... (behold, Alderaan *evil_laughter*)</p>\"\n  },\n  \"startDate\": \"2026-02-02\",\n  \"endDate\": \"2026-02-09\",\n  \"status\": \"closed\",\n  \"sharing\": \"none\",\n  \"createdAt\": \"2026-02-06T09:30:49.157Z\",\n  \"updatedAt\": \"2026-02-10T09:53:21.620Z\",\n  \"customField14\": true,\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/versions/1\",\n      \"title\": \"v0.1.0-alpha\"\n    },\n    \"schema\": {\n      \"href\": \"/api/v3/versions/schema\"\n    },\n    \"update\": {\n      \"href\": \"/api/v3/versions/1/form\",\n      \"method\": \"post\"\n    },\n    \"updateImmediately\": {\n      \"href\": \"/api/v3/versions/1\",\n      \"method\": \"patch\"\n    },\n    \"delete\": {\n      \"href\": \"/api/v3/versions/1\",\n      \"method\": \"delete\"\n    },\n    \"availableInProjects\": {\n      \"href\": \"/api/v3/versions/1/workspaces\"\n    },\n    \"definingProject\": {\n      \"href\": \"/api/v3/projects/10\",\n      \"title\": \"Death Star\"\n    },\n    \"customField23\": {\n      \"href\": \"/api/v3/users/18\",\n      \"title\": \"Mara Jade\"\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "84a08291-4dbf-438a-9f80-f5ea22e057dd",
+              "name": "Occurs when the client did not send a valid JSON object in the request body.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Version id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"v0.9.1-alpha\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:InvalidRequestBody\",\n  \"message\": \"The request body was not a single JSON object.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "ba5bbc51-6a62-4dd4-9f37-69060db2b0e3",
+              "name": "Returned if the client does not have sufficient permissions.\n\n**Required permission:** Manage versions in the version's project.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Version id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"v0.9.1-alpha\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:MissingPermission\",\n  \"message\": \"You are not authorized to access this resource.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "4bc28067-8c2b-48d2-82ea-4679b5a205cd",
+              "name": "Returned if the version does not exist or the client does not have sufficient permissions\nto see it.\n\n**Required permission:** view work packages **or** manage versions (any project where the version is available)\n\n*Note: A client without sufficient permissions shall not be able to test for the existence of\na version. That's why a 404 is returned here, even if a 403 might be more appropriate.*",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Version id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"v0.9.1-alpha\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:NotFound\",\n  \"message\": \"The requested resource could not be found.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "6314acab-a218-4142-b974-c002c19d4e86",
+              "name": "Occurs when the client did not send a Content-Type header",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Version id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "text/plain"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"v0.9.1-alpha\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Acceptable",
+              "code": 406,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "Missing content-type header",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "e421dc2d-46f0-4873-9526-fb17b5698f65",
+              "name": "Occurs when the client sends an unsupported Content-Type header.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Version id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"v0.9.1-alpha\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unsupported Media Type",
+              "code": 415,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:TypeNotSupported\",\n  \"message\": \"Expected CONTENT-TYPE to be (expected value) but got (actual value).\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "9ebd1d4e-0785-4cb1-8627-32158536e777",
+              "name": "Returned if:\n\n* a constraint for a property was violated (`PropertyConstraintViolation`)",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Version id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"v0.9.1-alpha\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
+              "code": 422,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "da35c321-3da0-4599-aeee-0e3c9288fde9",
+          "name": "Version update form",
+          "request": {
+            "name": "Version update form",
+            "description": {
+              "content": "",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "versions",
+                ":id",
+                "form"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<integer>",
+                  "key": "id",
+                  "description": "(Required) Project id"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "POST",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "7f9768fe-ce86-4b26-b5c4-8e58e15428d2",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions",
+                    ":id",
+                    "form"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Project id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "d488aa5c-0d62-42e8-bf0a-eca71a4c09fc",
+              "name": "Occurs when the client did not send a valid JSON object in the request body.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions",
+                    ":id",
+                    "form"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Project id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:InvalidRequestBody\",\n  \"message\": \"The request body was not a single JSON object.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "3929b097-29b2-413c-b3c9-bda51cbcfe55",
+              "name": "Returned if the client does not have sufficient permissions.\n\n**Required permission:** manage versions in the version's project",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions",
+                    ":id",
+                    "form"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Project id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:MissingPermission\",\n  \"message\": \"You are not authorized to access this resource.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "0323903a-01e8-409b-a495-c5ba80fefc84",
+              "name": "Occurs when the client did not send a Content-Type header",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions",
+                    ":id",
+                    "form"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Project id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "text/plain"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Not Acceptable",
+              "code": 406,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "Missing content-type header",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "8aa32d4b-7b44-40cf-84a1-e2f9f2ff9b4c",
+              "name": "Occurs when the client sends an unsupported Content-Type header.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "versions",
+                    ":id",
+                    "form"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Project id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Unsupported Media Type",
+              "code": 415,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:TypeNotSupported\",\n  \"message\": \"Expected CONTENT-TYPE to be (expected value) but got (actual value).\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "1a31bd2c-03a2-4ed6-97b3-f968d5035476",
+          "name": "List versions available in a workspace",
+          "request": {
+            "name": "List versions available in a workspace",
+            "description": {
+              "content": "This endpoint lists the versions that are *available* in a given workspace.\nNote that due to sharing this might be more than the versions *defined* by that workspace.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "workspaces",
+                ":id",
+                "versions"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<integer>",
+                  "key": "id",
+                  "description": "(Required) ID of the workspace whose versions will be listed"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "c06e458e-6114-4ab0-816c-96c9562a7528",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "workspaces",
+                    ":id",
+                    "versions"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) ID of the workspace whose versions will be listed"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_embedded\": {\n    \"elements\": [\n      {\n        \"_links\": {\n          \"availableInProjects\": {\n            \"href\": \"/api/v3/versions/11/workspaces\"\n          },\n          \"definingProject\": {\n            \"href\": \"/api/v3/projects/11\"\n          },\n          \"self\": {\n            \"href\": \"/api/v3/versions/11\"\n          }\n        },\n        \"_type\": \"Version\",\n        \"description\": {\n          \"format\": \"plain\",\n          \"html\": \"This version has a description\",\n          \"raw\": \"This version has a description\"\n        },\n        \"endDate\": null,\n        \"id\": 11,\n        \"name\": \"v3.0 Alpha\",\n        \"startDate\": \"2014-11-20\",\n        \"status\": \"Open\"\n      },\n      {\n        \"_links\": {\n          \"availableInProjects\": {\n            \"href\": \"/api/v3/versions/12/workspaces\"\n          },\n          \"definingProject\": {\n            \"href\": \"/api/v3/projects/11\"\n          },\n          \"self\": {\n            \"href\": \"/api/v3/versions/12\"\n          }\n        },\n        \"_type\": \"Version\",\n        \"description\": {\n          \"format\": \"plain\",\n          \"html\": \"\",\n          \"raw\": \"\"\n        },\n        \"endDate\": null,\n        \"id\": 12,\n        \"name\": \"v2.0\",\n        \"startDate\": null,\n        \"status\": \"Closed\"\n      },\n      {\n        \"_links\": {\n          \"availableInProjects\": {\n            \"href\": \"/api/v3/versions/10/workspaces\"\n          },\n          \"definingProject\": {\n            \"href\": \"/api/v3/projects/11\"\n          },\n          \"self\": {\n            \"href\": \"/api/v3/versions/10\"\n          }\n        },\n        \"_type\": \"Version\",\n        \"description\": {\n          \"format\": \"plain\",\n          \"html\": \"\",\n          \"raw\": \"\"\n        },\n        \"endDate\": null,\n        \"id\": 10,\n        \"name\": \"v1.0\",\n        \"startDate\": null,\n        \"status\": \"Open\"\n      }\n    ]\n  },\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/workspaces/11/versions\"\n    }\n  },\n  \"_type\": \"Collection\",\n  \"count\": 3,\n  \"total\": 3\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b581a78f-63d0-4bb4-8152-5af43bc892aa",
+              "name": "Returned if the workspace does not exist or the client does not have sufficient permissions\nto see it.\n\n**Required permission:** view work packages **or** manage versions (on given workspace)\n\n*Note: A client without sufficient permissions shall not be able to test for the existence of a workspace.\nThat's why a 404 is returned here, even if a 403 might be more appropriate.*",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "workspaces",
+                    ":id",
+                    "versions"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) ID of the workspace whose versions will be listed"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:NotFound\",\n  \"message\": \"The specified project does not exist.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://qa.openproject-edge.com",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {
+        "key": "username",
+        "value": "{{basicAuthUsername}}"
+      },
+      {
+        "key": "password",
+        "value": "{{basicAuthPassword}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "3ca592aa-c98d-4341-b986-6060a429173a",
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Versions API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "You're looking at the current **stable** documentation of the OpenProject APIv3. If you're interested in the current\ndevelopment version, please go to [github.com/opf](https://github.com/opf/openproject/tree/dev/docs/api/apiv3).\n\n## Introduction\n\nThe documentation for the APIv3 is written according to the [OpenAPI 3.1 Specification](https://swagger.io/specification/).\nYou can either view the static version of this documentation on the [website](https://www.openproject.org/docs/api/introduction/)\nor the interactive version, rendered with [OpenAPI Explorer](https://github.com/Rhosys/openapi-explorer/blob/main/README.md),\nin your OpenProject installation under `/api/docs`.\nIn the latter you can try out the various API endpoints directly interacting with our OpenProject data.\nMoreover you can access the specification source itself under `/api/v3/spec.json` and `/api/v3/spec.yml`\n(e.g. [here](https://community.openproject.org/api/v3/spec.yml)).\n\nThe APIv3 is a hypermedia REST API, a shorthand for \"Hypermedia As The Engine Of Application State\" (HATEOAS).\nThis means that each endpoint of this API will have links to other resources or actions defined in the resulting body.\n\nThese related resources and actions for any given resource will be context sensitive. For example, only actions that the\nauthenticated user can take are being rendered. This can be used to dynamically identify actions that the user might take for any\ngiven response.\n\nAs an example, if you fetch a work package through the [Work Package endpoint](https://www.openproject.org/docs/api/endpoints/work-packages/), the `update` link will only\nbe present when the user you authenticated has been granted a permission to update the work package in the assigned project.\n\n## HAL+JSON\n\nHAL is a simple format that gives a consistent and easy way to hyperlink between resources in your API.\nRead more in the following specification: [https://tools.ietf.org/html/draft-kelly-json-hal-08](https://tools.ietf.org/html/draft-kelly-json-hal-08)\n\n**OpenProject API implementation of HAL+JSON format** enriches JSON and introduces a few meta properties:\n\n- `_type` - specifies the type of the resource (e.g.: WorkPackage, Project)\n- `_links` - contains all related resource and action links available for the resource\n- `_embedded` - contains all embedded objects\n\nHAL does not guarantee that embedded resources are embedded in their full representation, they might as well be\npartially represented (e.g. some properties can be left out).\nHowever in this API you have the guarantee that whenever a resource is **embedded**, it is embedded in its **full representation**.\n\n## API response structure\n\nAll API responses contain a single HAL+JSON object, even collections of objects are technically represented by\na single HAL+JSON object that itself contains its members. More details on collections can be found\nin the [Collections Section](https://www.openproject.org/docs/api/collections/).\n\n## Authentication\n\nThe API supports the following authentication schemes:\n\n* Session-based authentication\n* API tokens\n    * passed as Bearer token\n    * passed via Basic auth\n* OAuth 2.0\n    * using built-in authorization server\n    * using an external authorization server (RFC 9068)\n\nDepending on the settings of the OpenProject instance many resources can be accessed without being authenticated.\nIn case the instance requires authentication on all requests the client will receive an **HTTP 401** status code\nin response to any request.\n\nOtherwise unauthenticated clients have all the permissions of the anonymous user.\n\n### Session-based authentication\n\nThis means you have to login to OpenProject via the Web-Interface to be authenticated in the API.\nThis method is well-suited for clients acting within the browser, like the Angular-Client built into OpenProject.\n\nIn this case, you always need to pass the HTTP header `X-Requested-With \"XMLHttpRequest\"` for authentication.\n\n### API token as bearer token\n\nUsers can authenticate towards the API v3 using an API token as a bearer token.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -H \"Authorization: Bearer $API_KEY\" https://community.openproject.org/api/v3/users/42\n```\n\nUsers can generate API tokens on their account page.\n\n### API token through Basic Auth\n\nAPI tokens can also be used with basic auth, using the user name `apikey` (NOT your login) and the API token as the password.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -u apikey:$API_KEY https://community.openproject.org/api/v3/users/42\n```\n\n### OAuth 2.0 authentication\n\nOpenProject allows authentication and authorization with OAuth2 with *Authorization code flow*, as well as *Client credentials* operation modes.\n\nTo get started, you first need to register an application in the OpenProject OAuth administration section of your installation.\nThis will save an entry for your application with a client unique identifier (`client_id`) and an accompanying secret key (`client_secret`).\n\nYou can then use one the following guides to perform the supported OAuth 2.0 flows:\n\n- [Authorization code flow](https://oauth.net/2/grant-types/authorization-code)\n\n- [Authorization code flow with PKCE](https://doorkeeper.gitbook.io/guides/ruby-on-rails/pkce-flow), recommended for clients unable to keep the client_secret confidential\n\n- [Client credentials](https://oauth.net/2/grant-types/client-credentials/) - Requires an application to be bound to an impersonating user for non-public access\n\n### OAuth 2.0 using an external authorization server\n\nThere is a possibility to use JSON Web Tokens (JWT) generated by an OIDC provider configured in OpenProject as a bearer token to do authenticated requests against the API.\nThe following requirements must be met:\n\n- OIDC provider must be configured in OpenProject with **jwks_uri**\n- JWT must be signed using RSA algorithm\n- JWT **iss** claim must be equal to OIDC provider **issuer**\n- JWT **aud** claim must contain the OpenProject **client ID** used at the OIDC provider\n- JWT **scope** claim must include a valid scope to access the desired API (e.g. `api_v3` for APIv3)\n- JWT must be actual (neither expired or too early to be used)\n- JWT must be passed in Authorization header like: `Authorization: Bearer {jwt}`\n- User from **sub** claim must be linked to OpenProject before (e.g. by logging in), otherwise it will be not authenticated\n\nIn more general terms, OpenProject should be compliant to [RFC 9068](https://www.rfc-editor.org/rfc/rfc9068) when validating access tokens.\n\n### Why not username and password?\n\nThe simplest way to do basic auth would be to use a user's username and password naturally.\nHowever, OpenProject already has supported API keys in the past for the API v2, though not through basic auth.\n\nUsing **username and password** directly would have some advantages:\n\n* It is intuitive for the user who then just has to provide those just as they would when logging into OpenProject.\n\n* No extra logic for token management necessary.\n\nOn the other hand using **API keys** has some advantages too, which is why we went for that:\n\n* If compromised while saved on an insecure client the user only has to regenerate the API key instead of changing their password, too.\n\n* They are naturally long and random which makes them invulnerable to dictionary attacks and harder to crack in general.\n\nMost importantly users may not actually have a password to begin with. Specifically when they have registered\nthrough an OpenID Connect provider.\n\n## Cross-Origin Resource Sharing (CORS)\n\nBy default, the OpenProject API is _not_ responding with any CORS headers.\nIf you want to allow cross-domain AJAX calls against your OpenProject instance, you need to enable CORS headers being returned.\n\nPlease see [our API settings documentation](https://www.openproject.org/docs/system-admin-guide/api-and-webhooks/) on\nhow to selectively enable CORS.\n\n## Allowed HTTP methods\n\n- `GET` - Get a single resource or collection of resources\n\n- `POST` - Create a new resource or perform\n\n- `PATCH` - Update a resource\n\n- `DELETE` - Delete a resource\n\n## Compression\n\nResponses are compressed if requested by the client. Currently [gzip](https://www.gzip.org/) and [deflate](https://tools.ietf.org/html/rfc1951)\nare supported. The client signals the desired compression by setting the [`Accept-Encoding` header](https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3).\nIf no `Accept-Encoding` header is send, `Accept-Encoding: identity` is assumed which will result in the API responding uncompressed.",
+      "type": "text/plain"
+    }
+  }
+}

@@ -1,0 +1,212 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Users API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Users",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Users",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/users",
+            "params": [
+              {
+                "name": "offset",
+                "value": "25",
+                "type": "query",
+                "description": "Page number inside the requested collection."
+              },
+              {
+                "name": "pageSize",
+                "value": "25",
+                "type": "query",
+                "description": "Number of elements to display per page."
+              },
+              {
+                "name": "filters",
+                "value": "[{ \"status\": { \"operator\": \"=\", \"values\": [\"invited\"] } }, { \"group\": { \"operator\": \"=\", \"values\": [\"1\"] } }, { \"name\": { \"operator\": \"=\", \"values\": [\"h.wurst@openproject.com\"] } }]",
+                "type": "query",
+                "description": "JSON specifying filter conditions.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)\nendpoint. Currently supported filters are:\n\n+ status: Status the user has\n\n+ group: Name of the group in which to-be-listed users are members.\n\n+ name: Filter users in whose first or last names, or email addresses the given string occurs.\n\n+ login: User's login"
+              },
+              {
+                "name": "sortBy",
+                "value": "[[\"status\", \"asc\"]]",
+                "type": "query",
+                "description": "JSON specifying sort criteria.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint."
+              },
+              {
+                "name": "select",
+                "value": "total,elements/name,elements/self,self",
+                "type": "query",
+                "description": "Comma separated list of properties to include."
+              }
+            ]
+          },
+          "docs": "Lists users. Only administrators or users with the following global permission can access this resource:\n- `manage_user`"
+        },
+        {
+          "info": {
+            "name": "Create User",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/users",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new user. Only administrators and users with manage_user global permission are allowed to do so.\nWhen calling this endpoint the client provides a single object, containing at least the properties and links that are required, in the body.\n\nValid values for `status`:\n\n1) \"active\" - In this case a password has to be provided in addition to the other attributes.\n\n2) \"invited\" - In this case nothing but the email address is required. The rest is optional. An invitation will be sent to the u"
+        },
+        {
+          "info": {
+            "name": "View user schema",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/users/schema"
+          },
+          "docs": "The schema response use two exemplary custom fields that extend the schema response. Depending on your instance and custom field configuration, the response will look somewhat different."
+        },
+        {
+          "info": {
+            "name": "View user",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/users/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "User id. Use `me` to reference current user, if any."
+              }
+            ]
+          },
+          "docs": "View user"
+        },
+        {
+          "info": {
+            "name": "Update user",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://qa.openproject-edge.com/api/v3/users/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "User id. Use `me` to reference current user, if any."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates the user's writable attributes.\nWhen calling this endpoint the client provides a single object, containing at least the properties and links that are required, in the body.\n\nPassword updates for self-service account changes require both `password` and `currentPassword`."
+        },
+        {
+          "info": {
+            "name": "Delete user",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://qa.openproject-edge.com/api/v3/users/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "User id. Use `me` to reference current user, if any."
+              }
+            ]
+          },
+          "docs": "Permanently deletes the specified user account."
+        },
+        {
+          "info": {
+            "name": "User update form",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/users/:id/form",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "User id. Use `me` to reference current user, if any."
+              }
+            ]
+          },
+          "docs": "Validates a user update payload.\n\nFor self password changes, provide both `password` and `currentPassword`."
+        },
+        {
+          "info": {
+            "name": "Lock user",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/users/:id/lock",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "User id"
+              }
+            ]
+          },
+          "docs": "Lock user"
+        },
+        {
+          "info": {
+            "name": "Unlock user",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://qa.openproject-edge.com/api/v3/users/:id/lock",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "User id"
+              }
+            ]
+          },
+          "docs": "Unlock user"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

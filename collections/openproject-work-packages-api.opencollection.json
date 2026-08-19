@@ -1,0 +1,852 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Work Packages API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Work Packages",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get work packages of project",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/projects/:id/work_packages",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Project id"
+              },
+              {
+                "name": "offset",
+                "value": "25",
+                "type": "query",
+                "description": "Page number inside the requested collection."
+              },
+              {
+                "name": "pageSize",
+                "value": "25",
+                "type": "query",
+                "description": "Number of elements to display per page."
+              },
+              {
+                "name": "filters",
+                "value": "[{ \"type_id\": { \"operator\": \"=\", \"values\": ['1', '2'] }}]",
+                "type": "query",
+                "description": "JSON specifying filter conditions.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint. If no filter is to be applied, the client should send an empty array (`[]`)."
+              },
+              {
+                "name": "sortBy",
+                "value": "[[\"status\", \"asc\"]]",
+                "type": "query",
+                "description": "JSON specifying sort criteria.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint."
+              },
+              {
+                "name": "groupBy",
+                "value": "status",
+                "type": "query",
+                "description": "The column to group by."
+              },
+              {
+                "name": "showSums",
+                "value": "true",
+                "type": "query",
+                "description": "Indicates whether properties should be summed up if they support it."
+              },
+              {
+                "name": "select",
+                "value": "total,elements/subject,elements/id,self",
+                "type": "query",
+                "description": "Comma separated list of properties to include."
+              }
+            ]
+          },
+          "docs": "Returns the collection of work packages that are related to the given project.\nThis endpoint is deprecated and replaced by [`/api/v3/workspaces/{id}/work_packages`](https://www.openproject.org/docs/api/endpoints/work-packages/#get-work-packages-of-workspace)"
+        },
+        {
+          "info": {
+            "name": "Create work package in project",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/projects/:id/work_packages",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Project id"
+              },
+              {
+                "name": "notify",
+                "value": "false",
+                "type": "query",
+                "description": "Indicates whether change notifications (e.g. via E-Mail) should be sent.\nNote that this controls notifications for all users interested in changes to the work package (e.g. watchers, author and assignee),\nnot just the current user."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "When calling this endpoint the client provides a single object, containing at least the properties and links that\nare required, in the body. The required fields of a WorkPackage can be found in its schema, which is embedded in\nthe respective form. Note that it is only allowed to provide properties or links supporting the write operation.\n\nThis endpoint is deprecated and replaced by [`/api/v3/workspaces/{id}/work_packages`](https://www.openproject.org/docs/api/endpoints/work-packages/#create-work"
+        },
+        {
+          "info": {
+            "name": "Form for creating Work Packages in a Project",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/projects/:id/work_packages/form",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "ID of the project in which the work package will be created"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "This endpoint allows you to validation a new work package creation body in a specific project. It works similarly\nto the `/api/v3/work_packages/form` endpoint, but already specifies the work package's project in the path, so that\nit does not have to be defined in the request body.\n\nThis endpoint is deprecated and replaced by [`/api/v3/workspaces/{id}/work_packages/form`](https://www.openproject.org/docs/api/endpoints/work-packages/#form-for-creating-work-packages-in-a-workspace)"
+        },
+        {
+          "info": {
+            "name": "Project Available assignees",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/projects/:id/available_assignees",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Project id"
+              }
+            ]
+          },
+          "docs": "Gets a list of users that can be assigned to work packages in the given project.\nThis endpoint is deprecated and replaced by [`/api/v3/workspaces/{id}/available_assignees`](https://www.openproject.org/docs/api/endpoints/work-packages/#workspace-available-assignees)"
+        },
+        {
+          "info": {
+            "name": "List work packages",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/work_packages",
+            "params": [
+              {
+                "name": "offset",
+                "value": "25",
+                "type": "query",
+                "description": "Page number inside the requested collection."
+              },
+              {
+                "name": "pageSize",
+                "value": "25",
+                "type": "query",
+                "description": "Number of elements to display per page."
+              },
+              {
+                "name": "filters",
+                "value": "[{ \"type_id\": { \"operator\": \"=\", \"values\": [\"1\", \"2\"] }}]",
+                "type": "query",
+                "description": "JSON specifying filter conditions.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)\nendpoint. If no filter is to be applied, the client should send an empty array (`[]`), otherwise a default\nfilter is applied. A Currently supported filters are (there are additional filters added by modules):\n\n- assigned_to\n- assignee_or_group\n- attachment_base\n- attachment_content\n- attachment_file_name\n- author\n- blocked\n- blocks\n- category\n- comment\n- created_at\n- custom_field\n- dates_interval\n- description\n- done_ratio\n- due_date\n- duplicated\n- duplicates\n- duration\n- estimated_hours\n- file_link_origin_id\n- follows\n- group\n- id\n- includes\n- linkable_to_storage_id\n- linkable_to_storage_url\n- manual_sort\n- milestone\n- only_subproject\n- parent\n- partof\n- precedes\n- principal_base\n- priority\n- project\n- relatable\n- relates\n- required\n- requires\n- responsible\n- role\n- search\n- start_date\n- status\n- storage_id\n- storage_url\n- subject\n- subject_or_id\n- subproject\n- type\n- typeahead\n- updated_at\n- version\n- watcher\n- work_package"
+              },
+              {
+                "name": "sortBy",
+                "value": "[[\"status\", \"asc\"]]",
+                "type": "query",
+                "description": "JSON specifying sort criteria.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint."
+              },
+              {
+                "name": "groupBy",
+                "value": "status",
+                "type": "query",
+                "description": "The column to group by."
+              },
+              {
+                "name": "showSums",
+                "value": "true",
+                "type": "query",
+                "description": "Indicates whether properties should be summed up if they support it."
+              },
+              {
+                "name": "select",
+                "value": "total,elements/subject,elements/id,self",
+                "type": "query",
+                "description": "Comma separated list of properties to include."
+              },
+              {
+                "name": "timestamps",
+                "value": "2022-01-01T00:00:00Z,PT0S",
+                "type": "query",
+                "description": "In order to perform a [baseline comparison](/docs/api/baseline-comparisons), you may provide one or several timestamps\nin ISO-8601 format as comma-separated list. The timestamps may be absolute or relative,\nsuch as ISO8601 dates, ISO8601 durations and the following relative date keywords: \"oneDayAgo@HH:MM+HH:MM\",\n\"lastWorkingDay@HH:MM+HH:MM\", \"oneWeekAgo@HH:MM+HH:MM\", \"oneMonthAgo@HH:MM+HH:MM\".\nThe first \"HH:MM\" part represents the zero paded hours and minutes.\nThe last \"+HH:MM\" part represents the timezone offset from UTC associated with the time,\nthe offset can be positive or negative e.g.\"oneDayAgo@01:00+01:00\", \"oneDayAgo@01:00-01:00\".\n\nUsually, the first timestamp is the baseline date, the last timestamp is the current date.\nValues older than 1 day are accepted only with valid Enterprise Token available."
+              }
+            ]
+          },
+          "docs": "Returns a collection of work packages."
+        },
+        {
+          "info": {
+            "name": "Create Work Package",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/work_packages",
+            "params": [
+              {
+                "name": "notify",
+                "value": "false",
+                "type": "query",
+                "description": "Indicates whether change notifications (e.g. via E-Mail) should be sent.\nNote that this controls notifications for all users interested in changes to the work package (e.g. watchers, author and assignee),\nnot just the current user."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "When calling this endpoint the client provides a single object, containing at least the properties and links that are required, in the body.\nThe required fields of a WorkPackage can be found in its schema, which is embedded in the respective form.\nNote that it is only allowed to provide properties or links supporting the write operation.\n\nA project link must be set when creating work packages through this route.\n\nWhen setting start date, finish date, and duration together, their correctness will"
+        },
+        {
+          "info": {
+            "name": "Form for creating a Work Package",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/work_packages/form",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "When calling this endpoint, the client provides a single object containing the properties and links to be\ncreated, in the body. The input is validated and a schema response is returned. If the validation errors of the\nresponse is empty, the same payload can be used to create a work package.\n\nOnly the properties of the work package write model are allowed to set on a work package on creation.\n\nWhen setting start date, finish date, and duration together, their correctness will be checked and a val"
+        },
+        {
+          "info": {
+            "name": "List Work Package Schemas",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/work_packages/schemas",
+            "params": [
+              {
+                "name": "filters",
+                "value": "[{ \"id\": { \"operator\": \"=\", \"values\": [\"12-1\", \"14-2\"] } }]",
+                "type": "query",
+                "description": "JSON specifying filter conditions.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)\nendpoint. Currently supported filters are:\n\n+ id: The schema's id\n\nSchema id has the form `project_id-work_package_type_id`."
+              }
+            ]
+          },
+          "docs": "List all work package schemas that match the given filters. This endpoint does not return a successful response,\nif no filter is given."
+        },
+        {
+          "info": {
+            "name": "View Work Package Schema",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/work_packages/schemas/:identifier",
+            "params": [
+              {
+                "name": "identifier",
+                "value": "12-13",
+                "type": "path",
+                "description": "Identifier of the schema"
+              }
+            ]
+          },
+          "docs": "View Work Package Schema"
+        },
+        {
+          "info": {
+            "name": "View Work Package",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/work_packages/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Work package id"
+              },
+              {
+                "name": "timestamps",
+                "value": "2022-01-01T00:00:00Z,PT0S",
+                "type": "query",
+                "description": "In order to perform a [baseline comparison](/docs/api/baseline-comparisons) of the work-package attributes, you may\nprovide one or several timestamps in ISO-8601 format as comma-separated list. The timestamps may be absolute or relative,\nsuch as ISO8601 dates, ISO8601 durations and the following relative date keywords: \"oneDayAgo@HH:MM+HH:MM\",\n\"lastWorkingDay@HH:MM+HH:MM\", \"oneWeekAgo@HH:MM+HH:MM\", \"oneMonthAgo@HH:MM+HH:MM\".\nThe first \"HH:MM\" part represents the zero paded hours and minutes.\nThe last \"+HH:MM\" part represents the timezone offset from UTC associated with the time,\nthe offset can be positive or negative e.g.\"oneDayAgo@01:00+01:00\", \"oneDayAgo@01:00-01:00\".\n\nUsually, the first timestamp is the baseline date, the last timestamp is the current date.\nValues older than 1 day are accepted only with valid Enterprise Token available."
+              }
+            ]
+          },
+          "docs": "Returns the specified work package."
+        },
+        {
+          "info": {
+            "name": "Update a Work Package",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://qa.openproject-edge.com/api/v3/work_packages/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "42",
+                "type": "path",
+                "description": "Work package id"
+              },
+              {
+                "name": "notify",
+                "value": "false",
+                "type": "query",
+                "description": "Indicates whether change notifications should be sent. Note that this controls notifications for all users\ninterested in changes to the work package (e.g. watchers, author and assignee), not just the current user."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "When calling this endpoint the client provides a single object, containing the properties and links that it wants\nto change, in the body. Note that it is only allowed to provide properties or links supporting the **write**\noperation.\n\nAdditionally to the fields the client wants to change, it is mandatory to provide the value of `lockVersion` which\nwas received by the `GET` request this change originates from.\n\nThe value of `lockVersion` is used to implement\n[optimistic locking](https://en.wikipe"
+        },
+        {
+          "info": {
+            "name": "Delete Work Package",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://qa.openproject-edge.com/api/v3/work_packages/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Work package id"
+              }
+            ]
+          },
+          "docs": "Deletes the work package, as well as:\n\n- all associated time entries\n- its hierarchy of child work packages"
+        },
+        {
+          "info": {
+            "name": "List work package activities",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/work_packages/:id/activities",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Work package id"
+              }
+            ]
+          },
+          "docs": "List work package activities"
+        },
+        {
+          "info": {
+            "name": "Comment work package",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/work_packages/:id/activities",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Work package id"
+              },
+              {
+                "name": "notify",
+                "value": "false",
+                "type": "query",
+                "description": "Indicates whether change notifications (e.g. via E-Mail) should be sent.\nNote that this controls notifications for all users interested in changes to the work package (e.g. watchers, author and assignee),\nnot just the current user."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates an activity for the selected work package and, on success, returns the\nupdated activity."
+        },
+        {
+          "info": {
+            "name": "Work Package Available assignees",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/work_packages/:id/available_assignees",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Work package id"
+              }
+            ]
+          },
+          "docs": "Gets a list of users that can be assigned to the given work package."
+        },
+        {
+          "info": {
+            "name": "Available projects for work package",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/work_packages/:id/available_projects",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "work package id"
+              }
+            ]
+          },
+          "docs": "Gets a list of projects that are available as projects to which the work package can be moved."
+        },
+        {
+          "info": {
+            "name": "Available relation candidates",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/work_packages/:id/available_relation_candidates",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Project id"
+              },
+              {
+                "name": "pageSize",
+                "value": "25",
+                "type": "query",
+                "description": "Maximum number of candidates to list (default 10)"
+              },
+              {
+                "name": "filters",
+                "value": "[{ \"status_id\": { \"operator\": \"o\", \"values\": null } }]",
+                "type": "query",
+                "description": "JSON specifying filter conditions.\nAccepts the same filters as the [work packages](https://www.openproject.org/docs/api/endpoints/work-packages/) endpoint."
+              },
+              {
+                "name": "query",
+                "value": "\"rollout\"",
+                "type": "query",
+                "description": "Shortcut for filtering by ID or subject"
+              },
+              {
+                "name": "type",
+                "value": "\"follows\"",
+                "type": "query",
+                "description": "Type of relation to find candidates for (default \"relates\")"
+              },
+              {
+                "name": "sortBy",
+                "value": "[[\"status\", \"asc\"]]",
+                "type": "query",
+                "description": "JSON specifying sort criteria.\nAccepts the same sort criteria as the [work packages](https://www.openproject.org/docs/api/endpoints/work-packages/) endpoint."
+              }
+            ]
+          },
+          "docs": "Available relation candidates"
+        },
+        {
+          "info": {
+            "name": "Available watchers",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/work_packages/:id/available_watchers",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "work package id"
+              }
+            ]
+          },
+          "docs": "Gets a list of users that are able to be watchers of the specified work package."
+        },
+        {
+          "info": {
+            "name": "Gets all file links of a work package",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/work_packages/:id/file_links",
+            "params": [
+              {
+                "name": "id",
+                "value": "1337",
+                "type": "path",
+                "description": "Work package id"
+              },
+              {
+                "name": "filters",
+                "value": "[{\"storage\":{\"operator\":\"=\",\"values\":[\"42\"]}}]",
+                "type": "query",
+                "description": "JSON specifying filter conditions.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)\nendpoint. The following filters are supported:\n\n- storage"
+              }
+            ]
+          },
+          "docs": "Gets all file links of a work package.\n\nAs a side effect, for every file link a request is sent to the storage's origin to fetch live data and patch\nthe file link's data before returning, as well as retrieving permissions of the user on this origin file. "
+        },
+        {
+          "info": {
+            "name": "Creates file links.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/work_packages/:id/file_links",
+            "params": [
+              {
+                "name": "id",
+                "value": "1337",
+                "type": "path",
+                "description": "Work package id"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates file links on a work package.\n\nThe request is interpreted as a bulk insert, where every element of the collection is validated separately. Each\nelement contains the origin meta data and a link to the storage, the file link is about to point to. The storage\nlink can be provided as a resource link with id or as the host url.\n\nThe file's id and name are considered mandatory information. The rest of the origin meta data SHOULD be provided\nby the client. The _mimeType_ SHOULD be a standard mi"
+        },
+        {
+          "info": {
+            "name": "Form for editing a Work Package",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/work_packages/:id/form",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "ID of the work package being modified"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "When calling this endpoint, the client provides a single object containing the properties and links to be\nedited, in the body. The input is validated and a schema response is returned. If the validation errors of the\nresponse is empty, the same payload can be used to edit the work package.\n\nOnly the properties of the work package write model are allowed to set on a work package on editing.\n\nWhen setting start date, finish date, and duration together, their correctness will be checked and a valid"
+        },
+        {
+          "info": {
+            "name": "Revisions",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/work_packages/:id/revisions",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Work package id"
+              }
+            ]
+          },
+          "docs": "Gets a list of revisions that are linked to this work package, e.g., because it is referenced in the commit message of the revision.\nOnly linked revisions from repositories are shown if the user has the view changesets permission in the defining project."
+        },
+        {
+          "info": {
+            "name": "List work package reminders",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/work_packages/:work_package_id/reminders",
+            "params": [
+              {
+                "name": "work_package_id",
+                "value": "1",
+                "type": "path",
+                "description": "Work package id"
+              }
+            ]
+          },
+          "docs": "Gets a list of your upcoming reminders for this work package.\n\nOnly active reminders that belong to the current user are returned."
+        },
+        {
+          "info": {
+            "name": "Create a work package reminder",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/work_packages/:work_package_id/reminders",
+            "params": [
+              {
+                "name": "work_package_id",
+                "value": "1",
+                "type": "path",
+                "description": "Work package id"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new reminder for the specified work package.\n\n**Note:** A user can only have one **active** reminder at a time for a given work package."
+        },
+        {
+          "info": {
+            "name": "List watchers",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/work_packages/:id/watchers",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Work package id"
+              }
+            ]
+          },
+          "docs": "List watchers"
+        },
+        {
+          "info": {
+            "name": "Add watcher",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/work_packages/:id/watchers",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Work package id"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Adds a watcher to the specified work package.\n\nThe request is expected to contain a single JSON object, that contains a link object under the `user` key.\n\nThe response will be user added as watcher.\nIn case the user was already watching the work package an `HTTP 200` is returned, an\n`HTTP 201` if the user was added as a new watcher."
+        },
+        {
+          "info": {
+            "name": "Remove watcher",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://qa.openproject-edge.com/api/v3/work_packages/:id/watchers/:user_id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Work package id"
+              },
+              {
+                "name": "user_id",
+                "value": "1",
+                "type": "path",
+                "description": "User id"
+              }
+            ]
+          },
+          "docs": "Removes the specified user from the list of watchers for the given work package.\n\nIf the request succeeds, the specified user is not watching the work package anymore.\n\n*Note: This might also be the case, if the specified user did not watch the work package prior to the request.*"
+        },
+        {
+          "info": {
+            "name": "Workspace Available assignees",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/workspaces/:id/available_assignees",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Workspace id"
+              }
+            ]
+          },
+          "docs": "Gets a list of users that can be assigned to work packages in the given workspace."
+        },
+        {
+          "info": {
+            "name": "Get work packages of workspace",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/workspaces/:id/work_packages",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Workspace id"
+              },
+              {
+                "name": "offset",
+                "value": "25",
+                "type": "query",
+                "description": "Page number inside the requested collection."
+              },
+              {
+                "name": "pageSize",
+                "value": "25",
+                "type": "query",
+                "description": "Number of elements to display per page."
+              },
+              {
+                "name": "filters",
+                "value": "[{ \"type_id\": { \"operator\": \"=\", \"values\": ['1', '2'] }}]",
+                "type": "query",
+                "description": "JSON specifying filter conditions.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint. If no filter is to be applied, the client should send an empty array (`[]`)."
+              },
+              {
+                "name": "sortBy",
+                "value": "[[\"status\", \"asc\"]]",
+                "type": "query",
+                "description": "JSON specifying sort criteria.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint."
+              },
+              {
+                "name": "groupBy",
+                "value": "status",
+                "type": "query",
+                "description": "The column to group by."
+              },
+              {
+                "name": "showSums",
+                "value": "true",
+                "type": "query",
+                "description": "Indicates whether properties should be summed up if they support it."
+              },
+              {
+                "name": "select",
+                "value": "total,elements/subject,elements/id,self",
+                "type": "query",
+                "description": "Comma separated list of properties to include."
+              }
+            ]
+          },
+          "docs": "Returns the collection of work packages that are related to the given workspace."
+        },
+        {
+          "info": {
+            "name": "Create work package in workspace",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/workspaces/:id/work_packages",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Project id"
+              },
+              {
+                "name": "notify",
+                "value": "false",
+                "type": "query",
+                "description": "Indicates whether change notifications (e.g. via E-Mail) should be sent.\nNote that this controls notifications for all users interested in changes to the work package (e.g. watchers, author and assignee),\nnot just the current user."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "When calling this endpoint the client provides a single object, containing at least the properties and links that\nare required, in the body. The required fields of a WorkPackage can be found in its schema, which is embedded in\nthe respective form. Note that it is only allowed to provide properties or links supporting the write operation."
+        },
+        {
+          "info": {
+            "name": "Form for creating Work Packages in a Workspace",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/workspaces/:id/work_packages/form",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "ID of the workspace in which the work package will be created"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "This endpoint allows you to validation a new work package creation body in a specific workspace. It works similarly\nto the `/api/v3/work_packages/form` endpoint, but already specifies the work package's workspace in the path, so that\nit does not have to be defined in the request body."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

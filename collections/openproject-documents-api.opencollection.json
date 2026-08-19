@@ -1,0 +1,98 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Documents API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Documents",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Documents",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/documents",
+            "params": [
+              {
+                "name": "offset",
+                "value": "25",
+                "type": "query",
+                "description": "Page number inside the requested collection."
+              },
+              {
+                "name": "pageSize",
+                "value": "25",
+                "type": "query",
+                "description": "Number of elements to display per page."
+              },
+              {
+                "name": "sortBy",
+                "value": "[[\"created_at\", \"asc\"]]",
+                "type": "query",
+                "description": "JSON specifying sort criteria.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint. Currently supported sorts are:\n\n+ id: Sort by primary key\n\n+ created_at: Sort by document creation datetime"
+              }
+            ]
+          },
+          "docs": "The documents returned depend on the provided parameters and also on the requesting user's permissions."
+        },
+        {
+          "info": {
+            "name": "View document",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/documents/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Document id"
+              }
+            ]
+          },
+          "docs": "View document"
+        },
+        {
+          "info": {
+            "name": "Update document",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://qa.openproject-edge.com/api/v3/documents/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Document id"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates a document's attributes."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

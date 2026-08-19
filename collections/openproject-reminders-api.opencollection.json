@@ -1,0 +1,120 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Reminders API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Reminders",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List all active reminders",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/reminders"
+          },
+          "docs": "Gets a list of all active reminders for the user."
+        },
+        {
+          "info": {
+            "name": "Update a reminder",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://qa.openproject-edge.com/api/v3/reminders/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Reminder ID"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates an existing reminder.\n\nA user can only update their own active reminder.\n\n**Required permission:** view work packages for the project the reminder is contained in."
+        },
+        {
+          "info": {
+            "name": "Delete a reminder",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://qa.openproject-edge.com/api/v3/reminders/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Reminder ID"
+              }
+            ]
+          },
+          "docs": "Deletes an existing reminder.\n\nA user can only delete their own active reminder.\n\n**Required permission:** view work packages for the project the reminder is contained in."
+        },
+        {
+          "info": {
+            "name": "List work package reminders",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/work_packages/:work_package_id/reminders",
+            "params": [
+              {
+                "name": "work_package_id",
+                "value": "1",
+                "type": "path",
+                "description": "Work package id"
+              }
+            ]
+          },
+          "docs": "Gets a list of your upcoming reminders for this work package.\n\nOnly active reminders that belong to the current user are returned."
+        },
+        {
+          "info": {
+            "name": "Create a work package reminder",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/work_packages/:work_package_id/reminders",
+            "params": [
+              {
+                "name": "work_package_id",
+                "value": "1",
+                "type": "path",
+                "description": "Work package id"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new reminder for the specified work package.\n\n**Note:** A user can only have one **active** reminder at a time for a given work package."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

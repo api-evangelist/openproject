@@ -1,0 +1,55 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Project Phase Definitions API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Project Phase Definitions",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List project phase definitions",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/project_phase_definitions"
+          },
+          "docs": "Returns a collection of all project phase definitions.\nThe result set is always limited to only contain project phase definitions the client is allowed to see."
+        },
+        {
+          "info": {
+            "name": "Get a project phase definition",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/project_phase_definitions/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1337",
+                "type": "path",
+                "description": "Project phase definition id"
+              }
+            ]
+          },
+          "docs": "Gets a project phase definition resource. This resource is part of the abstract definition of a project life\ncycle shaping the phases of a project. "
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

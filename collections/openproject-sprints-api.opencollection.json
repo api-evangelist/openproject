@@ -1,0 +1,112 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Sprints API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Sprints",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List sprints in project",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/projects/:id/sprints",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "ID of the project whose sprints will be listed"
+              },
+              {
+                "name": "filters",
+                "value": "[{ \"definingWorkspace\": { \"operator\": \"=\", \"values\": [\"1\"] }\" }]",
+                "type": "query",
+                "description": "JSON specifying filter conditions.\n\nAccepts the same format and filters as returned by the [sprints](https://www.openproject.org/docs/api/endpoints/sprints/) endpoint."
+              },
+              {
+                "name": "offset",
+                "value": "25",
+                "type": "query",
+                "description": "Page number inside the requested collection."
+              },
+              {
+                "name": "pageSize",
+                "value": "25",
+                "type": "query",
+                "description": "Number of elements to display per page."
+              }
+            ]
+          },
+          "docs": "List sprints in the project. The sprints might be ones native to the project or shared with it. This endpoint supports pagination and filtering."
+        },
+        {
+          "info": {
+            "name": "List sprints",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/sprints",
+            "params": [
+              {
+                "name": "filters",
+                "value": "[{ \"definingWorkspace\": { \"operator\": \"=\", \"values\": [\"1\"] }\" }]",
+                "type": "query",
+                "description": "JSON specifying filter conditions.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint.\nCurrently supported filters are:\n\n+ definingWorkspace: filters sprints based on the project they are defined in. This is opposed to the projects they are shared with."
+              },
+              {
+                "name": "offset",
+                "value": "25",
+                "type": "query",
+                "description": "Page number inside the requested collection."
+              },
+              {
+                "name": "pageSize",
+                "value": "25",
+                "type": "query",
+                "description": "Number of elements to display per page."
+              }
+            ]
+          },
+          "docs": "List sprints visible to the user. This endpoint supports pagination and filtering."
+        },
+        {
+          "info": {
+            "name": "Get sprint",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/sprints/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Sprint id"
+              }
+            ]
+          },
+          "docs": "Retrieves a sprint defined by its unique identifier."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

@@ -1,0 +1,93 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Types API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Types",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List types available in a project",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/projects/:id/types",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "ID of the project whose types will be listed"
+              }
+            ]
+          },
+          "docs": "This endpoint lists the types that are *available* in a given project.\nThis endpoint is deprecated and replaced by [`/api/v3/workspaces/{id}/types`](https://www.openproject.org/docs/api/endpoints/types/#list-types-available-in-a-workspace)"
+        },
+        {
+          "info": {
+            "name": "List all Types",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/types"
+          },
+          "docs": "List all Types"
+        },
+        {
+          "info": {
+            "name": "View Type",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/types/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Type id"
+              }
+            ]
+          },
+          "docs": "View Type"
+        },
+        {
+          "info": {
+            "name": "List types available in a workspace",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/workspaces/:id/types",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "ID of the workspace whose types will be listed"
+              }
+            ]
+          },
+          "docs": "This endpoint lists the types that are *available* in a given workspace."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

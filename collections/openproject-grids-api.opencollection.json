@@ -1,0 +1,143 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Grids API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Grids",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List grids",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/grids",
+            "params": [
+              {
+                "name": "offset",
+                "value": "25",
+                "type": "query",
+                "description": "Page number inside the requested collection."
+              },
+              {
+                "name": "pageSize",
+                "value": "25",
+                "type": "query",
+                "description": "Number of elements to display per page."
+              },
+              {
+                "name": "filters",
+                "value": "[{ \"page\": { \"operator\": \"=\", \"values\": [\"/my/page\"] } }]",
+                "type": "query",
+                "description": "JSON specifying filter conditions. Accepts the same format as returned by\nthe [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint. Currently supported filters\nare:\n\n- page: Filter grid by work package"
+              }
+            ]
+          },
+          "docs": "Lists all grids matching the provided filters and being part of the selected query page. The grids returned will\nalso depend on the permissions of the requesting user."
+        },
+        {
+          "info": {
+            "name": "Create a grid",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/grids",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new grid applying the attributes provided in the body. The constraints applied to the grid depend on the\npage the grid is placed in which is why the create form endpoint should be used to be guided when wanting to\ncreate a grid."
+        },
+        {
+          "info": {
+            "name": "Grid Create Form",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/grids/form"
+          },
+          "docs": "Grid Create Form"
+        },
+        {
+          "info": {
+            "name": "Get a grid",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/grids/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "42",
+                "type": "path",
+                "description": "Grid id"
+              }
+            ]
+          },
+          "docs": "Fetches a single grid identified by its id."
+        },
+        {
+          "info": {
+            "name": "Update a grid",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://qa.openproject-edge.com/api/v3/grids/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "42",
+                "type": "path",
+                "description": "Grid id"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates the given grid by applying the attributes provided in the body. The constraints applied to the grid depend\non the page the grid is placed in which is why the create form endpoint should be used to be guided when wanting\nto update a grid."
+        },
+        {
+          "info": {
+            "name": "Grid Update Form",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/grids/:id/form",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "ID of the grid being modified"
+              }
+            ]
+          },
+          "docs": "Grid Update Form"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

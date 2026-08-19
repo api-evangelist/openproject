@@ -1,0 +1,69 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Values::Property API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Values::Property",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get a notification detail",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/notifications/:notification_id/details/:id",
+            "params": [
+              {
+                "name": "notification_id",
+                "value": "1",
+                "type": "path",
+                "description": "notification id"
+              },
+              {
+                "name": "id",
+                "value": "0",
+                "type": "path",
+                "description": "detail id"
+              }
+            ]
+          },
+          "docs": "Returns an individual detail of a notification identified by the notification id and the id of the detail."
+        },
+        {
+          "info": {
+            "name": "View Values schema",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/values/schema/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "startDate",
+                "type": "path",
+                "description": "The identifier of the value. This is typically the value of the `property` property of\nthe `Values` resource. It should be in lower camelcase format."
+              }
+            ]
+          },
+          "docs": "The schema of a `Values` resource."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

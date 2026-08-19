@@ -1,0 +1,186 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Memberships API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Memberships",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List memberships",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/memberships",
+            "params": [
+              {
+                "name": "filters",
+                "value": "",
+                "type": "query",
+                "description": "JSON specifying filter conditions.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)\nendpoint. Currently supported filters are:\n\n+ any_name_attribute: filters memberships based on the name of the principal. All possible name variants\n  (and also email and login) are searched.\n+ blocked: reduces the result set to all memberships that are temporarily blocked or that are not blocked\n  temporarily.\n+ group: filters memberships based on the name of a group. The group however is not the principal used for\n  filtering. Rather, the memberships of the group are used as the filter values.\n+ name: filters memberships based on the name of the principal. Note that only the name is used which depends\n  on a setting in the OpenProject instance.\n+ principal: filters memberships based on the id of the principal.\n+ project: filters memberships based on the id of the project.\n+ role: filters memberships based on the id of any role assigned to the membership.\n+ status: filters memberships based on the status of the principal.\n+ created_at: filters memberships based on the time the membership was created.\n+ updated_at: filters memberships based on the time the membership was updated last."
+              },
+              {
+                "name": "sortBy",
+                "value": "[[\"id\", \"asc\"]]",
+                "type": "query",
+                "description": "JSON specifying sort criteria.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)\nendpoint. Currently supported sorts are:\n\n+ id: Sort by primary key\n+ name: Sort by the name of the principal. Note that this depends on the setting for how the name is to be\n  displayed at least for users.\n+ email: Sort by the email address of the principal. Groups and principal users, which do not have an email,\n  are sorted last.\n+ status: Sort by the status of the principal. Groups and principal users, which do not have a status, are\n  sorted together with the active users.\n+ created_at: Sort by membership creation datetime\n+ updated_at: Sort by the time the membership was updated last"
+              }
+            ]
+          },
+          "docs": "Returns a collection of memberships. The client can choose to filter\nthe memberships similar to how work packages are filtered. In addition to the\nprovided filters, the server will reduce the result set to only contain memberships,\nfor which the requesting client has sufficient permissions (*view_members*, *manage_members*)."
+        },
+        {
+          "info": {
+            "name": "Create a membership",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/memberships",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new membership applying the attributes provided in the body.\n\nYou can use the form and schema to retrieve the valid attribute values and by that be guided towards successful\ncreation.\n\nBy providing a `notificationMessage` within the `_meta` block of the payload, the client can include a customized\nmessage to the user of the newly created membership. In case of a group, the message will be sent to every user\nbelonging to the group.\n\nBy including `{ \"sendNotifications\": false }` within t"
+        },
+        {
+          "info": {
+            "name": "Available projects for memberships",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/memberships/available_projects"
+          },
+          "docs": "Gets a list of projects in which a membership can be created in. The list contains all projects in which the user\nissuing the request has the manage members permissions."
+        },
+        {
+          "info": {
+            "name": "Form create membership",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/memberships/form",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Requests and validates the creation form for memberships. The request payload, if sent, is validated. The form\nendpoint itself does not create a membership."
+        },
+        {
+          "info": {
+            "name": "Schema membership",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/memberships/schema"
+          },
+          "docs": "Retrieves the schema for the membership resource object."
+        },
+        {
+          "info": {
+            "name": "Get a membership",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/memberships/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Membership id"
+              }
+            ]
+          },
+          "docs": "Retrieves a membership resource identified by the given id."
+        },
+        {
+          "info": {
+            "name": "Update membership",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://qa.openproject-edge.com/api/v3/memberships/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Membership id"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates the given membership by applying the attributes provided in the body.\n\nBy providing a `notificationMessage` within the `_meta` block of the payload, the client can include a customized message to the user\nof the updated membership. In case of a group, the message will be sent to every user belonging to the group.\n\nBy including `{ \"sendNotifications\": false }` within the `_meta` block of the payload, no notifications is send out at all."
+        },
+        {
+          "info": {
+            "name": "Delete membership",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://qa.openproject-edge.com/api/v3/memberships/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Membership id"
+              }
+            ]
+          },
+          "docs": "Deletes the membership."
+        },
+        {
+          "info": {
+            "name": "Form update membership",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/memberships/:id/form",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Membership id"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Requests and validates the update form for a membership identified by the given id. The request payload, if sent,\nis validated. The form endpoint itself does not change the membership."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

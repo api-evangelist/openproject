@@ -1,0 +1,44 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Query Columns API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Query Columns",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "View Query Column",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/queries/columns/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "priority",
+                "type": "path",
+                "description": "QueryColumn id"
+              }
+            ]
+          },
+          "docs": "Retrieve an individual QueryColumn as identified by the `id` parameter."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

@@ -1,0 +1,63 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Custom Field Items API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Custom Field Items",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get a custom field hierarchy item",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/custom_field_items/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "42",
+                "type": "path",
+                "description": "The custom field item's unique identifier"
+              }
+            ]
+          },
+          "docs": "Retrieves a single custom field item specified by its unique identifier."
+        },
+        {
+          "info": {
+            "name": "Get a custom field hierarchy item's branch",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/custom_field_items/:id/branch",
+            "params": [
+              {
+                "name": "id",
+                "value": "42",
+                "type": "path",
+                "description": "The custom field item's unique identifier"
+              }
+            ]
+          },
+          "docs": "Retrieves the branch of a single custom field item specified by its unique identifier.\n\nA branch is list of all ancestors, starting with the root item and finishing with the item itself."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

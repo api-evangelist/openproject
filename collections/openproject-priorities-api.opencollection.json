@@ -1,0 +1,55 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Priorities API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Priorities",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List all Priorities",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/priorities"
+          },
+          "docs": "List all Priorities"
+        },
+        {
+          "info": {
+            "name": "View Priority",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/priorities/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Priority id"
+              }
+            ]
+          },
+          "docs": "View Priority"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

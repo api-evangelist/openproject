@@ -1,0 +1,3065 @@
+{
+  "item": [
+    {
+      "id": "7b40257c-e1ee-4371-8eb2-25f0bd07df58",
+      "name": "Principals",
+      "description": {
+        "content": "Principals are the superclass of users, groups and placeholder users. This endpoint returns all principals\nwithin a joined collection but can be filtered to e.g. only return groups or users.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "5c03f93c-ac1e-4c88-9c24-cbce6a71ff55",
+          "name": "List placehoder users",
+          "request": {
+            "name": "List placehoder users",
+            "description": {
+              "content": "List all placeholder users. This can only be accessed if the requesting user has the global permission\n`manage_placeholder_user` or `manage_members` in any project.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "placeholder_users"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "filters",
+                  "value": "<string>",
+                  "description": "JSON specifying filter conditions.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint.\nCurrently supported filters are:\n\n- name: filters placeholder users by the name.\n- group: filters placeholder by the group it is contained in.\n- status: filters placeholder by the status it has."
+                },
+                {
+                  "disabled": false,
+                  "key": "select",
+                  "value": "<string>",
+                  "description": "Comma separated list of properties to include."
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "a6d68d4e-393f-43fd-ab7c-fa0bf919f1bb",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "placeholder_users"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "filters",
+                      "value": "[{ \"name\": { \"operator\": \"~\", \"values\": [\"Darth\"] } }]"
+                    },
+                    {
+                      "key": "select",
+                      "value": "total,elements/name,elements/self,self"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_embedded\": {\n    \"elements\": [\n      {\n        \"_links\": {\n          \"self\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"memberships\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"showUser\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"updateImmediately\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"lock\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"unlock\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"delete\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"authSource\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          }\n        },\n        \"_type\": \"PlaceholderUser\",\n        \"avatar\": \"http://DJJ.blthyqCffUO9bbIc96fZQLrhtQ,C\",\n        \"id\": 1415,\n        \"name\": \"string\",\n        \"createdAt\": \"1984-12-14T05:26:51.479Z\",\n        \"updatedAt\": \"1953-09-26T10:03:56.923Z\",\n        \"login\": \"string\",\n        \"firstName\": \"string\",\n        \"lastName\": \"string\",\n        \"email\": \"string\",\n        \"admin\": false,\n        \"status\": \"string\",\n        \"language\": \"string\",\n        \"identityUrl\": \"string\",\n        \"customField7066\": true\n      },\n      {\n        \"_links\": {\n          \"self\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"memberships\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"showUser\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"updateImmediately\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"lock\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"unlock\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"delete\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"authSource\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          }\n        },\n        \"_type\": \"PlaceholderUser\",\n        \"avatar\": \"https://tKeVwaMcKWHDNca.hdzsFJm962j2BVoud6k6.4NgaxkeDorAIlCXhOSxNVLs,DLzCZ-B\",\n        \"id\": 8768,\n        \"name\": \"string\",\n        \"createdAt\": \"2021-09-15T05:33:39.597Z\",\n        \"updatedAt\": \"1960-06-23T05:36:28.346Z\",\n        \"login\": \"string\",\n        \"firstName\": \"string\",\n        \"lastName\": \"string\",\n        \"email\": \"string\",\n        \"admin\": true,\n        \"status\": \"string\",\n        \"language\": \"string\",\n        \"identityUrl\": \"string\",\n        \"customField815697250\": null\n      }\n    ]\n  },\n  \"_links\": {\n    \"changeSize\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"jumpTo\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"self\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"previousByOffset\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"nextByOffset\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    }\n  },\n  \"_type\": \"Collection\",\n  \"count\": 1411,\n  \"offset\": 608,\n  \"pageSize\": 1461,\n  \"total\": 9686\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "5e63868a-15be-454e-985d-58778556874b",
+              "name": "Returned if the client sends invalid request parameters e.g. filters",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "placeholder_users"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "filters",
+                      "value": "[{ \"name\": { \"operator\": \"~\", \"values\": [\"Darth\"] } }]"
+                    },
+                    {
+                      "key": "select",
+                      "value": "total,elements/name,elements/self,self"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:InvalidQuery\",\n  \"message\": \"Filters Invalid filter does not exist.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "e86ec228-1a3e-4c6f-a88b-843e4a772986",
+          "name": "Create placeholder user",
+          "request": {
+            "name": "Create placeholder user",
+            "description": {
+              "content": "Creates a new placeholder user. Only administrators and users with `manage_placeholder_user` global permission are\nallowed to do so. When calling this endpoint the client provides a single object, containing at least the\nproperties and links that are required, in the body.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "placeholder_users"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "3981e58c-093c-455f-8469-349fd88382dc",
+              "name": "Created",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "placeholder_users"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"showUser\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"memberships\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"delete\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"updateImmediately\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    }\n  },\n  \"_type\": \"User\",\n  \"id\": 8283,\n  \"name\": \"string\",\n  \"createdAt\": \"1989-08-31T01:25:30.421Z\",\n  \"updatedAt\": \"1980-10-24T12:46:11.195Z\",\n  \"status\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "eb565b6f-5165-4f85-871a-64e69e283cd8",
+              "name": "Occurs when the client did not send a valid JSON object in the request body.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "placeholder_users"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:InvalidRequestBody\",\n  \"message\": \"The request body was not a single JSON object.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "ed58b520-aebb-4667-8c87-2c07bdc8dff4",
+              "name": "Returned if the client does not have sufficient permissions.\n\n**Required permission:** Administrator",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "placeholder_users"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:MissingPermission\",\n  \"message\": \"You are not allowed to create new placeholder users.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "cc9823ca-5e11-464e-9565-8c14c84d6b43",
+              "name": "Occurs when the client did not send a Content-Type header",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "placeholder_users"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "text/plain"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Acceptable",
+              "code": 406,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "Missing content-type header",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "fe83f8bc-f671-49f0-8776-b7965f8872b1",
+              "name": "Occurs when the client sends an unsupported Content-Type header.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "placeholder_users"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unsupported Media Type",
+              "code": 415,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:TypeNotSupported\",\n  \"message\": \"Expected CONTENT-TYPE to be (expected value) but got (actual value).\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f6d58dc8-41b2-4204-bfad-2e0340613d07",
+              "name": "Returned if:\n\n* a constraint for a property was violated (`PropertyConstraintViolation`)",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "placeholder_users"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
+              "code": 422,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_embedded\": {\n    \"details\": {\n      \"attribute\": \"name\"\n    }\n  },\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:PropertyConstraintViolation\",\n  \"message\": \"Name has already been taken.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "4d14dbed-e983-4d7d-b748-3d8ea3f43f9d",
+          "name": "Delete placeholder user",
+          "request": {
+            "name": "Delete placeholder user",
+            "description": {
+              "content": "Set the specified placeholder user to deleted status.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "placeholder_users",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<integer>",
+                  "key": "id",
+                  "description": "(Required) Placeholder user id"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "DELETE",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "faa2bc99-4a68-4710-a823-082aff32326b",
+              "name": "Returned if the group was marked for deletion.\n\nNote that the response body is empty as of now. In future versions of the API a body\n*might* be returned, indicating the progress of deletion.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "placeholder_users",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Placeholder user id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Accepted",
+              "code": 202,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "b0feeaf8-e529-4520-a7ba-fe6de457c97a",
+              "name": "Returned if the client does not have sufficient permissions.\n\n**Required permission:** `manage_placeholder_users`",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "placeholder_users",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Placeholder user id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:MissingPermission\",\n  \"message\": \"You are not allowed to delete the account of this user.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "312af0b3-596b-48eb-8288-e9e5cc2e8499",
+              "name": "Returned if the placeholder user does not exist.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "placeholder_users",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Placeholder user id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:NotFound\",\n  \"message\": \"The specified placeholder user does not exist.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "3d0b571e-e7aa-4566-a8f3-8e31d64bb331",
+          "name": "View placeholder user",
+          "request": {
+            "name": "View placeholder user",
+            "description": {
+              "content": "Return the placeholder user resource.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "placeholder_users",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "id",
+                  "description": "(Required) The placeholder user id"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "377be3d3-8d28-44e3-bd16-6908a6f23fff",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "placeholder_users",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) The placeholder user id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"PlaceholderUser\",\n  \"id\": 27,\n  \"name\": \"Akolyth\",\n  \"createdAt\": \"2024-02-12T11:52:24.708Z\",\n  \"updatedAt\": \"2024-02-12T11:52:24.708Z\",\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/placeholder_users/27\",\n      \"title\": \"Akolyth\"\n    },\n    \"memberships\": {\n      \"href\": \"/api/v3/memberships?filters=%5B%7B%22principal%22%3A%7B%22operator%22%3A%22%3D%22%2C%22values%22%3A%5B%2227%22%5D%7D%7D%5D\",\n      \"title\": \"Memberships\"\n    },\n    \"updateImmediately\": {\n      \"href\": \"/api/v3/placeholder_users/27\",\n      \"title\": \"Update Akolyth\",\n      \"method\": \"patch\"\n    },\n    \"delete\": {\n      \"href\": \"/api/v3/placeholder_users/27\",\n      \"title\": \"Delete Akolyth\",\n      \"method\": \"delete\"\n    },\n    \"showUser\": {\n      \"href\": \"/placeholder_users/27\",\n      \"type\": \"text/html\"\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "bc9390a6-119b-4d79-99d5-fa3a7ab96948",
+              "name": "Returned if the user does not exist or if the API user does not have permission to view them.\n\n**Required permission**: `manage_placeholder_users`",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "placeholder_users",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) The placeholder user id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:NotFound\",\n  \"message\": \"The specified placeholder user does not exist or you do not have permission to view them.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "c9057022-099f-4b17-82f5-3e6013dc0f8e",
+          "name": "Update placeholder user",
+          "request": {
+            "name": "Update placeholder user",
+            "description": {
+              "content": "Updates the placeholder user's writable attributes.\nWhen calling this endpoint the client provides a single object, containing at least the properties and links\nthat are required, in the body.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "placeholder_users",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<integer>",
+                  "key": "id",
+                  "description": "(Required) Placeholder user id"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "PATCH",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "5cfa8272-bbb8-41bc-a10b-6660f86cd7b5",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "placeholder_users",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Placeholder user id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"showUser\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"memberships\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"delete\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"updateImmediately\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    }\n  },\n  \"_type\": \"User\",\n  \"id\": 8283,\n  \"name\": \"string\",\n  \"createdAt\": \"1989-08-31T01:25:30.421Z\",\n  \"updatedAt\": \"1980-10-24T12:46:11.195Z\",\n  \"status\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "808b5bfe-9ad9-4754-986c-409e90d48c86",
+              "name": "Occurs when the client did not send a valid JSON object in the request body.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "placeholder_users",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Placeholder user id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:InvalidRequestBody\",\n  \"message\": \"The request body was not a single JSON object.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "861ad111-0195-49b8-b40c-2f4b7c9615bf",
+              "name": "Returned if the client does not have sufficient permissions.\n\n**Required permission**: `manage_placeholder_users`",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "placeholder_users",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Placeholder user id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:MissingPermission\",\n  \"message\": \"You are not allowed to update the account of this user.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "ebf2e559-e5b8-409f-a5de-80f71b054547",
+              "name": "Returned if the placeholder user does not exist.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "placeholder_users",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Placeholder user id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:NotFound\",\n  \"message\": \"The specified placeholder user does not exist.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "97a1a522-1ebf-4953-8a2a-c99ce95b9f14",
+              "name": "Occurs when the client did not send a Content-Type header",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "placeholder_users",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Placeholder user id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "text/plain"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Acceptable",
+              "code": 406,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "Missing content-type header",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "f09bade6-66e4-4174-89b1-b8094458cc44",
+              "name": "Occurs when the client sends an unsupported Content-Type header.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "placeholder_users",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Placeholder user id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unsupported Media Type",
+              "code": 415,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:TypeNotSupported\",\n  \"message\": \"Expected CONTENT-TYPE to be (expected value) but got (actual value).\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "a9301c54-e482-4fbd-8185-32b6808a1990",
+              "name": "Returned if:\n\n- the client tries to modify a read-only property (`PropertyIsReadOnly`)\n- a constraint for a property was violated (`PropertyConstraintViolation`)",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "placeholder_users",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Placeholder user id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
+              "code": 422,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_embedded\": {\n    \"details\": {\n      \"attribute\": \"name\"\n    }\n  },\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:PropertyConstraintViolation\",\n  \"message\": \"Name has already been taken.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "5e15be84-f548-4d55-8e8e-8b41dac8670d",
+          "name": "List principals",
+          "request": {
+            "name": "List principals",
+            "description": {
+              "content": "List all principals. The client can choose to filter the principals similar to how work packages are filtered. In\naddition to the provided filters, the server will reduce the result set to only contain principals who are members\nin projects the client is allowed to see.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "principals"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "filters",
+                  "value": "<string>",
+                  "description": "JSON specifying filter conditions.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint.\nCurrently supported filters are:\n\n- type: filters principals by their type (*User*, *Group*, *PlaceholderUser*).\n- member: filters principals by the projects they are members in.\n- name: filters principals by the user or group name.\n- any_name_attribute: filters principals by the user or group first- and last name, email or login.\n- status: filters principals by their status number (active = *1*, registered = *2*, locked = *3*, invited = *4*)"
+                },
+                {
+                  "disabled": false,
+                  "key": "select",
+                  "value": "<string>",
+                  "description": "Comma separated list of properties to include."
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "fc72a801-42a7-4909-92f9-792f5a4afb3d",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "principals"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "filters",
+                      "value": "[{ \"type\": { \"operator\": \"=\", \"values\": [\"User\"] } }]"
+                    },
+                    {
+                      "key": "select",
+                      "value": "total,elements/name,elements/self,self"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_embedded\": {\n    \"elements\": [\n      {\n        \"_links\": {\n          \"self\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"memberships\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"showUser\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"updateImmediately\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"lock\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"unlock\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"delete\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"authSource\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          }\n        },\n        \"_type\": \"PlaceholderUser\",\n        \"avatar\": \"http://DJJ.blthyqCffUO9bbIc96fZQLrhtQ,C\",\n        \"id\": 1415,\n        \"name\": \"string\",\n        \"createdAt\": \"1984-12-14T05:26:51.479Z\",\n        \"updatedAt\": \"1953-09-26T10:03:56.923Z\",\n        \"login\": \"string\",\n        \"firstName\": \"string\",\n        \"lastName\": \"string\",\n        \"email\": \"string\",\n        \"admin\": false,\n        \"status\": \"string\",\n        \"language\": \"string\",\n        \"identityUrl\": \"string\",\n        \"customField7066\": true\n      },\n      {\n        \"_links\": {\n          \"self\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"memberships\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"showUser\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"updateImmediately\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"lock\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"unlock\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"delete\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"authSource\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          }\n        },\n        \"_type\": \"PlaceholderUser\",\n        \"avatar\": \"https://tKeVwaMcKWHDNca.hdzsFJm962j2BVoud6k6.4NgaxkeDorAIlCXhOSxNVLs,DLzCZ-B\",\n        \"id\": 8768,\n        \"name\": \"string\",\n        \"createdAt\": \"2021-09-15T05:33:39.597Z\",\n        \"updatedAt\": \"1960-06-23T05:36:28.346Z\",\n        \"login\": \"string\",\n        \"firstName\": \"string\",\n        \"lastName\": \"string\",\n        \"email\": \"string\",\n        \"admin\": true,\n        \"status\": \"string\",\n        \"language\": \"string\",\n        \"identityUrl\": \"string\",\n        \"customField815697250\": null\n      }\n    ]\n  },\n  \"_links\": {\n    \"changeSize\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"jumpTo\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"self\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"previousByOffset\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"nextByOffset\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    }\n  },\n  \"_type\": \"Collection\",\n  \"count\": 1411,\n  \"offset\": 608,\n  \"pageSize\": 1461,\n  \"total\": 9686\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "7c7f563c-7b49-4936-aaa3-05b169f963d5",
+              "name": "Returned if the client sends invalid request parameters e.g. filters",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "principals"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "filters",
+                      "value": "[{ \"type\": { \"operator\": \"=\", \"values\": [\"User\"] } }]"
+                    },
+                    {
+                      "key": "select",
+                      "value": "total,elements/name,elements/self,self"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:InvalidQuery\",\n  \"message\": \"Filters Invalid filter does not exist.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "dffeaa31-976e-4d48-a1f0-268917da0c8c",
+          "name": "List Users",
+          "request": {
+            "name": "List Users",
+            "description": {
+              "content": "Lists users. Only administrators or users with the following global permission can access this resource:\n- `manage_user`",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "users"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "offset",
+                  "value": "1",
+                  "description": "Page number inside the requested collection."
+                },
+                {
+                  "disabled": false,
+                  "key": "pageSize",
+                  "value": "<integer>",
+                  "description": "Number of elements to display per page."
+                },
+                {
+                  "disabled": false,
+                  "key": "filters",
+                  "value": "<string>",
+                  "description": "JSON specifying filter conditions.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)\nendpoint. Currently supported filters are:\n\n+ status: Status the user has\n\n+ group: Name of the group in which to-be-listed users are members.\n\n+ name: Filter users in whose first or last names, or email addresses the given string occurs.\n\n+ login: User's login"
+                },
+                {
+                  "disabled": false,
+                  "key": "sortBy",
+                  "value": "<string>",
+                  "description": "JSON specifying sort criteria.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint."
+                },
+                {
+                  "disabled": false,
+                  "key": "select",
+                  "value": "<string>",
+                  "description": "Comma separated list of properties to include."
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "f1ccab42-022e-4712-9991-a0723a391608",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "users"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "offset",
+                      "value": "1"
+                    },
+                    {
+                      "key": "pageSize",
+                      "value": "<integer>"
+                    },
+                    {
+                      "key": "filters",
+                      "value": "[{ \"status\": { \"operator\": \"=\", \"values\": [\"invited\"] } }, { \"group\": { \"operator\": \"=\", \"values\": [\"1\"] } }, { \"name\": { \"operator\": \"=\", \"values\": [\"h.wurst@openproject.com\"] } }]"
+                    },
+                    {
+                      "key": "sortBy",
+                      "value": "[[\"status\", \"asc\"]]"
+                    },
+                    {
+                      "key": "select",
+                      "value": "total,elements/name,elements/self,self"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_embedded\": {\n    \"elements\": [\n      {\n        \"_links\": {\n          \"self\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"memberships\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"showUser\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"A relative path to show the user in the web application.\\n\\n# Condition\\n\\n- User is not a new record\\n- User is not `locked`\"\n          },\n          \"updateImmediately\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"A link to update the user resource.\\n\\n# Conditions\\n\\n- `admin`\"\n          },\n          \"lock\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"Restrict the user from logging in and performing any actions.\\n\\n# Conditions\\n\\n- User is not locked\\n- `admin`\"\n          },\n          \"unlock\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"Allow a locked user to login and act again.\\n\\n# Conditions\\n\\n- User is not locked\\n- `admin`\"\n          },\n          \"delete\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"Permanently remove a user from the instance\\n\\n# Conditions\\n\\neither:\\n  - `admin`\\n  - Setting `users_deletable_by_admin` is set\\nor:\\n  - User is self\\n  - Setting `users_deletable_by_self` is set\"\n          },\n          \"authSource\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"Permanently remove a user from the instance\\n\\n# Conditions\\n\\n- LDAP authentication configured\\n- `admin`\"\n          }\n        },\n        \"_type\": \"User\",\n        \"avatar\": \"http://dXKEqelNilKwFZKEPePePYzMSWaDFgUrE.yazuz4GlJ-vaCiyeJozEX5jV..p-lQBMV\",\n        \"id\": 4197,\n        \"name\": \"string\",\n        \"createdAt\": \"2008-03-28T22:44:53.348Z\",\n        \"updatedAt\": \"1956-12-31T16:03:04.163Z\",\n        \"login\": \"string\",\n        \"firstName\": \"string\",\n        \"lastName\": \"string\",\n        \"email\": \"string\",\n        \"admin\": false,\n        \"status\": \"string\",\n        \"language\": \"string\",\n        \"identityUrl\": \"string\",\n        \"customField5261877\": null\n      },\n      {\n        \"_links\": {\n          \"self\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"memberships\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n          },\n          \"showUser\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"A relative path to show the user in the web application.\\n\\n# Condition\\n\\n- User is not a new record\\n- User is not `locked`\"\n          },\n          \"updateImmediately\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"A link to update the user resource.\\n\\n# Conditions\\n\\n- `admin`\"\n          },\n          \"lock\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"Restrict the user from logging in and performing any actions.\\n\\n# Conditions\\n\\n- User is not locked\\n- `admin`\"\n          },\n          \"unlock\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"Allow a locked user to login and act again.\\n\\n# Conditions\\n\\n- User is not locked\\n- `admin`\"\n          },\n          \"delete\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"Permanently remove a user from the instance\\n\\n# Conditions\\n\\neither:\\n  - `admin`\\n  - Setting `users_deletable_by_admin` is set\\nor:\\n  - User is self\\n  - Setting `users_deletable_by_self` is set\"\n          },\n          \"authSource\": {\n            \"value\": \"<Error: Too many levels of nesting to fake this schema>\",\n            \"description\": \"Permanently remove a user from the instance\\n\\n# Conditions\\n\\n- LDAP authentication configured\\n- `admin`\"\n          }\n        },\n        \"_type\": \"User\",\n        \"avatar\": \"http://LqKHRnQsTCiwsbGTveqCIhvYskDByu.quL,6mxst23XvxRg997iFJ0yHLp\",\n        \"id\": 2151,\n        \"name\": \"string\",\n        \"createdAt\": \"1952-08-07T18:15:26.016Z\",\n        \"updatedAt\": \"2000-04-03T10:22:51.159Z\",\n        \"login\": \"string\",\n        \"firstName\": \"string\",\n        \"lastName\": \"string\",\n        \"email\": \"string\",\n        \"admin\": true,\n        \"status\": \"string\",\n        \"language\": \"string\",\n        \"identityUrl\": \"string\",\n        \"customField28879126263\": null\n      }\n    ]\n  },\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    }\n  },\n  \"_type\": \"Collection\",\n  \"count\": 5092,\n  \"total\": 1595\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "68c707aa-c61f-42e1-92c6-e53e96418ca0",
+              "name": "Occurs when the client did not send a valid JSON object in the request body.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "users"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "offset",
+                      "value": "1"
+                    },
+                    {
+                      "key": "pageSize",
+                      "value": "<integer>"
+                    },
+                    {
+                      "key": "filters",
+                      "value": "[{ \"status\": { \"operator\": \"=\", \"values\": [\"invited\"] } }, { \"group\": { \"operator\": \"=\", \"values\": [\"1\"] } }, { \"name\": { \"operator\": \"=\", \"values\": [\"h.wurst@openproject.com\"] } }]"
+                    },
+                    {
+                      "key": "sortBy",
+                      "value": "[[\"status\", \"asc\"]]"
+                    },
+                    {
+                      "key": "select",
+                      "value": "total,elements/name,elements/self,self"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:InvalidRequestBody\",\n  \"message\": \"The request body was not a single JSON object.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "37e858e5-feed-41d7-9895-09437220f4da",
+              "name": "Returned if the client does not have sufficient permissions.\n\n**Required permission:** Administrator or any of: 'manage_members', 'manage_user', 'share_work_packages'.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "users"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "offset",
+                      "value": "1"
+                    },
+                    {
+                      "key": "pageSize",
+                      "value": "<integer>"
+                    },
+                    {
+                      "key": "filters",
+                      "value": "[{ \"status\": { \"operator\": \"=\", \"values\": [\"invited\"] } }, { \"group\": { \"operator\": \"=\", \"values\": [\"1\"] } }, { \"name\": { \"operator\": \"=\", \"values\": [\"h.wurst@openproject.com\"] } }]"
+                    },
+                    {
+                      "key": "sortBy",
+                      "value": "[[\"status\", \"asc\"]]"
+                    },
+                    {
+                      "key": "select",
+                      "value": "total,elements/name,elements/self,self"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:MissingPermission\",\n  \"message\": \"You are not allowed to list users.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "b3bba072-7804-45c1-92e8-dd89e85aa572",
+          "name": "Create User",
+          "request": {
+            "name": "Create User",
+            "description": {
+              "content": "Creates a new user. Only administrators and users with manage_user global permission are allowed to do so.\nWhen calling this endpoint the client provides a single object, containing at least the properties and links that are required, in the body.\n\nValid values for `status`:\n\n1) \"active\" - In this case a password has to be provided in addition to the other attributes.\n\n2) \"invited\" - In this case nothing but the email address is required. The rest is optional. An invitation will be sent to the user.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "users"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"admin\": \"<boolean>\",\n  \"email\": \"<string>\",\n  \"login\": \"<string>\",\n  \"firstName\": \"<string>\",\n  \"lastName\": \"<string>\",\n  \"language\": \"<string>\",\n  \"password\": \"<string>\",\n  \"currentPassword\": \"<string>\",\n  \"status\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "d974bdaf-8a63-4a52-80f2-c5e985019aae",
+              "name": "Created",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "users"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"login\": \"j.sheppard\",\n  \"password\": \"idestroyedsouvereign\",\n  \"currentPassword\": \"iusedtobuildstarships\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Sheppard\",\n  \"email\": \"shep@mail.com\",\n  \"admin\": true,\n  \"status\": \"active\",\n  \"language\": \"en\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"memberships\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"showUser\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"updateImmediately\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"lock\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"unlock\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"delete\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"authSource\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    }\n  },\n  \"_type\": \"PlaceholderUser\",\n  \"avatar\": \"https://Eg.tzdzy08NQa+\",\n  \"id\": 7674,\n  \"name\": \"string\",\n  \"createdAt\": \"2008-01-02T20:35:22.934Z\",\n  \"updatedAt\": \"1966-06-05T04:23:05.531Z\",\n  \"login\": \"string\",\n  \"firstName\": \"string\",\n  \"lastName\": \"string\",\n  \"email\": \"string\",\n  \"admin\": false,\n  \"status\": \"string\",\n  \"language\": \"string\",\n  \"identityUrl\": \"string\",\n  \"customField4\": false\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "796372a3-72e2-4805-985f-069e76e0eaa1",
+              "name": "Occurs when the client did not send a valid JSON object in the request body.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "users"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"login\": \"j.sheppard\",\n  \"password\": \"idestroyedsouvereign\",\n  \"currentPassword\": \"iusedtobuildstarships\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Sheppard\",\n  \"email\": \"shep@mail.com\",\n  \"admin\": true,\n  \"status\": \"active\",\n  \"language\": \"en\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:InvalidRequestBody\",\n  \"message\": \"The request body was not a single JSON object.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "bac99f5a-9b64-4407-9245-9b13846d2001",
+              "name": "Returned if the client does not have sufficient permissions.\n\n**Required permission:** Administrator",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "users"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"login\": \"j.sheppard\",\n  \"password\": \"idestroyedsouvereign\",\n  \"currentPassword\": \"iusedtobuildstarships\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Sheppard\",\n  \"email\": \"shep@mail.com\",\n  \"admin\": true,\n  \"status\": \"active\",\n  \"language\": \"en\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:MissingPermission\",\n  \"message\": \"You are not allowed to create new users.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "16625ac1-2933-4eef-b23d-1cf6438f0dd7",
+              "name": "Occurs when the client did not send a Content-Type header",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "users"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "text/plain"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"login\": \"j.sheppard\",\n  \"password\": \"idestroyedsouvereign\",\n  \"currentPassword\": \"iusedtobuildstarships\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Sheppard\",\n  \"email\": \"shep@mail.com\",\n  \"admin\": true,\n  \"status\": \"active\",\n  \"language\": \"en\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Acceptable",
+              "code": 406,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "Missing content-type header",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "d537bf4e-8c42-4179-a2fd-1b3ac9732f15",
+              "name": "Occurs when the client sends an unsupported Content-Type header.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "users"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"login\": \"j.sheppard\",\n  \"password\": \"idestroyedsouvereign\",\n  \"currentPassword\": \"iusedtobuildstarships\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Sheppard\",\n  \"email\": \"shep@mail.com\",\n  \"admin\": true,\n  \"status\": \"active\",\n  \"language\": \"en\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unsupported Media Type",
+              "code": 415,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:TypeNotSupported\",\n  \"message\": \"Expected CONTENT-TYPE to be (expected value) but got (actual value).\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "1729c099-6ea7-4edb-b252-7331fce03a51",
+              "name": "Returned if:\n\n* a constraint for a property was violated (`PropertyConstraintViolation`)",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "users"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"login\": \"j.sheppard\",\n  \"password\": \"idestroyedsouvereign\",\n  \"currentPassword\": \"iusedtobuildstarships\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Sheppard\",\n  \"email\": \"shep@mail.com\",\n  \"admin\": true,\n  \"status\": \"active\",\n  \"language\": \"en\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
+              "code": 422,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_embedded\": {\n    \"details\": {\n      \"attribute\": \"email\"\n    }\n  },\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:PropertyConstraintViolation\",\n  \"message\": \"The email address is already taken.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "43a22a3d-72d8-4afe-85aa-7278848cc243",
+          "name": "Delete user",
+          "request": {
+            "name": "Delete user",
+            "description": {
+              "content": "Permanently deletes the specified user account.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "users",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "id",
+                  "description": "(Required) User id. Use `me` to reference current user, if any."
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "DELETE",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "0eb8f6eb-2be7-49c5-9235-f1a1d7c92418",
+              "name": "Returned if the account was deleted successfully.\n\nNote that the response body is empty as of now. In future versions of the API a body\n*might* be returned, indicating the progress of deletion.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "users",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) User id. Use `me` to reference current user, if any."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Accepted",
+              "code": 202,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "ab423219-5174-49d5-9a0c-cd7ce5fadfdf",
+              "name": "Returned if the client does not have sufficient permissions or if deletion of users was disabled in the instance wide settings.\n\n**Required permission:** Administrators only (exception: users might be able to delete their own accounts)",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "users",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) User id. Use `me` to reference current user, if any."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:MissingPermission\",\n  \"message\": \"You are not allowed to delete the account of this user.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "d623741e-472f-496c-bedf-9220ed96c81a",
+              "name": "Returned if the user does not exist.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "users",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) User id. Use `me` to reference current user, if any."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:NotFound\",\n  \"message\": \"The specified user does not exist.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "05b40085-e007-41f3-a73b-6648796c2c6c",
+          "name": "View user",
+          "request": {
+            "name": "View user",
+            "description": {
+              "content": "",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "users",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "id",
+                  "description": "(Required) User id. Use `me` to reference current user, if any."
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "483e73cb-5f48-46c3-b153-8db6e019709d",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "users",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) User id. Use `me` to reference current user, if any."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"User\",\n  \"id\": 14,\n  \"name\": \"Mara Jade\",\n  \"createdAt\": \"2022-04-04T08:07:22.910Z\",\n  \"updatedAt\": \"2024-02-09T09:01:17.382Z\",\n  \"login\": \"member\",\n  \"admin\": false,\n  \"firstName\": \"Mara\",\n  \"lastName\": \"Jade\",\n  \"email\": \"m.jade@empire.org\",\n  \"avatar\": \"https://secure.gravatar.com/avatar/17dd23570f3bd129d06db9b48b7a41b8?default=404&secure=true\",\n  \"status\": \"active\",\n  \"identityUrl\": null,\n  \"language\": \"en\",\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/users/14\",\n      \"title\": \"Mara Jade\"\n    },\n    \"memberships\": {\n      \"href\": \"/api/v3/memberships?filters=%5B%7B%22principal%22%3A%7B%22operator%22%3A%22%3D%22%2C%22values%22%3A%5B%2214%22%5D%7D%7D%5D\",\n      \"title\": \"Memberships\"\n    },\n    \"showUser\": {\n      \"href\": \"/users/14\",\n      \"type\": \"text/html\"\n    },\n    \"updateImmediately\": {\n      \"href\": \"/api/v3/users/14\",\n      \"title\": \"Update member\",\n      \"method\": \"patch\"\n    },\n    \"lock\": {\n      \"href\": \"/api/v3/users/14/lock\",\n      \"title\": \"Set lock on member\",\n      \"method\": \"post\"\n    },\n    \"delete\": {\n      \"href\": \"/api/v3/users/14\",\n      \"title\": \"Delete member\",\n      \"method\": \"delete\"\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "466014ca-7ed7-47b2-89ae-b9ee1b0df127",
+              "name": "Returned if the user does not exist or if the API user does not have permission to view them.\n\n**Required permission** The user needs to be locked in if the installation is configured to prevent anonymous access",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "users",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) User id. Use `me` to reference current user, if any."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:NotFound\",\n  \"message\": \"The specified user does not exist or you do not have permission to view them.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "26a1dd6d-0c3a-4a65-a12d-76e102575b8a",
+          "name": "Update user",
+          "request": {
+            "name": "Update user",
+            "description": {
+              "content": "Updates the user's writable attributes.\nWhen calling this endpoint the client provides a single object, containing at least the properties and links that are required, in the body.\n\nPassword updates for self-service account changes require both `password` and `currentPassword`.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "users",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "id",
+                  "description": "(Required) User id. Use `me` to reference current user, if any."
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "PATCH",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"admin\": \"<boolean>\",\n  \"email\": \"<string>\",\n  \"login\": \"<string>\",\n  \"firstName\": \"<string>\",\n  \"lastName\": \"<string>\",\n  \"language\": \"<string>\",\n  \"password\": \"<string>\",\n  \"currentPassword\": \"<string>\",\n  \"status\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "c884f15a-dc35-448a-b11c-da7740c660a2",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "users",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) User id. Use `me` to reference current user, if any."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"login\": \"j.sheppard\",\n  \"password\": \"idestroyedsouvereign\",\n  \"currentPassword\": \"iusedtobuildstarships\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Sheppard\",\n  \"email\": \"shep@mail.com\",\n  \"admin\": true,\n  \"status\": \"active\",\n  \"language\": \"en\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"memberships\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"showUser\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"updateImmediately\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"lock\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"unlock\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"delete\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    },\n    \"authSource\": {\n      \"href\": \"/api/v3/work_packages\",\n      \"method\": \"POST\"\n    }\n  },\n  \"_type\": \"PlaceholderUser\",\n  \"avatar\": \"https://Eg.tzdzy08NQa+\",\n  \"id\": 7674,\n  \"name\": \"string\",\n  \"createdAt\": \"2008-01-02T20:35:22.934Z\",\n  \"updatedAt\": \"1966-06-05T04:23:05.531Z\",\n  \"login\": \"string\",\n  \"firstName\": \"string\",\n  \"lastName\": \"string\",\n  \"email\": \"string\",\n  \"admin\": false,\n  \"status\": \"string\",\n  \"language\": \"string\",\n  \"identityUrl\": \"string\",\n  \"customField4\": false\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "3ac01d35-d69e-4ac6-a47f-8a6ab586f604",
+              "name": "Occurs when the client did not send a valid JSON object in the request body.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "users",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) User id. Use `me` to reference current user, if any."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"login\": \"j.sheppard\",\n  \"password\": \"idestroyedsouvereign\",\n  \"currentPassword\": \"iusedtobuildstarships\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Sheppard\",\n  \"email\": \"shep@mail.com\",\n  \"admin\": true,\n  \"status\": \"active\",\n  \"language\": \"en\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:InvalidRequestBody\",\n  \"message\": \"The request body was not a single JSON object.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "88bbc45c-e11c-41de-9ca7-ae518ef9698b",
+              "name": "Returned if the client does not have sufficient permissions.\n\n**Required permission:** Administrators, manage_user global permission",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "users",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) User id. Use `me` to reference current user, if any."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"login\": \"j.sheppard\",\n  \"password\": \"idestroyedsouvereign\",\n  \"currentPassword\": \"iusedtobuildstarships\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Sheppard\",\n  \"email\": \"shep@mail.com\",\n  \"admin\": true,\n  \"status\": \"active\",\n  \"language\": \"en\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:MissingPermission\",\n  \"message\": \"You are not allowed to update the account of this user.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "45acfcaf-40af-41ea-a5c5-c8ef2ca21e98",
+              "name": "Returned if the user does not exist or if the API user does not have the necessary permissions to update it.\n\n**Required permission:** Administrators only (exception: users may update their own accounts)",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "users",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) User id. Use `me` to reference current user, if any."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"login\": \"j.sheppard\",\n  \"password\": \"idestroyedsouvereign\",\n  \"currentPassword\": \"iusedtobuildstarships\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Sheppard\",\n  \"email\": \"shep@mail.com\",\n  \"admin\": true,\n  \"status\": \"active\",\n  \"language\": \"en\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:NotFound\",\n  \"message\": \"The specified user does not exist or you do not have permission to view them.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "af418471-3c87-4a15-b9c3-6df23a883a67",
+              "name": "Occurs when the client did not send a Content-Type header",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "users",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) User id. Use `me` to reference current user, if any."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "text/plain"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"login\": \"j.sheppard\",\n  \"password\": \"idestroyedsouvereign\",\n  \"currentPassword\": \"iusedtobuildstarships\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Sheppard\",\n  \"email\": \"shep@mail.com\",\n  \"admin\": true,\n  \"status\": \"active\",\n  \"language\": \"en\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Acceptable",
+              "code": 406,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "Missing content-type header",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "6ab2aa7b-f695-457d-9d30-b49e9fa8b5d3",
+              "name": "Occurs when the client sends an unsupported Content-Type header.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "users",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) User id. Use `me` to reference current user, if any."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"login\": \"j.sheppard\",\n  \"password\": \"idestroyedsouvereign\",\n  \"currentPassword\": \"iusedtobuildstarships\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Sheppard\",\n  \"email\": \"shep@mail.com\",\n  \"admin\": true,\n  \"status\": \"active\",\n  \"language\": \"en\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unsupported Media Type",
+              "code": 415,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:TypeNotSupported\",\n  \"message\": \"Expected CONTENT-TYPE to be (expected value) but got (actual value).\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "1535c07b-bfa2-424d-a074-0a41e7b349e2",
+              "name": "Returned if:\n\n* the client tries to modify a read-only property (`PropertyIsReadOnly`)\n\n* a constraint for a property was violated (`PropertyConstraintViolation`)",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "users",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) User id. Use `me` to reference current user, if any."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"login\": \"j.sheppard\",\n  \"password\": \"idestroyedsouvereign\",\n  \"currentPassword\": \"iusedtobuildstarships\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Sheppard\",\n  \"email\": \"shep@mail.com\",\n  \"admin\": true,\n  \"status\": \"active\",\n  \"language\": \"en\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
+              "code": 422,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_embedded\": {\n    \"details\": {\n      \"attribute\": \"email\"\n    }\n  },\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:PropertyConstraintViolation\",\n  \"message\": \"The email address is already taken.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://qa.openproject-edge.com",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {
+        "key": "username",
+        "value": "{{basicAuthUsername}}"
+      },
+      {
+        "key": "password",
+        "value": "{{basicAuthPassword}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "ea707a9e-df40-4ab1-9eda-19740e121ee6",
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Principals API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "You're looking at the current **stable** documentation of the OpenProject APIv3. If you're interested in the current\ndevelopment version, please go to [github.com/opf](https://github.com/opf/openproject/tree/dev/docs/api/apiv3).\n\n## Introduction\n\nThe documentation for the APIv3 is written according to the [OpenAPI 3.1 Specification](https://swagger.io/specification/).\nYou can either view the static version of this documentation on the [website](https://www.openproject.org/docs/api/introduction/)\nor the interactive version, rendered with [OpenAPI Explorer](https://github.com/Rhosys/openapi-explorer/blob/main/README.md),\nin your OpenProject installation under `/api/docs`.\nIn the latter you can try out the various API endpoints directly interacting with our OpenProject data.\nMoreover you can access the specification source itself under `/api/v3/spec.json` and `/api/v3/spec.yml`\n(e.g. [here](https://community.openproject.org/api/v3/spec.yml)).\n\nThe APIv3 is a hypermedia REST API, a shorthand for \"Hypermedia As The Engine Of Application State\" (HATEOAS).\nThis means that each endpoint of this API will have links to other resources or actions defined in the resulting body.\n\nThese related resources and actions for any given resource will be context sensitive. For example, only actions that the\nauthenticated user can take are being rendered. This can be used to dynamically identify actions that the user might take for any\ngiven response.\n\nAs an example, if you fetch a work package through the [Work Package endpoint](https://www.openproject.org/docs/api/endpoints/work-packages/), the `update` link will only\nbe present when the user you authenticated has been granted a permission to update the work package in the assigned project.\n\n## HAL+JSON\n\nHAL is a simple format that gives a consistent and easy way to hyperlink between resources in your API.\nRead more in the following specification: [https://tools.ietf.org/html/draft-kelly-json-hal-08](https://tools.ietf.org/html/draft-kelly-json-hal-08)\n\n**OpenProject API implementation of HAL+JSON format** enriches JSON and introduces a few meta properties:\n\n- `_type` - specifies the type of the resource (e.g.: WorkPackage, Project)\n- `_links` - contains all related resource and action links available for the resource\n- `_embedded` - contains all embedded objects\n\nHAL does not guarantee that embedded resources are embedded in their full representation, they might as well be\npartially represented (e.g. some properties can be left out).\nHowever in this API you have the guarantee that whenever a resource is **embedded**, it is embedded in its **full representation**.\n\n## API response structure\n\nAll API responses contain a single HAL+JSON object, even collections of objects are technically represented by\na single HAL+JSON object that itself contains its members. More details on collections can be found\nin the [Collections Section](https://www.openproject.org/docs/api/collections/).\n\n## Authentication\n\nThe API supports the following authentication schemes:\n\n* Session-based authentication\n* API tokens\n    * passed as Bearer token\n    * passed via Basic auth\n* OAuth 2.0\n    * using built-in authorization server\n    * using an external authorization server (RFC 9068)\n\nDepending on the settings of the OpenProject instance many resources can be accessed without being authenticated.\nIn case the instance requires authentication on all requests the client will receive an **HTTP 401** status code\nin response to any request.\n\nOtherwise unauthenticated clients have all the permissions of the anonymous user.\n\n### Session-based authentication\n\nThis means you have to login to OpenProject via the Web-Interface to be authenticated in the API.\nThis method is well-suited for clients acting within the browser, like the Angular-Client built into OpenProject.\n\nIn this case, you always need to pass the HTTP header `X-Requested-With \"XMLHttpRequest\"` for authentication.\n\n### API token as bearer token\n\nUsers can authenticate towards the API v3 using an API token as a bearer token.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -H \"Authorization: Bearer $API_KEY\" https://community.openproject.org/api/v3/users/42\n```\n\nUsers can generate API tokens on their account page.\n\n### API token through Basic Auth\n\nAPI tokens can also be used with basic auth, using the user name `apikey` (NOT your login) and the API token as the password.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -u apikey:$API_KEY https://community.openproject.org/api/v3/users/42\n```\n\n### OAuth 2.0 authentication\n\nOpenProject allows authentication and authorization with OAuth2 with *Authorization code flow*, as well as *Client credentials* operation modes.\n\nTo get started, you first need to register an application in the OpenProject OAuth administration section of your installation.\nThis will save an entry for your application with a client unique identifier (`client_id`) and an accompanying secret key (`client_secret`).\n\nYou can then use one the following guides to perform the supported OAuth 2.0 flows:\n\n- [Authorization code flow](https://oauth.net/2/grant-types/authorization-code)\n\n- [Authorization code flow with PKCE](https://doorkeeper.gitbook.io/guides/ruby-on-rails/pkce-flow), recommended for clients unable to keep the client_secret confidential\n\n- [Client credentials](https://oauth.net/2/grant-types/client-credentials/) - Requires an application to be bound to an impersonating user for non-public access\n\n### OAuth 2.0 using an external authorization server\n\nThere is a possibility to use JSON Web Tokens (JWT) generated by an OIDC provider configured in OpenProject as a bearer token to do authenticated requests against the API.\nThe following requirements must be met:\n\n- OIDC provider must be configured in OpenProject with **jwks_uri**\n- JWT must be signed using RSA algorithm\n- JWT **iss** claim must be equal to OIDC provider **issuer**\n- JWT **aud** claim must contain the OpenProject **client ID** used at the OIDC provider\n- JWT **scope** claim must include a valid scope to access the desired API (e.g. `api_v3` for APIv3)\n- JWT must be actual (neither expired or too early to be used)\n- JWT must be passed in Authorization header like: `Authorization: Bearer {jwt}`\n- User from **sub** claim must be linked to OpenProject before (e.g. by logging in), otherwise it will be not authenticated\n\nIn more general terms, OpenProject should be compliant to [RFC 9068](https://www.rfc-editor.org/rfc/rfc9068) when validating access tokens.\n\n### Why not username and password?\n\nThe simplest way to do basic auth would be to use a user's username and password naturally.\nHowever, OpenProject already has supported API keys in the past for the API v2, though not through basic auth.\n\nUsing **username and password** directly would have some advantages:\n\n* It is intuitive for the user who then just has to provide those just as they would when logging into OpenProject.\n\n* No extra logic for token management necessary.\n\nOn the other hand using **API keys** has some advantages too, which is why we went for that:\n\n* If compromised while saved on an insecure client the user only has to regenerate the API key instead of changing their password, too.\n\n* They are naturally long and random which makes them invulnerable to dictionary attacks and harder to crack in general.\n\nMost importantly users may not actually have a password to begin with. Specifically when they have registered\nthrough an OpenID Connect provider.\n\n## Cross-Origin Resource Sharing (CORS)\n\nBy default, the OpenProject API is _not_ responding with any CORS headers.\nIf you want to allow cross-domain AJAX calls against your OpenProject instance, you need to enable CORS headers being returned.\n\nPlease see [our API settings documentation](https://www.openproject.org/docs/system-admin-guide/api-and-webhooks/) on\nhow to selectively enable CORS.\n\n## Allowed HTTP methods\n\n- `GET` - Get a single resource or collection of resources\n\n- `POST` - Create a new resource or perform\n\n- `PATCH` - Update a resource\n\n- `DELETE` - Delete a resource\n\n## Compression\n\nResponses are compressed if requested by the client. Currently [gzip](https://www.gzip.org/) and [deflate](https://tools.ietf.org/html/rfc1951)\nare supported. The client signals the desired compression by setting the [`Accept-Encoding` header](https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3).\nIf no `Accept-Encoding` header is send, `Accept-Encoding: identity` is assumed which will result in the API responding uncompressed.",
+      "type": "text/plain"
+    }
+  }
+}

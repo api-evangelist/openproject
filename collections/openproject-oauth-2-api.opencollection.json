@@ -1,0 +1,63 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities OAuth 2 API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "OAuth 2",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get the oauth application.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/oauth_applications/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1337",
+                "type": "path",
+                "description": "OAuth application id"
+              }
+            ]
+          },
+          "docs": "Retrieves the OAuth 2 provider application for the given identifier. The secret will not be part of the response,\ninstead a `confidential` flag is indicating, whether there is a secret or not."
+        },
+        {
+          "info": {
+            "name": "Get the oauth client credentials object.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/oauth_client_credentials/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1337",
+                "type": "path",
+                "description": "OAuth Client Credentials id"
+              }
+            ]
+          },
+          "docs": "Retrieves the OAuth 2 client credentials for the given identifier. The secret will not be part of the response,\ninstead a `confidential` flag is indicating, whether there is a secret or not."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

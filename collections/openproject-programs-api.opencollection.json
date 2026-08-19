@@ -1,0 +1,140 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Programs API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Programs",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List programs",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/programs",
+            "params": [
+              {
+                "name": "filters",
+                "value": "[{ \"ancestor\": { \"operator\": \"=\", \"values\": [\"1\"] }\" }]",
+                "type": "query",
+                "description": "JSON specifying filter conditions.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint.\nCurrently supported filters are:\n\n+ active: based on the active property of the program\n+ ancestor: filters programs by their ancestor. A program is not considered to be its own ancestor.\n+ available_project_attributes: filters programs based on the activated project attributes.\n+ created_at: based on the time the program was created\n+ favorited: based on the favorited property of the program\n+ id: based on programs' id.\n+ latest_activity_at: based on the time the last activity was registered on a program.\n+ name_and_identifier: based on both the name and the identifier.\n+ parent_id: filters programs by their parent.\n+ principal: based on members of the program.\n+ project_phase_any: based on the project phases active in a program.\n+ project_status_code: based on status code of the program\n+ storage_id: filters programs by linked storages\n+ storage_url: filters programs by linked storages identified by the host url\n+ type_id: based on the types active in a program.\n+ user_action: based on the actions the current user has in the program.\n+ visible: based on the visibility for the user (id) provided as the filter value. This filter is useful for admins to identify the programs visible to a user.\n\nThere might also be additional filters based on the custom fields that have been configured.\n\nEach defined lifecycle step will also define a filter in this list endpoint. Given that the elements are not\nstatic but rather dynamically created on each OpenProject instance, a list cannot be provided. Those filters follow the schema:\n+ project_start_gate_[id]: a filter on a project phase's start gate active in a program. The id is the id of the phase the gate belongs to.\n+ project_finish_gate_[id]: a filter on a project phase's finish gate active in a program. The id is the id of the phase the gate belongs to.\n+ project_phase_[id]: a filter on a project phase active in a program. The id is the id of the phase queried for."
+              },
+              {
+                "name": "sortBy",
+                "value": "[[\"id\", \"asc\"]]",
+                "type": "query",
+                "description": "JSON specifying sort criteria.\nCurrently supported orders are:\n\n+ id\n+ name\n+ typeahead (sorting by hierarchy and name)\n+ created_at\n+ public\n+ latest_activity_at\n+ required_disk_space\n\nThere might also be additional orders based on the custom fields that have been configured."
+              },
+              {
+                "name": "select",
+                "value": "total,elements/identifier,elements/name",
+                "type": "query",
+                "description": "Comma separated list of properties to include."
+              }
+            ]
+          },
+          "docs": "Returns a collection of programs. The collection can be filtered via query parameters similar to how work packages are filtered. In addition to the provided filter, the result set is always limited to only contain programs the client is allowed to see."
+        },
+        {
+          "info": {
+            "name": "View program",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/programs/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Program id"
+              }
+            ]
+          },
+          "docs": "View program"
+        },
+        {
+          "info": {
+            "name": "Update Program",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://qa.openproject-edge.com/api/v3/programs/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Program id"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates the given program by applying the attributes provided in the body."
+        },
+        {
+          "info": {
+            "name": "Delete Program",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://qa.openproject-edge.com/api/v3/programs/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Program id"
+              }
+            ]
+          },
+          "docs": "Deletes the program permanently. As this is a lengthy process, the actual deletion is carried out asynchronously.\nSo the program might exist well after the request has returned successfully. To prevent unwanted changes to\nthe program scheduled for deletion, it is archived at once."
+        },
+        {
+          "info": {
+            "name": "Program update form",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/programs/:id/form",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Program id"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Program update form"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

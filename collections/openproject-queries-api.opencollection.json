@@ -1,0 +1,553 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Queries API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Queries",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "View default query for project",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/projects/:id/queries/default",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Id of the project the default query is requested for"
+              },
+              {
+                "name": "filters",
+                "value": "[{ \"assignee\": { \"operator\": \"=\", \"values\": [\"1\", \"5\"] }\" }]",
+                "type": "query",
+                "description": "JSON specifying filter conditions.\nThe filters provided as parameters are not applied to the query but are instead used to override the query's persisted filters.\nAll filters also accepted by the work packages endpoint are accepted. If no filter is to be applied, the client should send an empty array (`[]`)."
+              },
+              {
+                "name": "offset",
+                "value": "25",
+                "type": "query",
+                "description": "Page number inside the queries' result collection of work packages."
+              },
+              {
+                "name": "pageSize",
+                "value": "25",
+                "type": "query",
+                "description": "Number of elements to display per page for the queries' result collection of work packages."
+              },
+              {
+                "name": "sortBy",
+                "value": "[[\"status\", \"asc\"]]",
+                "type": "query",
+                "description": "JSON specifying sort criteria. The sort criteria is applied to the query's result collection of work packages overriding the query's persisted sort criteria."
+              },
+              {
+                "name": "groupBy",
+                "value": "status",
+                "type": "query",
+                "description": "The column to group by. The grouping criteria is applied to the to the query's result collection of work packages overriding the query's persisted group criteria."
+              },
+              {
+                "name": "showSums",
+                "value": "true",
+                "type": "query",
+                "description": "Indicates whether properties should be summed up if they support it. The showSums parameter is applied to the to the query's result collection of work packages overriding the query's persisted sums property."
+              },
+              {
+                "name": "timestamps",
+                "value": "2023-01-01,P-1Y,PT0S,lastWorkingDay@12:00",
+                "type": "query",
+                "description": "Indicates the timestamps to filter by when showing changed attributes on work packages. Values can be either ISO8601 dates, ISO8601 durations and the following relative date keywords: \"oneDayAgo@HH:MM+HH:MM\", \"lastWorkingDay@HH:MM+HH:MM\", \"oneWeekAgo@HH:MM+HH:MM\", \"oneMonthAgo@HH:MM+HH:MM\". The first \"HH:MM\" part represents the zero paded hours and minutes. The last \"+HH:MM\" part represents the timezone offset from UTC associated with the time. Values older than 1 day are accepted only with valid Enterprise Token available.\n"
+              },
+              {
+                "name": "timelineVisible",
+                "value": "true",
+                "type": "query",
+                "description": "Indicates whether the timeline should be shown."
+              },
+              {
+                "name": "showHierarchies",
+                "value": "true",
+                "type": "query",
+                "description": "Indicates whether the hierarchy mode should be enabled."
+              }
+            ]
+          },
+          "docs": "Same as [viewing an existing, persisted Query](https://www.openproject.org/docs/api/endpoints/queries/#list-queries)\nin its response, this resource returns an unpersisted query and by that allows\nto get the default query configuration. The client may also provide additional\nparameters which will modify the default query. The query will already be scoped\nto the project.\n\nThis endpoint is deprecated and replaced by [`/api/v3/workspaces/{id}/queries/default`](https://www.openproject.org/docs/api/en"
+        },
+        {
+          "info": {
+            "name": "View schema for project queries",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/projects/:id/queries/schema",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Project id"
+              }
+            ]
+          },
+          "docs": "Retrieve the schema for project queries.\n\nThis endpoint is deprecated and replaced by ['/api/v3/workspaces/{id}/queries/schema`](https://www.openproject.org/docs/api/endpoints/queries/#view-schema-for-workspace-queries)"
+        },
+        {
+          "info": {
+            "name": "List queries",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/queries",
+            "params": [
+              {
+                "name": "filters",
+                "value": "[{ \"project_id\": { \"operator\": \"!*\", \"values\": null }\" }]",
+                "type": "query",
+                "description": "JSON specifying filter conditions.\nCurrently supported filters are:\n\n+ project: filters queries by the project they are assigned to. If the project filter is passed with the `!*` (not any) operator, global queries are returned.\n\n+ id: filters queries based on their id\n\n+ updated_at: filters queries based on the last time they where updated"
+              }
+            ]
+          },
+          "docs": "Returns a collection of queries. The collection can be filtered via query parameters similar to how work packages are filtered. Please note however, that the filters are applied to the queries and not to the work packages the queries in turn might return."
+        },
+        {
+          "info": {
+            "name": "Create query",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/queries",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "When calling this endpoint the client provides a single object, containing at least the properties and links that are required, in the body.\nThe required fields of a Query can be found in its schema, which is embedded in the respective form.\nNote that it is only allowed to provide properties or links supporting the write operation."
+        },
+        {
+          "info": {
+            "name": "Available projects for query",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/queries/available_projects"
+          },
+          "docs": "Gets a list of projects that are available as projects a query can be assigned to."
+        },
+        {
+          "info": {
+            "name": "View default query",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/queries/default",
+            "params": [
+              {
+                "name": "filters",
+                "value": "[{ \"assignee\": { \"operator\": \"=\", \"values\": [\"1\", \"5\"] }\" }]",
+                "type": "query",
+                "description": "JSON specifying filter conditions.\nThe filters provided as parameters are not applied to the query but are instead used to override the query's persisted filters.\nAll filters also accepted by the work packages endpoint are accepted. If no filter is to be applied, the client should send an empty array (`[]`)."
+              },
+              {
+                "name": "offset",
+                "value": "25",
+                "type": "query",
+                "description": "Page number inside the queries' result collection of work packages."
+              },
+              {
+                "name": "pageSize",
+                "value": "25",
+                "type": "query",
+                "description": "Number of elements to display per page for the queries' result collection of work packages."
+              },
+              {
+                "name": "sortBy",
+                "value": "[[\"status\", \"asc\"]]",
+                "type": "query",
+                "description": "JSON specifying sort criteria. The sort criteria is applied to the query's result collection of work packages overriding the query's persisted sort criteria."
+              },
+              {
+                "name": "groupBy",
+                "value": "status",
+                "type": "query",
+                "description": "The column to group by. The grouping criteria is applied to the to the query's result collection of work packages overriding the query's persisted group criteria."
+              },
+              {
+                "name": "showSums",
+                "value": "true",
+                "type": "query",
+                "description": "Indicates whether properties should be summed up if they support it. The showSums parameter is applied to the to the query's result collection of work packages overriding the query's persisted sums property."
+              },
+              {
+                "name": "timestamps",
+                "value": "2023-01-01,P-1Y,PT0S,lastWorkingDay@12:00",
+                "type": "query",
+                "description": "Indicates the timestamps to filter by when showing changed attributes on work packages. Values can be either ISO8601 dates, ISO8601 durations and the following relative date keywords: \"oneDayAgo@HH:MM+HH:MM\", \"lastWorkingDay@HH:MM+HH:MM\", \"oneWeekAgo@HH:MM+HH:MM\", \"oneMonthAgo@HH:MM+HH:MM\". The first \"HH:MM\" part represents the zero paded hours and minutes. The last \"+HH:MM\" part represents the timezone offset from UTC associated with the time, the offset can be positive or negative e.g.\"oneDayAgo@01:00+01:00\", \"oneDayAgo@01:00-01:00\". Values older than 1 day are accepted only with valid Enterprise Token available.\n"
+              },
+              {
+                "name": "timelineVisible",
+                "value": "true",
+                "type": "query",
+                "description": "Indicates whether the timeline should be shown."
+              },
+              {
+                "name": "timelineZoomLevel",
+                "value": "days",
+                "type": "query",
+                "description": "Indicates in what zoom level the timeline should be shown. Valid values are  `days`, `weeks`, `months`, `quarters`, and `years`."
+              },
+              {
+                "name": "showHierarchies",
+                "value": "true",
+                "type": "query",
+                "description": "Indicates whether the hierarchy mode should be enabled."
+              }
+            ]
+          },
+          "docs": "Same as [viewing an existing, persisted Query](https://www.openproject.org/docs/api/endpoints/queries/#list-queries) in its response, this resource returns an unpersisted query and by that allows to get the default query configuration. The client may also provide additional parameters which will modify the default query."
+        },
+        {
+          "info": {
+            "name": "Query Create Form",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/queries/form",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Query Create Form"
+        },
+        {
+          "info": {
+            "name": "View schema for global queries",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/queries/schema"
+          },
+          "docs": "Retrieve the schema for global queries, those, that are not assigned to a project."
+        },
+        {
+          "info": {
+            "name": "View query",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/queries/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Query id"
+              },
+              {
+                "name": "filters",
+                "value": "[{ \"assignee\": { \"operator\": \"=\", \"values\": [\"1\", \"5\"] }\" }]",
+                "type": "query",
+                "description": "JSON specifying filter conditions.\nThe filters provided as parameters are not applied to the query but are instead used to override the query's persisted filters.\nAll filters also accepted by the work packages endpoint are accepted. If no filter is to be applied, the client should send an empty array (`[]`)."
+              },
+              {
+                "name": "offset",
+                "value": "25",
+                "type": "query",
+                "description": "Page number inside the queries' result collection of work packages."
+              },
+              {
+                "name": "pageSize",
+                "value": "25",
+                "type": "query",
+                "description": "Number of elements to display per page for the queries' result collection of work packages."
+              },
+              {
+                "name": "columns",
+                "value": "[]",
+                "type": "query",
+                "description": "Selected columns for the table view."
+              },
+              {
+                "name": "sortBy",
+                "value": "[[\"status\", \"asc\"]]",
+                "type": "query",
+                "description": "JSON specifying sort criteria. The sort criteria is applied to the query's result collection of work packages overriding the query's persisted sort criteria."
+              },
+              {
+                "name": "groupBy",
+                "value": "status",
+                "type": "query",
+                "description": "The column to group by. The grouping criteria is applied to the to the query's result collection of work packages overriding the query's persisted group criteria."
+              },
+              {
+                "name": "showSums",
+                "value": "true",
+                "type": "query",
+                "description": "Indicates whether properties should be summed up if they support it. The showSums parameter is applied to the to the query's result collection of work packages overriding the query's persisted sums property."
+              },
+              {
+                "name": "timestamps",
+                "value": "2023-01-01,P-1Y,PT0S,lastWorkingDay@12:00",
+                "type": "query",
+                "description": "Indicates the timestamps to filter by when showing changed attributes on work packages. Values can be either ISO8601 dates, ISO8601 durations and the following relative date keywords: \"oneDayAgo@HH:MM+HH:MM\", \"lastWorkingDay@HH:MM+HH:MM\", \"oneWeekAgo@HH:MM+HH:MM\", \"oneMonthAgo@HH:MM+HH:MM\". The first \"HH:MM\" part represents the zero paded hours and minutes. The last \"+HH:MM\" part represents the timezone offset from UTC associated with the time, the offset can be positive or negative e.g.\"oneDayAgo@01:00+01:00\", \"oneDayAgo@01:00-01:00\". Values older than 1 day are accepted only with valid Enterprise Token available.\n"
+              },
+              {
+                "name": "timelineVisible",
+                "value": "true",
+                "type": "query",
+                "description": "Indicates whether the timeline should be shown."
+              },
+              {
+                "name": "timelineLabels",
+                "value": "{}",
+                "type": "query",
+                "description": "Overridden labels in the timeline view"
+              },
+              {
+                "name": "highlightingMode",
+                "value": "inline",
+                "type": "query",
+                "description": "Highlighting mode for the table view."
+              },
+              {
+                "name": "highlightedAttributes",
+                "value": "[]",
+                "type": "query",
+                "description": "Highlighted attributes mode for the table view when `highlightingMode` is `inline`. When set to `[]` all highlightable attributes will be returned as `highlightedAttributes`."
+              },
+              {
+                "name": "showHierarchies",
+                "value": "true",
+                "type": "query",
+                "description": "Indicates whether the hierarchy mode should be enabled."
+              }
+            ]
+          },
+          "docs": "Retrieve an individual query as identified by the id parameter. Then endpoint accepts a number of parameters that can be used to override the resources' persisted parameters."
+        },
+        {
+          "info": {
+            "name": "Edit Query",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://qa.openproject-edge.com/api/v3/queries/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Query id"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "When calling this endpoint the client provides a single object, containing the properties and links that it wants to change, in the body.\nNote that it is only allowed to provide properties or links supporting the **write** operation."
+        },
+        {
+          "info": {
+            "name": "Delete query",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://qa.openproject-edge.com/api/v3/queries/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Query id"
+              }
+            ]
+          },
+          "docs": "Delete the query identified by the id parameter"
+        },
+        {
+          "info": {
+            "name": "Query Update Form",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/queries/:id/form",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Query id"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Query Update Form"
+        },
+        {
+          "info": {
+            "name": "Star query",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://qa.openproject-edge.com/api/v3/queries/:id/star",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Query id"
+              }
+            ]
+          },
+          "docs": "Star query"
+        },
+        {
+          "info": {
+            "name": "Unstar query",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://qa.openproject-edge.com/api/v3/queries/:id/unstar",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Query id"
+              }
+            ]
+          },
+          "docs": "Unstar query"
+        },
+        {
+          "info": {
+            "name": "View default query for workspace",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/workspaces/:id/queries/default",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Id of the workspace the default query is requested for"
+              },
+              {
+                "name": "filters",
+                "value": "[{ \"assignee\": { \"operator\": \"=\", \"values\": [\"1\", \"5\"] }\" }]",
+                "type": "query",
+                "description": "JSON specifying filter conditions.\nThe filters provided as parameters are not applied to the query but are instead used to override the query's persisted filters.\nAll filters also accepted by the work packages endpoint are accepted. If no filter is to be applied, the client should send an empty array (`[]`)."
+              },
+              {
+                "name": "offset",
+                "value": "25",
+                "type": "query",
+                "description": "Page number inside the queries' result collection of work packages."
+              },
+              {
+                "name": "pageSize",
+                "value": "25",
+                "type": "query",
+                "description": "Number of elements to display per page for the queries' result collection of work packages."
+              },
+              {
+                "name": "sortBy",
+                "value": "[[\"status\", \"asc\"]]",
+                "type": "query",
+                "description": "JSON specifying sort criteria. The sort criteria is applied to the query's result collection of work packages overriding the query's persisted sort criteria."
+              },
+              {
+                "name": "groupBy",
+                "value": "status",
+                "type": "query",
+                "description": "The column to group by. The grouping criteria is applied to the to the query's result collection of work packages overriding the query's persisted group criteria."
+              },
+              {
+                "name": "showSums",
+                "value": "true",
+                "type": "query",
+                "description": "Indicates whether properties should be summed up if they support it. The showSums parameter is applied to the to the query's result collection of work packages overriding the query's persisted sums property."
+              },
+              {
+                "name": "timestamps",
+                "value": "2023-01-01,P-1Y,PT0S,lastWorkingDay@12:00",
+                "type": "query",
+                "description": "Indicates the timestamps to filter by when showing changed attributes on work packages. Values can be either ISO8601 dates, ISO8601 durations and the following relative date keywords: \"oneDayAgo@HH:MM+HH:MM\", \"lastWorkingDay@HH:MM+HH:MM\", \"oneWeekAgo@HH:MM+HH:MM\", \"oneMonthAgo@HH:MM+HH:MM\". The first \"HH:MM\" part represents the zero paded hours and minutes. The last \"+HH:MM\" part represents the timezone offset from UTC associated with the time. Values older than 1 day are accepted only with valid Enterprise Token available.\n"
+              },
+              {
+                "name": "timelineVisible",
+                "value": "true",
+                "type": "query",
+                "description": "Indicates whether the timeline should be shown."
+              },
+              {
+                "name": "showHierarchies",
+                "value": "true",
+                "type": "query",
+                "description": "Indicates whether the hierarchy mode should be enabled."
+              }
+            ]
+          },
+          "docs": "Same as [viewing an existing, persisted Query](https://www.openproject.org/docs/api/endpoints/queries/#list-queries) in its response, this resource returns an unpersisted query and by that allows to get the default query configuration. The client may also provide additional parameters which will modify the default query. The query will already be scoped to the workspace."
+        },
+        {
+          "info": {
+            "name": "View schema for workspace queries",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/workspace/:id/queries/schema",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Project id"
+              }
+            ]
+          },
+          "docs": "Retrieve the schema for workspace queries."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

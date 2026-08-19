@@ -1,0 +1,190 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Time Entries API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Time Entries",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Time entry update form",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/time_entries/:id/form",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Time entries activity id"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Time entry update form"
+        },
+        {
+          "info": {
+            "name": "Available projects for time entries",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/time_entries/available_projects"
+          },
+          "docs": "Gets a list of projects in which a time entry can be created in or be assigned to on update. The list contains all projects in which the user issuing the request has the necessary permissions."
+        },
+        {
+          "info": {
+            "name": "Time entry create form",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/time_entries/form"
+          },
+          "docs": "Time entry create form"
+        },
+        {
+          "info": {
+            "name": "View time entry schema",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/time_entries/schema"
+          },
+          "docs": "View time entry schema"
+        },
+        {
+          "info": {
+            "name": "Get time entry",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/time_entries/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "time entry id"
+              }
+            ]
+          },
+          "docs": "Retrieves a single time entry identified by the given id."
+        },
+        {
+          "info": {
+            "name": "update time entry",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://qa.openproject-edge.com/api/v3/time_entries/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Time entry id"
+              }
+            ]
+          },
+          "docs": "Updates the given time entry by applying the attributes provided in\nthe body. Please note that while there is a fixed set of attributes, custom fields\ncan extend a time entries' attributes and are accepted by the endpoint."
+        },
+        {
+          "info": {
+            "name": "Delete time entry",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://qa.openproject-edge.com/api/v3/time_entries/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Time entry id"
+              }
+            ]
+          },
+          "docs": "Permanently deletes the specified time entry."
+        },
+        {
+          "info": {
+            "name": "List time entries",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/time_entries",
+            "params": [
+              {
+                "name": "offset",
+                "value": "25",
+                "type": "query",
+                "description": "Page number inside the requested collection."
+              },
+              {
+                "name": "pageSize",
+                "value": "25",
+                "type": "query",
+                "description": "Number of elements to display per page."
+              },
+              {
+                "name": "sortBy",
+                "value": "[[\"spent_on\", \"asc\"]]",
+                "type": "query",
+                "description": "JSON specifying sort criteria.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint. Currently supported sorts are:\n\n+ id: Sort by primary key\n\n+ hours: Sort by logged hours\n\n+ spent_on: Sort by spent on date\n\n+ created_at: Sort by time entry creation datetime\n\n+ updated_at: Sort by the time the time entry was updated last"
+              },
+              {
+                "name": "filters",
+                "value": "[{ \"entity_type\": { \"operator\": \"=\", \"values\": [\"WorkPackage\"] }}, { \"entity_id\": { \"operator\": \"=\", \"values\": [\"1\", \"2\"] } }, { \"project\": { \"operator\": \"=\", \"values\": [\"1\"] } }]",
+                "type": "query",
+                "description": "JSON specifying filter conditions.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint. Currently supported filters are:\n\n+ entity_type: Filter time entries depending on the entity they are logged on. Can either be `WorkPackage` or `Meeting`.\n\n+ entity_id: Filter time entries for the specified entity IDs.\n\n+ project_id: Filter time entries by project\n\n+ user_id: Filter time entries by users\n\n+ ongoing: Filter to only recevie ongoing timers\n\n+ spent_on: Filter time entries by spent on date\n\n+ created_at: Filter time entries by creation datetime\n\n+ updated_at: Filter time entries by the last time they where updated\n\n+ activity_id: Filter time entries by time entry activity"
+              }
+            ]
+          },
+          "docs": "Lists time entries. The time entries returned depend on the filters\nprovided and also on the permission of the requesting user."
+        },
+        {
+          "info": {
+            "name": "Create time entry",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/time_entries",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new time entry applying the attributes provided in the body.\nPlease note that while there is a fixed set of attributes, custom fields can extend\na time entries' attributes and are accepted by the endpoint."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

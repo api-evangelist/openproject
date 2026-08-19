@@ -1,0 +1,268 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Attachments API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Attachments",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List attachments by activity",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/activities/:id/attachments",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "ID of the activity whose attachments will be listed"
+              }
+            ]
+          },
+          "docs": "List all attachments of a single activity."
+        },
+        {
+          "info": {
+            "name": "Add attachment to activity",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/activities/:id/attachments",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "ID of the activity to receive the attachment"
+              }
+            ],
+            "body": {
+              "type": "multipart-form",
+              "data": []
+            }
+          },
+          "docs": "Adds an attachment to the specified activity."
+        },
+        {
+          "info": {
+            "name": "Create Attachment",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/attachments"
+          },
+          "docs": "Clients can create attachments without a container first and attach them later on.\nThis is useful if the container does not exist at the time the attachment is uploaded.\nAfter the upload, the client can then claim such containerless attachments for any resource eligible (e.g. WorkPackage) on subsequent requests.\nThe upload and the claiming *must* be done for the same user account. Attachments uploaded by another user cannot be claimed and\nonce claimed for a resource, they cannot be claimed by an"
+        },
+        {
+          "info": {
+            "name": "View attachment",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/attachments/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Attachment id"
+              }
+            ]
+          },
+          "docs": "View attachment"
+        },
+        {
+          "info": {
+            "name": "Delete attachment",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://qa.openproject-edge.com/api/v3/attachments/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Attachment id"
+              }
+            ]
+          },
+          "docs": "Permanently deletes the specified attachment."
+        },
+        {
+          "info": {
+            "name": "List attachments by meeting",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/meetings/:id/attachments",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "ID of the meeting whose attachments will be listed"
+              }
+            ]
+          },
+          "docs": "List attachments by meeting"
+        },
+        {
+          "info": {
+            "name": "Add attachment to meeting",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/meetings/:id/attachments",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "ID of the meeting to receive the attachment"
+              }
+            ]
+          },
+          "docs": "Adds an attachment with the meeting as its container."
+        },
+        {
+          "info": {
+            "name": "List attachments by post",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/posts/:id/attachments",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "ID of the post whose attachments will be listed"
+              }
+            ]
+          },
+          "docs": "List attachments by post"
+        },
+        {
+          "info": {
+            "name": "Add attachment to post",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/posts/:id/attachments",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "ID of the post to receive the attachment"
+              }
+            ]
+          },
+          "docs": "Adds an attachment with the post as its container."
+        },
+        {
+          "info": {
+            "name": "List attachments by wiki page",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/wiki_pages/:id/attachments",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "ID of the wiki page whose attachments will be listed"
+              }
+            ]
+          },
+          "docs": "List attachments by wiki page"
+        },
+        {
+          "info": {
+            "name": "Add attachment to wiki page",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/wiki_pages/:id/attachments",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "ID of the wiki page to receive the attachment"
+              }
+            ]
+          },
+          "docs": "Adds an attachment with the wiki page as its container."
+        },
+        {
+          "info": {
+            "name": "List attachments by work package",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/work_packages/:id/attachments",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "ID of the work package whose attachments will be listed"
+              }
+            ]
+          },
+          "docs": "List attachments by work package"
+        },
+        {
+          "info": {
+            "name": "Create work package attachment",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/work_packages/:id/attachments",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "ID of the work package to receive the attachment"
+              }
+            ]
+          },
+          "docs": "To add an attachment to a work package, a client needs to issue a request of type `multipart/form-data`\nwith exactly two parts.\n\nThe first part *must* be called `metadata`. Its content type is expected to be `application/json`,\nthe body *must* be a single JSON object, containing at least the `fileName` and optionally the attachments `description`.\n\nThe second part *must* be called `file`, its content type *should* match the mime type of the file.\nThe body *must* be the raw content of the file.\nN"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

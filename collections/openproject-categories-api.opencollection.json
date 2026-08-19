@@ -1,0 +1,82 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Categories API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Categories",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "View Category",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/categories/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Category id"
+              }
+            ]
+          },
+          "docs": "View Category"
+        },
+        {
+          "info": {
+            "name": "List categories of a project",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/projects/:id/categories",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "ID of the project whose categories will be listed"
+              }
+            ]
+          },
+          "docs": "List all categories of a project\nThis endpoint is deprecated and replaced by [`/api/v3/workspaces/{id}/categories`](https://www.openproject.org/docs/api/endpoints/categories/#list-categories-of-a-workspace) "
+        },
+        {
+          "info": {
+            "name": "List categories of a workspace",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/workspaces/:id/categories",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "ID of the workspace whose categories will be listed"
+              }
+            ]
+          },
+          "docs": "List all categories of a project"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

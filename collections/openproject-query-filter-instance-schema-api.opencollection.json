@@ -1,0 +1,93 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Query Filter Instance Schema API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Query Filter Instance Schema",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Query Filter Instance Schemas for Project",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/projects/:id/queries/filter_instance_schemas",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Project id"
+              }
+            ]
+          },
+          "docs": "Returns the list of QueryFilterInstanceSchemas defined for a query\nof the specified project.\n\nThis endpoint is deprecated and replaced by [`/api/v3/workspaces/{id}/queries/filter_instance_schemas`](https://www.openproject.org/docs/api/endpoints/query-filter-instance-schema/#list-query-filter-instance-schemas-for-workspace)"
+        },
+        {
+          "info": {
+            "name": "List Query Filter Instance Schemas",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/queries/filter_instance_schemas"
+          },
+          "docs": "Returns the list of QueryFilterInstanceSchemas defined for a global query. That is a query not assigned to a project."
+        },
+        {
+          "info": {
+            "name": "View Query Filter Instance Schema",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/queries/filter_instance_schemas/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "author",
+                "type": "path",
+                "description": "QueryFilterInstanceSchema identifier. The identifier is the filter identifier."
+              }
+            ]
+          },
+          "docs": "Retrieve an individual QueryFilterInstanceSchema as identified by the id parameter."
+        },
+        {
+          "info": {
+            "name": "List Query Filter Instance Schemas for Workspace",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/workspace/:id/queries/filter_instance_schemas",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Workspace id"
+              }
+            ]
+          },
+          "docs": "Returns the list of QueryFilterInstanceSchemas defined for a query of the specified workspace."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

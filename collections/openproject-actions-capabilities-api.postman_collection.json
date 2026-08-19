@@ -1,0 +1,694 @@
+{
+  "item": [
+    {
+      "id": "febf727e-ac34-4da6-b0b5-9636f53cc17e",
+      "name": "Actions & Capabilities",
+      "description": {
+        "content": "An action is a change one can trigger within the OpenProject instance.\nThis could be creating a work package, exporting work packages or updating a user.\nAn action can also be something where the user is able to be involved so where the user is in the passive role\ne.g. when being assigned a work package.\n\nA capability combines an action with a context and a principal. It thus communicates, which principal can carry out\n(or be passively involved) which action within a certain context. E.g. a user might have the capability of creating work packages\nwithin a project.\n\nIn other words, an action is independent of a principal and context while a capability is\na relation between an action, the context and the principal.\n\nThe actions are most of the time derived from permissions which can be configured via the administrative UI where an administrator\nselects from a set of permissions to be granted per role. But there are other cases, e.g. in order to become assignee or responsible of a work package, a user has\nto have a role which allows having work packages assigned which is not a permission.\n\nEven though user might have a capability, it might still not be possible to carry out the action\nbecause some other requirement is not met.\nE.g. a user might have the capability to update work packages, but if a particular work package is\nin a readonly state, that work package cannot be updated.\n\n*Only a small set of actions that actually already exist in the system are currently exposed via\nthe api. They will be added over time.*\n\n## Action\n\nAn action describes what can be carried out within the application. Until an action becomes assigned,\nwhich turns it into a capability, it remains in the state of \"could be\".\n\n### Linked Properties\n\n|  Link               | Description                              | Type             | Constraints                                                    | Supported operations |\n|:-------------------:|----------------------------------------- | -------------    | -------------------------------------------------------------- | -------------------- |\n| self                | The action                               | Action           | not null                                                       | READ                 |\n\n### Local Properties\n\n| Property    | Description                                                                             | Type        | Constraints    | Supported operations |\n| :---------: | ---------------------------------------------                                           | ----------- | -----------    | -------------------- |\n| id          | Identifier for the action                                                               | String      | Not null       | READ                 |\n| name        | A human readable name for the action *Not yet implemented*                              | String      | Not null       | READ                 |\n| description | Describes what can be done by principals having that action   *Not yet implemented*     | String      | Not null       | READ                 |\n| modules     | Clusters the actions into groups into which they belong logically *Not yet implemented* | []String    | Not null       | READ                 |\n\n## Capabilities\n\nActions can be assigned to a principal by assigning roles to that principal. E.g. a user might receive the 'work_packages/show'\naction by having a role called reader assigned within a project.\n\nWhenever a principal is assigned an action within a context, the principal has additional capabilities.\n\nExactly which actions can be gained by having a role assigned depends on the configuration of that role.\nThe configuration is adaptable by admins within the administration of the OpenProject instance.\n\n### Linked Properties\n\n|  Link               | Description                                                                                            | Type               | Constraints     | Supported operations |\n|-------------------- |-----------------------------------------                                                               | -------------      | --------------- | -------------------- |\n| self                | The capability                                                                                         |                    |                 |                      |\n| action              | The action the principal is granted                                                                    | Action             | not null        | READ                 |\n| context             | The context the principal has this the action in. This is typically a workspace or the global context. | Workspace or null  |                 | READ                 |\n| principal           | The principal being allowed the action.                                                                | Action             | not null        | READ                 |\n\n### Local Properties\n\n| Property    | Description                                   | Type        | Constraints        | Supported operations |\n| :---------: | --------------------------------------------- | ----------- | -----------        | -------------------- |\n| id          | Identifier for the action                     | String      | Not null           | READ                 |\n| name        | A human readable name for the action          | String      | Not null           | READ                 |",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "b42bca81-7c87-42bf-b8e3-086e5e7fdadf",
+          "name": "List actions",
+          "request": {
+            "name": "List actions",
+            "description": {
+              "content": "Returns a collection of actions. The client can choose to filter the actions similar to how work packages are filtered.\nIn addition to the provided filters, the server will reduce the result set to only contain actions, for which the requesting client\nhas sufficient permissions.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "actions"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "filters",
+                  "value": "<string>",
+                  "description": "JSON specifying filter conditions.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint.\nCurrently supported filters are:\n\n+ id: Returns only the action having the id or all actions except those having the id(s)."
+                },
+                {
+                  "disabled": false,
+                  "key": "sortBy",
+                  "value": "[[\"id\", \"asc\"]]",
+                  "description": "JSON specifying sort criteria.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint. Currently supported sorts are:\n\n+ *No sort supported yet*"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "8dac5538-9550-4e98-963a-cee604040bb6",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "actions"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "filters",
+                      "value": "[{ \"id\": { \"operator\": \"=\", \"values\": [\"memberships/create\"] }\" }]"
+                    },
+                    {
+                      "key": "sortBy",
+                      "value": "[[\"id\", \"asc\"]]"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_embedded\": {\n    \"elements\": [\n      {\n        \"_links\": {\n          \"self\": {\n            \"href\": \"/api/v3/actions/work_packages/create\",\n            \"title\": \"Add work package\"\n          }\n        },\n        \"_type\": \"Action\",\n        \"description\": \"Creating a work package within a project including the uploading of attachments. Some attributes might not be selected, e.g version which requires a second permission\",\n        \"id\": \"work_packages/create\",\n        \"modules\": [\n          \"work_packages\"\n        ],\n        \"name\": \"Add work package\"\n      },\n      {\n        \"_links\": {\n          \"self\": {\n            \"href\": \"/api/v3/actions/work_packages/assign_versions\",\n            \"title\": \"Assigning version\"\n          }\n        },\n        \"_type\": \"Action\",\n        \"description\": \"Assigning a work package to a version when creating/updating a work package. Only principals having this permission can assign a value to the version property of the work package resource.\",\n        \"id\": \"work_packages/assign_versions\",\n        \"modules\": [\n          \"work_packages\",\n          \"versions\"\n        ],\n        \"name\": \"Assign version\"\n      }\n    ]\n  },\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/actions\"\n    }\n  },\n  \"_type\": \"Collection\",\n  \"count\": 2,\n  \"total\": 2\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "73d3c166-1ff4-4dac-8b66-ab836c013a13",
+          "name": "View action",
+          "request": {
+            "name": "View action",
+            "description": {
+              "content": "Returns an individual action.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "actions",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "id",
+                  "description": "(Required) action id which is the name of the action"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "565d5f8f-374d-4545-a376-f968bd37fc53",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "actions",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) action id which is the name of the action"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/actions/work_packages/create\",\n      \"title\": \"Add work package\"\n    }\n  },\n  \"_type\": \"Action\",\n  \"description\": \"Creating a work package within a project including the uploading of attachments. Some attributes might not be selected, e.g version which requires a second permission\",\n  \"id\": \"work_packages/create\",\n  \"modules\": [\n    \"work_packages\"\n  ],\n  \"name\": \"Add work package\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "8c6c5625-05d1-48ea-bae0-6d11fb2bf4a5",
+              "name": "Returned if the action does not exist.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "actions",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) action id which is the name of the action"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:NotFound\",\n  \"message\": \"The requested resource could not be found.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "80229f60-190d-4086-8535-eb3ed00d581d",
+          "name": "List capabilities",
+          "request": {
+            "name": "List capabilities",
+            "description": {
+              "content": "Returns a collection of actions assigned to a principal in a context. The client can choose to filter the actions similar to how work packages are filtered. In addition to the provided filters, the server will reduce the result set to only contain actions, for which the requesting client has sufficient permissions",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "capabilities"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "filters",
+                  "value": "<string>",
+                  "description": "JSON specifying filter conditions.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint.\n\n+ action: Get all capabilities of a certain action\n\n+ principal: Get all capabilities of a principal\n\n+ context: Get all capabilities within a context. Note that for a workspace context the client needs to\n  provide `w{id}`, e.g. `w5` and for the global context a `g`.\n\n  + **Deprecation**: The now deprecated context `p` for project still works, but must eventually be replaced\n    with the `w` for the workspace context."
+                },
+                {
+                  "disabled": false,
+                  "key": "sortBy",
+                  "value": "[[\"id\", \"asc\"]]",
+                  "description": "JSON specifying sort criteria.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint. Currently supported sorts are:\n\n+ id: Sort by the capabilities id"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "8f65bc58-9fa8-44a6-b7e6-d5868ee18624",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "capabilities"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "filters",
+                      "value": "[{ \"principal\": { \"operator\": \"=\", \"values\": [\"1\"] }\" }]"
+                    },
+                    {
+                      "key": "sortBy",
+                      "value": "[[\"id\", \"asc\"]]"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_embedded\": {\n    \"elements\": [\n      {\n        \"_links\": {\n          \"action\": {\n            \"href\": \"/api/v3/actions/work_packages/create\",\n            \"title\": \"Add work package\"\n          },\n          \"context\": {\n            \"href\": \"/api/v3/projects/123\",\n            \"title\": \"A project\"\n          },\n          \"principal\": {\n            \"href\": \"/api/v3/users/567\",\n            \"title\": \"Some user\"\n          },\n          \"self\": {\n            \"href\": \"/api/v3/capabilities/work_packages/create/w123-567\"\n          }\n        },\n        \"_type\": \"Capability\",\n        \"id\": \"work_packages/create/w123-567\"\n      },\n      {\n        \"_links\": {\n          \"action\": {\n            \"href\": \"/api/v3/actions/work_packages/assignee\"\n          },\n          \"context\": {\n            \"href\": \"/api/v3/projects/123\",\n            \"title\": \"A project\"\n          },\n          \"principal\": {\n            \"href\": \"/api/v3/users/567\",\n            \"title\": \"Some user\"\n          },\n          \"self\": {\n            \"href\": \"/api/v3/capabilities/work_packages/assignee/w123-567\"\n          }\n        },\n        \"_type\": \"Capability\",\n        \"id\": \"work_packages/assignee/w123-567\"\n      },\n      {\n        \"_links\": {\n          \"action\": {\n            \"href\": \"/api/v3/actions/memberships/create\"\n          },\n          \"context\": {\n            \"href\": \"/api/v3/portfolios/345\",\n            \"title\": \"A portfolio\"\n          },\n          \"principal\": {\n            \"href\": \"/api/v3/users/821\",\n            \"title\": \"Some user\"\n          },\n          \"self\": {\n            \"href\": \"/api/v3/capabilities/memberships/create/w345-821\",\n            \"title\": \"Create members\"\n          }\n        },\n        \"_type\": \"Capability\",\n        \"id\": \"memberships/create/w345-821\"\n      },\n      {\n        \"_links\": {\n          \"context\": {\n            \"href\": \"/api/v3/capabilities/context/global\",\n            \"title\": \"Global\"\n          },\n          \"principal\": {\n            \"href\": \"/api/v3/users/567\",\n            \"title\": \"Some user\"\n          },\n          \"self\": {\n            \"href\": \"/api/v3/capabilities/users/delete/g-567\",\n            \"title\": \"Delete user\"\n          }\n        },\n        \"_type\": \"Capability\",\n        \"id\": \"users/delete/g-567\"\n      }\n    ]\n  },\n  \"_links\": {\n    \"changeSize\": {\n      \"href\": \"/api/v3/capabilities?pageSize={size}\",\n      \"templated\": true\n    },\n    \"jumpTo\": {\n      \"href\": \"/api/v3/capabilities?offset={offset}\",\n      \"templated\": true\n    },\n    \"self\": {\n      \"href\": \"/api/v3/capabilities\"\n    }\n  },\n  \"_type\": \"Collection\",\n  \"count\": 4,\n  \"total\": 4\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "21adf299-71c0-4a00-8a3a-51237f723dea",
+          "name": "View global context",
+          "request": {
+            "name": "View global context",
+            "description": {
+              "content": "Returns the global capability context. This context is necessary to consistently link to a context even if the context is not a project.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "capabilities",
+                "context",
+                "global"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "f052a2e5-736a-4935-a818-4a61ee2541d1",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "capabilities",
+                    "context",
+                    "global"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/capabilities/context/global\"\n    }\n  },\n  \"_type\": \"CapabilityContext::Global\",\n  \"id\": \"global\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b1c60eac-93f4-4e0e-802b-9f6d95e0fac5",
+              "name": "Returned if the action does not exist.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "capabilities",
+                    "context",
+                    "global"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:NotFound\",\n  \"message\": \"The requested resource could not be found.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "ec2d69a7-b5de-4999-9706-ee7a3eab1780",
+          "name": "View capabilities",
+          "request": {
+            "name": "View capabilities",
+            "description": {
+              "content": "",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "capabilities",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "id",
+                  "description": "(Required) capability id"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "b5f22849-e8b7-44e0-85df-5b0c596ebf99",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "capabilities",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) capability id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_links\": {\n    \"action\": {\n      \"href\": \"/api/v3/actions/work_packages/create\",\n      \"title\": \"Add work package\"\n    },\n    \"context\": {\n      \"href\": \"/api/v3/projects/123\",\n      \"title\": \"A project\"\n    },\n    \"principal\": {\n      \"href\": \"/api/v3/users/567\",\n      \"title\": \"Some user\"\n    },\n    \"self\": {\n      \"href\": \"/api/v3/capabilities/work_packages/create/w123-567\"\n    }\n  },\n  \"_type\": \"Capability\",\n  \"id\": \"work_packages/create/p123-567\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "92cb46cd-7493-44d5-ae34-f7e64818e292",
+              "name": "Returned if the capability does not exist.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "capabilities",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) capability id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:NotFound\",\n  \"message\": \"The requested resource could not be found.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://qa.openproject-edge.com",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {
+        "key": "username",
+        "value": "{{basicAuthUsername}}"
+      },
+      {
+        "key": "password",
+        "value": "{{basicAuthPassword}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "ce5b312d-ea99-4d2d-9149-b2937f4badcb",
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "You're looking at the current **stable** documentation of the OpenProject APIv3. If you're interested in the current\ndevelopment version, please go to [github.com/opf](https://github.com/opf/openproject/tree/dev/docs/api/apiv3).\n\n## Introduction\n\nThe documentation for the APIv3 is written according to the [OpenAPI 3.1 Specification](https://swagger.io/specification/).\nYou can either view the static version of this documentation on the [website](https://www.openproject.org/docs/api/introduction/)\nor the interactive version, rendered with [OpenAPI Explorer](https://github.com/Rhosys/openapi-explorer/blob/main/README.md),\nin your OpenProject installation under `/api/docs`.\nIn the latter you can try out the various API endpoints directly interacting with our OpenProject data.\nMoreover you can access the specification source itself under `/api/v3/spec.json` and `/api/v3/spec.yml`\n(e.g. [here](https://community.openproject.org/api/v3/spec.yml)).\n\nThe APIv3 is a hypermedia REST API, a shorthand for \"Hypermedia As The Engine Of Application State\" (HATEOAS).\nThis means that each endpoint of this API will have links to other resources or actions defined in the resulting body.\n\nThese related resources and actions for any given resource will be context sensitive. For example, only actions that the\nauthenticated user can take are being rendered. This can be used to dynamically identify actions that the user might take for any\ngiven response.\n\nAs an example, if you fetch a work package through the [Work Package endpoint](https://www.openproject.org/docs/api/endpoints/work-packages/), the `update` link will only\nbe present when the user you authenticated has been granted a permission to update the work package in the assigned project.\n\n## HAL+JSON\n\nHAL is a simple format that gives a consistent and easy way to hyperlink between resources in your API.\nRead more in the following specification: [https://tools.ietf.org/html/draft-kelly-json-hal-08](https://tools.ietf.org/html/draft-kelly-json-hal-08)\n\n**OpenProject API implementation of HAL+JSON format** enriches JSON and introduces a few meta properties:\n\n- `_type` - specifies the type of the resource (e.g.: WorkPackage, Project)\n- `_links` - contains all related resource and action links available for the resource\n- `_embedded` - contains all embedded objects\n\nHAL does not guarantee that embedded resources are embedded in their full representation, they might as well be\npartially represented (e.g. some properties can be left out).\nHowever in this API you have the guarantee that whenever a resource is **embedded**, it is embedded in its **full representation**.\n\n## API response structure\n\nAll API responses contain a single HAL+JSON object, even collections of objects are technically represented by\na single HAL+JSON object that itself contains its members. More details on collections can be found\nin the [Collections Section](https://www.openproject.org/docs/api/collections/).\n\n## Authentication\n\nThe API supports the following authentication schemes:\n\n* Session-based authentication\n* API tokens\n    * passed as Bearer token\n    * passed via Basic auth\n* OAuth 2.0\n    * using built-in authorization server\n    * using an external authorization server (RFC 9068)\n\nDepending on the settings of the OpenProject instance many resources can be accessed without being authenticated.\nIn case the instance requires authentication on all requests the client will receive an **HTTP 401** status code\nin response to any request.\n\nOtherwise unauthenticated clients have all the permissions of the anonymous user.\n\n### Session-based authentication\n\nThis means you have to login to OpenProject via the Web-Interface to be authenticated in the API.\nThis method is well-suited for clients acting within the browser, like the Angular-Client built into OpenProject.\n\nIn this case, you always need to pass the HTTP header `X-Requested-With \"XMLHttpRequest\"` for authentication.\n\n### API token as bearer token\n\nUsers can authenticate towards the API v3 using an API token as a bearer token.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -H \"Authorization: Bearer $API_KEY\" https://community.openproject.org/api/v3/users/42\n```\n\nUsers can generate API tokens on their account page.\n\n### API token through Basic Auth\n\nAPI tokens can also be used with basic auth, using the user name `apikey` (NOT your login) and the API token as the password.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -u apikey:$API_KEY https://community.openproject.org/api/v3/users/42\n```\n\n### OAuth 2.0 authentication\n\nOpenProject allows authentication and authorization with OAuth2 with *Authorization code flow*, as well as *Client credentials* operation modes.\n\nTo get started, you first need to register an application in the OpenProject OAuth administration section of your installation.\nThis will save an entry for your application with a client unique identifier (`client_id`) and an accompanying secret key (`client_secret`).\n\nYou can then use one the following guides to perform the supported OAuth 2.0 flows:\n\n- [Authorization code flow](https://oauth.net/2/grant-types/authorization-code)\n\n- [Authorization code flow with PKCE](https://doorkeeper.gitbook.io/guides/ruby-on-rails/pkce-flow), recommended for clients unable to keep the client_secret confidential\n\n- [Client credentials](https://oauth.net/2/grant-types/client-credentials/) - Requires an application to be bound to an impersonating user for non-public access\n\n### OAuth 2.0 using an external authorization server\n\nThere is a possibility to use JSON Web Tokens (JWT) generated by an OIDC provider configured in OpenProject as a bearer token to do authenticated requests against the API.\nThe following requirements must be met:\n\n- OIDC provider must be configured in OpenProject with **jwks_uri**\n- JWT must be signed using RSA algorithm\n- JWT **iss** claim must be equal to OIDC provider **issuer**\n- JWT **aud** claim must contain the OpenProject **client ID** used at the OIDC provider\n- JWT **scope** claim must include a valid scope to access the desired API (e.g. `api_v3` for APIv3)\n- JWT must be actual (neither expired or too early to be used)\n- JWT must be passed in Authorization header like: `Authorization: Bearer {jwt}`\n- User from **sub** claim must be linked to OpenProject before (e.g. by logging in), otherwise it will be not authenticated\n\nIn more general terms, OpenProject should be compliant to [RFC 9068](https://www.rfc-editor.org/rfc/rfc9068) when validating access tokens.\n\n### Why not username and password?\n\nThe simplest way to do basic auth would be to use a user's username and password naturally.\nHowever, OpenProject already has supported API keys in the past for the API v2, though not through basic auth.\n\nUsing **username and password** directly would have some advantages:\n\n* It is intuitive for the user who then just has to provide those just as they would when logging into OpenProject.\n\n* No extra logic for token management necessary.\n\nOn the other hand using **API keys** has some advantages too, which is why we went for that:\n\n* If compromised while saved on an insecure client the user only has to regenerate the API key instead of changing their password, too.\n\n* They are naturally long and random which makes them invulnerable to dictionary attacks and harder to crack in general.\n\nMost importantly users may not actually have a password to begin with. Specifically when they have registered\nthrough an OpenID Connect provider.\n\n## Cross-Origin Resource Sharing (CORS)\n\nBy default, the OpenProject API is _not_ responding with any CORS headers.\nIf you want to allow cross-domain AJAX calls against your OpenProject instance, you need to enable CORS headers being returned.\n\nPlease see [our API settings documentation](https://www.openproject.org/docs/system-admin-guide/api-and-webhooks/) on\nhow to selectively enable CORS.\n\n## Allowed HTTP methods\n\n- `GET` - Get a single resource or collection of resources\n\n- `POST` - Create a new resource or perform\n\n- `PATCH` - Update a resource\n\n- `DELETE` - Delete a resource\n\n## Compression\n\nResponses are compressed if requested by the client. Currently [gzip](https://www.gzip.org/) and [deflate](https://tools.ietf.org/html/rfc1951)\nare supported. The client signals the desired compression by setting the [`Accept-Encoding` header](https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3).\nIf no `Accept-Encoding` header is send, `Accept-Encoding: identity` is assumed which will result in the API responding uncompressed.",
+      "type": "text/plain"
+    }
+  }
+}

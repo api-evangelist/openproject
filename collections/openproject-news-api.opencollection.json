@@ -1,0 +1,138 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities News API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "News",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List News",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/news",
+            "params": [
+              {
+                "name": "offset",
+                "value": "25",
+                "type": "query",
+                "description": "Page number inside the requested collection."
+              },
+              {
+                "name": "pageSize",
+                "value": "25",
+                "type": "query",
+                "description": "Number of elements to display per page."
+              },
+              {
+                "name": "sortBy",
+                "value": "[[\"created_at\", \"asc\"]]",
+                "type": "query",
+                "description": "JSON specifying sort criteria.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint. Currently supported sorts are:\n\n+ id: Sort by primary key\n\n+ created_at: Sort by news creation datetime"
+              },
+              {
+                "name": "filters",
+                "value": "[{ \"project_id\": { \"operator\": \"=\", \"values\": [\"1\", \"2\"] } }]",
+                "type": "query",
+                "description": "JSON specifying filter conditions.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint. Currently supported filters are:\n\n+ project_id: Filter news by project"
+              }
+            ]
+          },
+          "docs": "Lists news. The news returned depend on the provided parameters and also on the requesting user's permissions."
+        },
+        {
+          "info": {
+            "name": "Create News",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/news",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a news entry. Only administrators and users with \"Manage news\" permission in the given project are eligible.\nWhen calling this endpoint the client provides a single object, containing at least the properties and links that are required, in the body."
+        },
+        {
+          "info": {
+            "name": "View news",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/news/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "news id"
+              }
+            ]
+          },
+          "docs": "View news"
+        },
+        {
+          "info": {
+            "name": "Update news",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://qa.openproject-edge.com/api/v3/news/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "News id"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates the news's writable attributes.\nWhen calling this endpoint the client provides a single object, containing the properties and links to be updated, in the body."
+        },
+        {
+          "info": {
+            "name": "Delete news",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://qa.openproject-edge.com/api/v3/news/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "News id"
+              }
+            ]
+          },
+          "docs": "Permanently deletes the specified news entry."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

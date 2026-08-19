@@ -1,0 +1,2455 @@
+{
+  "item": [
+    {
+      "id": "7c3df5c3-738b-4329-997b-5386360e5927",
+      "name": "Time Entries",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "9c7fbd3e-11a7-43e8-891b-09f2a01bc655",
+          "name": "Time entry update form",
+          "request": {
+            "name": "Time entry update form",
+            "description": {
+              "content": "",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "time_entries",
+                ":id",
+                "form"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<integer>",
+                  "key": "id",
+                  "description": "(Required) Time entries activity id"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "<integer>",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "e7025772-a88e-4fe0-8dfc-d82550780771",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries",
+                    ":id",
+                    "form"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Time entries activity id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "<integer>",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "98fb48e0-2df0-4c79-8271-9b7272dec248",
+              "name": "Occurs when the client did not send a valid JSON object in the request body.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries",
+                    ":id",
+                    "form"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Time entries activity id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "<integer>",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:InvalidRequestBody\",\n  \"message\": \"The request body was not a single JSON object.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f9c49672-3b54-494a-81ed-aaf7597106a6",
+              "name": "Returned if the client does not have sufficient permissions to edit the time entry.\n\n**Required permission:** *edit time entries* for every time entry of a project, or *edit own time entries* for time entries belonging to the user.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries",
+                    ":id",
+                    "form"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Time entries activity id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "<integer>",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:MissingPermission\",\n  \"message\": \"You are not authorized to access this resource.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "3859c796-f22e-4a4e-b8fc-22845fe2dd02",
+              "name": "Returned if the time entry does not exist or if the client does not have sufficient permissions to view it.\n\n**Required permission** `view time entries` in the project the time entry is assigned to or `view own time entries` for time entries belonging to the user",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries",
+                    ":id",
+                    "form"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Time entries activity id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "<integer>",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:NotFound\",\n  \"message\": \"The requested resource could not be found.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "c698db58-7383-485a-ab05-4009c7f5a59b",
+              "name": "Occurs when the client did not send a Content-Type header",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries",
+                    ":id",
+                    "form"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Time entries activity id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "text/plain"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "<integer>",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Acceptable",
+              "code": 406,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "Missing content-type header",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "ebbb7ca3-2fef-410d-b0a4-0788e576357a",
+              "name": "Occurs when the client sends an unsupported Content-Type header.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries",
+                    ":id",
+                    "form"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Time entries activity id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "<integer>",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unsupported Media Type",
+              "code": 415,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:TypeNotSupported\",\n  \"message\": \"Expected CONTENT-TYPE to be (expected value) but got (actual value).\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "361c75a9-fd0e-46d5-bc58-b854c15df936",
+          "name": "Available projects for time entries",
+          "request": {
+            "name": "Available projects for time entries",
+            "description": {
+              "content": "Gets a list of projects in which a time entry can be created in or be assigned to on update. The list contains all projects in which the user issuing the request has the necessary permissions.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "time_entries",
+                "available_projects"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "03747b59-2d40-4c16-93b9-404d22059abc",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries",
+                    "available_projects"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_embedded\": {\n    \"elements\": [\n      {\n        \"_type\": \"Project...\"\n      },\n      {\n        \"_type\": \"Project...\"\n      }\n    ]\n  },\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/time_entries/available_projects\"\n    }\n  },\n  \"_type\": \"Collection\",\n  \"count\": 2,\n  \"total\": 2\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b7fd8cb4-fb81-4623-9c42-ac0d4924aa83",
+              "name": "Returned if the client does not have sufficient permissions.\n\n**Required permission:** *log time*, *edit time entries* or *edit own time entries* in any project",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries",
+                    "available_projects"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:MissingPermission\",\n  \"message\": \"You are not authorized to access this resource.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "7435459c-3b5b-45b5-bc4d-3c2eb085e314",
+          "name": "Time entry create form",
+          "request": {
+            "name": "Time entry create form",
+            "description": {
+              "content": "",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "time_entries",
+                "form"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "POST",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "13632dd6-b7f1-40d1-aeab-ba49718faf25",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries",
+                    "form"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "29525ac9-ac50-4f86-aa16-a40933672f17",
+              "name": "Occurs when the client did not send a valid JSON object in the request body.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries",
+                    "form"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:InvalidRequestBody\",\n  \"message\": \"The request body was not a single JSON object.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "fdc66095-d8a0-4e89-b5d4-de8a96b6f277",
+              "name": "Returned if the client does not have sufficient permissions.\n\n**Required permission:** *log time* in any project",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries",
+                    "form"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:MissingPermission\",\n  \"message\": \"You are not authorized to access this resource.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "dd6f7eb2-88a2-4694-8bbe-1f46e8beb236",
+              "name": "Occurs when the client did not send a Content-Type header",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries",
+                    "form"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "text/plain"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Not Acceptable",
+              "code": 406,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "Missing content-type header",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "c041d8a6-53b9-4329-8977-6d3e57503d77",
+              "name": "Occurs when the client sends an unsupported Content-Type header.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries",
+                    "form"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Unsupported Media Type",
+              "code": 415,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:TypeNotSupported\",\n  \"message\": \"Expected CONTENT-TYPE to be (expected value) but got (actual value).\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "3dd242fd-b210-48bf-a921-69d405f18d4e",
+          "name": "View time entry schema",
+          "request": {
+            "name": "View time entry schema",
+            "description": {
+              "content": "",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "time_entries",
+                "schema"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "767bc37e-c4b6-4ef4-a6a1-9974c3a53195",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries",
+                    "schema"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_dependencies\": [],\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/time_entries/schema\"\n    }\n  },\n  \"_type\": \"Schema\",\n  \"activity\": {\n    \"_links\": {},\n    \"hasDefault\": true,\n    \"location\": \"_links\",\n    \"name\": \"Activity\",\n    \"required\": true,\n    \"type\": \"TimeEntriesActivity\",\n    \"writable\": true\n  },\n  \"createdAt\": {\n    \"hasDefault\": false,\n    \"name\": \"Created on\",\n    \"options\": {},\n    \"required\": true,\n    \"type\": \"DateTime\",\n    \"writable\": false\n  },\n  \"customField29\": {\n    \"hasDefault\": false,\n    \"name\": \"sfsdfsdfsdfsdfdsf\",\n    \"options\": {\n      \"rtl\": null\n    },\n    \"required\": false,\n    \"type\": \"String\",\n    \"writable\": true\n  },\n  \"hours\": {\n    \"hasDefault\": false,\n    \"name\": \"Hours\",\n    \"options\": {},\n    \"required\": true,\n    \"type\": \"Duration\",\n    \"writable\": true\n  },\n  \"id\": {\n    \"hasDefault\": false,\n    \"name\": \"ID\",\n    \"options\": {},\n    \"required\": true,\n    \"type\": \"Integer\",\n    \"writable\": false\n  },\n  \"project\": {\n    \"_links\": {},\n    \"hasDefault\": false,\n    \"location\": \"_links\",\n    \"name\": \"Project\",\n    \"required\": false,\n    \"type\": \"Project\",\n    \"writable\": true\n  },\n  \"ongoing\": {\n    \"hasDefault\": false,\n    \"name\": \"Ongoing\",\n    \"options\": {},\n    \"required\": false,\n    \"type\": \"Boolean\",\n    \"writable\": true\n  },\n  \"spentOn\": {\n    \"hasDefault\": false,\n    \"name\": \"Date\",\n    \"options\": {},\n    \"required\": true,\n    \"type\": \"Date\",\n    \"writable\": true\n  },\n  \"updatedAt\": {\n    \"hasDefault\": false,\n    \"name\": \"Updated on\",\n    \"options\": {},\n    \"required\": true,\n    \"type\": \"DateTime\",\n    \"writable\": false\n  },\n  \"user\": {\n    \"hasDefault\": false,\n    \"name\": \"User\",\n    \"options\": {},\n    \"required\": true,\n    \"type\": \"User\",\n    \"writable\": false\n  },\n  \"workPackage\": {\n    \"_links\": {},\n    \"hasDefault\": false,\n    \"location\": \"_links\",\n    \"name\": \"Work package\",\n    \"required\": false,\n    \"type\": \"WorkPackage\",\n    \"writable\": true\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "8cef212d-6d74-4ddf-b517-7e7865ae30fc",
+              "name": "Returned if the client does not have sufficient permissions to see the schema.\n\n**Required permission:** *log time* or *view time entries* or *edit time entries* or *edit own time entries* on any project",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries",
+                    "schema"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:MissingPermission\",\n  \"message\": \"You are not authorized to access this resource.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "6e6c0627-f634-483b-8235-47a642bd2524",
+          "name": "update time entry",
+          "request": {
+            "name": "update time entry",
+            "description": {
+              "content": "Updates the given time entry by applying the attributes provided in\nthe body. Please note that while there is a fixed set of attributes, custom fields\ncan extend a time entries' attributes and are accepted by the endpoint.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "time_entries",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<integer>",
+                  "key": "id",
+                  "description": "(Required) Time entry id"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "PATCH",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "0052475e-8cd7-406f-bc51-859bbc90b248",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Time entry id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"TimeEntry\",\n  \"id\": 42,\n  \"comment\": {\n    \"format\": \"plain\",\n    \"raw\": \"The force shall set me free.\",\n    \"html\": \"<p>The force shall set me free.</p>\"\n  },\n  \"spentOn\": \"2023-01-11\",\n  \"hours\": \"PT4H\",\n  \"startTime\": \"2023-01-11T09:58:00.000Z\",\n  \"endTime\": \"2023-01-11T13:58:00.000Z\",\n  \"createdAt\": \"2023-01-11T13:58:24.927Z\",\n  \"updatedAt\": \"2023-01-11T13:58:24.927Z\",\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/time_entries/42\"\n    },\n    \"updateImmediately\": {\n      \"href\": \"/api/v3/time_entries/42\",\n      \"method\": \"patch\"\n    },\n    \"update\": {\n      \"href\": \"/api/v3/time_entries/42/form\",\n      \"method\": \"post\"\n    },\n    \"delete\": {\n      \"href\": \"/api/v3/time_entries/42\",\n      \"method\": \"delete\"\n    },\n    \"schema\": {\n      \"href\": \"/api/v3/time_entries/schema\"\n    },\n    \"project\": {\n      \"href\": \"/api/v3/projects/11\",\n      \"title\": \"DeathStarV2\"\n    },\n    \"entity\": {\n      \"href\": \"/api/v3/work_packages/77\",\n      \"title\": \"Build new hangar\"\n    },\n    \"user\": {\n      \"href\": \"/api/v3/users/3\",\n      \"title\": \"Darth Vader\"\n    },\n    \"activity\": {\n      \"href\": \"/api/v3/time_entries/activities/1\",\n      \"title\": \"Management\"\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "5ac21d91-5bd4-4c58-9d45-27e7ec99f6a0",
+              "name": "Occurs when the client did not send a valid JSON object in the request body.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Time entry id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:InvalidRequestBody\",\n  \"message\": \"The request body was not a single JSON object.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "aef88727-4168-4972-8faf-7fb8754de803",
+              "name": "Returned if the client does not have sufficient permissions.\n\n**Required permission:** Edit (own) time entries, depending on what time entry is being modified.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Time entry id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:MissingPermission\",\n  \"message\": \"You are not authorized to access this resource.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "24541a2f-3b56-45c1-b1c6-c48cd9d3fbb8",
+              "name": "Occurs when the client did not send a Content-Type header",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Time entry id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "text/plain"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {}
+              },
+              "status": "Not Acceptable",
+              "code": 406,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "Missing content-type header",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "49f181d3-98e4-49f7-903e-12d9d1d71db0",
+              "name": "Occurs when the client sends an unsupported Content-Type header.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Time entry id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {}
+              },
+              "status": "Unsupported Media Type",
+              "code": 415,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:TypeNotSupported\",\n  \"message\": \"Expected CONTENT-TYPE to be (expected value) but got (actual value).\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "08ea5ec8-7396-4b0e-b72a-60c478bb2ec6",
+              "name": "Returned if:\n\n* a constraint for a property was violated (`PropertyConstraintViolation`)",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Time entry id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {}
+              },
+              "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
+              "code": 422,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_embedded\": {\n    \"details\": {\n      \"attribute\": \"workPackage\"\n    }\n  },\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:PropertyConstraintViolation\",\n  \"message\": \"Work package is invalid.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "4a5caddb-72b1-449d-8a08-2bd999a0c442",
+          "name": "Delete time entry",
+          "request": {
+            "name": "Delete time entry",
+            "description": {
+              "content": "Permanently deletes the specified time entry.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "time_entries",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<integer>",
+                  "key": "id",
+                  "description": "(Required) Time entry id"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "DELETE",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "a4dde408-f710-41c5-8339-485beec2cef4",
+              "name": "Returned if the time entry was deleted successfully.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Time entry id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "No Content",
+              "code": 204,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "a7ba4608-5922-453c-814c-e7a3ac75f99d",
+              "name": "Returned if the client does not have sufficient permissions",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Time entry id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:MissingPermission\",\n  \"message\": \"You are not authorized to access this resource.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "96de3b7a-ca91-424e-8e95-3b2b6485d3cc",
+              "name": "Returned if the time entry does not exist or if the user does not have sufficient permissions to see the time entry.\n\n**Required permission** `view time entries` in the project the time entry is assigned to or `view own time entries` for time entries belonging to the user",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Time entry id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:NotFound\",\n  \"message\": \"The requested resource could not be found.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "a6af4fa8-bb73-46e6-bcac-f69ff3604dc8",
+              "name": "Occurs when the client did not send a Content-Type header",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Time entry id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "text/plain"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Not Acceptable",
+              "code": 406,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "Missing content-type header",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "49f2f206-b386-4f6d-9c0f-9a17c7c3a4ff",
+              "name": "Occurs when the client sends an unsupported Content-Type header.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) Time entry id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Unsupported Media Type",
+              "code": 415,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:TypeNotSupported\",\n  \"message\": \"Expected CONTENT-TYPE to be (expected value) but got (actual value).\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "15adc4a9-d68a-4235-9d5e-7bf04d681fd6",
+          "name": "Get time entry",
+          "request": {
+            "name": "Get time entry",
+            "description": {
+              "content": "Retrieves a single time entry identified by the given id.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "time_entries",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<integer>",
+                  "key": "id",
+                  "description": "(Required) time entry id"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "689617bc-6fab-447a-bf16-64c057830159",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) time entry id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"TimeEntry\",\n  \"id\": 42,\n  \"comment\": {\n    \"format\": \"plain\",\n    \"raw\": \"The force shall set me free.\",\n    \"html\": \"<p>The force shall set me free.</p>\"\n  },\n  \"spentOn\": \"2023-01-11\",\n  \"hours\": \"PT4H\",\n  \"startTime\": \"2023-01-11T09:58:00.000Z\",\n  \"endTime\": \"2023-01-11T13:58:00.000Z\",\n  \"createdAt\": \"2023-01-11T13:58:24.927Z\",\n  \"updatedAt\": \"2023-01-11T13:58:24.927Z\",\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/time_entries/42\"\n    },\n    \"updateImmediately\": {\n      \"href\": \"/api/v3/time_entries/42\",\n      \"method\": \"patch\"\n    },\n    \"update\": {\n      \"href\": \"/api/v3/time_entries/42/form\",\n      \"method\": \"post\"\n    },\n    \"delete\": {\n      \"href\": \"/api/v3/time_entries/42\",\n      \"method\": \"delete\"\n    },\n    \"schema\": {\n      \"href\": \"/api/v3/time_entries/schema\"\n    },\n    \"project\": {\n      \"href\": \"/api/v3/projects/11\",\n      \"title\": \"DeathStarV2\"\n    },\n    \"entity\": {\n      \"href\": \"/api/v3/work_packages/77\",\n      \"title\": \"Build new hangar\"\n    },\n    \"user\": {\n      \"href\": \"/api/v3/users/3\",\n      \"title\": \"Darth Vader\"\n    },\n    \"activity\": {\n      \"href\": \"/api/v3/time_entries/activities/1\",\n      \"title\": \"Management\"\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "c4186e46-88aa-4a11-97a2-f2aca3cd6028",
+              "name": "Returned if the time entry does not exist or if the user does not have permission to view them.\n\n**Required permission**\n- `view time entries` in the project the time entry is assigned to or\n- `view own time entries` for time entries belonging to the user",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<integer>",
+                      "key": "id",
+                      "description": "(Required) time entry id"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:NotFound\",\n  \"message\": \"The requested resource could not be found.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "e0313b2d-39d8-4f7c-9bda-a726898dfdb8",
+          "name": "List time entries",
+          "request": {
+            "name": "List time entries",
+            "description": {
+              "content": "Lists time entries. The time entries returned depend on the filters\nprovided and also on the permission of the requesting user.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "time_entries"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "offset",
+                  "value": "1",
+                  "description": "Page number inside the requested collection."
+                },
+                {
+                  "disabled": false,
+                  "key": "pageSize",
+                  "value": "<integer>",
+                  "description": "Number of elements to display per page."
+                },
+                {
+                  "disabled": false,
+                  "key": "sortBy",
+                  "value": "[\"spent_on\", \"asc\"]",
+                  "description": "JSON specifying sort criteria.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint. Currently supported sorts are:\n\n+ id: Sort by primary key\n\n+ hours: Sort by logged hours\n\n+ spent_on: Sort by spent on date\n\n+ created_at: Sort by time entry creation datetime\n\n+ updated_at: Sort by the time the time entry was updated last"
+                },
+                {
+                  "disabled": false,
+                  "key": "filters",
+                  "value": "<string>",
+                  "description": "JSON specifying filter conditions.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint. Currently supported filters are:\n\n+ entity_type: Filter time entries depending on the entity they are logged on. Can either be `WorkPackage` or `Meeting`.\n\n+ entity_id: Filter time entries for the specified entity IDs.\n\n+ project_id: Filter time entries by project\n\n+ user_id: Filter time entries by users\n\n+ ongoing: Filter to only recevie ongoing timers\n\n+ spent_on: Filter time entries by spent on date\n\n+ created_at: Filter time entries by creation datetime\n\n+ updated_at: Filter time entries by the last time they where updated\n\n+ activity_id: Filter time entries by time entry activity"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "63e46d47-552f-4884-b4e2-7d49057d9d4a",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "offset",
+                      "value": "25"
+                    },
+                    {
+                      "key": "pageSize",
+                      "value": "<integer>"
+                    },
+                    {
+                      "key": "sortBy",
+                      "value": "[[\"spent_on\", \"asc\"]]"
+                    },
+                    {
+                      "key": "filters",
+                      "value": "[{ \"entity_type\": { \"operator\": \"=\", \"values\": [\"WorkPackage\"] }}, { \"entity_id\": { \"operator\": \"=\", \"values\": [\"1\", \"2\"] } }, { \"project\": { \"operator\": \"=\", \"values\": [\"1\"] } }]"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Collection\",\n  \"total\": 39,\n  \"count\": 2,\n  \"pageSize\": 2,\n  \"offset\": 1,\n  \"_embedded\": {\n    \"elements\": [\n      {\n        \"_type\": \"TimeEntry\",\n        \"id\": 5,\n        \"comment\": {\n          \"format\": \"plain\",\n          \"raw\": \"Some comment\",\n          \"html\": \"<p>Some comment</p>\"\n        },\n        \"spentOn\": \"2015-03-20\",\n        \"hours\": \"PT5H\",\n        \"startTime\": \"2015-03-20T10:00:00.000Z\",\n        \"endTime\": \"2015-03-20T15:00:00.000Z\",\n        \"createdAt\": \"2015-03-20T12:56:56.803Z\",\n        \"updatedAt\": \"2015-03-20T12:56:56.803Z\",\n        \"_links\": {\n          \"self\": {\n            \"href\": \"/api/v3/time_entries/1\"\n          },\n          \"updateImmediately\": {\n            \"href\": \"/api/v3/time_entries/1\",\n            \"method\": \"patch\"\n          },\n          \"delete\": {\n            \"href\": \"/api/v3/time_entries/1\",\n            \"method\": \"delete\"\n          },\n          \"project\": {\n            \"href\": \"/api/v3/projects/1\",\n            \"title\": \"Some project\"\n          },\n          \"entity\": {\n            \"href\": \"/api/v3/work_packages/1\",\n            \"title\": \"Some work package\"\n          },\n          \"user\": {\n            \"href\": \"/api/v3/users/2\",\n            \"title\": \"Some user\"\n          },\n          \"activity\": {\n            \"href\": \"/api/v3/time_entries/activities/18\",\n            \"title\": \"Some time entry activity\"\n          }\n        }\n      },\n      {\n        \"_type\": \"TimeEntry\",\n        \"id\": 10,\n        \"comment\": {\n          \"format\": \"plain\",\n          \"raw\": \"Another comment\",\n          \"html\": \"<p>Another comment</p>\"\n        },\n        \"spentOn\": \"2015-03-21\",\n        \"hours\": \"PT7H\",\n        \"startTime\": \"2015-03-20T15:00:00.000Z\",\n        \"endTime\": \"2015-03-20T22:00:00.000Z\",\n        \"createdAt\": \"2015-03-20T12:56:56.569Z\",\n        \"updatedAt\": \"2015-03-20T12:56:56.371Z\",\n        \"_links\": {\n          \"self\": {\n            \"href\": \"/api/v3/time_entries/2\"\n          },\n          \"project\": {\n            \"href\": \"/api/v3/projects/42\",\n            \"title\": \"Some other project\"\n          },\n          \"entity\": {\n            \"href\": \"/api/v3/work_packages/541\",\n            \"title\": \"Some other work package\"\n          },\n          \"user\": {\n            \"href\": \"/api/v3/users/6\",\n            \"title\": \"Some other project\"\n          },\n          \"activity\": {\n            \"href\": \"/api/v3/time_entries/activities/14\",\n            \"title\": \"some other time entry activity\"\n          }\n        }\n      }\n    ]\n  },\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/time_entries?offset=1&pageSize=2\"\n    },\n    \"jumpTo\": {\n      \"href\": \"/api/v3/time_entries?offset=%7Boffset%7D&pageSize=2\",\n      \"templated\": true\n    },\n    \"changeSize\": {\n      \"href\": \"/api/v3/time_entries?offset=1&pageSize=%7Bsize%7D\",\n      \"templated\": true\n    },\n    \"nextByOffset\": {\n      \"href\": \"/api/v3/time_entries?offset=2&pageSize=2\"\n    },\n    \"createTimeEntry\": {\n      \"href\": \"/api/v3/time_entries/form\",\n      \"method\": \"post\"\n    },\n    \"createTimeEntryImmediately\": {\n      \"href\": \"/api/v3/time_entries\",\n      \"method\": \"post\"\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "e1407008-a632-436c-9c85-7dc28c412cce",
+              "name": "Occurs when the client did not send a valid JSON object in the request body.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "offset",
+                      "value": "25"
+                    },
+                    {
+                      "key": "pageSize",
+                      "value": "<integer>"
+                    },
+                    {
+                      "key": "sortBy",
+                      "value": "[[\"spent_on\", \"asc\"]]"
+                    },
+                    {
+                      "key": "filters",
+                      "value": "[{ \"entity_type\": { \"operator\": \"=\", \"values\": [\"WorkPackage\"] }}, { \"entity_id\": { \"operator\": \"=\", \"values\": [\"1\", \"2\"] } }, { \"project\": { \"operator\": \"=\", \"values\": [\"1\"] } }]"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:InvalidRequestBody\",\n  \"message\": \"The request body was not a single JSON object.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "073518f7-d904-42d0-9988-5d1ee57a84e2",
+              "name": "Returned if the client is not logged in and login is required.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "offset",
+                      "value": "25"
+                    },
+                    {
+                      "key": "pageSize",
+                      "value": "<integer>"
+                    },
+                    {
+                      "key": "sortBy",
+                      "value": "[[\"spent_on\", \"asc\"]]"
+                    },
+                    {
+                      "key": "filters",
+                      "value": "[{ \"entity_type\": { \"operator\": \"=\", \"values\": [\"WorkPackage\"] }}, { \"entity_id\": { \"operator\": \"=\", \"values\": [\"1\", \"2\"] } }, { \"project\": { \"operator\": \"=\", \"values\": [\"1\"] } }]"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:MissingPermission\",\n  \"message\": \"You are not authorized to view this resource.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "9d0dcb02-81ee-448c-9041-0e0e3d878815",
+          "name": "Create time entry",
+          "request": {
+            "name": "Create time entry",
+            "description": {
+              "content": "Creates a new time entry applying the attributes provided in the body.\nPlease note that while there is a fixed set of attributes, custom fields can extend\na time entries' attributes and are accepted by the endpoint.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "v3",
+                "time_entries"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/hal+json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "<object>",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "3c478cb6-d43b-4996-922d-8cfe09aeecd2",
+              "name": "Created",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"_type\": \"TimeEntry\",\n  \"id\": 42,\n  \"comment\": {\n    \"format\": \"plain\",\n    \"raw\": \"The force shall set me free.\",\n    \"html\": \"<p>The force shall set me free.</p>\"\n  },\n  \"spentOn\": \"2023-01-11\",\n  \"hours\": \"PT4H\",\n  \"startTime\": \"2023-01-11T09:58:00.000Z\",\n  \"endTime\": \"2023-01-11T13:58:00.000Z\",\n  \"createdAt\": \"2023-01-11T13:58:24.927Z\",\n  \"updatedAt\": \"2023-01-11T13:58:24.927Z\",\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/time_entries/42\"\n    },\n    \"updateImmediately\": {\n      \"href\": \"/api/v3/time_entries/42\",\n      \"method\": \"patch\"\n    },\n    \"update\": {\n      \"href\": \"/api/v3/time_entries/42/form\",\n      \"method\": \"post\"\n    },\n    \"delete\": {\n      \"href\": \"/api/v3/time_entries/42\",\n      \"method\": \"delete\"\n    },\n    \"schema\": {\n      \"href\": \"/api/v3/time_entries/schema\"\n    },\n    \"project\": {\n      \"href\": \"/api/v3/projects/11\",\n      \"title\": \"DeathStarV2\"\n    },\n    \"entity\": {\n      \"href\": \"/api/v3/work_packages/77\",\n      \"title\": \"Build new hangar\"\n    },\n    \"user\": {\n      \"href\": \"/api/v3/users/3\",\n      \"title\": \"Darth Vader\"\n    },\n    \"activity\": {\n      \"href\": \"/api/v3/time_entries/activities/1\",\n      \"title\": \"Management\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"TimeEntry\",\n  \"id\": 42,\n  \"comment\": {\n    \"format\": \"plain\",\n    \"raw\": \"The force shall set me free.\",\n    \"html\": \"<p>The force shall set me free.</p>\"\n  },\n  \"spentOn\": \"2023-01-11\",\n  \"hours\": \"PT4H\",\n  \"startTime\": \"2023-01-11T09:58:00.000Z\",\n  \"endTime\": \"2023-01-11T13:58:00.000Z\",\n  \"createdAt\": \"2023-01-11T13:58:24.927Z\",\n  \"updatedAt\": \"2023-01-11T13:58:24.927Z\",\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/time_entries/42\"\n    },\n    \"updateImmediately\": {\n      \"href\": \"/api/v3/time_entries/42\",\n      \"method\": \"patch\"\n    },\n    \"update\": {\n      \"href\": \"/api/v3/time_entries/42/form\",\n      \"method\": \"post\"\n    },\n    \"delete\": {\n      \"href\": \"/api/v3/time_entries/42\",\n      \"method\": \"delete\"\n    },\n    \"schema\": {\n      \"href\": \"/api/v3/time_entries/schema\"\n    },\n    \"project\": {\n      \"href\": \"/api/v3/projects/11\",\n      \"title\": \"DeathStarV2\"\n    },\n    \"entity\": {\n      \"href\": \"/api/v3/work_packages/77\",\n      \"title\": \"Build new hangar\"\n    },\n    \"user\": {\n      \"href\": \"/api/v3/users/3\",\n      \"title\": \"Darth Vader\"\n    },\n    \"activity\": {\n      \"href\": \"/api/v3/time_entries/activities/1\",\n      \"title\": \"Management\"\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "9b00eb6e-6cf5-4265-8af8-3fd4850c154a",
+              "name": "Occurs when the client did not send a valid JSON object in the request body.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"_type\": \"TimeEntry\",\n  \"id\": 42,\n  \"comment\": {\n    \"format\": \"plain\",\n    \"raw\": \"The force shall set me free.\",\n    \"html\": \"<p>The force shall set me free.</p>\"\n  },\n  \"spentOn\": \"2023-01-11\",\n  \"hours\": \"PT4H\",\n  \"startTime\": \"2023-01-11T09:58:00.000Z\",\n  \"endTime\": \"2023-01-11T13:58:00.000Z\",\n  \"createdAt\": \"2023-01-11T13:58:24.927Z\",\n  \"updatedAt\": \"2023-01-11T13:58:24.927Z\",\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/time_entries/42\"\n    },\n    \"updateImmediately\": {\n      \"href\": \"/api/v3/time_entries/42\",\n      \"method\": \"patch\"\n    },\n    \"update\": {\n      \"href\": \"/api/v3/time_entries/42/form\",\n      \"method\": \"post\"\n    },\n    \"delete\": {\n      \"href\": \"/api/v3/time_entries/42\",\n      \"method\": \"delete\"\n    },\n    \"schema\": {\n      \"href\": \"/api/v3/time_entries/schema\"\n    },\n    \"project\": {\n      \"href\": \"/api/v3/projects/11\",\n      \"title\": \"DeathStarV2\"\n    },\n    \"entity\": {\n      \"href\": \"/api/v3/work_packages/77\",\n      \"title\": \"Build new hangar\"\n    },\n    \"user\": {\n      \"href\": \"/api/v3/users/3\",\n      \"title\": \"Darth Vader\"\n    },\n    \"activity\": {\n      \"href\": \"/api/v3/time_entries/activities/1\",\n      \"title\": \"Management\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:InvalidRequestBody\",\n  \"message\": \"The request body was not a single JSON object.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "1e05bfa5-0ade-49ed-92c5-3ded77a34750",
+              "name": "Returned if the client does not have sufficient permissions.\n\n**Required permission:** Log time",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"_type\": \"TimeEntry\",\n  \"id\": 42,\n  \"comment\": {\n    \"format\": \"plain\",\n    \"raw\": \"The force shall set me free.\",\n    \"html\": \"<p>The force shall set me free.</p>\"\n  },\n  \"spentOn\": \"2023-01-11\",\n  \"hours\": \"PT4H\",\n  \"startTime\": \"2023-01-11T09:58:00.000Z\",\n  \"endTime\": \"2023-01-11T13:58:00.000Z\",\n  \"createdAt\": \"2023-01-11T13:58:24.927Z\",\n  \"updatedAt\": \"2023-01-11T13:58:24.927Z\",\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/time_entries/42\"\n    },\n    \"updateImmediately\": {\n      \"href\": \"/api/v3/time_entries/42\",\n      \"method\": \"patch\"\n    },\n    \"update\": {\n      \"href\": \"/api/v3/time_entries/42/form\",\n      \"method\": \"post\"\n    },\n    \"delete\": {\n      \"href\": \"/api/v3/time_entries/42\",\n      \"method\": \"delete\"\n    },\n    \"schema\": {\n      \"href\": \"/api/v3/time_entries/schema\"\n    },\n    \"project\": {\n      \"href\": \"/api/v3/projects/11\",\n      \"title\": \"DeathStarV2\"\n    },\n    \"entity\": {\n      \"href\": \"/api/v3/work_packages/77\",\n      \"title\": \"Build new hangar\"\n    },\n    \"user\": {\n      \"href\": \"/api/v3/users/3\",\n      \"title\": \"Darth Vader\"\n    },\n    \"activity\": {\n      \"href\": \"/api/v3/time_entries/activities/1\",\n      \"title\": \"Management\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:MissingPermission\",\n  \"message\": \"You are not authorized to access this resource.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "a66656bb-c2ff-412d-bf89-ede340d8be25",
+              "name": "Occurs when the client did not send a Content-Type header",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "text/plain"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"_type\": \"TimeEntry\",\n  \"id\": 42,\n  \"comment\": {\n    \"format\": \"plain\",\n    \"raw\": \"The force shall set me free.\",\n    \"html\": \"<p>The force shall set me free.</p>\"\n  },\n  \"spentOn\": \"2023-01-11\",\n  \"hours\": \"PT4H\",\n  \"startTime\": \"2023-01-11T09:58:00.000Z\",\n  \"endTime\": \"2023-01-11T13:58:00.000Z\",\n  \"createdAt\": \"2023-01-11T13:58:24.927Z\",\n  \"updatedAt\": \"2023-01-11T13:58:24.927Z\",\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/time_entries/42\"\n    },\n    \"updateImmediately\": {\n      \"href\": \"/api/v3/time_entries/42\",\n      \"method\": \"patch\"\n    },\n    \"update\": {\n      \"href\": \"/api/v3/time_entries/42/form\",\n      \"method\": \"post\"\n    },\n    \"delete\": {\n      \"href\": \"/api/v3/time_entries/42\",\n      \"method\": \"delete\"\n    },\n    \"schema\": {\n      \"href\": \"/api/v3/time_entries/schema\"\n    },\n    \"project\": {\n      \"href\": \"/api/v3/projects/11\",\n      \"title\": \"DeathStarV2\"\n    },\n    \"entity\": {\n      \"href\": \"/api/v3/work_packages/77\",\n      \"title\": \"Build new hangar\"\n    },\n    \"user\": {\n      \"href\": \"/api/v3/users/3\",\n      \"title\": \"Darth Vader\"\n    },\n    \"activity\": {\n      \"href\": \"/api/v3/time_entries/activities/1\",\n      \"title\": \"Management\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Acceptable",
+              "code": 406,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "Missing content-type header",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "ca410408-6ecb-4715-87f8-e667940f16aa",
+              "name": "Occurs when the client sends an unsupported Content-Type header.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"_type\": \"TimeEntry\",\n  \"id\": 42,\n  \"comment\": {\n    \"format\": \"plain\",\n    \"raw\": \"The force shall set me free.\",\n    \"html\": \"<p>The force shall set me free.</p>\"\n  },\n  \"spentOn\": \"2023-01-11\",\n  \"hours\": \"PT4H\",\n  \"startTime\": \"2023-01-11T09:58:00.000Z\",\n  \"endTime\": \"2023-01-11T13:58:00.000Z\",\n  \"createdAt\": \"2023-01-11T13:58:24.927Z\",\n  \"updatedAt\": \"2023-01-11T13:58:24.927Z\",\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/time_entries/42\"\n    },\n    \"updateImmediately\": {\n      \"href\": \"/api/v3/time_entries/42\",\n      \"method\": \"patch\"\n    },\n    \"update\": {\n      \"href\": \"/api/v3/time_entries/42/form\",\n      \"method\": \"post\"\n    },\n    \"delete\": {\n      \"href\": \"/api/v3/time_entries/42\",\n      \"method\": \"delete\"\n    },\n    \"schema\": {\n      \"href\": \"/api/v3/time_entries/schema\"\n    },\n    \"project\": {\n      \"href\": \"/api/v3/projects/11\",\n      \"title\": \"DeathStarV2\"\n    },\n    \"entity\": {\n      \"href\": \"/api/v3/work_packages/77\",\n      \"title\": \"Build new hangar\"\n    },\n    \"user\": {\n      \"href\": \"/api/v3/users/3\",\n      \"title\": \"Darth Vader\"\n    },\n    \"activity\": {\n      \"href\": \"/api/v3/time_entries/activities/1\",\n      \"title\": \"Management\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unsupported Media Type",
+              "code": 415,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:TypeNotSupported\",\n  \"message\": \"Expected CONTENT-TYPE to be (expected value) but got (actual value).\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "7f9fb278-2304-450a-9f74-8ba2d0afb34f",
+              "name": "Returned if:\n\n* a constraint for a property was violated (`PropertyConstraintViolation`)",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v3",
+                    "time_entries"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/hal+json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"_type\": \"TimeEntry\",\n  \"id\": 42,\n  \"comment\": {\n    \"format\": \"plain\",\n    \"raw\": \"The force shall set me free.\",\n    \"html\": \"<p>The force shall set me free.</p>\"\n  },\n  \"spentOn\": \"2023-01-11\",\n  \"hours\": \"PT4H\",\n  \"startTime\": \"2023-01-11T09:58:00.000Z\",\n  \"endTime\": \"2023-01-11T13:58:00.000Z\",\n  \"createdAt\": \"2023-01-11T13:58:24.927Z\",\n  \"updatedAt\": \"2023-01-11T13:58:24.927Z\",\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/v3/time_entries/42\"\n    },\n    \"updateImmediately\": {\n      \"href\": \"/api/v3/time_entries/42\",\n      \"method\": \"patch\"\n    },\n    \"update\": {\n      \"href\": \"/api/v3/time_entries/42/form\",\n      \"method\": \"post\"\n    },\n    \"delete\": {\n      \"href\": \"/api/v3/time_entries/42\",\n      \"method\": \"delete\"\n    },\n    \"schema\": {\n      \"href\": \"/api/v3/time_entries/schema\"\n    },\n    \"project\": {\n      \"href\": \"/api/v3/projects/11\",\n      \"title\": \"DeathStarV2\"\n    },\n    \"entity\": {\n      \"href\": \"/api/v3/work_packages/77\",\n      \"title\": \"Build new hangar\"\n    },\n    \"user\": {\n      \"href\": \"/api/v3/users/3\",\n      \"title\": \"Darth Vader\"\n    },\n    \"activity\": {\n      \"href\": \"/api/v3/time_entries/activities/1\",\n      \"title\": \"Management\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
+              "code": 422,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/hal+json"
+                }
+              ],
+              "body": "{\n  \"_embedded\": {\n    \"details\": {\n      \"attribute\": \"workPackage\"\n    }\n  },\n  \"_type\": \"Error\",\n  \"errorIdentifier\": \"urn:openproject-org:api:v3:errors:PropertyConstraintViolation\",\n  \"message\": \"Work package is invalid.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://qa.openproject-edge.com",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {
+        "key": "username",
+        "value": "{{basicAuthUsername}}"
+      },
+      {
+        "key": "password",
+        "value": "{{basicAuthPassword}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "ce58e35e-a6c6-4e28-8a8f-2fd49ea23649",
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Time Entries API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "You're looking at the current **stable** documentation of the OpenProject APIv3. If you're interested in the current\ndevelopment version, please go to [github.com/opf](https://github.com/opf/openproject/tree/dev/docs/api/apiv3).\n\n## Introduction\n\nThe documentation for the APIv3 is written according to the [OpenAPI 3.1 Specification](https://swagger.io/specification/).\nYou can either view the static version of this documentation on the [website](https://www.openproject.org/docs/api/introduction/)\nor the interactive version, rendered with [OpenAPI Explorer](https://github.com/Rhosys/openapi-explorer/blob/main/README.md),\nin your OpenProject installation under `/api/docs`.\nIn the latter you can try out the various API endpoints directly interacting with our OpenProject data.\nMoreover you can access the specification source itself under `/api/v3/spec.json` and `/api/v3/spec.yml`\n(e.g. [here](https://community.openproject.org/api/v3/spec.yml)).\n\nThe APIv3 is a hypermedia REST API, a shorthand for \"Hypermedia As The Engine Of Application State\" (HATEOAS).\nThis means that each endpoint of this API will have links to other resources or actions defined in the resulting body.\n\nThese related resources and actions for any given resource will be context sensitive. For example, only actions that the\nauthenticated user can take are being rendered. This can be used to dynamically identify actions that the user might take for any\ngiven response.\n\nAs an example, if you fetch a work package through the [Work Package endpoint](https://www.openproject.org/docs/api/endpoints/work-packages/), the `update` link will only\nbe present when the user you authenticated has been granted a permission to update the work package in the assigned project.\n\n## HAL+JSON\n\nHAL is a simple format that gives a consistent and easy way to hyperlink between resources in your API.\nRead more in the following specification: [https://tools.ietf.org/html/draft-kelly-json-hal-08](https://tools.ietf.org/html/draft-kelly-json-hal-08)\n\n**OpenProject API implementation of HAL+JSON format** enriches JSON and introduces a few meta properties:\n\n- `_type` - specifies the type of the resource (e.g.: WorkPackage, Project)\n- `_links` - contains all related resource and action links available for the resource\n- `_embedded` - contains all embedded objects\n\nHAL does not guarantee that embedded resources are embedded in their full representation, they might as well be\npartially represented (e.g. some properties can be left out).\nHowever in this API you have the guarantee that whenever a resource is **embedded**, it is embedded in its **full representation**.\n\n## API response structure\n\nAll API responses contain a single HAL+JSON object, even collections of objects are technically represented by\na single HAL+JSON object that itself contains its members. More details on collections can be found\nin the [Collections Section](https://www.openproject.org/docs/api/collections/).\n\n## Authentication\n\nThe API supports the following authentication schemes:\n\n* Session-based authentication\n* API tokens\n    * passed as Bearer token\n    * passed via Basic auth\n* OAuth 2.0\n    * using built-in authorization server\n    * using an external authorization server (RFC 9068)\n\nDepending on the settings of the OpenProject instance many resources can be accessed without being authenticated.\nIn case the instance requires authentication on all requests the client will receive an **HTTP 401** status code\nin response to any request.\n\nOtherwise unauthenticated clients have all the permissions of the anonymous user.\n\n### Session-based authentication\n\nThis means you have to login to OpenProject via the Web-Interface to be authenticated in the API.\nThis method is well-suited for clients acting within the browser, like the Angular-Client built into OpenProject.\n\nIn this case, you always need to pass the HTTP header `X-Requested-With \"XMLHttpRequest\"` for authentication.\n\n### API token as bearer token\n\nUsers can authenticate towards the API v3 using an API token as a bearer token.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -H \"Authorization: Bearer $API_KEY\" https://community.openproject.org/api/v3/users/42\n```\n\nUsers can generate API tokens on their account page.\n\n### API token through Basic Auth\n\nAPI tokens can also be used with basic auth, using the user name `apikey` (NOT your login) and the API token as the password.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -u apikey:$API_KEY https://community.openproject.org/api/v3/users/42\n```\n\n### OAuth 2.0 authentication\n\nOpenProject allows authentication and authorization with OAuth2 with *Authorization code flow*, as well as *Client credentials* operation modes.\n\nTo get started, you first need to register an application in the OpenProject OAuth administration section of your installation.\nThis will save an entry for your application with a client unique identifier (`client_id`) and an accompanying secret key (`client_secret`).\n\nYou can then use one the following guides to perform the supported OAuth 2.0 flows:\n\n- [Authorization code flow](https://oauth.net/2/grant-types/authorization-code)\n\n- [Authorization code flow with PKCE](https://doorkeeper.gitbook.io/guides/ruby-on-rails/pkce-flow), recommended for clients unable to keep the client_secret confidential\n\n- [Client credentials](https://oauth.net/2/grant-types/client-credentials/) - Requires an application to be bound to an impersonating user for non-public access\n\n### OAuth 2.0 using an external authorization server\n\nThere is a possibility to use JSON Web Tokens (JWT) generated by an OIDC provider configured in OpenProject as a bearer token to do authenticated requests against the API.\nThe following requirements must be met:\n\n- OIDC provider must be configured in OpenProject with **jwks_uri**\n- JWT must be signed using RSA algorithm\n- JWT **iss** claim must be equal to OIDC provider **issuer**\n- JWT **aud** claim must contain the OpenProject **client ID** used at the OIDC provider\n- JWT **scope** claim must include a valid scope to access the desired API (e.g. `api_v3` for APIv3)\n- JWT must be actual (neither expired or too early to be used)\n- JWT must be passed in Authorization header like: `Authorization: Bearer {jwt}`\n- User from **sub** claim must be linked to OpenProject before (e.g. by logging in), otherwise it will be not authenticated\n\nIn more general terms, OpenProject should be compliant to [RFC 9068](https://www.rfc-editor.org/rfc/rfc9068) when validating access tokens.\n\n### Why not username and password?\n\nThe simplest way to do basic auth would be to use a user's username and password naturally.\nHowever, OpenProject already has supported API keys in the past for the API v2, though not through basic auth.\n\nUsing **username and password** directly would have some advantages:\n\n* It is intuitive for the user who then just has to provide those just as they would when logging into OpenProject.\n\n* No extra logic for token management necessary.\n\nOn the other hand using **API keys** has some advantages too, which is why we went for that:\n\n* If compromised while saved on an insecure client the user only has to regenerate the API key instead of changing their password, too.\n\n* They are naturally long and random which makes them invulnerable to dictionary attacks and harder to crack in general.\n\nMost importantly users may not actually have a password to begin with. Specifically when they have registered\nthrough an OpenID Connect provider.\n\n## Cross-Origin Resource Sharing (CORS)\n\nBy default, the OpenProject API is _not_ responding with any CORS headers.\nIf you want to allow cross-domain AJAX calls against your OpenProject instance, you need to enable CORS headers being returned.\n\nPlease see [our API settings documentation](https://www.openproject.org/docs/system-admin-guide/api-and-webhooks/) on\nhow to selectively enable CORS.\n\n## Allowed HTTP methods\n\n- `GET` - Get a single resource or collection of resources\n\n- `POST` - Create a new resource or perform\n\n- `PATCH` - Update a resource\n\n- `DELETE` - Delete a resource\n\n## Compression\n\nResponses are compressed if requested by the client. Currently [gzip](https://www.gzip.org/) and [deflate](https://tools.ietf.org/html/rfc1951)\nare supported. The client signals the desired compression by setting the [`Accept-Encoding` header](https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3).\nIf no `Accept-Encoding` header is send, `Accept-Encoding: identity` is assumed which will result in the API responding uncompressed.",
+      "type": "text/plain"
+    }
+  }
+}

@@ -1,0 +1,134 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Relations API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Relations",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Relations",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/relations",
+            "params": [
+              {
+                "name": "filters",
+                "value": "[{ \"from\": { \"operator\": \"=\", \"values\": 42 }\" }]",
+                "type": "query",
+                "description": "JSON specifying filter conditions. Accepts the same format as returned by\nthe [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint. Valid fields to filter by are:\n\n- id - ID of relation\n- from - ID of work package from which the filtered relations emanates.\n- to - ID of work package to which this related points.\n- involved - ID of either the `from` or the `to` work package.\n- type - The type of relation to filter by, e.g. \"follows\"."
+              },
+              {
+                "name": "sortBy",
+                "value": "[[\"type\", \"asc\"]]",
+                "type": "query",
+                "description": "JSON specifying sort criteria.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint."
+              }
+            ]
+          },
+          "docs": "Lists all relations according to the given (optional, logically conjunctive) filters and ordered by ID.\nThe response only includes relations between work packages which the user is allowed to see."
+        },
+        {
+          "info": {
+            "name": "Get Relation",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/relations/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Relation id"
+              }
+            ]
+          },
+          "docs": "Get a single relation specified by its unique identifier."
+        },
+        {
+          "info": {
+            "name": "Update Relation",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://qa.openproject-edge.com/api/v3/relations/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Relation ID"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "When calling this endpoint the client provides a single object, containing the properties and links that it wants\nto change, in the body. It is only allowed to provide properties or links supporting the **write** operation.\n\nNote that changing the `type` of a relation invariably also changes the respective `reverseType` as well as the\n\"name\" of it. The returned Relation object will reflect that change. For instance if you change a Relation's\n`type` to \"follows\" then the `reverseType` will be cha"
+        },
+        {
+          "info": {
+            "name": "Delete Relation",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://qa.openproject-edge.com/api/v3/relations/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "The unique identifier of the relation resource"
+              }
+            ]
+          },
+          "docs": "Deletes the relation."
+        },
+        {
+          "info": {
+            "name": "Create relation",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/work_packages/:id/relations",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Work package id"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Create a work package relation on the given work package. A successful creation will result in a relation between\ntwo work packages, thus appearing on both involved work package resources."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

@@ -1,0 +1,55 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Statuses API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Statuses",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List the collection of all statuses",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/statuses"
+          },
+          "docs": "Returns a collection of all work package statuses."
+        },
+        {
+          "info": {
+            "name": "Get a work package status",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/statuses/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Status id"
+              }
+            ]
+          },
+          "docs": "Returns a work package status by its unique identifier."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

@@ -1,0 +1,370 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Projects API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Projects",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List projects",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/projects",
+            "params": [
+              {
+                "name": "filters",
+                "value": "[{ \"ancestor\": { \"operator\": \"=\", \"values\": [\"1\"] }\" }]",
+                "type": "query",
+                "description": "JSON specifying filter conditions.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint.\nCurrently supported filters are:\n\n+ active: based on the active property of the project\n+ ancestor: filters projects by their ancestor. A project is not considered to be its own ancestor.\n+ available_project_attributes: filters projects based on the activated project project attributes.\n+ created_at: based on the time the project was created\n+ favorited: based on the favorited property of the project\n+ id: based on projects' id.\n+ latest_activity_at: based on the time the last activity was registered on a project.\n+ name_and_identifier: based on both the name and the identifier.\n+ parent_id: filters projects by their parent.\n+ principal: based on members of the project.\n+ project_phase_any: based on the project phases active in a project.\n+ project_status_code: based on status code of the project\n+ storage_id: filters projects by linked storages\n+ storage_url: filters projects by linked storages identified by the host url\n+ type_id: based on the types active in a project.\n+ user_action: based on the actions the current user has in the project.\n+ visible: based on the visibility for the user (id) provided as the filter value. This filter is useful for admins to identify the projects visible to a user.\n\nThere might also be additional filters based on the custom fields that have been configured.\n\nEach defined lifecycle step will also define a filter in this list endpoint. Given that the elements are not\nstatic but rather dynamically created on each OpenProject instance, a list cannot be provided. Those filters follow the schema:\n+ project_start_gate_[id]: a filter on a project phase's start gate active in a project. The id is the id of the phase the gate belongs to.\n+ project_finish_gate_[id]: a filter on a project phase's finish gate active in a project. The id is the id of the phase the gate belongs to.\n+ project_phase_[id]: a filter on a project phase active in a project. The id is the id of the phase queried for."
+              },
+              {
+                "name": "sortBy",
+                "value": "[[\"id\", \"asc\"]]",
+                "type": "query",
+                "description": "JSON specifying sort criteria.\nCurrently supported orders are:\n\n+ id\n+ name\n+ typeahead (sorting by hierarchy and name)\n+ created_at\n+ public\n+ latest_activity_at\n+ required_disk_space\n\nThere might also be additional orders based on the custom fields that have been configured."
+              },
+              {
+                "name": "select",
+                "value": "total,elements/identifier,elements/name",
+                "type": "query",
+                "description": "Comma separated list of properties to include."
+              }
+            ]
+          },
+          "docs": "Returns a collection of projects. The collection can be filtered via query parameters similar to how work packages are filtered. In addition to the provided filter, the result set is always limited to only contain projects the client is allowed to see.\nPrior to OpenProject 17.0, only projects existed and the concept of workspaces wasn't implemented in the API. With 17.0 the other workspace types (program and portfolio) exist and will be returned alongside projects by this endpoint. This might su"
+        },
+        {
+          "info": {
+            "name": "Create project",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/projects",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new project, applying the attributes provided in the body.\n\nYou can use the form and schema to be retrieve the valid attribute values and by that be guided towards successful creation."
+        },
+        {
+          "info": {
+            "name": "Project create form",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/projects/form",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Project create form"
+        },
+        {
+          "info": {
+            "name": "View project schema",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/projects/schema"
+          },
+          "docs": "Provides the schema describing a project resource.\nThis endpoint is deprecated. As projects are workspaces, an equivalent schema can be found fetching `/api/v3/workspaces/schema`."
+        },
+        {
+          "info": {
+            "name": "View project",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/projects/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Project id"
+              }
+            ]
+          },
+          "docs": "View project"
+        },
+        {
+          "info": {
+            "name": "Update Project",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://qa.openproject-edge.com/api/v3/projects/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Project id"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates the given project by applying the attributes provided in the body."
+        },
+        {
+          "info": {
+            "name": "Delete Project",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://qa.openproject-edge.com/api/v3/projects/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Project id"
+              }
+            ]
+          },
+          "docs": "Deletes the project permanently. As this is a lengthy process, the actual deletion is carried out asynchronously.\nSo the project might exist well after the request has returned successfully. To prevent unwanted changes to\nthe project scheduled for deletion, it is archived at once."
+        },
+        {
+          "info": {
+            "name": "Project update form",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/projects/:id/form",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Project id"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Project update form"
+        },
+        {
+          "info": {
+            "name": "Create project copy",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/projects/:id/copy",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Project id"
+              }
+            ]
+          },
+          "docs": "Create project copy"
+        },
+        {
+          "info": {
+            "name": "Project copy form",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/projects/:id/copy/form",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Project id"
+              }
+            ]
+          },
+          "docs": "Project copy form"
+        },
+        {
+          "info": {
+            "name": "View project status",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/project_statuses/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "on_track",
+                "type": "path",
+                "description": "Project status id"
+              }
+            ]
+          },
+          "docs": "View project status"
+        },
+        {
+          "info": {
+            "name": "List available parent project candidates",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/projects/available_parent_projects",
+            "params": [
+              {
+                "name": "filters",
+                "value": "[{ \"ancestor\": { \"operator\": \"=\", \"values\": ['1'] }\" }]",
+                "type": "query",
+                "description": "JSON specifying filter conditions."
+              },
+              {
+                "name": "of",
+                "value": "123",
+                "type": "query",
+                "description": "The id or identifier of the project the parent candidate is determined for"
+              },
+              {
+                "name": "workspace_type",
+                "value": "program",
+                "type": "query",
+                "description": "The workspace type of the new project the parent candidate is determined for. Ignored when `of` parameter is provided.\nNote that while 'portfolio' is supported as a type (since it is a type of Workspace), the endpoint will currently always return an empty resultset as portfolios cannot have parents."
+              },
+              {
+                "name": "sortBy",
+                "value": "[[\"id\", \"asc\"]]",
+                "type": "query",
+                "description": "JSON specifying sort criteria.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint and allows all the filters and sortBy supported by the project list endpoint."
+              }
+            ]
+          },
+          "docs": "Lists projects which can become parent to another project. Only sound candidates are returned.\nFor instance a project cannot become parent of itself or its children.\n\nTo specify the project for which a parent is queried for, the `of` parameter can be provided. If no `of`\nparameter is provided, a new project is assumed. Then, the check for the hierarchy is omitted as a new project cannot be\npart of a hierarchy yet, instead `workspace_type` parameter can be passed defining it for new project.\n\nCan"
+        },
+        {
+          "info": {
+            "name": "Favorite Project",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/projects/:id/favorite",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Project id"
+              }
+            ]
+          },
+          "docs": "Adds the project to the current user's favorites.\n\nThis endpoint is deprecated and replaced by [`/api/v3/workspaces/{id}/favorite`](https://www.openproject.org/docs/api/endpoints/workspaces/#favorite-workspace)"
+        },
+        {
+          "info": {
+            "name": "Unfavorite Project",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://qa.openproject-edge.com/api/v3/projects/:id/favorite",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Project id"
+              }
+            ]
+          },
+          "docs": "Removes the project from the current user's favorites.\n\nThis endpoint is deprecated and replaced by [`/api/v3/workspaces/{id}/favorite`](https://www.openproject.org/docs/api/endpoints/workspaces/#unfavorite-workspace)"
+        },
+        {
+          "info": {
+            "name": "View project configuration",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/projects/:id/configuration",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Project id"
+              }
+            ]
+          },
+          "docs": "Returns the configuration scoped to a specific project, including all global\nconfiguration properties plus project-specific settings."
+        },
+        {
+          "info": {
+            "name": "List projects having version",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/versions/:id/projects",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Version id"
+              }
+            ]
+          },
+          "docs": "This endpoint lists the projects where the given version is available.\n\nThe projects returned depend on the sharing settings of the given version,\nbut are also limited to the projects that the current user is allowed to see.\n\nThis endpoint is deprecated and replaced by [`/api/v3/versions/{id}/workspaces`](https://www.openproject.org/docs/api/endpoints/projects/#list-workspaces-having-version)"
+        },
+        {
+          "info": {
+            "name": "List workspaces having version",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/versions/:id/workspaces",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Version id"
+              }
+            ]
+          },
+          "docs": "This endpoint lists the workspaces where the given version is available.\n\nThe workspaces returned depend on the sharing settings of the given version,\nbut are also limited to the workspaces that the current user is allowed to see."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

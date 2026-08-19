@@ -1,0 +1,126 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Groups API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Groups",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List groups",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/groups",
+            "params": [
+              {
+                "name": "sortBy",
+                "value": "[[\"id\", \"asc\"]]",
+                "type": "query",
+                "description": "JSON specifying sort criteria.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint. Currently supported sorts are:\n\n+ id: Sort by primary key\n\n+ created_at: Sort by group creation datetime\n\n+ updated_at: Sort by the time the group was updated last"
+              },
+              {
+                "name": "select",
+                "value": "total,elements/name,elements/self,self",
+                "type": "query",
+                "description": "Comma separated list of properties to include."
+              }
+            ]
+          },
+          "docs": "Returns a collection of groups. The client can choose to filter the\ngroups similar to how work packages are filtered. In addition to the provided\nfilters, the server will reduce the result set to only contain groups, for which\nthe requesting client has sufficient permissions (*view_members*, *manage_members*)."
+        },
+        {
+          "info": {
+            "name": "Create group",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/groups",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new group applying the attributes provided in the body."
+        },
+        {
+          "info": {
+            "name": "Get group",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/groups/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Group id"
+              }
+            ]
+          },
+          "docs": "Fetches a group resource."
+        },
+        {
+          "info": {
+            "name": "Update group",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://qa.openproject-edge.com/api/v3/groups/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Group id"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates the given group by applying the attributes provided in the body.\n\nPlease note that the `members` array provided will override the existing set of members (similar to a PUT). A\nclient thus has to provide the complete list of members the group is to have after the PATCH even if only one\nmember is to be added."
+        },
+        {
+          "info": {
+            "name": "Delete group",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://qa.openproject-edge.com/api/v3/groups/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Group id"
+              }
+            ]
+          },
+          "docs": "Deletes the group."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

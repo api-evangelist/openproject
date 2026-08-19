@@ -1,0 +1,216 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Versions API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Versions",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List versions available in a project",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/projects/:id/versions",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "ID of the project whose versions will be listed"
+              }
+            ]
+          },
+          "docs": "This endpoint lists the versions that are *available* in a given project.\nNote that due to sharing this might be more than the versions *defined* by that project.\n\nThis endpoint is deprecated and replaced by [`/api/v3/workspaces/{id}/versions`](https://www.openproject.org/docs/api/endpoints/versions/#list-versions-available-in-a-workspace)"
+        },
+        {
+          "info": {
+            "name": "List versions",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/versions",
+            "params": [
+              {
+                "name": "filters",
+                "value": "[{ \"sharing\": { \"operator\": \"=\", \"values\": [\"system\"] } }]",
+                "type": "query",
+                "description": "JSON specifying filter conditions. Accepts the same format as returned by\nthe [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint. Currently supported\nfilters are:\n\n- sharing: filters versions by how they are shared within the server (*none*, *descendants*, *hierarchy*, *tree*, *system*).\n- name: filters versions by their name."
+              },
+              {
+                "name": "sortBy",
+                "value": "[[\"name\", \"desc\"]]",
+                "type": "query",
+                "description": "JSON specifying sort criteria. Accepts the same format as returned by\nthe [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint. Currently supported\nattributes are:\n\n- id: Sort by the version id\n- name: Sort by the version name using numeric collation, comparing sequences of decimal digits by their numeric value"
+              }
+            ]
+          },
+          "docs": "Returns a collection of versions. The client can choose to filter the versions similar to how work packages are\nfiltered. In addition to the provided filters, the server will reduce the result set to only contain versions,\nfor which the requesting client has sufficient permissions (*view_work_packages*)."
+        },
+        {
+          "info": {
+            "name": "Create version",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/versions",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new version applying the attributes provided in the body. Please note that while there is a fixed set\nof attributes, custom fields can extend a version's attributes and are accepted by the endpoint.\n\nYou can use the form and schema to be retrieve the valid attribute values and by that be guided towards\nsuccessful creation."
+        },
+        {
+          "info": {
+            "name": "Available projects for versions",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/versions/available_projects"
+          },
+          "docs": "Gets a list of projects in which a version can be created in. The list contains all projects in which the user issuing the request has the manage versions permissions."
+        },
+        {
+          "info": {
+            "name": "Version create form",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/versions/form"
+          },
+          "docs": "Version create form"
+        },
+        {
+          "info": {
+            "name": "View version schema",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/versions/schema"
+          },
+          "docs": "View version schema"
+        },
+        {
+          "info": {
+            "name": "Get version",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/versions/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Version id"
+              }
+            ]
+          },
+          "docs": "Retrieves a version defined by its unique identifier."
+        },
+        {
+          "info": {
+            "name": "Update Version",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://qa.openproject-edge.com/api/v3/versions/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Version id"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates the given version by applying the attributes provided in the body. Please note that while there is a fixed\nset of attributes, custom fields can extend a version's attributes and are accepted by the endpoint."
+        },
+        {
+          "info": {
+            "name": "Delete version",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://qa.openproject-edge.com/api/v3/versions/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Version id"
+              }
+            ]
+          },
+          "docs": "Deletes the version. Entities associated to the version will no longer be assigned to it."
+        },
+        {
+          "info": {
+            "name": "Version update form",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/versions/:id/form",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Project id"
+              }
+            ]
+          },
+          "docs": "Version update form"
+        },
+        {
+          "info": {
+            "name": "List versions available in a workspace",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/workspaces/:id/versions",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "ID of the workspace whose versions will be listed"
+              }
+            ]
+          },
+          "docs": "This endpoint lists the versions that are *available* in a given workspace.\nNote that due to sharing this might be more than the versions *defined* by that workspace."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

@@ -1,0 +1,44 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Wiki Pages API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Wiki Pages",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "View Wiki Page",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/wiki_pages/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "Wiki page identifier"
+              }
+            ]
+          },
+          "docs": "Retrieve an individual wiki page as identified by the id parameter"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

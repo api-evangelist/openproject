@@ -1,0 +1,188 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "OpenProject API V3 (Stable) Actions & Capabilities Notifications API",
+    "version": "3"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Notifications",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get notification collection",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/notifications",
+            "params": [
+              {
+                "name": "offset",
+                "value": "25",
+                "type": "query",
+                "description": "Page number inside the requested collection."
+              },
+              {
+                "name": "pageSize",
+                "value": "25",
+                "type": "query",
+                "description": "Number of elements to display per page."
+              },
+              {
+                "name": "sortBy",
+                "value": "[[\"reason\", \"asc\"]]",
+                "type": "query",
+                "description": "JSON specifying sort criteria.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint. Currently supported sorts are:\n\n+ id: Sort by primary key\n\n+ reason: Sort by notification reason\n\n+ readIAN: Sort by read status"
+              },
+              {
+                "name": "groupBy",
+                "value": "reason",
+                "type": "query",
+                "description": "string specifying group_by criteria.\n\n+ reason: Group by notification reason\n\n+ project: Sort by associated project"
+              },
+              {
+                "name": "filters",
+                "value": "[{ \"readIAN\": { \"operator\": \"=\", \"values\": [\"t\"] } }]",
+                "type": "query",
+                "description": "JSON specifying filter conditions.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/) endpoint. Currently supported filters are:\n\n+ id: Filter by primary key\n\n+ project: Filter by the project the notification was created in\n\n+ readIAN: Filter by read status\n\n+ reason: Filter by the reason, e.g. 'mentioned' or 'assigned' the notification was created because of\n\n+ resourceId: Filter by the id of the resource the notification was created for. Ideally used together with the `resourceType` filter.\n\n+ resourceType: Filter by the type of the resource the notification was created for. Ideally used together with the `resourceId` filter."
+              }
+            ]
+          },
+          "docs": "Returns the collection of available in-app notifications. The notifications returned depend on the provided\nparameters and also on the requesting user's permissions.\n\nContrary to most collections, this one also links to and embeds schemas for the `details` properties of the notifications returned.\nThis is an optimization. Clients will receive the information necessary to display the various types of details that a notification\ncan carry."
+        },
+        {
+          "info": {
+            "name": "Read all notifications",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/notifications/read_ian",
+            "params": [
+              {
+                "name": "filters",
+                "value": "[{ \"reason\": { \"operator\": \"=\", \"values\": [\"mentioned\"] } }]",
+                "type": "query",
+                "description": "JSON specifying filter conditions.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)\nendpoint. Currently supported filters are:\n\n+ id: Filter by primary key\n\n+ project: Filter by the project the notification was created in\n\n+ reason: Filter by the reason, e.g. 'mentioned' or 'assigned' the notification was created because of\n\n+ resourceId: Filter by the id of the resource the notification was created for. Ideally used together with the\n  `resourceType` filter.\n\n+ resourceType: Filter by the type of the resource the notification was created for. Ideally used together with\n  the `resourceId` filter."
+              }
+            ]
+          },
+          "docs": "Marks the whole notification collection as read. The collection contains only elements the authenticated user can\nsee, and can be further reduced with filters."
+        },
+        {
+          "info": {
+            "name": "Unread all notifications",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/notifications/unread_ian",
+            "params": [
+              {
+                "name": "filters",
+                "value": "[{ \"reason\": { \"operator\": \"=\", \"values\": [\"mentioned\"] } }]",
+                "type": "query",
+                "description": "JSON specifying filter conditions.\nAccepts the same format as returned by the [queries](https://www.openproject.org/docs/api/endpoints/queries/)\nendpoint. Currently supported filters are:\n\n+ id: Filter by primary key\n\n+ project: Filter by the project the notification was created in\n\n+ reason: Filter by the reason, e.g. 'mentioned' or 'assigned' the notification was created because of\n\n+ resourceId: Filter by the id of the resource the notification was created for. Ideally used together with the\n  `resourceType` filter.\n\n+ resourceType: Filter by the type of the resource the notification was created for. Ideally used together with\n  the `resourceId` filter."
+              }
+            ]
+          },
+          "docs": "Marks the whole notification collection as unread. The collection contains only elements the authenticated user can\nsee, and can be further reduced with filters."
+        },
+        {
+          "info": {
+            "name": "Get the notification",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/notifications/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "notification id"
+              }
+            ]
+          },
+          "docs": "Returns the notification identified by the notification id."
+        },
+        {
+          "info": {
+            "name": "Get a notification detail",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://qa.openproject-edge.com/api/v3/notifications/:notification_id/details/:id",
+            "params": [
+              {
+                "name": "notification_id",
+                "value": "1",
+                "type": "path",
+                "description": "notification id"
+              },
+              {
+                "name": "id",
+                "value": "0",
+                "type": "path",
+                "description": "detail id"
+              }
+            ]
+          },
+          "docs": "Returns an individual detail of a notification identified by the notification id and the id of the detail."
+        },
+        {
+          "info": {
+            "name": "Read notification",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/notifications/:id/read_ian",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "notification id"
+              }
+            ]
+          },
+          "docs": "Marks the given notification as read."
+        },
+        {
+          "info": {
+            "name": "Unread notification",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://qa.openproject-edge.com/api/v3/notifications/:id/unread_ian",
+            "params": [
+              {
+                "name": "id",
+                "value": "1",
+                "type": "path",
+                "description": "notification id"
+              }
+            ]
+          },
+          "docs": "Marks the given notification as unread."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
