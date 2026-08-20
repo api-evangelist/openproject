@@ -24,6 +24,13 @@ image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/openprojec
 tags:
   - Agile
   - Gantt
+  - Open-Source
+  - Project Management
+  - Time Tracking
+  - Work Packages
+tags_raw:
+  - Agile
+  - Gantt
   - Open Source
   - Project Management
   - Time Tracking
@@ -505,6 +512,8 @@ apis:
   humanURL: https://www.openproject.org/docs/api/
   baseURL: https://community.openproject.org/api/v3
   tags:
+  - Collection
+  tags_raw:
   - Collections
   properties:
   - type: OpenAPI
@@ -641,6 +650,8 @@ apis:
   humanURL: https://www.openproject.org/docs/api/
   baseURL: https://community.openproject.org/api/v3
   tags:
+  - Custom Actions
+  tags_raw:
   - Custom actions
   properties:
   - type: OpenAPI
@@ -1244,6 +1255,8 @@ apis:
   humanURL: https://www.openproject.org/docs/api/
   baseURL: https://community.openproject.org/api/v3
   tags:
+  - Group
+  tags_raw:
   - Groups
   properties:
   - type: OpenAPI
@@ -1568,6 +1581,8 @@ apis:
   humanURL: https://www.openproject.org/docs/api/
   baseURL: https://community.openproject.org/api/v3
   tags:
+  - Notification
+  tags_raw:
   - Notifications
   properties:
   - type: OpenAPI
@@ -1586,6 +1601,8 @@ apis:
   humanURL: https://www.openproject.org/docs/api/
   baseURL: https://community.openproject.org/api/v3
   tags:
+  - Authentication
+  tags_raw:
   - OAuth 2
   properties:
   - type: OpenAPI
@@ -1692,6 +1709,8 @@ apis:
   humanURL: https://www.openproject.org/docs/api/
   baseURL: https://community.openproject.org/api/v3
   tags:
+  - Portfolio
+  tags_raw:
   - Portfolios
   properties:
   - type: OpenAPI
@@ -2294,6 +2313,8 @@ apis:
   humanURL: https://www.openproject.org/docs/api/
   baseURL: https://community.openproject.org/api/v3
   tags:
+  - Project
+  tags_raw:
   - Projects
   properties:
   - type: OpenAPI
@@ -2549,6 +2570,8 @@ apis:
   humanURL: https://www.openproject.org/docs/api/
   baseURL: https://community.openproject.org/api/v3
   tags:
+  - Query
+  tags_raw:
   - Queries
   properties:
   - type: OpenAPI
@@ -3602,6 +3625,8 @@ apis:
   humanURL: https://www.openproject.org/docs/api/
   baseURL: https://community.openproject.org/api/v3
   tags:
+  - Status
+  tags_raw:
   - Statuses
   properties:
   - type: OpenAPI
@@ -3999,6 +4024,8 @@ apis:
   humanURL: https://www.openproject.org/docs/api/
   baseURL: https://community.openproject.org/api/v3
   tags:
+  - User Preferences
+  tags_raw:
   - UserPreferences
   properties:
   - type: OpenAPI
@@ -4163,6 +4190,8 @@ apis:
   humanURL: https://www.openproject.org/docs/api/
   baseURL: https://community.openproject.org/api/v3
   tags:
+  - User
+  tags_raw:
   - Users
   properties:
   - type: OpenAPI
@@ -4956,6 +4985,8 @@ apis:
   humanURL: https://www.openproject.org/docs/api/
   baseURL: https://community.openproject.org/api/v3
   tags:
+  - Work Packages
+  tags_raw:
   - WorkPackages
   properties:
   - type: OpenAPI
