@@ -5,6 +5,18 @@ description: >-
   time tracking, BIM, and enterprise project portfolio management. The OpenProject APIv3 is a hypermedia (HAL+JSON) REST
   API that exposes work packages, projects, users, attachments, custom fields, and many other resources.
 type: Index
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: true
+  label: Hosted service · you call their endpoint
+  confidence: high
+  source:
+  - openapi
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 accessModel:
   pricing: freemium
   onboarding: self-serve
@@ -5050,6 +5062,9 @@ apis:
   - type: GitHub
     url: https://github.com/opf/openproject
 common:
+  - type: CapabilityMap
+    url: capabilities/openproject-capability-edges.yml
+    name: OpenProject Business Capability Map
   - type: AgenticAccess
     url: agentic-access/openproject-agentic-access.yml
   - type: VulnerabilityDisclosure
