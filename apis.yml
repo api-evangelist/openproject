@@ -662,7 +662,7 @@ apis:
   humanURL: https://www.openproject.org/docs/api/
   baseURL: https://community.openproject.org/api/v3
   tags:
-  - Custom Actions
+  - Custom actions
   tags_raw:
   - Custom actions
   properties:
@@ -1613,7 +1613,7 @@ apis:
   humanURL: https://www.openproject.org/docs/api/
   baseURL: https://community.openproject.org/api/v3
   tags:
-  - Authentication
+  - OAuth 2
   tags_raw:
   - OAuth 2
   properties:
@@ -4036,7 +4036,7 @@ apis:
   humanURL: https://www.openproject.org/docs/api/
   baseURL: https://community.openproject.org/api/v3
   tags:
-  - User Preferences
+  - UserPreferences
   tags_raw:
   - UserPreferences
   properties:
@@ -4997,7 +4997,7 @@ apis:
   humanURL: https://www.openproject.org/docs/api/
   baseURL: https://community.openproject.org/api/v3
   tags:
-  - Work Packages
+  - WorkPackages
   tags_raw:
   - WorkPackages
   properties:
