@@ -1608,26 +1608,6 @@ apis:
     url: https://www.openproject.org/docs/api/endpoints/
   - type: GitHub
     url: https://github.com/opf/openproject
-- aid: openproject:openproject-oauth-2-api
-  name: OpenProject OAuth 2 API
-  description: TBD
-  humanURL: https://www.openproject.org/docs/api/
-  baseURL: https://community.openproject.org/api/v3
-  tags:
-  - Authentication
-  tags_raw:
-  - OAuth 2
-  properties:
-  - type: OpenAPI
-    url: openapi/openproject-oauth-2-api-openapi.yml
-  - type: Documentation
-    url: https://www.openproject.org/docs/api/
-  - type: Introduction
-    url: https://www.openproject.org/docs/api/introduction/
-  - type: Endpoints
-    url: https://www.openproject.org/docs/api/endpoints/
-  - type: GitHub
-    url: https://github.com/opf/openproject
 - aid: openproject:openproject-portfolios-api
   name: OpenProject Portfolios API
   description: "Portfolios are one of the types of [workspaces](https://www.openproject.org/docs/api/endpoints/workspaces)\
@@ -3986,71 +3966,6 @@ apis:
     url: https://www.openproject.org/docs/api/endpoints/
   - type: GitHub
     url: https://github.com/opf/openproject
-- aid: openproject:openproject-userpreferences-api
-  name: OpenProject UserPreferences API
-  description: >-
-    The user preferences endpoints return collections or single entities of type `UserPreferences`. The
-    following tables list the different properties
-
-    of `UserPreferences` entities.
-
-
-    ## Linked Properties
-
-
-    |  Link     | Description                                              | Type           | Constraints           |
-    Supported operations |
-
-    |:---------:|----------------------------------------------------------| -------------- | ---------------------
-    | -------------------- |
-
-    | self      | This UserPreferences                                     | UserPreferences| not null              |
-    READ                 |
-
-    | user      | The user that this preference belongs to                 | User           | not null              |
-    READ                 |
-
-
-    ## Local Properties
-
-
-    | Property               | Description                                                                     |
-    Type                | Constraints | Supported operations |
-
-    |:----------------------:| -----------------------------------------------------------                     |
-    ----------          | ----------- | -------------------- |
-
-    | autoHidePopups         | Whether to hide popups (e.g. success messages) after 5 seconds                  |
-    Boolean             |             | READ / WRITE         |
-
-    | notifications          | The settings for the notifications to be received by the user                   |
-    NotificationSetting |             | READ / WRITE         |
-
-    | timeZone               | Current selected time zone                                                      |
-    String              |             | READ / WRITE         |
-
-    | commentSortDescending  | Sort comments in descending order                                               |
-    Boolean             |             | READ / WRITE         |
-
-    | warnOnLeavingUnsaved   | Issue warning when leaving a page with unsaved text                             |
-    Boolean             |             | READ / WRITE         |
-  humanURL: https://www.openproject.org/docs/api/
-  baseURL: https://community.openproject.org/api/v3
-  tags:
-  - User Preferences
-  tags_raw:
-  - UserPreferences
-  properties:
-  - type: OpenAPI
-    url: openapi/openproject-userpreferences-api-openapi.yml
-  - type: Documentation
-    url: https://www.openproject.org/docs/api/
-  - type: Introduction
-    url: https://www.openproject.org/docs/api/introduction/
-  - type: Endpoints
-    url: https://www.openproject.org/docs/api/endpoints/
-  - type: GitHub
-    url: https://github.com/opf/openproject
 - aid: openproject:openproject-users-api
   name: OpenProject Users API
   description: >-
@@ -4992,26 +4907,6 @@ apis:
     url: https://www.openproject.org/docs/api/endpoints/
   - type: GitHub
     url: https://github.com/opf/openproject
-- aid: openproject:openproject-workpackages-api
-  name: OpenProject WorkPackages API
-  description: The WorkPackages API from OpenProject — 1 operation(s) for workpackages.
-  humanURL: https://www.openproject.org/docs/api/
-  baseURL: https://community.openproject.org/api/v3
-  tags:
-  - Work Packages
-  tags_raw:
-  - WorkPackages
-  properties:
-  - type: OpenAPI
-    url: openapi/openproject-workpackages-api-openapi.yml
-  - type: Documentation
-    url: https://www.openproject.org/docs/api/
-  - type: Introduction
-    url: https://www.openproject.org/docs/api/introduction/
-  - type: Endpoints
-    url: https://www.openproject.org/docs/api/endpoints/
-  - type: GitHub
-    url: https://github.com/opf/openproject
 - aid: openproject:openproject-workspace-api
   name: OpenProject Workspace API
   description: The Workspace API from OpenProject — 1 operation(s) for workspace.
@@ -5054,6 +4949,43 @@ apis:
   properties:
   - type: OpenAPI
     url: openapi/openproject-workspaces-api-openapi.yml
+  - type: Documentation
+    url: https://www.openproject.org/docs/api/
+  - type: Introduction
+    url: https://www.openproject.org/docs/api/introduction/
+  - type: Endpoints
+    url: https://www.openproject.org/docs/api/endpoints/
+  - type: GitHub
+    url: https://github.com/opf/openproject
+- aid: openproject:openproject-oauth2-api
+  name: OpenProject O Auth2 API
+  description: TBD
+  humanURL: https://www.openproject.org/docs/api/
+  baseURL: https://community.openproject.org/api/v3
+  tags:
+  - OAuth2
+  properties:
+  - type: OpenAPI
+    url: openapi/openproject-oauth2-api-openapi.yml
+  - type: Documentation
+    url: https://www.openproject.org/docs/api/
+  - type: Introduction
+    url: https://www.openproject.org/docs/api/introduction/
+  - type: Endpoints
+    url: https://www.openproject.org/docs/api/endpoints/
+  - type: GitHub
+    url: https://github.com/opf/openproject
+- aid: openproject:openproject-user-preferences-api
+  name: OpenProject User Preferences API
+  description: >-
+    The user preferences endpoints return collections or single entities of type `UserPreferences`.
+  humanURL: https://www.openproject.org/docs/api/
+  baseURL: https://community.openproject.org/api/v3
+  tags:
+  - User Preferences
+  properties:
+  - type: OpenAPI
+    url: openapi/openproject-user-preferences-api-openapi.yml
   - type: Documentation
     url: https://www.openproject.org/docs/api/
   - type: Introduction
