@@ -1423,6 +1423,8 @@ apis:
   humanURL: https://www.openproject.org/docs/api/
   baseURL: https://community.openproject.org/api/v3
   tags:
+  - Membership
+  tags_raw:
   - Memberships
   properties:
   - type: OpenAPI
@@ -3480,6 +3482,8 @@ apis:
   humanURL: https://www.openproject.org/docs/api/
   baseURL: https://community.openproject.org/api/v3
   tags:
+  - Schema
+  tags_raw:
   - Schemas
   properties:
   - type: OpenAPI
@@ -4945,6 +4949,8 @@ apis:
   humanURL: https://www.openproject.org/docs/api/
   baseURL: https://community.openproject.org/api/v3
   tags:
+  - Workspace
+  tags_raw:
   - Workspaces
   properties:
   - type: OpenAPI
@@ -4963,6 +4969,8 @@ apis:
   humanURL: https://www.openproject.org/docs/api/
   baseURL: https://community.openproject.org/api/v3
   tags:
+  - Authentication
+  tags_raw:
   - OAuth2
   properties:
   - type: OpenAPI
