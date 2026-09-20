@@ -11,6 +11,10 @@ pricing_basis: per-seat
 delivery: open-core
 delivery_method: page
 delivery_evidence: Community Free No minimum users Community features
+open_source_repository:
+  repo: opf/openproject
+  license: GPL-3.0
+  stars: 16163
 free_self_hosted_tiers:
 - Community
 managed_premium:
