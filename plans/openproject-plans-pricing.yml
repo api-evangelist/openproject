@@ -10,6 +10,13 @@ provenance:
   grounding: every price_text was found verbatim in the fetched page text
 audience: business-product
 pricing_basis: per-seat
+delivery:
+  delivery: open-core
+  method: page
+  read: '2026-09-20'
+  evidence: Community Free No minimum users Community features
+  free_edition: Community
+  managed_tier: Basic
 published: true
 note: 'Per-user subscription pricing with EU/€ and US/$ toggle, on-premises or cloud hosting, and multi-year
   discounts (2 years: 5 months free; 3 years: 8 months free; 4 years: 11 months free; 5 years: 15 months
