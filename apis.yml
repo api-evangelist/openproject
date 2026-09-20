@@ -5003,6 +5003,8 @@ apis:
   - type: GitHub
     url: https://github.com/opf/openproject
 common:
+  - type: RateLimits
+    url: rate-limits/openproject-rate-limits.yml
   - type: Plans
     url: plans/openproject-plans-pricing.yml
   - type: CapabilityMap
