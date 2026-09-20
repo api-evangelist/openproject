@@ -1,0 +1,76 @@
+slug: openproject
+provider: OpenProject
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Software & Technology
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 6
+edges:
+- tag: Projects
+  spec_file: openproject-projects-api-openapi.yml
+  capability_id: BC-900.30
+  capability_id_l1: BC-900
+  capability_name: Project Management
+  confidence: 0.9
+  evidence: POST /api/v3/projects "Create project"; PATCH /api/v3/projects/{id} "Update Project"; GET
+    /api/v3/project_statuses/{id} "View project status"
+  reason: Full lifecycle management of project entities including creation, hierarchy (available parent
+    projects), copying and project status in a project management platform — squarely project management.
+- tag: Work Packages
+  spec_file: openproject-work-packages-api-openapi.yml
+  capability_id: BC-900.30
+  capability_id_l1: BC-900
+  capability_name: Project Management
+  confidence: 0.88
+  evidence: POST /api/v3/projects/{id}/work_packages Create_Project_Work_Package Create work package in
+    project; GET /api/v3/projects/{id}/available_assignees Project Available assignees
+  reason: Work packages are OpenProject's core task/issue tracking artefact with assignees, schemas and
+    project scoping — this is project execution planning and tracking.
+- tag: Programs
+  spec_file: openproject-programs-api-openapi.yml
+  capability_id: BC-900.20
+  capability_id_l1: BC-900
+  capability_name: Programme Management
+  confidence: 0.85
+  evidence: GET /api/v3/programs "List programs"; PATCH /api/v3/programs/{id} "Update Program"; DELETE
+    /api/v3/programs/{id} "Delete Program"
+  reason: The tag manages program entities (list, view, update, delete) in an enterprise project portfolio
+    management platform, which is programme management as a delivery construct above projects.
+- tag: Portfolios
+  spec_file: openproject-portfolios-api-openapi.yml
+  capability_id: BC-900.10
+  capability_id_l1: BC-900
+  capability_name: Portfolio Management
+  confidence: 0.78
+  evidence: GET /api/v3/portfolios 'List portfolios'; 'Update Portfolio'; schema 'PortfolioCollectionModel'
+  reason: Portfolio objects in an enterprise project portfolio management platform; operations manage
+    the portfolio entity itself.
+- tag: Sprints
+  spec_file: openproject-sprints-api-openapi.yml
+  capability_id: BC-900.30
+  capability_id_l1: BC-900
+  capability_name: Project Management
+  confidence: 0.78
+  evidence: GET /api/v3/projects/{id}/sprints  List_sprints_in_project  List sprints in project; SprintModel
+  reason: Sprints scoped to projects are agile iteration containers used to plan and track delivery work,
+    which is Project Management execution on this project management platform. Read-only surface keeps
+    confidence short of 0.9, and the alternative reading (portfolio-level) is less supported since sprints
+    are nested under projects.
+- tag: OAuth 2
+  spec_file: openproject-oauth-2-api-openapi.yml
+  capability_id: BC-4270.40
+  capability_id_l1: BC-4270
+  capability_name: Developer Identity & Credential Management
+  confidence: 0.7
+  evidence: GET /api/v3/oauth_client_credentials/{id} 'Get the oauth client credentials object.'; schema
+    'OAuthApplicationReadModel'
+  reason: Exposes OAuth application and client credential objects for integrations — developer credential/OAuth
+    client stewardship. Read-only and minimal, so moderate confidence; could also be treated as pure auth
+    plumbing.
