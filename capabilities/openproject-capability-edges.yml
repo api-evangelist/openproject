@@ -64,7 +64,8 @@ edges:
     confidence short of 0.9, and the alternative reading (portfolio-level) is less supported since sprints
     are nested under projects.
 - tag: OAuth 2
-  spec_file: openproject-oauth-2-api-openapi.yml
+  spec_file: openproject-oauth2-api-openapi.yml
+  reanchored_from: openproject-oauth-2-api-openapi.yml
   capability_id: BC-4270.40
   capability_id_l1: BC-4270
   capability_name: Developer Identity & Credential Management
