@@ -1,7 +1,7 @@
-openapi: 3.1.2
+openapi: 3.2.0
 info:
-  description: "You're looking at the current **stable** documentation of the OpenProject APIv3. If you're interested in the current\ndevelopment version, please go to [github.com/opf](https://github.com/opf/openproject/tree/dev/docs/api/apiv3).\n\n## Introduction\n\nThe documentation for the APIv3 is written according to the [OpenAPI 3.1 Specification](https://swagger.io/specification/).\nYou can either view the static version of this documentation on the [website](https://www.openproject.org/docs/api/introduction/)\nor the interactive version, rendered with [OpenAPI Explorer](https://github.com/Rhosys/openapi-explorer/blob/main/README.md),\nin your OpenProject installation under `/api/docs`.\nIn the latter you can try out the various API endpoints directly interacting with our OpenProject data.\nMoreover you can access the specification source itself under `/api/v3/spec.json` and `/api/v3/spec.yml`\n(e.g. [here](https://community.openproject.org/api/v3/spec.yml)).\n\nThe APIv3 is a hypermedia REST API, a shorthand for \"Hypermedia As The Engine Of Application State\" (HATEOAS).\nThis means that each endpoint of this API will have links to other resources or actions defined in the resulting body.\n\nThese related resources and actions for any given resource will be context sensitive. For example, only actions that the\nauthenticated user can take are being rendered. This can be used to dynamically identify actions that the user might take for any\ngiven response.\n\nAs an example, if you fetch a work package through the [Work Package endpoint](https://www.openproject.org/docs/api/endpoints/work-packages/), the `update` link will only\nbe present when the user you authenticated has been granted a permission to update the work package in the assigned project.\n\n## HAL+JSON\n\nHAL is a simple format that gives a consistent and easy way to hyperlink between resources in your API.\nRead more in the following specification: [https://tools.ietf.org/html/draft-kelly-json-hal-08](https://tools.ietf.org/html/draft-kelly-json-hal-08)\n\n**OpenProject API implementation of HAL+JSON format** enriches JSON and introduces a few meta properties:\n\n- `_type` - specifies the type of the resource (e.g.: WorkPackage, Project)\n- `_links` - contains all related resource and action links available for the resource\n- `_embedded` - contains all embedded objects\n\nHAL does not guarantee that embedded resources are embedded in their full representation, they might as well be\npartially represented (e.g. some properties can be left out).\nHowever in this API you have the guarantee that whenever a resource is **embedded**, it is embedded in its **full representation**.\n\n## API response structure\n\nAll API responses contain a single HAL+JSON object, even collections of objects are technically represented by\na single HAL+JSON object that itself contains its members. More details on collections can be found\nin the [Collections Section](https://www.openproject.org/docs/api/collections/).\n\n## Authentication\n\nThe API supports the following authentication schemes:\n\n* Session-based authentication\n* API tokens\n    * passed as Bearer token\n    * passed via Basic auth\n* OAuth 2.0\n    * using built-in authorization server\n    * using an external authorization server (RFC 9068)\n\nDepending on the settings of the OpenProject instance many resources can be accessed without being authenticated.\nIn case the instance requires authentication on all requests the client will receive an **HTTP 401** status code\nin response to any request.\n\nOtherwise unauthenticated clients have all the permissions of the anonymous user.\n\n### Session-based authentication\n\nThis means you have to login to OpenProject via the Web-Interface to be authenticated in the API.\nThis method is well-suited for clients acting within the browser, like the Angular-Client built into OpenProject.\n\nIn this case, you always need to pass the HTTP header `X-Requested-With \"XMLHttpRequest\"` for authentication.\n\n### API token as bearer token\n\nUsers can authenticate towards the API v3 using an API token as a bearer token.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -H \"Authorization: Bearer $API_KEY\" https://community.openproject.org/api/v3/users/42\n```\n\nUsers can generate API tokens on their account page.\n\n### API token through Basic Auth\n\nAPI tokens can also be used with basic auth, using the user name `apikey` (NOT your login) and the API token as the password.\n\nFor example:\n\n```shell\nAPI_KEY=opapi-2519132cdf62dcf5a66fd96394672079f9e9cad1\ncurl -u apikey:$API_KEY https://community.openproject.org/api/v3/users/42\n```\n\n### OAuth 2.0 authentication\n\nOpenProject allows authentication and authorization with OAuth2 with *Authorization code flow*, as well as *Client credentials* operation modes.\n\nTo get started, you first need to register an application in the OpenProject OAuth administration section of your installation.\nThis will save an entry for your application with a client unique identifier (`client_id`) and an accompanying secret key (`client_secret`).\n\nYou can then use one the following guides to perform the supported OAuth 2.0 flows:\n\n- [Authorization code flow](https://oauth.net/2/grant-types/authorization-code)\n\n- [Authorization code flow with PKCE](https://doorkeeper.gitbook.io/guides/ruby-on-rails/pkce-flow), recommended for clients unable to keep the client_secret confidential\n\n- [Client credentials](https://oauth.net/2/grant-types/client-credentials/) - Requires an application to be bound to an impersonating user for non-public access\n\n### OAuth 2.0 using an external authorization server\n\nThere is a possibility to use JSON Web Tokens (JWT) generated by an OIDC provider configured in OpenProject as a bearer token to do authenticated requests against the API.\nThe following requirements must be met:\n\n- OIDC provider must be configured in OpenProject with **jwks_uri**\n- JWT must be signed using RSA algorithm\n- JWT **iss** claim must be equal to OIDC provider **issuer**\n- JWT **aud** claim must contain the OpenProject **client ID** used at the OIDC provider\n- JWT **scope** claim must include a valid scope to access the desired API (e.g. `api_v3` for APIv3)\n- JWT must be actual (neither expired or too early to be used)\n- JWT must be passed in Authorization header like: `Authorization: Bearer {jwt}`\n- User from **sub** claim must be linked to OpenProject before (e.g. by logging in), otherwise it will be not authenticated\n\nIn more general terms, OpenProject should be compliant to [RFC 9068](https://www.rfc-editor.org/rfc/rfc9068) when validating access tokens.\n\n### Why not username and password?\n\nThe simplest way to do basic auth would be to use a user's username and password naturally.\nHowever, OpenProject already has supported API keys in the past for the API v2, though not through basic auth.\n\nUsing **username and password** directly would have some advantages:\n\n* It is intuitive for the user who then just has to provide those just as they would when logging into OpenProject.\n\n* No extra logic for token management necessary.\n\nOn the other hand using **API keys** has some advantages too, which is why we went for that:\n\n* If compromised while saved on an insecure client the user only has to regenerate the API key instead of changing their password, too.\n\n* They are naturally long and random which makes them invulnerable to dictionary attacks and harder to crack in general.\n\nMost importantly users may not actually have a password to begin with. Specifically when they have registered\nthrough an OpenID Connect provider.\n\n## Cross-Origin Resource Sharing (CORS)\n\nBy default, the OpenProject API is _not_ responding with any CORS headers.\nIf you want to allow cross-domain AJAX calls against your OpenProject instance, you need to enable CORS headers being returned.\n\nPlease see [our API settings documentation](https://www.openproject.org/docs/system-admin-guide/api-and-webhooks/) on\nhow to selectively enable CORS.\n\n## Allowed HTTP methods\n\n- `GET` - Get a single resource or collection of resources\n\n- `POST` - Create a new resource or perform\n\n- `PATCH` - Update a resource\n\n- `DELETE` - Delete a resource\n\n## Compression\n\nResponses are compressed if requested by the client. Currently [gzip](https://www.gzip.org/) and [deflate](https://tools.ietf.org/html/rfc1951)\nare supported. The client signals the desired compression by setting the [`Accept-Encoding` header](https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3).\nIf no `Accept-Encoding` header is send, `Accept-Encoding: identity` is assumed which will result in the API responding uncompressed."
-  title: OpenProject API V3 (Stable) Actions & Capabilities Principals API
+  description: You're looking at the current **stable** documentation of the OpenProject APIv3.
+  title: OpenProject API V3 (Stable) Principals API
   version: '3'
 servers:
 - url: https://qa.openproject-edge.com
@@ -671,420 +671,131 @@ paths:
 
             * a constraint for a property was violated (`PropertyConstraintViolation`)'
 components:
-  schemas:
-    CollectionModel:
-      type: object
-      required:
-      - _type
-      - total
-      - count
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - Collection
-        total:
-          type: integer
-          description: The total amount of elements available in the collection.
-          minimum: 0
-        count:
-          type: integer
-          description: Actual amount of elements in this response.
-          minimum: 0
-        _links:
-          $ref: '#/components/schemas/CollectionLinks'
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
-          type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
-    GroupModel:
-      allOf:
-      - $ref: '#/components/schemas/PrincipalModel'
-      - $ref: '#/components/schemas/CustomFieldProperties'
-      - type: object
-        required:
-        - _type
-        - _embedded
-        properties:
-          _type:
-            type: string
-            enum:
-            - Group
-          _embedded:
-            type: object
-            properties:
-              members:
-                type: array
-                description: Embedded list of members.
-                items:
-                  $ref: '#/components/schemas/UserModel'
-          _links:
-            type: object
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'This group resource
-
-
-                    **Resource**: Group'
-              members:
-                type: array
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/Link'
-                  - description: 'A member of the group
-
-
-                      # Conditions:
-
-
-                      - user has permission `manage_members` in any project
-
-
-                      **Resource**: User'
-              memberships:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'An collection of all memberships of the group.
-
-
-                    **Resource**: MembershipCollection'
-              delete:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'An href to delete the group.
-
-
-                    # Conditions:
-
-
-                    - `admin`'
-              updateImmediately:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'An href to update the group.
-
-
-                    # Conditions:
-
-
-                    - `admin`
-
-
-                    **Resource**: Group'
-    PrincipalModel:
-      type: object
-      required:
-      - _type
-      - id
-      - name
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - User
-          - Group
-          - PlaceholderUser
-        id:
-          type: integer
-          description: The principal's unique identifier.
-          minimum: 1
-        name:
-          type: string
-          description: The principal's display name, layout depends on instance settings.
-        createdAt:
-          type: string
-          format: date-time
-          description: Time of creation
-        updatedAt:
-          type: string
-          format: date-time
-          description: Time of the most recent change to the principal
-        _links:
-          type: object
-          required:
-          - self
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This principal resource.
-
-
-                  **Resource**: User|Group|PlaceholderUser'
-            memberships:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'An href to the collection of the principal''s memberships.
-
-
-                  # Conditions:
-
-
-                  - user has permission `view_members` or `manage_members` in any project
-
-
-                  **Resource**: Collection'
-    CollectionLinks:
-      type: object
-      required:
-      - self
-      properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This collection resource.
-
-
-              **Resource**: Collection'
-    UserCreateModel:
-      type: object
-      required:
-      - admin
-      - email
-      - login
-      - firstName
-      - lastName
-      - language
-      properties:
-        admin:
-          type: boolean
-        email:
-          type: string
-          maxLength: 60
-        login:
-          type: string
-          maxLength: 256
-        password:
-          type: string
-          description: 'The user''s password.
-
-
-            *Conditions:*
-
-
-            Writable on create.
-
-
-            Writable on update only when:
-
-            - the caller updates their own account
-
-            - `currentPassword` is provided and valid'
-        currentPassword:
-          type: string
-          description: 'The user''s current password.
-
-
-            *Conditions:*
-
-
-            Required when changing `password` for a self update (`PATCH /api/v3/users/me` or `PATCH /api/v3/users/{id}` where `id` is the caller).
-
-
-            Ignored for non-self updates (for example, administrators updating other users).'
-        firstName:
-          type: string
-          maxLength: 30
-        lastName:
-          type: string
-          maxLength: 30
-        status:
-          type: string
-          description: 'The current activation status of the user.
-
-
-            *Conditions:*
-
-
-            Only writable on creation, not on update.'
-        language:
-          type: string
-      example:
-        login: j.sheppard
-        password: idestroyedsouvereign
-        currentPassword: iusedtobuildstarships
-        firstName: John
-        lastName: Sheppard
-        email: shep@mail.com
-        admin: true
+  examples:
+    UserResponse:
+      value:
+        _type: User
+        id: 14
+        name: Mara Jade
+        createdAt: '2022-04-04T08:07:22.910Z'
+        updatedAt: '2024-02-09T09:01:17.382Z'
+        login: member
+        admin: false
+        firstName: Mara
+        lastName: Jade
+        email: m.jade@empire.org
+        avatar: https://secure.gravatar.com/avatar/17dd23570f3bd129d06db9b48b7a41b8?default=404&secure=true
         status: active
+        identityUrl: null
         language: en
-    UserCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'This user collection
-
-
-                    **Resource**: Collection'
-          _embedded:
-            type: object
-            required:
-            - elements
-            properties:
-              elements:
-                type: array
-                items:
-                  $ref: '#/components/schemas/UserModel'
-      example:
-        _type: Collection
-        total: 2
-        count: 2
         _links:
           self:
-            href: /api/v3/users
-        _embedded:
-          elements:
-          - _abbreviated: User resource shortened for brevity
-            _type: User
-            id: 1337
-          - _abbreviated: User resource shortened for brevity
-            _type: User
-            id: 1338
-    PlaceholderUserModel:
+            href: /api/v3/users/14
+            title: Mara Jade
+          memberships:
+            href: /api/v3/memberships?filters=%5B%7B%22principal%22%3A%7B%22operator%22%3A%22%3D%22%2C%22values%22%3A%5B%2214%22%5D%7D%7D%5D
+            title: Memberships
+          showUser:
+            href: /users/14
+            type: text/html
+          updateImmediately:
+            href: /api/v3/users/14
+            title: Update member
+            method: patch
+          lock:
+            href: /api/v3/users/14/lock
+            title: Set lock on member
+            method: post
+          delete:
+            href: /api/v3/users/14
+            title: Delete member
+            method: delete
+    PlaceholderUserResponse:
+      value:
+        _type: PlaceholderUser
+        id: 27
+        name: Akolyth
+        createdAt: '2024-02-12T11:52:24.708Z'
+        updatedAt: '2024-02-12T11:52:24.708Z'
+        _links:
+          self:
+            href: /api/v3/placeholder_users/27
+            title: Akolyth
+          memberships:
+            href: /api/v3/memberships?filters=%5B%7B%22principal%22%3A%7B%22operator%22%3A%22%3D%22%2C%22values%22%3A%5B%2227%22%5D%7D%7D%5D
+            title: Memberships
+          updateImmediately:
+            href: /api/v3/placeholder_users/27
+            title: Update Akolyth
+            method: patch
+          delete:
+            href: /api/v3/placeholder_users/27
+            title: Delete Akolyth
+            method: delete
+          showUser:
+            href: /placeholder_users/27
+            type: text/html
+  schemas:
+    OffsetPaginatedCollectionLinks:
       allOf:
-      - $ref: '#/components/schemas/PrincipalModel'
+      - $ref: '#/components/schemas/CollectionLinks'
       - type: object
         required:
-        - _type
+        - jumpTo
+        - changeSize
         properties:
-          _type:
-            type: string
-            enum:
-            - PlaceholderUser
-          status:
-            type: string
-            description: 'The current activation status of the placeholder user.
+          jumpTo:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: A templated link to jump to a given offset.
+          changeSize:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: A templated link to change the current page size.
+          previousByOffset:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: 'A link to the previous page of the collection.
 
 
-              # Conditions
+                # Conditions
+
+                - The collection is not on the first page.'
+          nextByOffset:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: 'A link to the next page of the collection.
 
 
-              - User has `manage_placeholder_user` permission globally'
-          _links:
-            type: object
-            required:
-            - showUser
-            properties:
-              showUser:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: A relative path to show the placeholder user in the web application.
-              delete:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'An href to delete the placeholder user.
+                # Conditions
 
-
-                    # Conditions:
-
-
-                    - `manage_placeholder_user`'
-              updateImmediately:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'An href to update the placeholder user.
-
-
-                    # Conditions:
-
-
-                    - `manage_placeholder_user`
-
-
-                    **Resource**: PlaceholderUser'
-    OffsetPaginatedCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - pageSize
-        - offset
-        - _links
-        properties:
-          pageSize:
-            type: integer
-            description: 'The amount of elements per page. If not set by the request this value defaults to the server''s system
-
-              settings.'
-            minimum: 0
-          offset:
-            type: integer
-            description: The page offset indicating on which page the element collection starts.
-            minimum: 0
-          _links:
-            $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
-    ErrorResponse:
+                - The collection is not on the last page.'
+    CustomFieldProperties:
       type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
+      patternProperties:
+        ^customField\d+$:
+          type:
+          - 'null'
+          - number
+          - boolean
+          - string
+          - object
+          description: 'A custom field value, that belongs to a custom field of a simple type:
+
+
+            - Boolean
+
+            - Date
+
+            - Float
+
+            - Integer
+
+            - Link (URL)
+
+            - Text
+
+            - Long text'
     UserModel:
       allOf:
       - $ref: '#/components/schemas/PrincipalModel'
@@ -1262,6 +973,108 @@ components:
                     - LDAP authentication configured
 
                     - `admin`'
+    PlaceholderUserCreateModel:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The new name of the placeholder user to be created.
+    PlaceholderUserModel:
+      allOf:
+      - $ref: '#/components/schemas/PrincipalModel'
+      - type: object
+        required:
+        - _type
+        properties:
+          _type:
+            type: string
+            enum:
+            - PlaceholderUser
+          status:
+            type: string
+            description: 'The current activation status of the placeholder user.
+
+
+              # Conditions
+
+
+              - User has `manage_placeholder_user` permission globally'
+          _links:
+            type: object
+            required:
+            - showUser
+            properties:
+              showUser:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: A relative path to show the placeholder user in the web application.
+              delete:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'An href to delete the placeholder user.
+
+
+                    # Conditions:
+
+
+                    - `manage_placeholder_user`'
+              updateImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'An href to update the placeholder user.
+
+
+                    # Conditions:
+
+
+                    - `manage_placeholder_user`
+
+
+                    **Resource**: PlaceholderUser'
+    UserCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This user collection
+
+
+                    **Resource**: Collection'
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserModel'
+      example:
+        _type: Collection
+        total: 2
+        count: 2
+        _links:
+          self:
+            href: /api/v3/users
+        _embedded:
+          elements:
+          - _abbreviated: User resource shortened for brevity
+            _type: User
+            id: 1337
+          - _abbreviated: User resource shortened for brevity
+            _type: User
+            id: 1338
     PrincipalCollectionModel:
       allOf:
       - $ref: '#/components/schemas/OffsetPaginatedCollectionModel'
@@ -1299,80 +1112,324 @@ components:
           - _abbreviated: PlaceholderUser resource shortened for brevity
             _type: PlaceholderUser
             id: 1339
-    PlaceholderUserCreateModel:
+    CollectionLinks:
       type: object
+      required:
+      - self
       properties:
-        name:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
           type: string
-          description: The new name of the placeholder user to be created.
-    OffsetPaginatedCollectionLinks:
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
+    GroupModel:
       allOf:
-      - $ref: '#/components/schemas/CollectionLinks'
+      - $ref: '#/components/schemas/PrincipalModel'
+      - $ref: '#/components/schemas/CustomFieldProperties'
       - type: object
         required:
-        - jumpTo
-        - changeSize
+        - _type
+        - _embedded
         properties:
-          jumpTo:
-            allOf:
-            - $ref: '#/components/schemas/Link'
-            - description: A templated link to jump to a given offset.
-          changeSize:
-            allOf:
-            - $ref: '#/components/schemas/Link'
-            - description: A templated link to change the current page size.
-          previousByOffset:
-            allOf:
-            - $ref: '#/components/schemas/Link'
-            - description: 'A link to the previous page of the collection.
-
-
-                # Conditions
-
-                - The collection is not on the first page.'
-          nextByOffset:
-            allOf:
-            - $ref: '#/components/schemas/Link'
-            - description: 'A link to the next page of the collection.
-
-
-                # Conditions
-
-                - The collection is not on the last page.'
-    CustomFieldProperties:
-      type: object
-      patternProperties:
-        ^customField\d+$:
-          type:
-          - 'null'
-          - number
-          - boolean
-          - string
-          - object
-          description: 'A custom field value, that belongs to a custom field of a simple type:
-
-
-            - Boolean
-
-            - Date
-
-            - Float
-
-            - Integer
-
-            - Link (URL)
-
-            - Text
-
-            - Long text'
-  responses:
-    MissingContentType:
-      description: Occurs when the client did not send a Content-Type header
-      content:
-        text/plain:
-          schema:
+          _type:
             type: string
-          example: Missing content-type header
+            enum:
+            - Group
+          _embedded:
+            type: object
+            properties:
+              members:
+                type: array
+                description: Embedded list of members.
+                items:
+                  $ref: '#/components/schemas/UserModel'
+          _links:
+            type: object
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This group resource
+
+
+                    **Resource**: Group'
+              members:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'A member of the group
+
+
+                      # Conditions:
+
+
+                      - user has permission `manage_members` in any project
+
+
+                      **Resource**: User'
+              memberships:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'An collection of all memberships of the group.
+
+
+                    **Resource**: MembershipCollection'
+              delete:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'An href to delete the group.
+
+
+                    # Conditions:
+
+
+                    - `admin`'
+              updateImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'An href to update the group.
+
+
+                    # Conditions:
+
+
+                    - `admin`
+
+
+                    **Resource**: Group'
+    OffsetPaginatedCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - pageSize
+        - offset
+        - _links
+        properties:
+          pageSize:
+            type: integer
+            description: 'The amount of elements per page. If not set by the request this value defaults to the server''s system
+
+              settings.'
+            minimum: 0
+          offset:
+            type: integer
+            description: The page offset indicating on which page the element collection starts.
+            minimum: 0
+          _links:
+            $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    UserCreateModel:
+      type: object
+      required:
+      - admin
+      - email
+      - login
+      - firstName
+      - lastName
+      - language
+      properties:
+        admin:
+          type: boolean
+        email:
+          type: string
+          maxLength: 60
+        login:
+          type: string
+          maxLength: 256
+        password:
+          type: string
+          description: 'The user''s password.
+
+
+            *Conditions:*
+
+
+            Writable on create.
+
+
+            Writable on update only when:
+
+            - the caller updates their own account
+
+            - `currentPassword` is provided and valid'
+        currentPassword:
+          type: string
+          description: 'The user''s current password.
+
+
+            *Conditions:*
+
+
+            Required when changing `password` for a self update (`PATCH /api/v3/users/me` or `PATCH /api/v3/users/{id}` where `id` is the caller).
+
+
+            Ignored for non-self updates (for example, administrators updating other users).'
+        firstName:
+          type: string
+          maxLength: 30
+        lastName:
+          type: string
+          maxLength: 30
+        status:
+          type: string
+          description: 'The current activation status of the user.
+
+
+            *Conditions:*
+
+
+            Only writable on creation, not on update.'
+        language:
+          type: string
+      example:
+        login: j.sheppard
+        password: idestroyedsouvereign
+        currentPassword: iusedtobuildstarships
+        firstName: John
+        lastName: Sheppard
+        email: shep@mail.com
+        admin: true
+        status: active
+        language: en
+    CollectionModel:
+      type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
+    PrincipalModel:
+      type: object
+      required:
+      - _type
+      - id
+      - name
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - User
+          - Group
+          - PlaceholderUser
+        id:
+          type: integer
+          description: The principal's unique identifier.
+          minimum: 1
+        name:
+          type: string
+          description: The principal's display name, layout depends on instance settings.
+        createdAt:
+          type: string
+          format: date-time
+          description: Time of creation
+        updatedAt:
+          type: string
+          format: date-time
+          description: Time of the most recent change to the principal
+        _links:
+          type: object
+          required:
+          - self
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This principal resource.
+
+
+                  **Resource**: User|Group|PlaceholderUser'
+            memberships:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'An href to the collection of the principal''s memberships.
+
+
+                  # Conditions:
+
+
+                  - user has permission `view_members` or `manage_members` in any project
+
+
+                  **Resource**: Collection'
+  responses:
     UnsupportedMediaType:
       description: Occurs when the client sends an unsupported Content-Type header.
       content:
@@ -1393,70 +1450,13 @@ components:
             _type: Error
             errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
             message: The request body was not a single JSON object.
-  examples:
-    UserResponse:
-      value:
-        _type: User
-        id: 14
-        name: Mara Jade
-        createdAt: '2022-04-04T08:07:22.910Z'
-        updatedAt: '2024-02-09T09:01:17.382Z'
-        login: member
-        admin: false
-        firstName: Mara
-        lastName: Jade
-        email: m.jade@empire.org
-        avatar: https://secure.gravatar.com/avatar/17dd23570f3bd129d06db9b48b7a41b8?default=404&secure=true
-        status: active
-        identityUrl: null
-        language: en
-        _links:
-          self:
-            href: /api/v3/users/14
-            title: Mara Jade
-          memberships:
-            href: /api/v3/memberships?filters=%5B%7B%22principal%22%3A%7B%22operator%22%3A%22%3D%22%2C%22values%22%3A%5B%2214%22%5D%7D%7D%5D
-            title: Memberships
-          showUser:
-            href: /users/14
-            type: text/html
-          updateImmediately:
-            href: /api/v3/users/14
-            title: Update member
-            method: patch
-          lock:
-            href: /api/v3/users/14/lock
-            title: Set lock on member
-            method: post
-          delete:
-            href: /api/v3/users/14
-            title: Delete member
-            method: delete
-    PlaceholderUserResponse:
-      value:
-        _type: PlaceholderUser
-        id: 27
-        name: Akolyth
-        createdAt: '2024-02-12T11:52:24.708Z'
-        updatedAt: '2024-02-12T11:52:24.708Z'
-        _links:
-          self:
-            href: /api/v3/placeholder_users/27
-            title: Akolyth
-          memberships:
-            href: /api/v3/memberships?filters=%5B%7B%22principal%22%3A%7B%22operator%22%3A%22%3D%22%2C%22values%22%3A%5B%2227%22%5D%7D%7D%5D
-            title: Memberships
-          updateImmediately:
-            href: /api/v3/placeholder_users/27
-            title: Update Akolyth
-            method: patch
-          delete:
-            href: /api/v3/placeholder_users/27
-            title: Delete Akolyth
-            method: delete
-          showUser:
-            href: /placeholder_users/27
-            type: text/html
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
   securitySchemes:
     BasicAuth:
       type: http

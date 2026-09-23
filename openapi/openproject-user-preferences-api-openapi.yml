@@ -1,0 +1,284 @@
+openapi: 3.2.0
+info:
+  description: You're looking at the current **stable** documentation of the OpenProject APIv3.
+  title: OpenProject API V3 (Stable) User Preferences API
+  version: '3'
+servers:
+- url: https://qa.openproject-edge.com
+  description: Edge QA instance
+- url: https://qa.openproject-stage.com
+  description: Staging instance
+- url: https://community.openproject.org
+  description: Community instance
+security:
+- BasicAuth: []
+tags:
+- description: The user preferences endpoints return collections or single entities of type `UserPreferences`.
+  name: User Preferences
+paths:
+  /api/v3/my_preferences:
+    get:
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              examples:
+                response:
+                  value:
+                    _links:
+                      self:
+                        href: /api/v3/my_preferences
+                      user:
+                        href: /api/v3/users/1
+                        title: John Sheppard
+                      updateImmediately:
+                        href: /api/v3/users/3/preferences
+                        method: patch
+                    _type: UserPreferences
+                    commentSortDescending: true
+                    disableKeyboardShortcuts: false
+                    timeZone: Europe/Berlin
+                    warnOnLeavingUnsaved: true
+                    notifications:
+                      watched: false
+                      involved: true
+                      mentioned: false
+                      shared: true
+                      newsAdded: false,
+                      newsCommented: false
+                      documentAdded: false
+                      forumMessages: false
+                      wikiPageAdded: false
+                      wikiPageUpdated: false
+                      membershipAdded: false
+                      membershipUpdated: false
+                      workPackageCommented: false
+                      workPackageProcessed: false
+                      workPackagePrioritized: false
+                      workPackageScheduled: false
+                      _links:
+                        project:
+                          href: null
+              schema:
+                $ref: '#/components/schemas/UserPreferencesModel'
+          description: OK
+          headers: {}
+        '401':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:Unauthenticated
+                    message: You need to be authenticated to access this resource.
+          description: Returned if no user is currently authenticated
+          headers: {}
+      tags:
+      - User Preferences
+      description: ''
+      operationId: Show_my_preferences
+      summary: Show my preferences
+    patch:
+      responses:
+        '200':
+          content:
+            application/hal+json:
+              examples:
+                response:
+                  value:
+                    _links:
+                      self:
+                        href: /api/v3/my_preferences
+                      user:
+                        href: /api/v3/users/1
+                        title: John Sheppard
+                      updateImmediately:
+                        href: /api/v3/users/3/preferences
+                        method: patch
+                    _type: UserPreferences
+                    commentSortDescending: true
+                    disableKeyboardShortcuts: false
+                    timeZone: Europe/Berlin
+                    warnOnLeavingUnsaved: true
+                    notifications:
+                      watched: false
+                      involved: true
+                      mentioned: false
+                      shared: true
+                      newsAdded: false,
+                      newsCommented: false
+                      documentAdded: false
+                      forumMessages: false
+                      wikiPageAdded: false
+                      wikiPageUpdated: false
+                      membershipAdded: false
+                      membershipUpdated: false
+                      workPackageCommented: false
+                      workPackageProcessed: false
+                      workPackagePrioritized: false
+                      workPackageScheduled: false
+                      _links:
+                        project:
+                          href: null
+              schema:
+                $ref: '#/components/schemas/UserPreferencesModel'
+          description: OK
+          headers: {}
+        '400':
+          $ref: '#/components/responses/InvalidRequestBody'
+        '401':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:Unauthenticated
+                    message: You need to be authenticated to access this resource.
+          description: Returned if no user is currently authenticated
+          headers: {}
+        '406':
+          $ref: '#/components/responses/MissingContentType'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                response:
+                  value:
+                    _type: Error
+                    errorIdentifier: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+                    message: Time zone is not set to one of the allowed values.
+          description: 'Returned if the update contains invalid properties.
+
+            Reasons are:
+
+
+            * Specifying an invalid type
+
+
+            * Using an unknown time zone'
+          headers: {}
+      tags:
+      - User Preferences
+      description: When calling this endpoint the client provides a single object, containing the properties that it wants to change, in the body.
+      operationId: Update_UserPreferences
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                autoHidePopups: true
+                timeZone: Europe/Paris
+              properties:
+                autoHidePopups:
+                  type: boolean
+                timeZone:
+                  type: string
+              type: object
+      summary: Update my preferences
+components:
+  responses:
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
+    UnsupportedMediaType:
+      description: Occurs when the client sends an unsupported Content-Type header.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
+            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+    InvalidRequestBody:
+      description: Occurs when the client did not send a valid JSON object in the request body.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+            message: The request body was not a single JSON object.
+  schemas:
+    UserPreferencesModel:
+      type: object
+      example:
+        _links:
+          self:
+            href: /api/v3/my_preferences
+          user:
+            href: /api/v3/users/1
+            title: John Sheppard
+          updateImmediately:
+            href: /api/v3/users/3/preferences
+            method: patch
+        _type: UserPreferences
+        commentSortDescending: true
+        disableKeyboardShortcuts: false
+        timeZone: Europe/Berlin
+        warnOnLeavingUnsaved: true
+        notifications:
+        - watched: false
+          involved: true
+          mentioned: false
+          shared: true
+          newsAdded: false,
+          newsCommented: false
+          documentAdded: false
+          forumMessages: false
+          wikiPageAdded: false
+          wikiPageUpdated: false
+          membershipAdded: false
+          membershipUpdated: false
+          workPackageCommented: false
+          workPackageProcessed: false
+          workPackagePrioritized: false
+          workPackageScheduled: false
+          _links:
+            project:
+              href: null
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
