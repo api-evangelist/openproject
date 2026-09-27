@@ -420,62 +420,6 @@ paths:
       summary: Portfolio update form
 components:
   schemas:
-    CustomCommentProperties:
-      type: object
-      patternProperties:
-        ^customComment\d+$:
-          type:
-          - 'null'
-          - string
-          description: 'A plain-text comment associated with a project custom field that has comments enabled.
-
-
-            The property is only present when the corresponding `customField{N}` has `has_comment` set to `true`.'
-    CollectionLinks:
-      type: object
-      required:
-      - self
-      properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This collection resource.
-
-
-              **Resource**: Collection'
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
-          type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
     CollectionModel:
       type: object
       required:
@@ -498,88 +442,32 @@ components:
           minimum: 0
         _links:
           $ref: '#/components/schemas/CollectionLinks'
-    OffsetPaginatedCollectionLinks:
-      allOf:
-      - $ref: '#/components/schemas/CollectionLinks'
-      - type: object
-        required:
-        - jumpTo
-        - changeSize
-        properties:
-          jumpTo:
-            allOf:
-            - $ref: '#/components/schemas/Link'
-            - description: A templated link to jump to a given offset.
-          changeSize:
-            allOf:
-            - $ref: '#/components/schemas/Link'
-            - description: A templated link to change the current page size.
-          previousByOffset:
-            allOf:
-            - $ref: '#/components/schemas/Link'
-            - description: 'A link to the previous page of the collection.
-
-
-                # Conditions
-
-                - The collection is not on the first page.'
-          nextByOffset:
-            allOf:
-            - $ref: '#/components/schemas/Link'
-            - description: 'A link to the next page of the collection.
-
-
-                # Conditions
-
-                - The collection is not on the last page.'
-    OffsetPaginatedCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - pageSize
-        - offset
-        - _links
-        properties:
-          pageSize:
-            type: integer
-            description: 'The amount of elements per page. If not set by the request this value defaults to the server''s system
-
-              settings.'
-            minimum: 0
-          offset:
-            type: integer
-            description: The page offset indicating on which page the element collection starts.
-            minimum: 0
-          _links:
-            $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
-    Formattable:
+    ErrorResponse:
       type: object
       required:
-      - format
+      - _type
+      - errorIdentifier
+      - message
       properties:
-        format:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
           type: string
           enum:
-          - plain
-          - markdown
-          - custom
-          readOnly: true
-          description: Indicates the formatting language of the raw text
-          example: markdown
-        raw:
+          - Error
+        errorIdentifier:
           type: string
-          description: The raw text, as entered by the user
-          example: I **am** formatted!
-        html:
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
           type: string
-          readOnly: true
-          description: The text converted to HTML according to the format
-          example: I <strong>am</strong> formatted!
-      example:
-        format: markdown
-        raw: I am formatted!
-        html: I am formatted!
+          example: Project can't be blank.
     PortfolioModel:
       allOf:
       - $ref: '#/components/schemas/CustomFieldProperties'
@@ -825,58 +713,40 @@ components:
 
 
                       **Resource**: Portfolio'
-    ErrorResponse:
-      type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
-    CustomFieldProperties:
-      type: object
-      patternProperties:
-        ^customField\d+$:
-          type:
-          - 'null'
-          - number
-          - boolean
-          - string
-          - object
-          description: 'A custom field value, that belongs to a custom field of a simple type:
+    OffsetPaginatedCollectionLinks:
+      allOf:
+      - $ref: '#/components/schemas/CollectionLinks'
+      - type: object
+        required:
+        - jumpTo
+        - changeSize
+        properties:
+          jumpTo:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: A templated link to jump to a given offset.
+          changeSize:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: A templated link to change the current page size.
+          previousByOffset:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: 'A link to the previous page of the collection.
 
 
-            - Boolean
+                # Conditions
 
-            - Date
+                - The collection is not on the first page.'
+          nextByOffset:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: 'A link to the next page of the collection.
 
-            - Float
 
-            - Integer
+                # Conditions
 
-            - Link (URL)
-
-            - Text
-
-            - Long text'
+                - The collection is not on the last page.'
     PortfolioCollectionModel:
       allOf:
       - $ref: '#/components/schemas/OffsetPaginatedCollectionModel'
@@ -905,6 +775,136 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/PortfolioModel'
+    OffsetPaginatedCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - pageSize
+        - offset
+        - _links
+        properties:
+          pageSize:
+            type: integer
+            description: 'The amount of elements per page. If not set by the request this value defaults to the server''s system
+
+              settings.'
+            minimum: 0
+          offset:
+            type: integer
+            description: The page offset indicating on which page the element collection starts.
+            minimum: 0
+          _links:
+            $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
+    CustomCommentProperties:
+      type: object
+      patternProperties:
+        ^customComment\d+$:
+          type:
+          - 'null'
+          - string
+          description: 'A plain-text comment associated with a project custom field that has comments enabled.
+
+
+            The property is only present when the corresponding `customField{N}` has `has_comment` set to `true`.'
+    CustomFieldProperties:
+      type: object
+      patternProperties:
+        ^customField\d+$:
+          type:
+          - 'null'
+          - number
+          - boolean
+          - string
+          - object
+          description: 'A custom field value, that belongs to a custom field of a simple type:
+
+
+            - Boolean
+
+            - Date
+
+            - Float
+
+            - Integer
+
+            - Link (URL)
+
+            - Text
+
+            - Long text'
+    Formattable:
+      type: object
+      required:
+      - format
+      properties:
+        format:
+          type: string
+          enum:
+          - plain
+          - markdown
+          - custom
+          readOnly: true
+          description: Indicates the formatting language of the raw text
+          example: markdown
+        raw:
+          type: string
+          description: The raw text, as entered by the user
+          example: I **am** formatted!
+        html:
+          type: string
+          readOnly: true
+          description: The text converted to HTML according to the format
+          example: I <strong>am</strong> formatted!
+      example:
+        format: markdown
+        raw: I am formatted!
+        html: I am formatted!
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
   responses:
     MissingContentType:
       description: Occurs when the client did not send a Content-Type header
@@ -934,6 +934,45 @@ components:
             errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
             message: The request body was not a single JSON object.
   examples:
+    PortfolioCollection:
+      value:
+        _type: Collection
+        count: 2
+        total: 2
+        pageSize: 20
+        offset: 1
+        _embedded:
+          elements:
+          - _hint: Portfolio resource shortened for brevity
+            id: 1
+            identifier: connect2030
+            name: Digital Connect 2030
+            active: true
+            public: true
+          - _hint: Portfolio resource shortened for brevity
+            id: 2
+            identifier: future2050
+            name: Digital Future 2050
+            active: true
+            public: false
+        _links:
+          self:
+            href: /api/v3/portfolios?filters=%5B%5D&offset=1&pageSize=20
+          jumpTo:
+            href: /api/v3/portfolios?filters=%5B%5D&offset=%7Boffset%7D&pageSize=20
+            templated: true
+          changeSize:
+            href: /api/v3/portfolios?filters=%5B%5D&offset=1&pageSize=%7Bsize%7D
+            templated: true
+          representations:
+          - href: /portfolios.csv?filters=%5B%5D&offset=1&pageSize=20
+            identifier: csv
+            type: text/csv
+            title: CSV
+          - href: /portfolios.xls?filters=%5B%5D&offset=1&pageSize=20
+            identifier: xls
+            type: application/vnd.ms-excel
+            title: XLS
     Portfolio:
       value:
         _type: Portfolio
@@ -990,45 +1029,6 @@ components:
         updatedAt: '2014-05-21T08:51:20.396Z'
         customField123: 123
         customComment123: Why is the value 123?
-    PortfolioCollection:
-      value:
-        _type: Collection
-        count: 2
-        total: 2
-        pageSize: 20
-        offset: 1
-        _embedded:
-          elements:
-          - _hint: Portfolio resource shortened for brevity
-            id: 1
-            identifier: connect2030
-            name: Digital Connect 2030
-            active: true
-            public: true
-          - _hint: Portfolio resource shortened for brevity
-            id: 2
-            identifier: future2050
-            name: Digital Future 2050
-            active: true
-            public: false
-        _links:
-          self:
-            href: /api/v3/portfolios?filters=%5B%5D&offset=1&pageSize=20
-          jumpTo:
-            href: /api/v3/portfolios?filters=%5B%5D&offset=%7Boffset%7D&pageSize=20
-            templated: true
-          changeSize:
-            href: /api/v3/portfolios?filters=%5B%5D&offset=1&pageSize=%7Bsize%7D
-            templated: true
-          representations:
-          - href: /portfolios.csv?filters=%5B%5D&offset=1&pageSize=20
-            identifier: csv
-            type: text/csv
-            title: CSV
-          - href: /portfolios.xls?filters=%5B%5D&offset=1&pageSize=20
-            identifier: xls
-            type: application/vnd.ms-excel
-            title: XLS
     PortfolioBody:
       value:
         name: Portfolio example

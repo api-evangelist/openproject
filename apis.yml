@@ -6,16 +6,22 @@ description: >-
   API that exposes work packages, projects, users, attachments, custom fields, and many other resources.
 type: Index
 deliveryModel:
-  model: saas
-  open_source: false
+  model: open-core
+  license: GPL-3.0
+  license_evidence:
+    repo: opf/openproject
+    spdx: GPL-3.0
+    stars: 16203
+  open_source: true
   commercial: true
   callable_host: true
-  label: Hosted service · you call their endpoint
-  confidence: high
+  label: Open core · an OSS project plus a commercial hosted product
+  confidence: medium
   source:
   - openapi
   - pricing
-  generated: '2026-08-28'
+  - repository-license
+  generated: '2026-09-25'
   method: derived
 accessModel:
   pricing: freemium
@@ -37,7 +43,7 @@ image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/openprojec
 tags:
   - Agile
   - Gantt
-  - Open-Source
+  - Open Source
   - Project Management
   - Time Tracking
   - Work Packages
@@ -48,6 +54,7 @@ tags_raw:
   - Project Management
   - Time Tracking
   - Work Packages
+  - Open-Source
 created: '2025-01-08'
 modified: '2026-05-19'
 url: https://raw.githubusercontent.com/api-evangelist/openproject/refs/heads/main/apis.yml
@@ -4969,8 +4976,6 @@ apis:
   humanURL: https://www.openproject.org/docs/api/
   baseURL: https://community.openproject.org/api/v3
   tags:
-  - Authentication
-  tags_raw:
   - OAuth2
   properties:
   - type: OpenAPI

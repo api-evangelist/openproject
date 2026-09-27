@@ -81,6 +81,88 @@ paths:
             **Required permission:** view project phase OR select project phase'
 components:
   schemas:
+    CollectionModel:
+      type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    OffsetPaginatedCollectionLinks:
+      allOf:
+      - $ref: '#/components/schemas/CollectionLinks'
+      - type: object
+        required:
+        - jumpTo
+        - changeSize
+        properties:
+          jumpTo:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: A templated link to jump to a given offset.
+          changeSize:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: A templated link to change the current page size.
+          previousByOffset:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: 'A link to the previous page of the collection.
+
+
+                # Conditions
+
+                - The collection is not on the first page.'
+          nextByOffset:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: 'A link to the next page of the collection.
+
+
+                # Conditions
+
+                - The collection is not on the last page.'
     CollectionLinks:
       type: object
       required:
@@ -93,39 +175,27 @@ components:
 
 
               **Resource**: Collection'
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
-          type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
+    OffsetPaginatedCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - pageSize
+        - offset
+        - _links
+        properties:
+          pageSize:
+            type: integer
+            description: 'The amount of elements per page. If not set by the request this value defaults to the server''s system
+
+              settings.'
+            minimum: 0
+          offset:
+            type: integer
+            description: The page offset indicating on which page the element collection starts.
+            minimum: 0
+          _links:
+            $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
     ProjectPhaseDefinitionCollectionModel:
       allOf:
       - $ref: '#/components/schemas/OffsetPaginatedCollectionModel'
@@ -172,83 +242,39 @@ components:
             name: Executing
             _type: ProjectPhaseDefinition
             _abbreviated: project phase definition resource shortened for brevity
-    CollectionModel:
+    Link:
       type: object
       required:
-      - _type
-      - total
-      - count
-      - _links
+      - href
       properties:
-        _type:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
           type: string
-          enum:
-          - Collection
-        total:
-          type: integer
-          description: The total amount of elements available in the collection.
-          minimum: 0
-        count:
-          type: integer
-          description: Actual amount of elements in this response.
-          minimum: 0
-        _links:
-          $ref: '#/components/schemas/CollectionLinks'
-    OffsetPaginatedCollectionLinks:
-      allOf:
-      - $ref: '#/components/schemas/CollectionLinks'
-      - type: object
-        required:
-        - jumpTo
-        - changeSize
-        properties:
-          jumpTo:
-            allOf:
-            - $ref: '#/components/schemas/Link'
-            - description: A templated link to jump to a given offset.
-          changeSize:
-            allOf:
-            - $ref: '#/components/schemas/Link'
-            - description: A templated link to change the current page size.
-          previousByOffset:
-            allOf:
-            - $ref: '#/components/schemas/Link'
-            - description: 'A link to the previous page of the collection.
-
-
-                # Conditions
-
-                - The collection is not on the first page.'
-          nextByOffset:
-            allOf:
-            - $ref: '#/components/schemas/Link'
-            - description: 'A link to the next page of the collection.
-
-
-                # Conditions
-
-                - The collection is not on the last page.'
-    OffsetPaginatedCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - pageSize
-        - offset
-        - _links
-        properties:
-          pageSize:
-            type: integer
-            description: 'The amount of elements per page. If not set by the request this value defaults to the server''s system
-
-              settings.'
-            minimum: 0
-          offset:
-            type: integer
-            description: The page offset indicating on which page the element collection starts.
-            minimum: 0
-          _links:
-            $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
     ProjectPhaseDefinitionModel:
       type: object
       required:
@@ -317,32 +343,6 @@ components:
         _links:
           self:
             href: /api/v3/project_phase_definitions/23
-    ErrorResponse:
-      type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
   securitySchemes:
     BasicAuth:
       type: http

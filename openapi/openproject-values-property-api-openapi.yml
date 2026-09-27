@@ -119,18 +119,6 @@ paths:
       summary: View Values schema
 components:
   examples:
-    ValuesPropertyDateSchema:
-      value:
-        _type: Schema
-        property:
-          name: Property
-          type: String
-        value:
-          name: Date
-          type: Date
-        _links:
-          self:
-            href: api/v3/values/schemas/date
     ValuesPropertyStartDate:
       value:
         _type: Values::Property
@@ -141,28 +129,6 @@ components:
             href: api/v3/notifications/123/details/0
           schema:
             href: api/v3/values/schemas/startDate
-    ValuesPropertyStartDateSchema:
-      value:
-        _type: Schema
-        property:
-          name: Property
-          type: String
-        value:
-          name: Start date
-          type: Date
-        _links:
-          self:
-            href: api/v3/values/schemas/startDate
-    ValuesPropertyDueDate:
-      value:
-        _type: Values::Property
-        property: dueDate
-        value: '2021-01-01'
-        _links:
-          self:
-            href: api/v3/notifications/123/details/0
-          schema:
-            href: api/v3/values/schemas/dueDate
     ValuesPropertyDueDateSchema:
       value:
         _type: Schema
@@ -175,6 +141,40 @@ components:
         _links:
           self:
             href: api/v3/values/schemas/dueDate
+    ValuesPropertyDateSchema:
+      value:
+        _type: Schema
+        property:
+          name: Property
+          type: String
+        value:
+          name: Date
+          type: Date
+        _links:
+          self:
+            href: api/v3/values/schemas/date
+    ValuesPropertyDueDate:
+      value:
+        _type: Values::Property
+        property: dueDate
+        value: '2021-01-01'
+        _links:
+          self:
+            href: api/v3/notifications/123/details/0
+          schema:
+            href: api/v3/values/schemas/dueDate
+    ValuesPropertyStartDateSchema:
+      value:
+        _type: Schema
+        property:
+          name: Property
+          type: String
+        value:
+          name: Start date
+          type: Date
+        _links:
+          self:
+            href: api/v3/values/schemas/startDate
     ValuesPropertyDate:
       value:
         _type: Values::Property
@@ -186,39 +186,57 @@ components:
           schema:
             href: api/v3/values/schemas/date
   schemas:
-    Link:
+    ErrorResponse:
       type: object
       required:
-      - href
+      - _type
+      - errorIdentifier
+      - message
       properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
-          type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
+        _embedded:
           type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
           type: string
-          description: An optional unique identifier to the link object
-        type:
+          enum:
+          - Error
+        errorIdentifier:
           type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    SchemaModel:
+      type: object
+      required:
+      - _type
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Schema
+        _dependencies:
+          type: array
+          description: A list of dependencies between one property's value and another property
+          items:
+            type: string
+        _links:
+          type: object
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This schema
+
+
+                  **Resource**: Schema'
     ValuesPropertyModel:
       type: object
       required:
@@ -257,57 +275,39 @@ components:
 
 
                   **Resource**: Schema'
-    SchemaModel:
+    Link:
       type: object
       required:
-      - _type
-      - _links
+      - href
       properties:
-        _type:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
           type: string
-          enum:
-          - Schema
-        _dependencies:
-          type: array
-          description: A list of dependencies between one property's value and another property
-          items:
-            type: string
-        _links:
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
           type: object
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This schema
-
-
-                  **Resource**: Schema'
-    ErrorResponse:
-      type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
+          description: The payload to send in the request to achieve the desired result
+        identifier:
           type: string
-          enum:
-          - Error
-        errorIdentifier:
+          description: An optional unique identifier to the link object
+        type:
           type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
   securitySchemes:
     BasicAuth:
       type: http

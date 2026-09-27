@@ -133,51 +133,6 @@ paths:
       - Custom Field Items
 components:
   schemas:
-    CollectionLinks:
-      type: object
-      required:
-      - self
-      properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This collection resource.
-
-
-              **Resource**: Collection'
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
-          type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
     CollectionModel:
       type: object
       required:
@@ -200,6 +155,44 @@ components:
           minimum: 0
         _links:
           $ref: '#/components/schemas/CollectionLinks'
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
     HierarchyItemReadModel:
       type: object
       required:
@@ -291,32 +284,39 @@ components:
 
 
                   **Resource**: HierarchyItemCollection'
-    ErrorResponse:
+    Link:
       type: object
       required:
-      - _type
-      - errorIdentifier
-      - message
+      - href
       properties:
-        _embedded:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
           type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
+          description: The payload to send in the request to achieve the desired result
+        identifier:
           type: string
-          enum:
-          - Error
-        errorIdentifier:
+          description: An optional unique identifier to the link object
+        type:
           type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
     HierarchyItemCollectionModel:
       allOf:
       - $ref: '#/components/schemas/CollectionModel'
@@ -347,6 +347,30 @@ components:
                 items:
                   $ref: '#/components/schemas/HierarchyItemReadModel'
   examples:
+    HierarchyItemResponse:
+      description: Simple response of a single item of a custom field of type hierarchy.
+      value:
+        _type: HierarchyItem
+        id: 1338
+        label: Stormtroopers
+        short: ST
+        weight: null
+        formattedWeight: null
+        depth: 1
+        _links:
+          self:
+            href: /api/v3/custom_field_items/1338
+            name: Stormtroopers
+          parent:
+            href: /api/v3/custom_field_items/1337
+            name: null
+          branch:
+            href: /api/v3/custom_field_items/1338/branch
+          children:
+          - href: /api/v3/custom_field_items/1340
+            name: ST-377
+          - href: /api/v3/custom_field_items/1341
+            name: ST-422
     HierarchyItemCollectionResponse:
       description: Simple response of a hierarchy structure starting at root.
       value:
@@ -409,30 +433,6 @@ components:
         _links:
           self:
             href: /api/v3/custom_field/42/items
-    HierarchyItemResponse:
-      description: Simple response of a single item of a custom field of type hierarchy.
-      value:
-        _type: HierarchyItem
-        id: 1338
-        label: Stormtroopers
-        short: ST
-        weight: null
-        formattedWeight: null
-        depth: 1
-        _links:
-          self:
-            href: /api/v3/custom_field_items/1338
-            name: Stormtroopers
-          parent:
-            href: /api/v3/custom_field_items/1337
-            name: null
-          branch:
-            href: /api/v3/custom_field_items/1338/branch
-          children:
-          - href: /api/v3/custom_field_items/1340
-            name: ST-377
-          - href: /api/v3/custom_field_items/1341
-            name: ST-422
   securitySchemes:
     BasicAuth:
       type: http

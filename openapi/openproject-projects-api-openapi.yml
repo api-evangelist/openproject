@@ -1550,35 +1550,234 @@ paths:
       operationId: List_workspaces_with_version
       summary: List workspaces having version
 components:
+  examples:
+    ProjectCollection:
+      value:
+        _type: Collection
+        count: 2
+        total: 2
+        pageSize: 20
+        offset: 1
+        _embedded:
+          elements:
+          - _abbreviated: Project resource shortened for brevity
+            id: 1
+            identifier: initialproject
+            name: DeathStar construction
+            active: true
+            public: true
+          - _abbreviated: Project resource shortened for brevity
+            id: 2
+            identifier: mysecret
+            name: Palpatine's secret plan
+            active: true
+            public: false
+        _links:
+          self:
+            href: /api/v3/projects?filters=%5B%5D&offset=1&pageSize=20
+          jumpTo:
+            href: /api/v3/projects?filters=%5B%5D&offset=%7Boffset%7D&pageSize=20
+            templated: true
+          changeSize:
+            href: /api/v3/projects?filters=%5B%5D&offset=1&pageSize=%7Bsize%7D
+            templated: true
+          representations:
+          - href: /projects.csv?filters=%5B%5D&offset=1&pageSize=20
+            identifier: csv
+            type: text/csv
+            title: CSV
+          - href: /projects.xls?filters=%5B%5D&offset=1&pageSize=20
+            identifier: xls
+            type: application/vnd.ms-excel
+            title: XLS
+    Project:
+      value:
+        _type: Project
+        _links:
+          self:
+            href: /api/v3/projects/1
+            title: Lorem
+          createWorkPackage:
+            href: /api/v3/projects/1/work_packages/form
+            method: post
+          createWorkPackageImmediate:
+            href: /api/v3/projects/1/work_packages
+            method: post
+          categories:
+            href: /api/v3/projects/1/categories
+          types:
+            href: /api/v3/projects/1/types
+          versions:
+            href: /api/v3/projects/1/versions
+          workPackages:
+            href: /api/v3/projects/1/work_packages
+          memberships:
+            href: /api/v3/memberships?filters=[{"project":{"operator":"=","values":["1"]}}]
+          customField456:
+            href: /api/v3/users/315
+            title: A user
+          parent:
+            href: /api/v3/projects/123
+            title: Parent project
+          ancestors:
+          - href: /api/v3/portfolios/2
+            title: Root portfolios
+          - href: /api/v3/programs/12
+            title: Grandparent program
+          - href: /api/v3/projects/123
+            title: Parent project
+          status:
+            href: /api/v3/project_statuses/on_track
+            title: On track
+        id: 1
+        identifier: project_example
+        name: Project example
+        active: true
+        public: false
+        statusExplanation:
+          format: markdown
+          raw: Everything **fine**
+          html: <p>Everything <strong>fine</strong></p>
+        description:
+          format: markdown
+          raw: Lorem **ipsum** dolor sit amet
+          html: <p>Lorem <strong>ipsum</strong> dolor sit amet</p>
+        createdAt: '2014-05-21T08:51:20.396Z'
+        updatedAt: '2014-05-21T08:51:20.396Z'
+        customField123: 123
+        customComment123: Why is the value 123?
+    ProjectBody:
+      value:
+        name: Project example
+        statusExplanation:
+          raw: Everything **fine**
+        description:
+          raw: Lorem **ipsum** dolor sit amet
+        customField123: 123
+        customComment123: Because it is 123!
+        _links:
+          parent:
+            href: /api/v3/projects/123
+          customField456:
+            href: /api/v3/users/315
   schemas:
-    ProjectCollectionModel:
+    OffsetPaginatedCollectionModel:
       allOf:
-      - $ref: '#/components/schemas/OffsetPaginatedCollectionModel'
+      - $ref: '#/components/schemas/CollectionModel'
       - type: object
         required:
+        - pageSize
+        - offset
         - _links
-        - _embedded
         properties:
+          pageSize:
+            type: integer
+            description: 'The amount of elements per page. If not set by the request this value defaults to the server''s system
+
+              settings.'
+            minimum: 0
+          offset:
+            type: integer
+            description: The page offset indicating on which page the element collection starts.
+            minimum: 0
           _links:
-            allOf:
-            - $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
-            - type: object
-              properties:
-                representations:
-                  type: array
-                  items:
-                    allOf:
-                    - $ref: '#/components/schemas/Link'
-                    - description: A project collection representation in a specific file format.
-          _embedded:
-            type: object
-            required:
-            - elements
-            properties:
-              elements:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ProjectModel'
+            $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
+    CustomFieldProperties:
+      type: object
+      patternProperties:
+        ^customField\d+$:
+          type:
+          - 'null'
+          - number
+          - boolean
+          - string
+          - object
+          description: 'A custom field value, that belongs to a custom field of a simple type:
+
+
+            - Boolean
+
+            - Date
+
+            - Float
+
+            - Integer
+
+            - Link (URL)
+
+            - Text
+
+            - Long text'
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
+    SchemaPropertyModel:
+      type: object
+      required:
+      - type
+      - name
+      - required
+      - hasDefault
+      - writable
+      properties:
+        type:
+          type: string
+          description: The resource type for this property.
+        name:
+          type: string
+          description: The name of the property.
+        required:
+          type: boolean
+          description: Indicates, if the property is required for submitting a request of this schema.
+        hasDefault:
+          type: boolean
+          description: Indicates, if the property has a default.
+        writable:
+          type: boolean
+          description: Indicates, if the property is writable when sending a request of this schema.
+        options:
+          type: object
+          description: Additional options for the property.
+        location:
+          type: string
+          description: Defines the json path where the property is located in the payload.
+          default: ''
+        placeholder:
+          type: string
+          description: A placeholder for the property to display if the property has no value.
+        _links:
+          type: object
+          description: Useful links for this property (e.g. an endpoint to fetch allowed values)
     OffsetPaginatedCollectionLinks:
       allOf:
       - $ref: '#/components/schemas/CollectionLinks'
@@ -1613,323 +1812,17 @@ components:
                 # Conditions
 
                 - The collection is not on the last page.'
-    ProjectModel:
-      allOf:
-      - $ref: '#/components/schemas/CustomFieldProperties'
-      - $ref: '#/components/schemas/CustomCommentProperties'
-      - type: object
-        properties:
-          _type:
-            type: string
-            enum:
-            - Project
-          id:
-            type: integer
-            description: Projects' id
-            minimum: 1
-          identifier:
-            type: string
-          name:
-            type: string
-          active:
-            type: boolean
-            description: Indicates whether the project is currently active or already archived
-          favorited:
-            type: boolean
-            description: Indicates whether the project is favorited by the current user
-          statusExplanation:
-            allOf:
-            - $ref: '#/components/schemas/Formattable'
-            - description: A text detailing and explaining why the project has the reported status
-          public:
-            type: boolean
-            description: Indicates whether the project is accessible for everybody
-          description:
-            $ref: '#/components/schemas/Formattable'
-          createdAt:
-            type: string
-            format: date-time
-            description: Time of creation. Can be writable by admins with the `apiv3_write_readonly_attributes` setting enabled.
-          updatedAt:
-            type: string
-            format: date-time
-            description: Time of the most recent change to the project
-          _links:
-            type: object
-            required:
-            - self
-            - categories
-            properties:
-              update:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Form endpoint that aids in updating this project
-
-
-                    # Conditions
-
-
-                    **Permission**: edit workspace'
-              updateImmediately:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Directly update this project
-
-
-                    # Conditions
-
-
-                    **Permission**: edit workspace'
-              delete:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Delete this project
-
-
-                    # Conditions
-
-
-                    **Permission**: admin'
-              favor:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Mark this project as favorited by the current user
-
-
-                    # Conditions
-
-
-                    Only present if the project is not yet favorited
-
-
-                    Permission**: none but login is required'
-              disfavor:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Mark this project as not favorited by the current user
-
-
-                    # Conditions
-
-                    Only present if the project is favorited by the current user
-
-
-                    Permission**: none but login is required'
-              createWorkPackage:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Form endpoint that aids in preparing and creating a work package
-
-
-                    # Conditions
-
-
-                    **Permission**: add work packages'
-              createWorkPackageImmediately:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Directly creates a work package in the project
-
-
-                    # Conditions
-
-
-                    **Permission**: add work packages'
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'This project
-
-
-                    **Resource**: Project'
-              categories:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Categories available in this project
-
-
-                    **Resource**: Collection'
-              types:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Types available in this project
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view work packages or manage types'
-              versions:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Versions available in this project
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view work packages or manage versions'
-              memberships:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Memberships in the project
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view members'
-              workPackages:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Work Packages of this project
-
-
-                    **Resource**: Collection'
-              parent:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Parent of the project
-
-
-                    **Resource**: Workspace
-
-
-                    # Conditions
-
-
-                    **Permission** edit workspace'
-              status:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Denotes the status of the project, so whether the project is on track, at risk or is having trouble.
-
-
-                    **Resource**: ProjectStatus
-
-
-                    # Conditions
-
-
-                    **Permission** edit workspace'
-              storages:
-                type: array
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/Link'
-                  - description: 'The link to a storage that is active for this project.
-
-
-                      **Resource**: Storage
-
-
-                      # Conditions
-
-
-                      **Permission**: view_file_links'
-              projectStorages:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'The project storage collection of this project.
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view_file_links'
-              ancestors:
-                type: array
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/Link'
-                  - description: 'A collection of links to the ancestor workspaces.
-
-
-                      **Resource**: Workspace'
-    CustomFieldProperties:
+    CustomCommentProperties:
       type: object
       patternProperties:
-        ^customField\d+$:
+        ^customComment\d+$:
           type:
           - 'null'
-          - number
-          - boolean
           - string
-          - object
-          description: 'A custom field value, that belongs to a custom field of a simple type:
+          description: 'A plain-text comment associated with a project custom field that has comments enabled.
 
 
-            - Boolean
-
-            - Date
-
-            - Float
-
-            - Integer
-
-            - Link (URL)
-
-            - Text
-
-            - Long text'
-    List_workspaces_by_versionModel:
-      type: object
-      example:
-        _links:
-          self:
-            href: /api/v3/versions/2/workspaces
-        total: 1
-        count: 1
-        _type: Collection
-        _embedded:
-          elements:
-          - _type: Project
-            _links:
-              self:
-                href: /api/v3/projects/1
-                title: Lorem
-              categories:
-                href: /api/v3/projects/1/categories
-              versions:
-                href: /api/v3/projects/1/versions
-              status:
-                href: /api/v3/project_statuses/on_track
-                title: On track
-            id: 1
-            identifier: project_identifier
-            name: Project example
-            description:
-              format: markdown
-              raw: Lorem **ipsum** dolor sit amet
-              html: <p>Lorem <strong>ipsum</strong> dolor sit amet</p>
-            active: true
-            statusExplanation:
-              format: markdown
-              raw: Everything **fine**
-              html: <p>Everything <strong>fine</strong></p>
-            createdAt: '2014-05-21T08:51:20.142Z'
-            updatedAt: '2014-05-21T08:51:20.142Z'
-    View_project_statusModel:
-      type: object
-      example:
-        _type: ProjectStatus
-        id: on_track
-        name: On track
-        _links:
-          self:
-            href: /api/v3/project_statuses/on_track
+            The property is only present when the corresponding `customField{N}` has `has_comment` set to `true`.'
     ProgramModel:
       allOf:
       - $ref: '#/components/schemas/CustomFieldProperties'
@@ -2175,288 +2068,251 @@ components:
 
 
                       **Resource**: Workspace'
-    Workspaces_schemaModel:
-      type: object
-      description: A schema for a workspace. This schema defines the attributes of a workspace.
-      properties:
-        _type:
-          type: string
-          enum:
-          - Schema
-          description: The type identifier for this resource
-        _dependencies:
-          type: array
-          description: Schema dependencies (currently empty for workspaces)
-        _attributeGroups:
-          type: array
-          items:
-            type: object
-            properties:
-              _type:
-                type: string
-                enum:
-                - ProjectFormCustomFieldSection
-                description: The type identifier for this resource
-              id:
-                type: integer
-                description: The unique identifier of the custom field section
-              name:
-                type: string
-                description: The human-readable name of the custom field section
-              attributes:
-                type: array
-                items:
-                  type: string
-                description: 'Array of camelCase custom field attribute names belonging to this section.
-
-                  Only includes custom fields visible to the current user.'
-          description: "Defines the organizational structure of project custom fields into sections for UI rendering.\n\nEach attribute group represents a project attribute section containing related project attributes.\nThe sections determine how project attributes are visually organized and grouped in forms.\n\n**Key behaviors:**\n- Admin-only project attributes appear only for users with admin privileges\n- Empty sections (with no accessible project attributes) are omitted from the response\n- The order reflects the configured section positioning in admin settings\n- Each section contains only project attributes assigned to that specific section\n\n**Example structure:**\n```json\n[\n  {\n    \"_type\": \"ProjectFormCustomFieldSection\",\n    \"name\": \"Project Details\",\n    \"attributes\": [\"customField1\", \"customField3\"]\n  },\n  {\n    \"_type\": \"ProjectFormCustomFieldSection\",\n    \"name\": \"Budget Information\",\n    \"attributes\": [\"customField2\", \"customField4\"]\n  }\n]\n```"
-        id:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        name:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        identifier:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        description:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        public:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        active:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        status:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        statusExplanation:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        parent:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        createdAt:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        updatedAt:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        _links:
-          type: object
-          description: Links related to this resource
-          properties:
-            self:
-              type: object
-              properties:
-                href:
-                  type: string
-                  example: /api/v3/workspaces/schema
-      patternProperties:
-        ^customField\d+$:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        ^customComment\d+$:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-      example:
-        _type: Schema
-        _dependencies: []
-        _attributeGroups:
-        - _type: ProjectFormCustomFieldSection
-          name: Project Details
-          attributes:
-          - customField30
-          - customField34
-        - _type: ProjectFormCustomFieldSection
-          name: Budget Information
-          attributes:
-          - customField31
-          - customField32
-          - customField35
-        id:
-          type: Integer
-          name: ID
-          required: true
-          hasDefault: false
-          writable: false
-        name:
-          type: String
-          name: Name
-          required: true
-          hasDefault: false
-          writable: true
-          minLength: 1
-          maxLength: 255
-        identifier:
-          type: String
-          name: Identifier
-          required: true
-          hasDefault: false
-          writable: true
-          minLength: 1
-          maxLength: 100
-        description:
-          type: Formattable
-          name: Description
-          required: false
-          hasDefault: false
-          writable: true
-        public:
-          type: Boolean
-          name: Public
-          required: true
-          hasDefault: false
-          writable: true
-        active:
-          type: Boolean
-          name: Active
-          required: true
-          hasDefault: true
-          writable: true
-        status:
-          type: ProjectStatus
-          name: Status
-          required: false
-          hasDefault: true
-          writable: true
-          _links:
-            allowedValues:
-            - href: /api/v3/project_statuses/on_track
-              title: On track
-            - href: /api/v3/project_statuses/at_risk
-              title: At risk
-            - href: /api/v3/project_statuses/off_track
-              title: Off track
-        statusExplanation:
-          type: Formattable
-          name: Status explanation
-          required: false
-          hasDefault: false
-          writable: true
-        parent:
-          type: Workspace
-          name: Subproject of
-          required: false
-          hasDefault: false
-          writable: true
-          location: _links
-          visibility: default
-          _links: {}
-        createdAt:
-          type: DateTime
-          name: Created on
-          required: true
-          hasDefault: false
-          writable: false
-        updatedAt:
-          type: DateTime
-          name: Updated on
-          required: true
-          hasDefault: false
-          writable: false
-        customField30:
-          type: Integer
-          name: Integer project custom field
-          required: false
-          hasDefault: false
-          writable: true
-          visibility: default
-        customField31:
-          type: CustomOption
-          name: List project custom field
-          required: false
-          hasDefault: false
-          writable: true
-          location: _links
-          visibility: default
-          _links: {}
-        customField32:
-          type: Version
-          name: Version project custom field
-          required: false
-          hasDefault: false
-          writable: true
-          location: _links
-          visibility: default
-          _links: {}
-        customField34:
-          type: Boolean
-          name: Boolean project custom field
-          required: false
-          hasDefault: false
-          writable: true
-          visibility: default
-        customField35:
-          type: String
-          name: Text project custom field
-          required: true
-          hasDefault: false
-          writable: true
-          visibility: default
-        customComment35:
-          type: String
-          name: Text project custom field comment
-          required: false
-          hasDefault: false
-          writable: true
-        _links:
-          self:
-            href: /api/v3/workspaces/schema
-    CustomCommentProperties:
-      type: object
-      patternProperties:
-        ^customComment\d+$:
-          type:
-          - 'null'
-          - string
-          description: 'A plain-text comment associated with a project custom field that has comments enabled.
-
-
-            The property is only present when the corresponding `customField{N}` has `has_comment` set to `true`.'
-    CollectionLinks:
-      type: object
-      required:
-      - self
-      properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This collection resource.
-
-
-              **Resource**: Collection'
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
-          type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
-    ProjectConfigurationModel:
+    ProjectModel:
       allOf:
-      - $ref: '#/components/schemas/ConfigurationModel'
+      - $ref: '#/components/schemas/CustomFieldProperties'
+      - $ref: '#/components/schemas/CustomCommentProperties'
       - type: object
         properties:
-          enabledInternalComments:
+          _type:
+            type: string
+            enum:
+            - Project
+          id:
+            type: integer
+            description: Projects' id
+            minimum: 1
+          identifier:
+            type: string
+          name:
+            type: string
+          active:
             type: boolean
-            description: Whether internal comments are enabled for this project
-            readOnly: true
+            description: Indicates whether the project is currently active or already archived
+          favorited:
+            type: boolean
+            description: Indicates whether the project is favorited by the current user
+          statusExplanation:
+            allOf:
+            - $ref: '#/components/schemas/Formattable'
+            - description: A text detailing and explaining why the project has the reported status
+          public:
+            type: boolean
+            description: Indicates whether the project is accessible for everybody
+          description:
+            $ref: '#/components/schemas/Formattable'
+          createdAt:
+            type: string
+            format: date-time
+            description: Time of creation. Can be writable by admins with the `apiv3_write_readonly_attributes` setting enabled.
+          updatedAt:
+            type: string
+            format: date-time
+            description: Time of the most recent change to the project
+          _links:
+            type: object
+            required:
+            - self
+            - categories
+            properties:
+              update:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Form endpoint that aids in updating this project
+
+
+                    # Conditions
+
+
+                    **Permission**: edit workspace'
+              updateImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Directly update this project
+
+
+                    # Conditions
+
+
+                    **Permission**: edit workspace'
+              delete:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Delete this project
+
+
+                    # Conditions
+
+
+                    **Permission**: admin'
+              favor:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Mark this project as favorited by the current user
+
+
+                    # Conditions
+
+
+                    Only present if the project is not yet favorited
+
+
+                    Permission**: none but login is required'
+              disfavor:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Mark this project as not favorited by the current user
+
+
+                    # Conditions
+
+                    Only present if the project is favorited by the current user
+
+
+                    Permission**: none but login is required'
+              createWorkPackage:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Form endpoint that aids in preparing and creating a work package
+
+
+                    # Conditions
+
+
+                    **Permission**: add work packages'
+              createWorkPackageImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Directly creates a work package in the project
+
+
+                    # Conditions
+
+
+                    **Permission**: add work packages'
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This project
+
+
+                    **Resource**: Project'
+              categories:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Categories available in this project
+
+
+                    **Resource**: Collection'
+              types:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Types available in this project
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view work packages or manage types'
+              versions:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Versions available in this project
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view work packages or manage versions'
+              memberships:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Memberships in the project
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view members'
+              workPackages:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Work Packages of this project
+
+
+                    **Resource**: Collection'
+              parent:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Parent of the project
+
+
+                    **Resource**: Workspace
+
+
+                    # Conditions
+
+
+                    **Permission** edit workspace'
+              status:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Denotes the status of the project, so whether the project is on track, at risk or is having trouble.
+
+
+                    **Resource**: ProjectStatus
+
+
+                    # Conditions
+
+
+                    **Permission** edit workspace'
+              storages:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'The link to a storage that is active for this project.
+
+
+                      **Resource**: Storage
+
+
+                      # Conditions
+
+
+                      **Permission**: view_file_links'
+              projectStorages:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The project storage collection of this project.
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view_file_links'
+              ancestors:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'A collection of links to the ancestor workspaces.
+
+
+                      **Resource**: Workspace'
     ConfigurationModel:
       type: object
       properties:
@@ -2482,80 +2338,6 @@ components:
           description: The list of all feature flags that are active
           items:
             type: string
-    Formattable:
-      type: object
-      required:
-      - format
-      properties:
-        format:
-          type: string
-          enum:
-          - plain
-          - markdown
-          - custom
-          readOnly: true
-          description: Indicates the formatting language of the raw text
-          example: markdown
-        raw:
-          type: string
-          description: The raw text, as entered by the user
-          example: I **am** formatted!
-        html:
-          type: string
-          readOnly: true
-          description: The text converted to HTML according to the format
-          example: I <strong>am</strong> formatted!
-      example:
-        format: markdown
-        raw: I am formatted!
-        html: I am formatted!
-    OffsetPaginatedCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - pageSize
-        - offset
-        - _links
-        properties:
-          pageSize:
-            type: integer
-            description: 'The amount of elements per page. If not set by the request this value defaults to the server''s system
-
-              settings.'
-            minimum: 0
-          offset:
-            type: integer
-            description: The page offset indicating on which page the element collection starts.
-            minimum: 0
-          _links:
-            $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
-    ErrorResponse:
-      type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
     CollectionModel:
       type: object
       required:
@@ -2578,39 +2360,6 @@ components:
           minimum: 0
         _links:
           $ref: '#/components/schemas/CollectionLinks'
-    List_available_parent_project_candidatesModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'The project collection
-
-
-                    **Resource**: ProjectCollection'
-                  readOnly: true
-          _embedded:
-            type: object
-            properties:
-              elements:
-                type: array
-                readOnly: true
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/ProjectModel'
-                  - $ref: '#/components/schemas/ProgramModel'
-                  - $ref: '#/components/schemas/PortfolioModel'
-                description: Collection of projects
     PortfolioModel:
       allOf:
       - $ref: '#/components/schemas/CustomFieldProperties'
@@ -2856,154 +2605,412 @@ components:
 
 
                       **Resource**: Portfolio'
-    SchemaPropertyModel:
+    ProjectConfigurationModel:
+      allOf:
+      - $ref: '#/components/schemas/ConfigurationModel'
+      - type: object
+        properties:
+          enabledInternalComments:
+            type: boolean
+            description: Whether internal comments are enabled for this project
+            readOnly: true
+    Workspaces_schemaModel:
+      type: object
+      description: A schema for a workspace. This schema defines the attributes of a workspace.
+      properties:
+        _type:
+          type: string
+          enum:
+          - Schema
+          description: The type identifier for this resource
+        _dependencies:
+          type: array
+          description: Schema dependencies (currently empty for workspaces)
+        _attributeGroups:
+          type: array
+          items:
+            type: object
+            properties:
+              _type:
+                type: string
+                enum:
+                - ProjectFormCustomFieldSection
+                description: The type identifier for this resource
+              id:
+                type: integer
+                description: The unique identifier of the custom field section
+              name:
+                type: string
+                description: The human-readable name of the custom field section
+              attributes:
+                type: array
+                items:
+                  type: string
+                description: 'Array of camelCase custom field attribute names belonging to this section.
+
+                  Only includes custom fields visible to the current user.'
+          description: "Defines the organizational structure of project custom fields into sections for UI rendering.\n\nEach attribute group represents a project attribute section containing related project attributes.\nThe sections determine how project attributes are visually organized and grouped in forms.\n\n**Key behaviors:**\n- Admin-only project attributes appear only for users with admin privileges\n- Empty sections (with no accessible project attributes) are omitted from the response\n- The order reflects the configured section positioning in admin settings\n- Each section contains only project attributes assigned to that specific section\n\n**Example structure:**\n```json\n[\n  {\n    \"_type\": \"ProjectFormCustomFieldSection\",\n    \"name\": \"Project Details\",\n    \"attributes\": [\"customField1\", \"customField3\"]\n  },\n  {\n    \"_type\": \"ProjectFormCustomFieldSection\",\n    \"name\": \"Budget Information\",\n    \"attributes\": [\"customField2\", \"customField4\"]\n  }\n]\n```"
+        id:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        name:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        identifier:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        description:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        public:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        active:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        status:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        statusExplanation:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        parent:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        createdAt:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        updatedAt:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        _links:
+          type: object
+          description: Links related to this resource
+          properties:
+            self:
+              type: object
+              properties:
+                href:
+                  type: string
+                  example: /api/v3/workspaces/schema
+      patternProperties:
+        ^customField\d+$:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        ^customComment\d+$:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+      example:
+        _type: Schema
+        _dependencies: []
+        _attributeGroups:
+        - _type: ProjectFormCustomFieldSection
+          name: Project Details
+          attributes:
+          - customField30
+          - customField34
+        - _type: ProjectFormCustomFieldSection
+          name: Budget Information
+          attributes:
+          - customField31
+          - customField32
+          - customField35
+        id:
+          type: Integer
+          name: ID
+          required: true
+          hasDefault: false
+          writable: false
+        name:
+          type: String
+          name: Name
+          required: true
+          hasDefault: false
+          writable: true
+          minLength: 1
+          maxLength: 255
+        identifier:
+          type: String
+          name: Identifier
+          required: true
+          hasDefault: false
+          writable: true
+          minLength: 1
+          maxLength: 100
+        description:
+          type: Formattable
+          name: Description
+          required: false
+          hasDefault: false
+          writable: true
+        public:
+          type: Boolean
+          name: Public
+          required: true
+          hasDefault: false
+          writable: true
+        active:
+          type: Boolean
+          name: Active
+          required: true
+          hasDefault: true
+          writable: true
+        status:
+          type: ProjectStatus
+          name: Status
+          required: false
+          hasDefault: true
+          writable: true
+          _links:
+            allowedValues:
+            - href: /api/v3/project_statuses/on_track
+              title: On track
+            - href: /api/v3/project_statuses/at_risk
+              title: At risk
+            - href: /api/v3/project_statuses/off_track
+              title: Off track
+        statusExplanation:
+          type: Formattable
+          name: Status explanation
+          required: false
+          hasDefault: false
+          writable: true
+        parent:
+          type: Workspace
+          name: Subproject of
+          required: false
+          hasDefault: false
+          writable: true
+          location: _links
+          visibility: default
+          _links: {}
+        createdAt:
+          type: DateTime
+          name: Created on
+          required: true
+          hasDefault: false
+          writable: false
+        updatedAt:
+          type: DateTime
+          name: Updated on
+          required: true
+          hasDefault: false
+          writable: false
+        customField30:
+          type: Integer
+          name: Integer project custom field
+          required: false
+          hasDefault: false
+          writable: true
+          visibility: default
+        customField31:
+          type: CustomOption
+          name: List project custom field
+          required: false
+          hasDefault: false
+          writable: true
+          location: _links
+          visibility: default
+          _links: {}
+        customField32:
+          type: Version
+          name: Version project custom field
+          required: false
+          hasDefault: false
+          writable: true
+          location: _links
+          visibility: default
+          _links: {}
+        customField34:
+          type: Boolean
+          name: Boolean project custom field
+          required: false
+          hasDefault: false
+          writable: true
+          visibility: default
+        customField35:
+          type: String
+          name: Text project custom field
+          required: true
+          hasDefault: false
+          writable: true
+          visibility: default
+        customComment35:
+          type: String
+          name: Text project custom field comment
+          required: false
+          hasDefault: false
+          writable: true
+        _links:
+          self:
+            href: /api/v3/workspaces/schema
+    Formattable:
       type: object
       required:
-      - type
-      - name
-      - required
-      - hasDefault
-      - writable
+      - format
       properties:
-        type:
+        format:
           type: string
-          description: The resource type for this property.
-        name:
+          enum:
+          - plain
+          - markdown
+          - custom
+          readOnly: true
+          description: Indicates the formatting language of the raw text
+          example: markdown
+        raw:
           type: string
-          description: The name of the property.
-        required:
-          type: boolean
-          description: Indicates, if the property is required for submitting a request of this schema.
-        hasDefault:
-          type: boolean
-          description: Indicates, if the property has a default.
-        writable:
-          type: boolean
-          description: Indicates, if the property is writable when sending a request of this schema.
-        options:
+          description: The raw text, as entered by the user
+          example: I **am** formatted!
+        html:
+          type: string
+          readOnly: true
+          description: The text converted to HTML according to the format
+          example: I <strong>am</strong> formatted!
+      example:
+        format: markdown
+        raw: I am formatted!
+        html: I am formatted!
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
           type: object
-          description: Additional options for the property.
-        location:
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
           type: string
-          description: Defines the json path where the property is located in the payload.
-          default: ''
-        placeholder:
+          enum:
+          - Error
+        errorIdentifier:
           type: string
-          description: A placeholder for the property to display if the property has no value.
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
+    View_project_statusModel:
+      type: object
+      example:
+        _type: ProjectStatus
+        id: on_track
+        name: On track
         _links:
-          type: object
-          description: Useful links for this property (e.g. an endpoint to fetch allowed values)
-  examples:
-    ProjectCollection:
-      value:
+          self:
+            href: /api/v3/project_statuses/on_track
+    List_available_parent_project_candidatesModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The project collection
+
+
+                    **Resource**: ProjectCollection'
+                  readOnly: true
+          _embedded:
+            type: object
+            properties:
+              elements:
+                type: array
+                readOnly: true
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/ProjectModel'
+                  - $ref: '#/components/schemas/ProgramModel'
+                  - $ref: '#/components/schemas/PortfolioModel'
+                description: Collection of projects
+    ProjectCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/OffsetPaginatedCollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            allOf:
+            - $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
+            - type: object
+              properties:
+                representations:
+                  type: array
+                  items:
+                    allOf:
+                    - $ref: '#/components/schemas/Link'
+                    - description: A project collection representation in a specific file format.
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectModel'
+    List_workspaces_by_versionModel:
+      type: object
+      example:
+        _links:
+          self:
+            href: /api/v3/versions/2/workspaces
+        total: 1
+        count: 1
         _type: Collection
-        count: 2
-        total: 2
-        pageSize: 20
-        offset: 1
         _embedded:
           elements:
-          - _abbreviated: Project resource shortened for brevity
+          - _type: Project
+            _links:
+              self:
+                href: /api/v3/projects/1
+                title: Lorem
+              categories:
+                href: /api/v3/projects/1/categories
+              versions:
+                href: /api/v3/projects/1/versions
+              status:
+                href: /api/v3/project_statuses/on_track
+                title: On track
             id: 1
-            identifier: initialproject
-            name: DeathStar construction
+            identifier: project_identifier
+            name: Project example
+            description:
+              format: markdown
+              raw: Lorem **ipsum** dolor sit amet
+              html: <p>Lorem <strong>ipsum</strong> dolor sit amet</p>
             active: true
-            public: true
-          - _abbreviated: Project resource shortened for brevity
-            id: 2
-            identifier: mysecret
-            name: Palpatine's secret plan
-            active: true
-            public: false
-        _links:
-          self:
-            href: /api/v3/projects?filters=%5B%5D&offset=1&pageSize=20
-          jumpTo:
-            href: /api/v3/projects?filters=%5B%5D&offset=%7Boffset%7D&pageSize=20
-            templated: true
-          changeSize:
-            href: /api/v3/projects?filters=%5B%5D&offset=1&pageSize=%7Bsize%7D
-            templated: true
-          representations:
-          - href: /projects.csv?filters=%5B%5D&offset=1&pageSize=20
-            identifier: csv
-            type: text/csv
-            title: CSV
-          - href: /projects.xls?filters=%5B%5D&offset=1&pageSize=20
-            identifier: xls
-            type: application/vnd.ms-excel
-            title: XLS
-    Project:
-      value:
-        _type: Project
-        _links:
-          self:
-            href: /api/v3/projects/1
-            title: Lorem
-          createWorkPackage:
-            href: /api/v3/projects/1/work_packages/form
-            method: post
-          createWorkPackageImmediate:
-            href: /api/v3/projects/1/work_packages
-            method: post
-          categories:
-            href: /api/v3/projects/1/categories
-          types:
-            href: /api/v3/projects/1/types
-          versions:
-            href: /api/v3/projects/1/versions
-          workPackages:
-            href: /api/v3/projects/1/work_packages
-          memberships:
-            href: /api/v3/memberships?filters=[{"project":{"operator":"=","values":["1"]}}]
-          customField456:
-            href: /api/v3/users/315
-            title: A user
-          parent:
-            href: /api/v3/projects/123
-            title: Parent project
-          ancestors:
-          - href: /api/v3/portfolios/2
-            title: Root portfolios
-          - href: /api/v3/programs/12
-            title: Grandparent program
-          - href: /api/v3/projects/123
-            title: Parent project
-          status:
-            href: /api/v3/project_statuses/on_track
-            title: On track
-        id: 1
-        identifier: project_example
-        name: Project example
-        active: true
-        public: false
-        statusExplanation:
-          format: markdown
-          raw: Everything **fine**
-          html: <p>Everything <strong>fine</strong></p>
-        description:
-          format: markdown
-          raw: Lorem **ipsum** dolor sit amet
-          html: <p>Lorem <strong>ipsum</strong> dolor sit amet</p>
-        createdAt: '2014-05-21T08:51:20.396Z'
-        updatedAt: '2014-05-21T08:51:20.396Z'
-        customField123: 123
-        customComment123: Why is the value 123?
-    ProjectBody:
-      value:
-        name: Project example
-        statusExplanation:
-          raw: Everything **fine**
-        description:
-          raw: Lorem **ipsum** dolor sit amet
-        customField123: 123
-        customComment123: Because it is 123!
-        _links:
-          parent:
-            href: /api/v3/projects/123
-          customField456:
-            href: /api/v3/users/315
+            statusExplanation:
+              format: markdown
+              raw: Everything **fine**
+              html: <p>Everything <strong>fine</strong></p>
+            createdAt: '2014-05-21T08:51:20.142Z'
+            updatedAt: '2014-05-21T08:51:20.142Z'
   responses:
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
     UnsupportedMediaType:
       description: Occurs when the client sends an unsupported Content-Type header.
       content:
@@ -3024,13 +3031,6 @@ components:
             _type: Error
             errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
             message: The request body was not a single JSON object.
-    MissingContentType:
-      description: Occurs when the client did not send a Content-Type header
-      content:
-        text/plain:
-          schema:
-            type: string
-          example: Missing content-type header
   securitySchemes:
     BasicAuth:
       type: http

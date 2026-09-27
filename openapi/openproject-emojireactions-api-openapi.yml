@@ -206,32 +206,39 @@ paths:
             That''s why a 404 is returned here, even if a 403 might be more appropriate.*'
 components:
   schemas:
-    ErrorResponse:
+    Link:
       type: object
       required:
-      - _type
-      - errorIdentifier
-      - message
+      - href
       properties:
-        _embedded:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
           type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
+          description: The payload to send in the request to achieve the desired result
+        identifier:
           type: string
-          enum:
-          - Error
-        errorIdentifier:
+          description: An optional unique identifier to the link object
+        type:
           type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
     EmojiReactionModel:
       type: object
       properties:
@@ -296,39 +303,32 @@ components:
             title: Jane Smith
           - href: /api/v3/users/437
             title: Bob Johnson
-    Link:
+    ErrorResponse:
       type: object
       required:
-      - href
+      - _type
+      - errorIdentifier
+      - message
       properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
-          type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
+        _embedded:
           type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
           type: string
-          description: An optional unique identifier to the link object
-        type:
+          enum:
+          - Error
+        errorIdentifier:
           type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
     EmojiReactions_Model:
       type: object
       properties:

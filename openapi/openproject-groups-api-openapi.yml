@@ -322,6 +322,125 @@ paths:
                 message: Member is already taken.
 components:
   schemas:
+    CollectionModel:
+      type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
+    CustomFieldProperties:
+      type: object
+      patternProperties:
+        ^customField\d+$:
+          type:
+          - 'null'
+          - number
+          - boolean
+          - string
+          - object
+          description: 'A custom field value, that belongs to a custom field of a simple type:
+
+
+            - Boolean
+
+            - Date
+
+            - Float
+
+            - Integer
+
+            - Link (URL)
+
+            - Text
+
+            - Long text'
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
     GroupCollectionModel:
       allOf:
       - $ref: '#/components/schemas/CollectionModel'
@@ -385,73 +504,60 @@ components:
                 title: ST-C-334
           - _abbreviated: Group resource shortened for brevity
             id: 1338
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
-          type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
-    CollectionLinks:
-      type: object
-      required:
-      - self
-      properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This collection resource.
-
-
-              **Resource**: Collection'
-    CollectionModel:
+    PrincipalModel:
       type: object
       required:
       - _type
-      - total
-      - count
+      - id
+      - name
       - _links
       properties:
         _type:
           type: string
           enum:
-          - Collection
-        total:
+          - User
+          - Group
+          - PlaceholderUser
+        id:
           type: integer
-          description: The total amount of elements available in the collection.
-          minimum: 0
-        count:
-          type: integer
-          description: Actual amount of elements in this response.
-          minimum: 0
+          description: The principal's unique identifier.
+          minimum: 1
+        name:
+          type: string
+          description: The principal's display name, layout depends on instance settings.
+        createdAt:
+          type: string
+          format: date-time
+          description: Time of creation
+        updatedAt:
+          type: string
+          format: date-time
+          description: Time of the most recent change to the principal
         _links:
-          $ref: '#/components/schemas/CollectionLinks'
+          type: object
+          required:
+          - self
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This principal resource.
+
+
+                  **Resource**: User|Group|PlaceholderUser'
+            memberships:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'An href to the collection of the principal''s memberships.
+
+
+                  # Conditions:
+
+
+                  - user has permission `view_members` or `manage_members` in any project
+
+
+                  **Resource**: Collection'
     GroupModel:
       allOf:
       - $ref: '#/components/schemas/PrincipalModel'
@@ -528,111 +634,6 @@ components:
 
 
                     **Resource**: Group'
-    GroupWriteModel:
-      type: object
-      properties:
-        name:
-          type: string
-          description: The new group name.
-        _links:
-          type: object
-          properties:
-            members:
-              type: array
-              items:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'A new member for the group.
-
-
-                    **Resource**: User'
-      example:
-        name: Emperor's guard
-        _links:
-          members:
-          - href: /api/v3/users/42
-          - href: /api/v3/users/43
-          - href: /api/v3/users/44
-    PrincipalModel:
-      type: object
-      required:
-      - _type
-      - id
-      - name
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - User
-          - Group
-          - PlaceholderUser
-        id:
-          type: integer
-          description: The principal's unique identifier.
-          minimum: 1
-        name:
-          type: string
-          description: The principal's display name, layout depends on instance settings.
-        createdAt:
-          type: string
-          format: date-time
-          description: Time of creation
-        updatedAt:
-          type: string
-          format: date-time
-          description: Time of the most recent change to the principal
-        _links:
-          type: object
-          required:
-          - self
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This principal resource.
-
-
-                  **Resource**: User|Group|PlaceholderUser'
-            memberships:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'An href to the collection of the principal''s memberships.
-
-
-                  # Conditions:
-
-
-                  - user has permission `view_members` or `manage_members` in any project
-
-
-                  **Resource**: Collection'
-    CustomFieldProperties:
-      type: object
-      patternProperties:
-        ^customField\d+$:
-          type:
-          - 'null'
-          - number
-          - boolean
-          - string
-          - object
-          description: 'A custom field value, that belongs to a custom field of a simple type:
-
-
-            - Boolean
-
-            - Date
-
-            - Float
-
-            - Integer
-
-            - Link (URL)
-
-            - Text
-
-            - Long text'
     UserModel:
       allOf:
       - $ref: '#/components/schemas/PrincipalModel'
@@ -810,32 +811,31 @@ components:
                     - LDAP authentication configured
 
                     - `admin`'
-    ErrorResponse:
+    GroupWriteModel:
       type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
       properties:
-        _embedded:
+        name:
+          type: string
+          description: The new group name.
+        _links:
           type: object
           properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
+            members:
+              type: array
+              items:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'A new member for the group.
+
+
+                    **Resource**: User'
+      example:
+        name: Emperor's guard
+        _links:
+          members:
+          - href: /api/v3/users/42
+          - href: /api/v3/users/43
+          - href: /api/v3/users/44
   responses:
     MissingContentType:
       description: Occurs when the client did not send a Content-Type header

@@ -827,51 +827,6 @@ paths:
             or if the requesting user does not have permission to view it.'
 components:
   schemas:
-    CollectionLinks:
-      type: object
-      required:
-      - self
-      properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This collection resource.
-
-
-              **Resource**: Collection'
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
-          type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
     CollectionModel:
       type: object
       required:
@@ -894,61 +849,6 @@ components:
           minimum: 0
         _links:
           $ref: '#/components/schemas/CollectionLinks'
-    UserNonWorkingTimeModel:
-      type: object
-      required:
-      - _type
-      - id
-      - startDate
-      - endDate
-      properties:
-        _type:
-          type: string
-          enum:
-          - UserNonWorkingTime
-        id:
-          type: integer
-          description: The unique identifier of the non-working time record.
-          minimum: 1
-        startDate:
-          type: string
-          format: date
-          description: The first date of the non-working time range in ISO 8601 format (YYYY-MM-DD).
-        endDate:
-          type: string
-          format: date
-          description: 'The last date of the non-working time range in ISO 8601 format (YYYY-MM-DD).
-
-            Must be greater than or equal to `startDate`.'
-        _links:
-          type: object
-          required:
-          - self
-          - user
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This non-working time record.
-
-                  **Resource**: UserNonWorkingTime'
-            user:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The user this non-working time belongs to.
-
-                  **Resource**: User'
-      example:
-        _type: UserNonWorkingTime
-        id: 7
-        startDate: '2025-06-16'
-        endDate: '2025-06-20'
-        _links:
-          self:
-            href: /api/v3/users/42/non_working_times/7
-          user:
-            href: /api/v3/users/42
-            title: Jane Doe
     UserWorkingHoursModel:
       type: object
       required:
@@ -1056,6 +956,190 @@ components:
           user:
             href: /api/v3/users/42
             title: Jane Doe
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
+    UserNonWorkingTimeCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This collection of non-working times records.
+
+                    **Resource**: UserNonWorkingTimeCollectionModel'
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                description: The array of personal non-working times for the user, ordered by start date ascending.
+                items:
+                  $ref: '#/components/schemas/UserNonWorkingTimeModel'
+      example:
+        _type: Collection
+        total: 2
+        count: 2
+        _links:
+          self:
+            href: /api/v3/users/42/non_working_times
+        _embedded:
+          elements:
+          - _type: UserNonWorkingTime
+            id: 7
+            startDate: '2025-06-16'
+            endDate: '2025-06-20'
+            _links:
+              self:
+                href: /api/v3/users/42/non_working_times/7
+              user:
+                href: /api/v3/users/42
+                title: Jane Doe
+          - _type: UserNonWorkingTime
+            id: 8
+            startDate: '2025-12-24'
+            endDate: '2025-12-24'
+            _links:
+              self:
+                href: /api/v3/users/42/non_working_times/8
+              user:
+                href: /api/v3/users/42
+                title: Jane Doe
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
+    UserNonWorkingTimeModel:
+      type: object
+      required:
+      - _type
+      - id
+      - startDate
+      - endDate
+      properties:
+        _type:
+          type: string
+          enum:
+          - UserNonWorkingTime
+        id:
+          type: integer
+          description: The unique identifier of the non-working time record.
+          minimum: 1
+        startDate:
+          type: string
+          format: date
+          description: The first date of the non-working time range in ISO 8601 format (YYYY-MM-DD).
+        endDate:
+          type: string
+          format: date
+          description: 'The last date of the non-working time range in ISO 8601 format (YYYY-MM-DD).
+
+            Must be greater than or equal to `startDate`.'
+        _links:
+          type: object
+          required:
+          - self
+          - user
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This non-working time record.
+
+                  **Resource**: UserNonWorkingTime'
+            user:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The user this non-working time belongs to.
+
+                  **Resource**: User'
+      example:
+        _type: UserNonWorkingTime
+        id: 7
+        startDate: '2025-06-16'
+        endDate: '2025-06-20'
+        _links:
+          self:
+            href: /api/v3/users/42/non_working_times/7
+          user:
+            href: /api/v3/users/42
+            title: Jane Doe
     UserWorkingHoursCollectionModel:
       allOf:
       - $ref: '#/components/schemas/CollectionModel'
@@ -1125,90 +1209,6 @@ components:
             _links:
               self:
                 href: /api/v3/users/42/working_hours/1
-              user:
-                href: /api/v3/users/42
-                title: Jane Doe
-    ErrorResponse:
-      type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
-    UserNonWorkingTimeCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'This collection of non-working times records.
-
-                    **Resource**: UserNonWorkingTimeCollectionModel'
-          _embedded:
-            type: object
-            required:
-            - elements
-            properties:
-              elements:
-                type: array
-                description: The array of personal non-working times for the user, ordered by start date ascending.
-                items:
-                  $ref: '#/components/schemas/UserNonWorkingTimeModel'
-      example:
-        _type: Collection
-        total: 2
-        count: 2
-        _links:
-          self:
-            href: /api/v3/users/42/non_working_times
-        _embedded:
-          elements:
-          - _type: UserNonWorkingTime
-            id: 7
-            startDate: '2025-06-16'
-            endDate: '2025-06-20'
-            _links:
-              self:
-                href: /api/v3/users/42/non_working_times/7
-              user:
-                href: /api/v3/users/42
-                title: Jane Doe
-          - _type: UserNonWorkingTime
-            id: 8
-            startDate: '2025-12-24'
-            endDate: '2025-12-24'
-            _links:
-              self:
-                href: /api/v3/users/42/non_working_times/8
               user:
                 href: /api/v3/users/42
                 title: Jane Doe

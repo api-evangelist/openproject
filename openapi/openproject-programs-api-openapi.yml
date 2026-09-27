@@ -422,62 +422,6 @@ paths:
       summary: Program update form
 components:
   schemas:
-    CustomCommentProperties:
-      type: object
-      patternProperties:
-        ^customComment\d+$:
-          type:
-          - 'null'
-          - string
-          description: 'A plain-text comment associated with a project custom field that has comments enabled.
-
-
-            The property is only present when the corresponding `customField{N}` has `has_comment` set to `true`.'
-    CollectionLinks:
-      type: object
-      required:
-      - self
-      properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This collection resource.
-
-
-              **Resource**: Collection'
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
-          type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
     CollectionModel:
       type: object
       required:
@@ -500,6 +444,60 @@ components:
           minimum: 0
         _links:
           $ref: '#/components/schemas/CollectionLinks'
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    ProgramCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/OffsetPaginatedCollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            allOf:
+            - $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
+            - type: object
+              properties:
+                representations:
+                  type: array
+                  items:
+                    allOf:
+                    - $ref: '#/components/schemas/Link'
+                    - description: A program collection representation in a specific file format.
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProgramModel'
     OffsetPaginatedCollectionLinks:
       allOf:
       - $ref: '#/components/schemas/CollectionLinks'
@@ -534,82 +532,17 @@ components:
                 # Conditions
 
                 - The collection is not on the last page.'
-    Formattable:
+    CustomCommentProperties:
       type: object
-      required:
-      - format
-      properties:
-        format:
-          type: string
-          enum:
-          - plain
-          - markdown
-          - custom
-          readOnly: true
-          description: Indicates the formatting language of the raw text
-          example: markdown
-        raw:
-          type: string
-          description: The raw text, as entered by the user
-          example: I **am** formatted!
-        html:
-          type: string
-          readOnly: true
-          description: The text converted to HTML according to the format
-          example: I <strong>am</strong> formatted!
-      example:
-        format: markdown
-        raw: I am formatted!
-        html: I am formatted!
-    OffsetPaginatedCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - pageSize
-        - offset
-        - _links
-        properties:
-          pageSize:
-            type: integer
-            description: 'The amount of elements per page. If not set by the request this value defaults to the server''s system
+      patternProperties:
+        ^customComment\d+$:
+          type:
+          - 'null'
+          - string
+          description: 'A plain-text comment associated with a project custom field that has comments enabled.
 
-              settings.'
-            minimum: 0
-          offset:
-            type: integer
-            description: The page offset indicating on which page the element collection starts.
-            minimum: 0
-          _links:
-            $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
-    ProgramCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/OffsetPaginatedCollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            allOf:
-            - $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
-            - type: object
-              properties:
-                representations:
-                  type: array
-                  items:
-                    allOf:
-                    - $ref: '#/components/schemas/Link'
-                    - description: A program collection representation in a specific file format.
-          _embedded:
-            type: object
-            required:
-            - elements
-            properties:
-              elements:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ProgramModel'
+
+            The property is only present when the corresponding `customField{N}` has `has_comment` set to `true`.'
     ProgramModel:
       allOf:
       - $ref: '#/components/schemas/CustomFieldProperties'
@@ -855,6 +788,39 @@ components:
 
 
                       **Resource**: Workspace'
+    OffsetPaginatedCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - pageSize
+        - offset
+        - _links
+        properties:
+          pageSize:
+            type: integer
+            description: 'The amount of elements per page. If not set by the request this value defaults to the server''s system
+
+              settings.'
+            minimum: 0
+          offset:
+            type: integer
+            description: The page offset indicating on which page the element collection starts.
+            minimum: 0
+          _links:
+            $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
     CustomFieldProperties:
       type: object
       patternProperties:
@@ -881,32 +847,66 @@ components:
             - Text
 
             - Long text'
-    ErrorResponse:
+    Formattable:
       type: object
       required:
-      - _type
-      - errorIdentifier
-      - message
+      - format
       properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
+        format:
           type: string
           enum:
-          - Error
-        errorIdentifier:
+          - plain
+          - markdown
+          - custom
+          readOnly: true
+          description: Indicates the formatting language of the raw text
+          example: markdown
+        raw:
           type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
+          description: The raw text, as entered by the user
+          example: I **am** formatted!
+        html:
           type: string
-          example: Project can't be blank.
+          readOnly: true
+          description: The text converted to HTML according to the format
+          example: I <strong>am</strong> formatted!
+      example:
+        format: markdown
+        raw: I am formatted!
+        html: I am formatted!
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
   responses:
     MissingContentType:
       description: Occurs when the client did not send a Content-Type header
@@ -936,6 +936,45 @@ components:
             errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
             message: The request body was not a single JSON object.
   examples:
+    ProgramCollection:
+      value:
+        _type: Collection
+        count: 2
+        total: 2
+        pageSize: 20
+        offset: 1
+        _embedded:
+          elements:
+          - _hint: Program resource shortened for brevity
+            id: 1
+            identifier: initialprogram
+            name: DeathStar construction
+            active: true
+            public: true
+          - _hint: Program resource shortened for brevity
+            id: 2
+            identifier: mysecret
+            name: Palpatine's secret plan
+            active: true
+            public: false
+        _links:
+          self:
+            href: /api/v3/programs?filters=%5B%5D&offset=1&pageSize=20
+          jumpTo:
+            href: /api/v3/programs?filters=%5B%5D&offset=%7Boffset%7D&pageSize=20
+            templated: true
+          changeSize:
+            href: /api/v3/programs?filters=%5B%5D&offset=1&pageSize=%7Bsize%7D
+            templated: true
+          representations:
+          - href: /programs.csv?filters=%5B%5D&offset=1&pageSize=20
+            identifier: csv
+            type: text/csv
+            title: CSV
+          - href: /programs.xls?filters=%5B%5D&offset=1&pageSize=20
+            identifier: xls
+            type: application/vnd.ms-excel
+            title: XLS
     ProgramBody:
       value:
         name: Program example
@@ -1006,45 +1045,6 @@ components:
         updatedAt: '2014-05-21T08:51:20.396Z'
         customField123: 123
         customComment123: Why is the value 123?
-    ProgramCollection:
-      value:
-        _type: Collection
-        count: 2
-        total: 2
-        pageSize: 20
-        offset: 1
-        _embedded:
-          elements:
-          - _hint: Program resource shortened for brevity
-            id: 1
-            identifier: initialprogram
-            name: DeathStar construction
-            active: true
-            public: true
-          - _hint: Program resource shortened for brevity
-            id: 2
-            identifier: mysecret
-            name: Palpatine's secret plan
-            active: true
-            public: false
-        _links:
-          self:
-            href: /api/v3/programs?filters=%5B%5D&offset=1&pageSize=20
-          jumpTo:
-            href: /api/v3/programs?filters=%5B%5D&offset=%7Boffset%7D&pageSize=20
-            templated: true
-          changeSize:
-            href: /api/v3/programs?filters=%5B%5D&offset=1&pageSize=%7Bsize%7D
-            templated: true
-          representations:
-          - href: /programs.csv?filters=%5B%5D&offset=1&pageSize=20
-            identifier: csv
-            type: text/csv
-            title: CSV
-          - href: /programs.xls?filters=%5B%5D&offset=1&pageSize=20
-            identifier: xls
-            type: application/vnd.ms-excel
-            title: XLS
   securitySchemes:
     BasicAuth:
       type: http

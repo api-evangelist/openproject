@@ -74,224 +74,6 @@ paths:
             **Required permission:** view meetings in the page''s project'
 components:
   schemas:
-    MeetingModel:
-      type: object
-      required:
-      - _type
-      - id
-      - lockVersion
-      - title
-      - startTime
-      - endTime
-      - duration
-      - createdAt
-      - updatedAt
-      properties:
-        _type:
-          type: string
-          enum:
-          - Meeting
-        id:
-          type: integer
-          description: Identifier of this meeting
-          minimum: 1
-        title:
-          type: string
-          description: The meeting's title
-        location:
-          type: string
-          description: The meeting's location
-        lockVersion:
-          type: integer
-          description: The version of the item as used for optimistic locking
-        startTime:
-          type: string
-          format: date-time
-          description: The scheduled meeting start time.
-        endTime:
-          type: string
-          format: date-time
-          description: The scheduled meeting start time.
-        duration:
-          type: number
-          description: The meeting duration in hours.
-        createdAt:
-          type: string
-          format: date-time
-          description: Time of creation. Can be writable by admins with the `apiv3_write_readonly_attributes` setting enabled.
-        updatedAt:
-          type: string
-          format: date-time
-          description: Time of the most recent change to the meeting.
-        _embedded:
-          type: object
-          required:
-          - attachments
-          - author
-          properties:
-            attachments:
-              $ref: '#/components/schemas/Attachments_Model'
-            author:
-              $ref: '#/components/schemas/UserModel'
-            project:
-              $ref: '#/components/schemas/ProjectModel'
-        _links:
-          type: object
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This meeting
-
-
-                  **Resource**: Meeting'
-            author:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The user having created the meeting
-
-
-                  **Resource**: User'
-            project:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The project the meeting is in
-
-
-                  **Resource**: Project'
-            attachments:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The attachment collection of this grid.
-
-
-                  **Resource**: AttachmentCollection'
-            addAttachment:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'Attach a file to the meeting
-
-
-                  # Conditions
-
-
-                  **Permission**: edit meeting'
-    MeetingCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedCollectionModel'
-      - type: object
-        required:
-        - _embedded
-        - _links
-        properties:
-          _embedded:
-            type: object
-            required:
-            - elements
-            properties:
-              elements:
-                type: array
-                items:
-                  $ref: '#/components/schemas/MeetingModel'
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'The link to this meeting collection resource
-
-
-                    **Resource**: MeetingCollection'
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
-          type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
-    CustomCommentProperties:
-      type: object
-      patternProperties:
-        ^customComment\d+$:
-          type:
-          - 'null'
-          - string
-          description: 'A plain-text comment associated with a project custom field that has comments enabled.
-
-
-            The property is only present when the corresponding `customField{N}` has `has_comment` set to `true`.'
-    Attachments_Model:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'The attachments collection
-
-
-                    **Resource**: AttachmentsCollection'
-                  readOnly: true
-          _embedded:
-            type: object
-            properties:
-              elements:
-                type: array
-                readOnly: true
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/AttachmentModel'
-                  - description: Collection of Attachments
-    CollectionLinks:
-      type: object
-      required:
-      - self
-      properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This collection resource.
-
-
-              **Resource**: Collection'
     CollectionModel:
       type: object
       required:
@@ -314,6 +96,44 @@ components:
           minimum: 0
         _links:
           $ref: '#/components/schemas/CollectionLinks'
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
     AttachmentModel:
       type: object
       required:
@@ -439,87 +259,145 @@ components:
           algorithm: md5
           hash: 64c26a8403cd796ea4cf913cda2ee4a9
         createdAt: '2014-05-21T08:51:20.396Z'
-    Formattable:
+    CustomCommentProperties:
       type: object
-      required:
-      - format
-      properties:
-        format:
-          type: string
-          enum:
-          - plain
-          - markdown
-          - custom
-          readOnly: true
-          description: Indicates the formatting language of the raw text
-          example: markdown
-        raw:
-          type: string
-          description: The raw text, as entered by the user
-          example: I **am** formatted!
-        html:
-          type: string
-          readOnly: true
-          description: The text converted to HTML according to the format
-          example: I <strong>am</strong> formatted!
-      example:
-        format: markdown
-        raw: I am formatted!
-        html: I am formatted!
-    PrincipalModel:
+      patternProperties:
+        ^customComment\d+$:
+          type:
+          - 'null'
+          - string
+          description: 'A plain-text comment associated with a project custom field that has comments enabled.
+
+
+            The property is only present when the corresponding `customField{N}` has `has_comment` set to `true`.'
+    MeetingModel:
       type: object
       required:
       - _type
       - id
-      - name
-      - _links
+      - lockVersion
+      - title
+      - startTime
+      - endTime
+      - duration
+      - createdAt
+      - updatedAt
       properties:
         _type:
           type: string
           enum:
-          - User
-          - Group
-          - PlaceholderUser
+          - Meeting
         id:
           type: integer
-          description: The principal's unique identifier.
+          description: Identifier of this meeting
           minimum: 1
-        name:
+        title:
           type: string
-          description: The principal's display name, layout depends on instance settings.
+          description: The meeting's title
+        location:
+          type: string
+          description: The meeting's location
+        lockVersion:
+          type: integer
+          description: The version of the item as used for optimistic locking
+        startTime:
+          type: string
+          format: date-time
+          description: The scheduled meeting start time.
+        endTime:
+          type: string
+          format: date-time
+          description: The scheduled meeting start time.
+        duration:
+          type: number
+          description: The meeting duration in hours.
         createdAt:
           type: string
           format: date-time
-          description: Time of creation
+          description: Time of creation. Can be writable by admins with the `apiv3_write_readonly_attributes` setting enabled.
         updatedAt:
           type: string
           format: date-time
-          description: Time of the most recent change to the principal
-        _links:
+          description: Time of the most recent change to the meeting.
+        _embedded:
           type: object
           required:
-          - self
+          - attachments
+          - author
+          properties:
+            attachments:
+              $ref: '#/components/schemas/Attachments_Model'
+            author:
+              $ref: '#/components/schemas/UserModel'
+            project:
+              $ref: '#/components/schemas/ProjectModel'
+        _links:
+          type: object
           properties:
             self:
               allOf:
               - $ref: '#/components/schemas/Link'
-              - description: 'This principal resource.
+              - description: 'This meeting
 
 
-                  **Resource**: User|Group|PlaceholderUser'
-            memberships:
+                  **Resource**: Meeting'
+            author:
               allOf:
               - $ref: '#/components/schemas/Link'
-              - description: 'An href to the collection of the principal''s memberships.
+              - description: 'The user having created the meeting
 
 
-                  # Conditions:
+                  **Resource**: User'
+            project:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The project the meeting is in
 
 
-                  - user has permission `view_members` or `manage_members` in any project
+                  **Resource**: Project'
+            attachments:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The attachment collection of this grid.
 
 
-                  **Resource**: Collection'
+                  **Resource**: AttachmentCollection'
+            addAttachment:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'Attach a file to the meeting
+
+
+                  # Conditions
+
+
+                  **Permission**: edit meeting'
+    CustomFieldProperties:
+      type: object
+      patternProperties:
+        ^customField\d+$:
+          type:
+          - 'null'
+          - number
+          - boolean
+          - string
+          - object
+          description: 'A custom field value, that belongs to a custom field of a simple type:
+
+
+            - Boolean
+
+            - Date
+
+            - Float
+
+            - Integer
+
+            - Link (URL)
+
+            - Text
+
+            - Long text'
     ProjectModel:
       allOf:
       - $ref: '#/components/schemas/CustomFieldProperties'
@@ -765,68 +643,180 @@ components:
 
 
                       **Resource**: Workspace'
-    PaginatedCollectionModel:
+    Formattable:
+      type: object
+      required:
+      - format
+      properties:
+        format:
+          type: string
+          enum:
+          - plain
+          - markdown
+          - custom
+          readOnly: true
+          description: Indicates the formatting language of the raw text
+          example: markdown
+        raw:
+          type: string
+          description: The raw text, as entered by the user
+          example: I **am** formatted!
+        html:
+          type: string
+          readOnly: true
+          description: The text converted to HTML according to the format
+          example: I <strong>am</strong> formatted!
+      example:
+        format: markdown
+        raw: I am formatted!
+        html: I am formatted!
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
+    MeetingCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedCollectionModel'
+      - type: object
+        required:
+        - _embedded
+        - _links
+        properties:
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MeetingModel'
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The link to this meeting collection resource
+
+
+                    **Resource**: MeetingCollection'
+    Attachments_Model:
       allOf:
       - $ref: '#/components/schemas/CollectionModel'
       - type: object
         required:
-        - pageSize
-        - offset
+        - _links
+        - _embedded
         properties:
-          pageSize:
-            type: integer
-            description: Amount of elements that a response will hold.
-            minimum: 0
-          offset:
-            type: integer
-            description: The page number that is requested from paginated collection.
-            minimum: 1
           _links:
             type: object
             required:
-            - jumpTo
-            - changeSize
+            - self
             properties:
-              jumpTo:
+              self:
                 allOf:
                 - $ref: '#/components/schemas/Link'
-                - description: 'Templated link to another page offset.
+                - description: 'The attachments collection
 
 
-                    **Resource**: Collection'
-              changeSize:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Templated link for another page size.
-
-
-                    **Resource**: Collection'
-    CustomFieldProperties:
+                    **Resource**: AttachmentsCollection'
+                  readOnly: true
+          _embedded:
+            type: object
+            properties:
+              elements:
+                type: array
+                readOnly: true
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/AttachmentModel'
+                  - description: Collection of Attachments
+    PrincipalModel:
       type: object
-      patternProperties:
-        ^customField\d+$:
-          type:
-          - 'null'
-          - number
-          - boolean
-          - string
-          - object
-          description: 'A custom field value, that belongs to a custom field of a simple type:
+      required:
+      - _type
+      - id
+      - name
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - User
+          - Group
+          - PlaceholderUser
+        id:
+          type: integer
+          description: The principal's unique identifier.
+          minimum: 1
+        name:
+          type: string
+          description: The principal's display name, layout depends on instance settings.
+        createdAt:
+          type: string
+          format: date-time
+          description: Time of creation
+        updatedAt:
+          type: string
+          format: date-time
+          description: Time of the most recent change to the principal
+        _links:
+          type: object
+          required:
+          - self
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This principal resource.
 
 
-            - Boolean
+                  **Resource**: User|Group|PlaceholderUser'
+            memberships:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'An href to the collection of the principal''s memberships.
 
-            - Date
 
-            - Float
+                  # Conditions:
 
-            - Integer
 
-            - Link (URL)
+                  - user has permission `view_members` or `manage_members` in any project
 
-            - Text
 
-            - Long text'
+                  **Resource**: Collection'
     UserModel:
       allOf:
       - $ref: '#/components/schemas/PrincipalModel'
@@ -1004,32 +994,42 @@ components:
                     - LDAP authentication configured
 
                     - `admin`'
-    ErrorResponse:
-      type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
+    PaginatedCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - pageSize
+        - offset
+        properties:
+          pageSize:
+            type: integer
+            description: Amount of elements that a response will hold.
+            minimum: 0
+          offset:
+            type: integer
+            description: The page number that is requested from paginated collection.
+            minimum: 1
+          _links:
+            type: object
+            required:
+            - jumpTo
+            - changeSize
+            properties:
+              jumpTo:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Templated link to another page offset.
+
+
+                    **Resource**: Collection'
+              changeSize:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Templated link for another page size.
+
+
+                    **Resource**: Collection'
   examples:
     MeetingSimpleResponse:
       description: A simple meeting response.

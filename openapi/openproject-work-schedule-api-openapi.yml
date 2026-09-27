@@ -437,6 +437,167 @@ paths:
           $ref: '#/components/responses/InvalidRequestBody'
 components:
   schemas:
+    CollectionModel:
+      type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
+    WeekDaySelfLinkModel:
+      type: object
+      description: Identify a particular week day by its href.
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This week day resource link.
+
+
+              **Resource**: WeekDay'
+            readOnly: true
+      example:
+        self:
+          href: /api/v3/days/week/3
+          title: Wednesday
+    WeekDayCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This week days collection
+
+
+                    **Resource**: WeekDayCollectionModel'
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                description: The array of week days.
+                minItems: 7
+                maxItems: 7
+                items:
+                  $ref: '#/components/schemas/WeekDayModel'
+      example:
+        _type: Collection
+        total: 7
+        count: 7
+        _links:
+          self:
+            href: /api/v3/days/week
+        _embedded:
+          elements:
+          - _type: WeekDay
+            day: 1
+            name: Monday
+            working: true
+            _links:
+              self:
+                href: /api/v3/days/week/1
+                title: Monday
+          - _type: WeekDay
+            day: 2
+            name: Tuesday
+            working: true
+            _links:
+              self:
+                href: /api/v3/days/week/2
+                title: Tuesday
+          - _type: WeekDay
+            day: 3
+            name: Wednesday
+            working: true
+            _links:
+              self:
+                href: /api/v3/days/week/3
+                title: Wednesday
+          - _type: WeekDay
+            day: 4
+            name: Thursday
+            working: true
+            _links:
+              self:
+                href: /api/v3/days/week/4
+                title: Thursday
+          - _type: WeekDay
+            day: 5
+            name: Friday
+            working: true
+            _links:
+              self:
+                href: /api/v3/days/week/5
+                title: Friday
+          - _type: WeekDay
+            day: 6
+            name: Saturday
+            working: false
+            _links:
+              self:
+                href: /api/v3/days/week/6
+                title: Saturday
+          - _type: WeekDay
+            day: 7
+            name: Sunday
+            working: false
+            _links:
+              self:
+                href: /api/v3/days/week/7
+                title: Sunday
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
     WeekDayModel:
       type: object
       required:
@@ -473,6 +634,44 @@ components:
           self:
             href: /api/v3/day/week/5
             title: Friday
+    NonWorkingDayModel:
+      type: object
+      required:
+      - _type
+      - date
+      - name
+      properties:
+        _type:
+          type: string
+          enum:
+          - NonWorkingDay
+        date:
+          type: string
+          format: date
+          description: Date of the non-working day.
+        name:
+          type: string
+          description: Descriptive name for the non-working day.
+        _links:
+          type: object
+          required:
+          - self
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This non-working day.
+
+
+                  **Resource**: NonWorkingDay'
+      example:
+        _type: NonWorkingDay
+        date: '2022-12-25'
+        name: Christmas
+        _links:
+          self:
+            href: /api/v3/days/non_working/2022-12-25
+            title: Christmas
     CollectionLinks:
       type: object
       required:
@@ -485,97 +684,23 @@ components:
 
 
               **Resource**: Collection'
-    Link:
+    WeekDayWriteModel:
       type: object
-      required:
-      - href
-      properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
-          type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
-    DayModel:
-      type: object
+      description: Describes a week day as a working day or a non-working day (weekend).
       required:
       - _type
-      - date
-      - name
       - working
       properties:
         _type:
           type: string
           enum:
-          - Day
-        date:
-          type: string
-          format: date
-          description: Date of the day.
-        name:
-          type: string
-          description: Descriptive name for the day.
+          - WeekDay
         working:
           type: boolean
-          description: '`true` for a working day, `false` otherwise.'
-        _links:
-          type: object
-          required:
-          - self
-          properties:
-            self:
-              $ref: '#/components/schemas/Link'
-            nonWorkingReasons:
-              type: array
-              description: 'A list of resources describing why this day is a non-working day.
-
-                Linked resources can be `NonWorkingDay` and `WeekDay` resources.
-
-                This property is absent for working days.'
-              items:
-                $ref: '#/components/schemas/Link'
-            weekDay:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: The week day for this day.
+          description: '`true` for a working day. `false` for a weekend day.'
       example:
-        _type: Day
-        date: '2022-12-25'
-        name: Sunday (Christmas)
+        _type: WeekDay
         working: false
-        _links:
-          self:
-            href: /api/v3/days/2022-12-25
-          nonWorkingReasons:
-          - href: /api/v3/days/week/7
-            title: Sunday
-          - href: /api/v3/days/non_working/2022-12-25
-            title: Christmas
-          weekday:
-            href: /api/v3/days/week/7
-            title: Sunday
     DayCollectionModel:
       allOf:
       - $ref: '#/components/schemas/CollectionModel'
@@ -675,85 +800,39 @@ components:
               weekday:
                 href: /api/v3/days/week/2
                 title: Tuesday
-    CollectionModel:
+    Link:
       type: object
       required:
-      - _type
-      - total
-      - count
-      - _links
+      - href
       properties:
-        _type:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
           type: string
-          enum:
-          - Collection
-        total:
-          type: integer
-          description: The total amount of elements available in the collection.
-          minimum: 0
-        count:
-          type: integer
-          description: Actual amount of elements in this response.
-          minimum: 0
-        _links:
-          $ref: '#/components/schemas/CollectionLinks'
-    NonWorkingDayCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'This non working days collection
-
-
-                    **Resource**: NonWorkingDayCollectionModel'
-          _embedded:
-            type: object
-            required:
-            - elements
-            properties:
-              elements:
-                type: array
-                description: The array of non working days. Each day has a name and a date.
-                items:
-                  $ref: '#/components/schemas/NonWorkingDayModel'
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
       example:
-        _type: Collection
-        total: 2
-        count: 2
-        _links:
-          self:
-            href: /api/v3/non_working?filters=[{"interval":{"operator":"<>d","values":["2022-04-29","2022-12-24"]}}]
-        _embedded:
-          elements:
-          - _type: NonWorkingDay
-            date: '2022-12-24'
-            name: Christmas Evening
-            _links:
-              self:
-                href: /api/v3/days/non_working/2022-04-24
-              weekday:
-                href: /api/v3/days/week/6
-                title: Saturday
-          - _type: NonWorkingDay
-            date: '2022-05-01'
-            name: Labour day
-            _links:
-              self:
-                href: /api/v3/days/non_working/2022-05-01
-              weekday:
-                href: /api/v3/days/week/7
-                title: Sunday
+        href: /api/v3/work_packages
+        method: POST
     WeekDayCollectionWriteModel:
       type: object
       required:
@@ -813,45 +892,7 @@ components:
             _links:
               self:
                 href: /api/v3/days/week/7
-    NonWorkingDayModel:
-      type: object
-      required:
-      - _type
-      - date
-      - name
-      properties:
-        _type:
-          type: string
-          enum:
-          - NonWorkingDay
-        date:
-          type: string
-          format: date
-          description: Date of the non-working day.
-        name:
-          type: string
-          description: Descriptive name for the non-working day.
-        _links:
-          type: object
-          required:
-          - self
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This non-working day.
-
-
-                  **Resource**: NonWorkingDay'
-      example:
-        _type: NonWorkingDay
-        date: '2022-12-25'
-        name: Christmas
-        _links:
-          self:
-            href: /api/v3/days/non_working/2022-12-25
-            title: Christmas
-    WeekDayCollectionModel:
+    NonWorkingDayCollectionModel:
       allOf:
       - $ref: '#/components/schemas/CollectionModel'
       - type: object
@@ -867,10 +908,10 @@ components:
               self:
                 allOf:
                 - $ref: '#/components/schemas/Link'
-                - description: 'This week days collection
+                - description: 'This non working days collection
 
 
-                    **Resource**: WeekDayCollectionModel'
+                    **Resource**: NonWorkingDayCollectionModel'
           _embedded:
             type: object
             required:
@@ -878,135 +919,94 @@ components:
             properties:
               elements:
                 type: array
-                description: The array of week days.
-                minItems: 7
-                maxItems: 7
+                description: The array of non working days. Each day has a name and a date.
                 items:
-                  $ref: '#/components/schemas/WeekDayModel'
+                  $ref: '#/components/schemas/NonWorkingDayModel'
       example:
         _type: Collection
-        total: 7
-        count: 7
+        total: 2
+        count: 2
         _links:
           self:
-            href: /api/v3/days/week
+            href: /api/v3/non_working?filters=[{"interval":{"operator":"<>d","values":["2022-04-29","2022-12-24"]}}]
         _embedded:
           elements:
-          - _type: WeekDay
-            day: 1
-            name: Monday
-            working: true
+          - _type: NonWorkingDay
+            date: '2022-12-24'
+            name: Christmas Evening
             _links:
               self:
-                href: /api/v3/days/week/1
-                title: Monday
-          - _type: WeekDay
-            day: 2
-            name: Tuesday
-            working: true
-            _links:
-              self:
-                href: /api/v3/days/week/2
-                title: Tuesday
-          - _type: WeekDay
-            day: 3
-            name: Wednesday
-            working: true
-            _links:
-              self:
-                href: /api/v3/days/week/3
-                title: Wednesday
-          - _type: WeekDay
-            day: 4
-            name: Thursday
-            working: true
-            _links:
-              self:
-                href: /api/v3/days/week/4
-                title: Thursday
-          - _type: WeekDay
-            day: 5
-            name: Friday
-            working: true
-            _links:
-              self:
-                href: /api/v3/days/week/5
-                title: Friday
-          - _type: WeekDay
-            day: 6
-            name: Saturday
-            working: false
-            _links:
-              self:
+                href: /api/v3/days/non_working/2022-04-24
+              weekday:
                 href: /api/v3/days/week/6
                 title: Saturday
-          - _type: WeekDay
-            day: 7
-            name: Sunday
-            working: false
+          - _type: NonWorkingDay
+            date: '2022-05-01'
+            name: Labour day
             _links:
               self:
+                href: /api/v3/days/non_working/2022-05-01
+              weekday:
                 href: /api/v3/days/week/7
                 title: Sunday
-    WeekDayWriteModel:
+    DayModel:
       type: object
-      description: Describes a week day as a working day or a non-working day (weekend).
       required:
       - _type
+      - date
+      - name
       - working
       properties:
         _type:
           type: string
           enum:
-          - WeekDay
+          - Day
+        date:
+          type: string
+          format: date
+          description: Date of the day.
+        name:
+          type: string
+          description: Descriptive name for the day.
         working:
           type: boolean
-          description: '`true` for a working day. `false` for a weekend day.'
-      example:
-        _type: WeekDay
-        working: false
-    ErrorResponse:
-      type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
-        _embedded:
+          description: '`true` for a working day, `false` otherwise.'
+        _links:
           type: object
+          required:
+          - self
           properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
-    WeekDaySelfLinkModel:
-      type: object
-      description: Identify a particular week day by its href.
-      properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This week day resource link.
+            self:
+              $ref: '#/components/schemas/Link'
+            nonWorkingReasons:
+              type: array
+              description: 'A list of resources describing why this day is a non-working day.
 
+                Linked resources can be `NonWorkingDay` and `WeekDay` resources.
 
-              **Resource**: WeekDay'
-            readOnly: true
+                This property is absent for working days.'
+              items:
+                $ref: '#/components/schemas/Link'
+            weekDay:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: The week day for this day.
       example:
-        self:
-          href: /api/v3/days/week/3
-          title: Wednesday
+        _type: Day
+        date: '2022-12-25'
+        name: Sunday (Christmas)
+        working: false
+        _links:
+          self:
+            href: /api/v3/days/2022-12-25
+          nonWorkingReasons:
+          - href: /api/v3/days/week/7
+            title: Sunday
+          - href: /api/v3/days/non_working/2022-12-25
+            title: Christmas
+          weekday:
+            href: /api/v3/days/week/7
+            title: Sunday
   responses:
     MissingContentType:
       description: Occurs when the client did not send a Content-Type header

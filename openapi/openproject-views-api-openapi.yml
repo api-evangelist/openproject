@@ -215,49 +215,7 @@ paths:
       operationId: Create_views
       summary: Create view
 components:
-  responses:
-    MissingContentType:
-      description: Occurs when the client did not send a Content-Type header
-      content:
-        text/plain:
-          schema:
-            type: string
-          example: Missing content-type header
-    UnsupportedMediaType:
-      description: Occurs when the client sends an unsupported Content-Type header.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
-            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
-    InvalidRequestBody:
-      description: Occurs when the client did not send a valid JSON object in the request body.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
-            message: The request body was not a single JSON object.
   examples:
-    ViewWorkPackagesTable:
-      value:
-        _type: Views::WorkPackagesTable
-        name: Current work packages
-        id: 9
-        _links:
-          self:
-            href: /api/v3/views/9
-          query:
-            href: /api/v3/queries/18
-            title: Current work packages
-          project:
-            href: /api/v3/project/89
-            title: The project
     Views:
       value:
         _links:
@@ -316,6 +274,20 @@ components:
           project:
             href: /api/v3/project/89
             title: The project
+    ViewWorkPackagesTable:
+      value:
+        _type: Views::WorkPackagesTable
+        name: Current work packages
+        id: 9
+        _links:
+          self:
+            href: /api/v3/views/9
+          query:
+            href: /api/v3/queries/18
+            title: Current work packages
+          project:
+            href: /api/v3/project/89
+            title: The project
   schemas:
     ErrorResponse:
       type: object
@@ -343,6 +315,34 @@ components:
         message:
           type: string
           example: Project can't be blank.
+  responses:
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
+    UnsupportedMediaType:
+      description: Occurs when the client sends an unsupported Content-Type header.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
+            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+    InvalidRequestBody:
+      description: Occurs when the client did not send a valid JSON object in the request body.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+            message: The request body was not a single JSON object.
   securitySchemes:
     BasicAuth:
       type: http

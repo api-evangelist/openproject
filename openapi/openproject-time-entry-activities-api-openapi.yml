@@ -57,156 +57,32 @@ paths:
                     message: The requested resource could not be found.
 components:
   schemas:
-    TimeEntryActivityModel:
+    ErrorResponse:
       type: object
       required:
       - _type
-      - id
-      - name
-      - position
-      - default
-      - _embedded
-      - _links
+      - errorIdentifier
+      - message
       properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
         _type:
           type: string
           enum:
-          - TimeEntriesActivity
-        id:
-          type: integer
-          description: Time entry id
-          minimum: 1
-        name:
+          - Error
+        errorIdentifier:
           type: string
-          description: The human readable name chosen for this activity
-        position:
-          type: integer
-          description: The rank the activity has in a list of activities
-        default:
-          type: boolean
-          description: Flag to signal whether this activity is the default activity
-        _embedded:
-          type: object
-          required:
-          - projects
-          properties:
-            projects:
-              type: array
-              items:
-                oneOf:
-                - $ref: '#/components/schemas/ProjectModel'
-                - $ref: '#/components/schemas/ProgramModel'
-                - $ref: '#/components/schemas/PortfolioModel'
-        _links:
-          type: object
-          required:
-          - self
-          - projects
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This time entry activity
-
-
-                  **Resource**: TimeEntriesActivity'
-            projects:
-              type: array
-              items:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'One of the projects the time entry is active in.
-
-
-                    **Resource**: Project'
-      example:
-        _type: TimeEntriesActivity
-        id: 18
-        name: Management
-        position: 8
-        default: false
-        _embedded:
-          projects: []
-        _links:
-          self:
-            href: /api/v3/time_entries/activities/18
-            title: Management
-          projects:
-          - href: /api/v3/projects/death_star_v2
-            title: DeathStarV2
-          - href: /api/v3/projects/star_killer_base
-            title: StarKillerBase
-    CustomCommentProperties:
-      type: object
-      patternProperties:
-        ^customComment\d+$:
-          type:
-          - 'null'
-          - string
-          description: 'A plain-text comment associated with a project custom field that has comments enabled.
-
-
-            The property is only present when the corresponding `customField{N}` has `has_comment` set to `true`.'
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
           type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
-    Formattable:
-      type: object
-      required:
-      - format
-      properties:
-        format:
-          type: string
-          enum:
-          - plain
-          - markdown
-          - custom
-          readOnly: true
-          description: Indicates the formatting language of the raw text
-          example: markdown
-        raw:
-          type: string
-          description: The raw text, as entered by the user
-          example: I **am** formatted!
-        html:
-          type: string
-          readOnly: true
-          description: The text converted to HTML according to the format
-          example: I <strong>am</strong> formatted!
-      example:
-        format: markdown
-        raw: I am formatted!
-        html: I am formatted!
+          example: Project can't be blank.
     PortfolioModel:
       allOf:
       - $ref: '#/components/schemas/CustomFieldProperties'
@@ -452,251 +328,17 @@ components:
 
 
                       **Resource**: Portfolio'
-    ProjectModel:
-      allOf:
-      - $ref: '#/components/schemas/CustomFieldProperties'
-      - $ref: '#/components/schemas/CustomCommentProperties'
-      - type: object
-        properties:
-          _type:
-            type: string
-            enum:
-            - Project
-          id:
-            type: integer
-            description: Projects' id
-            minimum: 1
-          identifier:
-            type: string
-          name:
-            type: string
-          active:
-            type: boolean
-            description: Indicates whether the project is currently active or already archived
-          favorited:
-            type: boolean
-            description: Indicates whether the project is favorited by the current user
-          statusExplanation:
-            allOf:
-            - $ref: '#/components/schemas/Formattable'
-            - description: A text detailing and explaining why the project has the reported status
-          public:
-            type: boolean
-            description: Indicates whether the project is accessible for everybody
-          description:
-            $ref: '#/components/schemas/Formattable'
-          createdAt:
-            type: string
-            format: date-time
-            description: Time of creation. Can be writable by admins with the `apiv3_write_readonly_attributes` setting enabled.
-          updatedAt:
-            type: string
-            format: date-time
-            description: Time of the most recent change to the project
-          _links:
-            type: object
-            required:
-            - self
-            - categories
-            properties:
-              update:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Form endpoint that aids in updating this project
-
-
-                    # Conditions
-
-
-                    **Permission**: edit workspace'
-              updateImmediately:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Directly update this project
-
-
-                    # Conditions
-
-
-                    **Permission**: edit workspace'
-              delete:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Delete this project
-
-
-                    # Conditions
-
-
-                    **Permission**: admin'
-              favor:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Mark this project as favorited by the current user
-
-
-                    # Conditions
-
-
-                    Only present if the project is not yet favorited
-
-
-                    Permission**: none but login is required'
-              disfavor:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Mark this project as not favorited by the current user
-
-
-                    # Conditions
-
-                    Only present if the project is favorited by the current user
-
-
-                    Permission**: none but login is required'
-              createWorkPackage:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Form endpoint that aids in preparing and creating a work package
-
-
-                    # Conditions
-
-
-                    **Permission**: add work packages'
-              createWorkPackageImmediately:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Directly creates a work package in the project
-
-
-                    # Conditions
-
-
-                    **Permission**: add work packages'
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'This project
-
-
-                    **Resource**: Project'
-              categories:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Categories available in this project
-
-
-                    **Resource**: Collection'
-              types:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Types available in this project
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view work packages or manage types'
-              versions:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Versions available in this project
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view work packages or manage versions'
-              memberships:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Memberships in the project
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view members'
-              workPackages:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Work Packages of this project
-
-
-                    **Resource**: Collection'
-              parent:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Parent of the project
-
-
-                    **Resource**: Workspace
-
-
-                    # Conditions
-
-
-                    **Permission** edit workspace'
-              status:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Denotes the status of the project, so whether the project is on track, at risk or is having trouble.
-
-
-                    **Resource**: ProjectStatus
-
-
-                    # Conditions
-
-
-                    **Permission** edit workspace'
-              storages:
-                type: array
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/Link'
-                  - description: 'The link to a storage that is active for this project.
-
-
-                      **Resource**: Storage
-
-
-                      # Conditions
-
-
-                      **Permission**: view_file_links'
-              projectStorages:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'The project storage collection of this project.
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view_file_links'
-              ancestors:
-                type: array
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/Link'
-                  - description: 'A collection of links to the ancestor workspaces.
-
-
-                      **Resource**: Workspace'
+    CustomCommentProperties:
+      type: object
+      patternProperties:
+        ^customComment\d+$:
+          type:
+          - 'null'
+          - string
+          description: 'A plain-text comment associated with a project custom field that has comments enabled.
+
+
+            The property is only present when the corresponding `customField{N}` has `has_comment` set to `true`.'
     ProgramModel:
       allOf:
       - $ref: '#/components/schemas/CustomFieldProperties'
@@ -968,32 +610,390 @@ components:
             - Text
 
             - Long text'
-    ErrorResponse:
+    ProjectModel:
+      allOf:
+      - $ref: '#/components/schemas/CustomFieldProperties'
+      - $ref: '#/components/schemas/CustomCommentProperties'
+      - type: object
+        properties:
+          _type:
+            type: string
+            enum:
+            - Project
+          id:
+            type: integer
+            description: Projects' id
+            minimum: 1
+          identifier:
+            type: string
+          name:
+            type: string
+          active:
+            type: boolean
+            description: Indicates whether the project is currently active or already archived
+          favorited:
+            type: boolean
+            description: Indicates whether the project is favorited by the current user
+          statusExplanation:
+            allOf:
+            - $ref: '#/components/schemas/Formattable'
+            - description: A text detailing and explaining why the project has the reported status
+          public:
+            type: boolean
+            description: Indicates whether the project is accessible for everybody
+          description:
+            $ref: '#/components/schemas/Formattable'
+          createdAt:
+            type: string
+            format: date-time
+            description: Time of creation. Can be writable by admins with the `apiv3_write_readonly_attributes` setting enabled.
+          updatedAt:
+            type: string
+            format: date-time
+            description: Time of the most recent change to the project
+          _links:
+            type: object
+            required:
+            - self
+            - categories
+            properties:
+              update:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Form endpoint that aids in updating this project
+
+
+                    # Conditions
+
+
+                    **Permission**: edit workspace'
+              updateImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Directly update this project
+
+
+                    # Conditions
+
+
+                    **Permission**: edit workspace'
+              delete:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Delete this project
+
+
+                    # Conditions
+
+
+                    **Permission**: admin'
+              favor:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Mark this project as favorited by the current user
+
+
+                    # Conditions
+
+
+                    Only present if the project is not yet favorited
+
+
+                    Permission**: none but login is required'
+              disfavor:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Mark this project as not favorited by the current user
+
+
+                    # Conditions
+
+                    Only present if the project is favorited by the current user
+
+
+                    Permission**: none but login is required'
+              createWorkPackage:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Form endpoint that aids in preparing and creating a work package
+
+
+                    # Conditions
+
+
+                    **Permission**: add work packages'
+              createWorkPackageImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Directly creates a work package in the project
+
+
+                    # Conditions
+
+
+                    **Permission**: add work packages'
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This project
+
+
+                    **Resource**: Project'
+              categories:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Categories available in this project
+
+
+                    **Resource**: Collection'
+              types:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Types available in this project
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view work packages or manage types'
+              versions:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Versions available in this project
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view work packages or manage versions'
+              memberships:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Memberships in the project
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view members'
+              workPackages:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Work Packages of this project
+
+
+                    **Resource**: Collection'
+              parent:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Parent of the project
+
+
+                    **Resource**: Workspace
+
+
+                    # Conditions
+
+
+                    **Permission** edit workspace'
+              status:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Denotes the status of the project, so whether the project is on track, at risk or is having trouble.
+
+
+                    **Resource**: ProjectStatus
+
+
+                    # Conditions
+
+
+                    **Permission** edit workspace'
+              storages:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'The link to a storage that is active for this project.
+
+
+                      **Resource**: Storage
+
+
+                      # Conditions
+
+
+                      **Permission**: view_file_links'
+              projectStorages:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The project storage collection of this project.
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view_file_links'
+              ancestors:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'A collection of links to the ancestor workspaces.
+
+
+                      **Resource**: Workspace'
+    Formattable:
+      type: object
+      required:
+      - format
+      properties:
+        format:
+          type: string
+          enum:
+          - plain
+          - markdown
+          - custom
+          readOnly: true
+          description: Indicates the formatting language of the raw text
+          example: markdown
+        raw:
+          type: string
+          description: The raw text, as entered by the user
+          example: I **am** formatted!
+        html:
+          type: string
+          readOnly: true
+          description: The text converted to HTML according to the format
+          example: I <strong>am</strong> formatted!
+      example:
+        format: markdown
+        raw: I am formatted!
+        html: I am formatted!
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
+    TimeEntryActivityModel:
       type: object
       required:
       - _type
-      - errorIdentifier
-      - message
+      - id
+      - name
+      - position
+      - default
+      - _embedded
+      - _links
       properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
         _type:
           type: string
           enum:
-          - Error
-        errorIdentifier:
+          - TimeEntriesActivity
+        id:
+          type: integer
+          description: Time entry id
+          minimum: 1
+        name:
           type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
+          description: The human readable name chosen for this activity
+        position:
+          type: integer
+          description: The rank the activity has in a list of activities
+        default:
+          type: boolean
+          description: Flag to signal whether this activity is the default activity
+        _embedded:
+          type: object
+          required:
+          - projects
+          properties:
+            projects:
+              type: array
+              items:
+                oneOf:
+                - $ref: '#/components/schemas/ProjectModel'
+                - $ref: '#/components/schemas/ProgramModel'
+                - $ref: '#/components/schemas/PortfolioModel'
+        _links:
+          type: object
+          required:
+          - self
+          - projects
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This time entry activity
+
+
+                  **Resource**: TimeEntriesActivity'
+            projects:
+              type: array
+              items:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'One of the projects the time entry is active in.
+
+
+                    **Resource**: Project'
+      example:
+        _type: TimeEntriesActivity
+        id: 18
+        name: Management
+        position: 8
+        default: false
+        _embedded:
+          projects: []
+        _links:
+          self:
+            href: /api/v3/time_entries/activities/18
+            title: Management
+          projects:
+          - href: /api/v3/projects/death_star_v2
+            title: DeathStarV2
+          - href: /api/v3/projects/star_killer_base
+            title: StarKillerBase
   securitySchemes:
     BasicAuth:
       type: http

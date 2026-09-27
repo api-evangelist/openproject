@@ -661,51 +661,72 @@ paths:
           $ref: '#/components/responses/UnsupportedMediaType'
 components:
   schemas:
-    CollectionLinks:
+    CollectionModel:
       type: object
       required:
-      - self
+      - _type
+      - total
+      - count
+      - _links
       properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This collection resource.
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
+    UserCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This user collection
 
 
-              **Resource**: Collection'
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
-          type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
+                    **Resource**: Collection'
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserModel'
       example:
-        href: /api/v3/work_packages
-        method: POST
+        _type: Collection
+        total: 2
+        count: 2
+        _links:
+          self:
+            href: /api/v3/users
+        _embedded:
+          elements:
+          - _abbreviated: User resource shortened for brevity
+            _type: User
+            id: 1337
+          - _abbreviated: User resource shortened for brevity
+            _type: User
+            id: 1338
     View_user_schemaModel:
       type: object
       example:
@@ -826,72 +847,176 @@ components:
         _links:
           self:
             href: /api/v3/users/schema
-    UserCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'This user collection
-
-
-                    **Resource**: Collection'
-          _embedded:
-            type: object
-            required:
-            - elements
-            properties:
-              elements:
-                type: array
-                items:
-                  $ref: '#/components/schemas/UserModel'
-      example:
-        _type: Collection
-        total: 2
-        count: 2
-        _links:
-          self:
-            href: /api/v3/users
-        _embedded:
-          elements:
-          - _abbreviated: User resource shortened for brevity
-            _type: User
-            id: 1337
-          - _abbreviated: User resource shortened for brevity
-            _type: User
-            id: 1338
-    CollectionModel:
+    ErrorResponse:
       type: object
       required:
       - _type
-      - total
-      - count
-      - _links
+      - errorIdentifier
+      - message
       properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
         _type:
           type: string
           enum:
-          - Collection
-        total:
-          type: integer
-          description: The total amount of elements available in the collection.
-          minimum: 0
-        count:
-          type: integer
-          description: Actual amount of elements in this response.
-          minimum: 0
-        _links:
-          $ref: '#/components/schemas/CollectionLinks'
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
+    CustomFieldProperties:
+      type: object
+      patternProperties:
+        ^customField\d+$:
+          type:
+          - 'null'
+          - number
+          - boolean
+          - string
+          - object
+          description: 'A custom field value, that belongs to a custom field of a simple type:
+
+
+            - Boolean
+
+            - Date
+
+            - Float
+
+            - Integer
+
+            - Link (URL)
+
+            - Text
+
+            - Long text'
+    UserCreateModel:
+      type: object
+      required:
+      - admin
+      - email
+      - login
+      - firstName
+      - lastName
+      - language
+      properties:
+        admin:
+          type: boolean
+        email:
+          type: string
+          maxLength: 60
+        login:
+          type: string
+          maxLength: 256
+        password:
+          type: string
+          description: 'The user''s password.
+
+
+            *Conditions:*
+
+
+            Writable on create.
+
+
+            Writable on update only when:
+
+            - the caller updates their own account
+
+            - `currentPassword` is provided and valid'
+        currentPassword:
+          type: string
+          description: 'The user''s current password.
+
+
+            *Conditions:*
+
+
+            Required when changing `password` for a self update (`PATCH /api/v3/users/me` or `PATCH /api/v3/users/{id}` where `id` is the caller).
+
+
+            Ignored for non-self updates (for example, administrators updating other users).'
+        firstName:
+          type: string
+          maxLength: 30
+        lastName:
+          type: string
+          maxLength: 30
+        status:
+          type: string
+          description: 'The current activation status of the user.
+
+
+            *Conditions:*
+
+
+            Only writable on creation, not on update.'
+        language:
+          type: string
+      example:
+        login: j.sheppard
+        password: idestroyedsouvereign
+        currentPassword: iusedtobuildstarships
+        firstName: John
+        lastName: Sheppard
+        email: shep@mail.com
+        admin: true
+        status: active
+        language: en
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
     PrincipalModel:
       type: object
       required:
@@ -946,32 +1071,6 @@ components:
 
 
                   **Resource**: Collection'
-    CustomFieldProperties:
-      type: object
-      patternProperties:
-        ^customField\d+$:
-          type:
-          - 'null'
-          - number
-          - boolean
-          - string
-          - object
-          description: 'A custom field value, that belongs to a custom field of a simple type:
-
-
-            - Boolean
-
-            - Date
-
-            - Float
-
-            - Integer
-
-            - Link (URL)
-
-            - Text
-
-            - Long text'
     UserModel:
       allOf:
       - $ref: '#/components/schemas/PrincipalModel'
@@ -1149,105 +1248,6 @@ components:
                     - LDAP authentication configured
 
                     - `admin`'
-    ErrorResponse:
-      type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
-    UserCreateModel:
-      type: object
-      required:
-      - admin
-      - email
-      - login
-      - firstName
-      - lastName
-      - language
-      properties:
-        admin:
-          type: boolean
-        email:
-          type: string
-          maxLength: 60
-        login:
-          type: string
-          maxLength: 256
-        password:
-          type: string
-          description: 'The user''s password.
-
-
-            *Conditions:*
-
-
-            Writable on create.
-
-
-            Writable on update only when:
-
-            - the caller updates their own account
-
-            - `currentPassword` is provided and valid'
-        currentPassword:
-          type: string
-          description: 'The user''s current password.
-
-
-            *Conditions:*
-
-
-            Required when changing `password` for a self update (`PATCH /api/v3/users/me` or `PATCH /api/v3/users/{id}` where `id` is the caller).
-
-
-            Ignored for non-self updates (for example, administrators updating other users).'
-        firstName:
-          type: string
-          maxLength: 30
-        lastName:
-          type: string
-          maxLength: 30
-        status:
-          type: string
-          description: 'The current activation status of the user.
-
-
-            *Conditions:*
-
-
-            Only writable on creation, not on update.'
-        language:
-          type: string
-      example:
-        login: j.sheppard
-        password: idestroyedsouvereign
-        currentPassword: iusedtobuildstarships
-        firstName: John
-        lastName: Sheppard
-        email: shep@mail.com
-        admin: true
-        status: active
-        language: en
   responses:
     MissingContentType:
       description: Occurs when the client did not send a Content-Type header

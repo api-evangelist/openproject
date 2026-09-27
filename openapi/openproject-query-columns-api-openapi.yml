@@ -80,27 +80,6 @@ paths:
       summary: View Query Column
 components:
   schemas:
-    Query_ColumnModel:
-      type: object
-      required:
-      - id
-      - name
-      properties:
-        id:
-          type: string
-          description: Query column id
-          readOnly: true
-        name:
-          type: string
-          description: Query column name
-      example:
-        _type: QueryColumn::Property
-        id: priority
-        name: Priority
-        _links:
-          self:
-            href: /api/v3/queries/columns/priority
-            title: Priority
     ErrorResponse:
       type: object
       required:
@@ -127,6 +106,27 @@ components:
         message:
           type: string
           example: Project can't be blank.
+    Query_ColumnModel:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: string
+          description: Query column id
+          readOnly: true
+        name:
+          type: string
+          description: Query column name
+      example:
+        _type: QueryColumn::Property
+        id: priority
+        name: Priority
+        _links:
+          self:
+            href: /api/v3/queries/columns/priority
+            title: Priority
   securitySchemes:
     BasicAuth:
       type: http

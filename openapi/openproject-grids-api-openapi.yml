@@ -400,64 +400,95 @@ paths:
       summary: Grid Update Form
 components:
   schemas:
-    GridWidgetModel:
+    CollectionModel:
       type: object
       required:
       - _type
-      - id
-      - identifier
-      - startRow
-      - endRow
-      - startColumn
-      - endColumn
+      - total
+      - count
+      - _links
       properties:
         _type:
           type: string
           enum:
-          - GridWidget
-        id:
-          type:
-          - integer
-          - 'null'
-          description: The grid widget's unique identifier. Can be null, if a new widget is created within a grid.
-          minimum: 1
-        identifier:
-          type: string
-          description: An alternative, human legible, and unique identifier.
-        startRow:
+          - Collection
+        total:
           type: integer
-          description: The index of the starting row of the widget. The row is inclusive.
-          minimum: 1
-        endRow:
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
           type: integer
-          description: The index of the ending row of the widget. The row is exclusive.
-          minimum: 1
-        startColumn:
-          type: integer
-          description: The index of the starting column of the widget. The column is inclusive.
-          minimum: 1
-        endColumn:
-          type: integer
-          description: The index of the ending column of the widget. The column is exclusive.
-          minimum: 1
-        options:
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
           type: object
-    GridCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedCollectionModel'
-      - type: object
-        required:
-        - _embedded
-        properties:
-          _embedded:
-            type: object
-            required:
-            - elements
-            properties:
-              elements:
-                type: array
-                items:
-                  $ref: '#/components/schemas/GridReadModel'
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    GridWriteModel:
+      type: object
+      properties:
+        rowCount:
+          type: integer
+          description: The number of rows the grid has
+          minimum: 1
+        columnCount:
+          type: integer
+          description: The number of columns the grid has
+          minimum: 1
+        widgets:
+          type: array
+          description: 'The set of `GridWidget`s selected for the grid.
+
+
+            # Conditions
+
+
+            - The widgets must not overlap.'
+          items:
+            $ref: '#/components/schemas/GridWidgetModel'
+        _links:
+          type: object
+          properties:
+            scope:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: The location where this grid is used, usually represented as a relative URL.
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
     Link:
       type: object
       required:
@@ -491,76 +522,22 @@ components:
       example:
         href: /api/v3/work_packages
         method: POST
-    PaginatedCollectionModel:
+    GridCollectionModel:
       allOf:
-      - $ref: '#/components/schemas/CollectionModel'
+      - $ref: '#/components/schemas/PaginatedCollectionModel'
       - type: object
         required:
-        - pageSize
-        - offset
+        - _embedded
         properties:
-          pageSize:
-            type: integer
-            description: Amount of elements that a response will hold.
-            minimum: 0
-          offset:
-            type: integer
-            description: The page number that is requested from paginated collection.
-            minimum: 1
-          _links:
+          _embedded:
             type: object
             required:
-            - jumpTo
-            - changeSize
+            - elements
             properties:
-              jumpTo:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Templated link to another page offset.
-
-
-                    **Resource**: Collection'
-              changeSize:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Templated link for another page size.
-
-
-                    **Resource**: Collection'
-    CollectionLinks:
-      type: object
-      required:
-      - self
-      properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This collection resource.
-
-
-              **Resource**: Collection'
-    CollectionModel:
-      type: object
-      required:
-      - _type
-      - total
-      - count
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - Collection
-        total:
-          type: integer
-          description: The total amount of elements available in the collection.
-          minimum: 0
-        count:
-          type: integer
-          description: Actual amount of elements in this response.
-          minimum: 0
-        _links:
-          $ref: '#/components/schemas/CollectionLinks'
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GridReadModel'
     GridReadModel:
       type: object
       required:
@@ -658,99 +635,84 @@ components:
               allOf:
               - $ref: '#/components/schemas/Link'
               - description: Deletes this grid resource.
-    GridWriteModel:
-      type: object
-      properties:
-        rowCount:
-          type: integer
-          description: The number of rows the grid has
-          minimum: 1
-        columnCount:
-          type: integer
-          description: The number of columns the grid has
-          minimum: 1
-        widgets:
-          type: array
-          description: 'The set of `GridWidget`s selected for the grid.
-
-
-            # Conditions
-
-
-            - The widgets must not overlap.'
-          items:
-            $ref: '#/components/schemas/GridWidgetModel'
-        _links:
-          type: object
-          properties:
-            scope:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: The location where this grid is used, usually represented as a relative URL.
-    ErrorResponse:
+    GridWidgetModel:
       type: object
       required:
       - _type
-      - errorIdentifier
-      - message
+      - id
+      - identifier
+      - startRow
+      - endRow
+      - startColumn
+      - endColumn
       properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
         _type:
           type: string
           enum:
-          - Error
-        errorIdentifier:
+          - GridWidget
+        id:
+          type:
+          - integer
+          - 'null'
+          description: The grid widget's unique identifier. Can be null, if a new widget is created within a grid.
+          minimum: 1
+        identifier:
           type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
-  responses:
-    MissingContentType:
-      description: Occurs when the client did not send a Content-Type header
-      content:
-        text/plain:
-          schema:
-            type: string
-          example: Missing content-type header
-    InvalidQuery:
-      description: Returned if the client sends invalid request parameters e.g. filters
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidQuery
-            message: Filters Invalid filter does not exist.
-    UnsupportedMediaType:
-      description: Occurs when the client sends an unsupported Content-Type header.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
-            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
-    InvalidRequestBody:
-      description: Occurs when the client did not send a valid JSON object in the request body.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
-            message: The request body was not a single JSON object.
+          description: An alternative, human legible, and unique identifier.
+        startRow:
+          type: integer
+          description: The index of the starting row of the widget. The row is inclusive.
+          minimum: 1
+        endRow:
+          type: integer
+          description: The index of the ending row of the widget. The row is exclusive.
+          minimum: 1
+        startColumn:
+          type: integer
+          description: The index of the starting column of the widget. The column is inclusive.
+          minimum: 1
+        endColumn:
+          type: integer
+          description: The index of the ending column of the widget. The column is exclusive.
+          minimum: 1
+        options:
+          type: object
+    PaginatedCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - pageSize
+        - offset
+        properties:
+          pageSize:
+            type: integer
+            description: Amount of elements that a response will hold.
+            minimum: 0
+          offset:
+            type: integer
+            description: The page number that is requested from paginated collection.
+            minimum: 1
+          _links:
+            type: object
+            required:
+            - jumpTo
+            - changeSize
+            properties:
+              jumpTo:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Templated link to another page offset.
+
+
+                    **Resource**: Collection'
+              changeSize:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Templated link for another page size.
+
+
+                    **Resource**: Collection'
   examples:
     GridSimplePatchModel:
       value:
@@ -885,6 +847,44 @@ components:
           changeSize:
             href: /api/v3/grids?filters=%5B%5D&offset=1&pageSize=%7Bsize%7D
             templated: true
+  responses:
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
+    InvalidQuery:
+      description: Returned if the client sends invalid request parameters e.g. filters
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidQuery
+            message: Filters Invalid filter does not exist.
+    UnsupportedMediaType:
+      description: Occurs when the client sends an unsupported Content-Type header.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
+            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+    InvalidRequestBody:
+      description: Occurs when the client did not send a valid JSON object in the request body.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+            message: The request body was not a single JSON object.
   securitySchemes:
     BasicAuth:
       type: http

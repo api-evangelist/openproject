@@ -88,7 +88,7 @@
     "openproject-openapi.yml: declared missing tag: Time Entries",
     "openproject-openapi.yml: declared missing tag: WorkPackages",
     "openproject-openapi.yml: declared missing tag: Workspace",
-    "superseded outputs removed: openproject-o-auth2-api-openapi.yml, openproject-user-preferences-api-openapi.yml",
+    "superseded outputs removed: openproject-oauth2-api-openapi.yml, openproject-user-preferences-api-openapi.yml",
     "apis.yml register: written (+3 apis, 62 total)"
   ],
   "skipped": [
@@ -115,7 +115,7 @@
     "openproject-memberships-api-openapi.yml: previously refined output, superseded by openapi/_original/",
     "openproject-news-api-openapi.yml: previously refined output, superseded by openapi/_original/",
     "openproject-notifications-api-openapi.yml: previously refined output, superseded by openapi/_original/",
-    "openproject-o-auth2-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "openproject-oauth2-api-openapi.yml: previously refined output, superseded by openapi/_original/",
     "openproject-portfolios-api-openapi.yml: previously refined output, superseded by openapi/_original/",
     "openproject-posts-api-openapi.yml: previously refined output, superseded by openapi/_original/",
     "openproject-previewing-api-openapi.yml: previously refined output, superseded by openapi/_original/",

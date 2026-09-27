@@ -166,30 +166,6 @@ paths:
       summary: view Budgets of a Project
 components:
   schemas:
-    BudgetModel:
-      type: object
-      properties:
-        _links:
-          type: object
-          required:
-          - self
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This budget
-
-
-                  **Resource**: Budget'
-                readOnly: true
-      example:
-        _type: Budget
-        _links:
-          self:
-            href: /api/v3/budgets/1
-            title: Q3 2015
-        id: 1
-        subject: Q3 2015
     Link:
       type: object
       required:
@@ -223,6 +199,31 @@ components:
       example:
         href: /api/v3/work_packages
         method: POST
+    Budgets_by_ProjectModel:
+      type: object
+      example:
+        _links:
+          self:
+            href: /api/v3/projects/1/budgets
+        _type: Collection
+        total: 2
+        count: 2
+        _embedded:
+          elements:
+          - _type: Budget
+            _links:
+              self:
+                href: /api/v3/budgets/1
+                title: Q3 2015
+            id: 1
+            subject: Q3 2015
+          - _type: Budget
+            _links:
+              self:
+                href: /api/v3/budgets/2
+                title: Q4 2015
+            id: 2
+            subject: Q4 2015
     ErrorResponse:
       type: object
       required:
@@ -249,31 +250,30 @@ components:
         message:
           type: string
           example: Project can't be blank.
-    Budgets_by_ProjectModel:
+    BudgetModel:
       type: object
+      properties:
+        _links:
+          type: object
+          required:
+          - self
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This budget
+
+
+                  **Resource**: Budget'
+                readOnly: true
       example:
+        _type: Budget
         _links:
           self:
-            href: /api/v3/projects/1/budgets
-        _type: Collection
-        total: 2
-        count: 2
-        _embedded:
-          elements:
-          - _type: Budget
-            _links:
-              self:
-                href: /api/v3/budgets/1
-                title: Q3 2015
-            id: 1
-            subject: Q3 2015
-          - _type: Budget
-            _links:
-              self:
-                href: /api/v3/budgets/2
-                title: Q4 2015
-            id: 2
-            subject: Q4 2015
+            href: /api/v3/budgets/1
+            title: Q3 2015
+        id: 1
+        subject: Q3 2015
   securitySchemes:
     BasicAuth:
       type: http

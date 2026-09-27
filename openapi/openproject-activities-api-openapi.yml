@@ -456,8 +456,13 @@ paths:
             That''s why a 404 is returned here, even if a 403 might be more appropriate.*'
 components:
   schemas:
-    EmojiReactions_Model:
+    CollectionModel:
       type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
       properties:
         _type:
           type: string
@@ -465,112 +470,14 @@ components:
           - Collection
         total:
           type: integer
-          description: Total number of emoji reactions
+          description: The total amount of elements available in the collection.
           minimum: 0
         count:
           type: integer
-          description: Number of emoji reactions in this response
+          description: Actual amount of elements in this response.
           minimum: 0
-        _embedded:
-          type: object
-          properties:
-            elements:
-              type: array
-              items:
-                $ref: '#/components/schemas/EmojiReactionModel'
         _links:
-          type: object
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: This collection
-      example:
-        _type: Collection
-        total: 2
-        count: 2
-        _embedded:
-          elements:
-          - _type: EmojiReaction
-            id: 1-thumbs_up
-            reaction: thumbs_up
-            emoji: 👍
-            reactionsCount: 3
-            firstReactionAt: '2024-04-08T15:37:19.275Z'
-            _links:
-              self:
-                href: /api/v3/emoji_reactions/1-thumbs_up
-              reactable:
-                href: /api/v3/activities/1
-              reactingUsers:
-              - href: /api/v3/users/435
-                title: John Doe
-              - href: /api/v3/users/436
-                title: Jane Smith
-              - href: /api/v3/users/437
-                title: Bob Johnson
-          - _type: EmojiReaction
-            id: 1-heart
-            reaction: heart
-            emoji: ❤️
-            reactionsCount: 1
-            firstReactionAt: '2024-04-08T15:38:19.275Z'
-            _links:
-              self:
-                href: /api/v3/emoji_reactions/1-heart
-              reactable:
-                href: /api/v3/activities/1
-              reactingUsers:
-              - href: /api/v3/users/435
-                title: John Doe
-        _links:
-          self:
-            href: /api/v3/activities/1/emoji_reactions
-    CollectionLinks:
-      type: object
-      required:
-      - self
-      properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This collection resource.
-
-
-              **Resource**: Collection'
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
-          type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
+          $ref: '#/components/schemas/CollectionLinks'
     WorkPackageModel:
       allOf:
       - $ref: '#/components/schemas/CustomFieldProperties'
@@ -1315,70 +1222,44 @@ components:
         customField2: 42
         createdAt: '2014-08-29T12:40:53.373Z'
         updatedAt: '2014-08-29T12:44:41.981Z'
-    Attachments_Model:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'The attachments collection
-
-
-                    **Resource**: AttachmentsCollection'
-                  readOnly: true
-          _embedded:
-            type: object
-            properties:
-              elements:
-                type: array
-                readOnly: true
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/AttachmentModel'
-                  - description: Collection of Attachments
-    FileUploadForm:
-      type: object
-      properties:
-        metadata:
-          type: object
-          properties:
-            fileName:
-              type: string
-        file:
-          type: string
-          format: binary
-    CollectionModel:
+    ErrorResponse:
       type: object
       required:
       - _type
-      - total
-      - count
-      - _links
+      - errorIdentifier
+      - message
       properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
         _type:
           type: string
           enum:
-          - Collection
-        total:
-          type: integer
-          description: The total amount of elements available in the collection.
-          minimum: 0
-        count:
-          type: integer
-          description: Actual amount of elements in this response.
-          minimum: 0
-        _links:
-          $ref: '#/components/schemas/CollectionLinks'
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
     AttachmentModel:
       type: object
       required:
@@ -1504,6 +1385,146 @@ components:
           algorithm: md5
           hash: 64c26a8403cd796ea4cf913cda2ee4a9
         createdAt: '2014-05-21T08:51:20.396Z'
+    FileUploadForm:
+      type: object
+      properties:
+        metadata:
+          type: object
+          properties:
+            fileName:
+              type: string
+        file:
+          type: string
+          format: binary
+    CustomFieldProperties:
+      type: object
+      patternProperties:
+        ^customField\d+$:
+          type:
+          - 'null'
+          - number
+          - boolean
+          - string
+          - object
+          description: 'A custom field value, that belongs to a custom field of a simple type:
+
+
+            - Boolean
+
+            - Date
+
+            - Float
+
+            - Integer
+
+            - Link (URL)
+
+            - Text
+
+            - Long text'
+    EmojiReactions_Model:
+      type: object
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: Total number of emoji reactions
+          minimum: 0
+        count:
+          type: integer
+          description: Number of emoji reactions in this response
+          minimum: 0
+        _embedded:
+          type: object
+          properties:
+            elements:
+              type: array
+              items:
+                $ref: '#/components/schemas/EmojiReactionModel'
+        _links:
+          type: object
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: This collection
+      example:
+        _type: Collection
+        total: 2
+        count: 2
+        _embedded:
+          elements:
+          - _type: EmojiReaction
+            id: 1-thumbs_up
+            reaction: thumbs_up
+            emoji: 👍
+            reactionsCount: 3
+            firstReactionAt: '2024-04-08T15:37:19.275Z'
+            _links:
+              self:
+                href: /api/v3/emoji_reactions/1-thumbs_up
+              reactable:
+                href: /api/v3/activities/1
+              reactingUsers:
+              - href: /api/v3/users/435
+                title: John Doe
+              - href: /api/v3/users/436
+                title: Jane Smith
+              - href: /api/v3/users/437
+                title: Bob Johnson
+          - _type: EmojiReaction
+            id: 1-heart
+            reaction: heart
+            emoji: ❤️
+            reactionsCount: 1
+            firstReactionAt: '2024-04-08T15:38:19.275Z'
+            _links:
+              self:
+                href: /api/v3/emoji_reactions/1-heart
+              reactable:
+                href: /api/v3/activities/1
+              reactingUsers:
+              - href: /api/v3/users/435
+                title: John Doe
+        _links:
+          self:
+            href: /api/v3/activities/1/emoji_reactions
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
     Formattable:
       type: object
       required:
@@ -1531,6 +1552,37 @@ components:
         format: markdown
         raw: I am formatted!
         html: I am formatted!
+    Attachments_Model:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The attachments collection
+
+
+                    **Resource**: AttachmentsCollection'
+                  readOnly: true
+          _embedded:
+            type: object
+            properties:
+              elements:
+                type: array
+                readOnly: true
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/AttachmentModel'
+                  - description: Collection of Attachments
     ActivityCommentWriteModel:
       type: object
       properties:
@@ -1882,58 +1934,34 @@ components:
             title: Jane Smith
           - href: /api/v3/users/437
             title: Bob Johnson
-    CustomFieldProperties:
-      type: object
-      patternProperties:
-        ^customField\d+$:
-          type:
-          - 'null'
-          - number
-          - boolean
-          - string
-          - object
-          description: 'A custom field value, that belongs to a custom field of a simple type:
-
-
-            - Boolean
-
-            - Date
-
-            - Float
-
-            - Integer
-
-            - Link (URL)
-
-            - Text
-
-            - Long text'
-    ErrorResponse:
-      type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
+  responses:
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
+    UnsupportedMediaType:
+      description: Occurs when the client sends an unsupported Content-Type header.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
+            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+    InvalidRequestBody:
+      description: Occurs when the client did not send a valid JSON object in the request body.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+            message: The request body was not a single JSON object.
   examples:
     ActivityResponse:
       description: A simple response example for an activity comment.
@@ -1980,34 +2008,6 @@ components:
           update:
             href: /api/v3/activities/1478
             method: patch
-  responses:
-    MissingContentType:
-      description: Occurs when the client did not send a Content-Type header
-      content:
-        text/plain:
-          schema:
-            type: string
-          example: Missing content-type header
-    UnsupportedMediaType:
-      description: Occurs when the client sends an unsupported Content-Type header.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
-            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
-    InvalidRequestBody:
-      description: Occurs when the client did not send a valid JSON object in the request body.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
-            message: The request body was not a single JSON object.
   securitySchemes:
     BasicAuth:
       type: http

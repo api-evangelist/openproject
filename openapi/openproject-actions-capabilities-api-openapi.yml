@@ -341,76 +341,32 @@ paths:
       summary: View capabilities
 components:
   schemas:
-    List_actionsModel:
+    ErrorResponse:
       type: object
-      example:
-        _links:
-          self:
-            href: /api/v3/actions
-        total: 2
-        count: 2
-        _type: Collection
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
         _embedded:
-          elements:
-          - _links:
-              self:
-                href: /api/v3/actions/work_packages/create
-                title: Add work package
-            _type: Action
-            id: work_packages/create
-            name: Add work package
-            description: Creating a work package within a project including the uploading of attachments. Some attributes might not be selected, e.g version which requires a second permission
-            modules:
-            - work_packages
-          - _links:
-              self:
-                href: /api/v3/actions/work_packages/assign_versions
-                title: Assigning version
-            _type: Action
-            id: work_packages/assign_versions
-            name: Assign version
-            description: Assigning a work package to a version when creating/updating a work package. Only principals having this permission can assign a value to the version property of the work package resource.
-            modules:
-            - work_packages
-            - versions
-    View_actionModel:
-      type: object
-      example:
-        _links:
-          self:
-            href: /api/v3/actions/work_packages/create
-            title: Add work package
-        _type: Action
-        id: work_packages/create
-        name: Add work package
-        description: Creating a work package within a project including the uploading of attachments. Some attributes might not be selected, e.g version which requires a second permission
-        modules:
-        - work_packages
-    View_capabilitiesModel:
-      type: object
-      example:
-        _links:
-          self:
-            href: /api/v3/capabilities/work_packages/create/p123-567
-          action:
-            href: /api/v3/actions/work_packages/create
-            title: Add work package
-          context:
-            href: /api/v3/projects/123
-            title: A project
-          principal:
-            href: /api/v3/users/567
-            title: Some user
-        _type: Capability
-        id: work_packages/create/p123-567
-    View_global_contextModel:
-      type: object
-      example:
-        _links:
-          self:
-            href: /api/v3/capabilities/context/global
-        _type: CapabilityContext::Global
-        id: global
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
     List_capabilitiesModel:
       type: object
       example:
@@ -481,32 +437,76 @@ components:
                 title: Some user
             _type: Capability
             id: users/delete/g-567
-    ErrorResponse:
+    View_capabilitiesModel:
       type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
+      example:
+        _links:
+          self:
+            href: /api/v3/capabilities/work_packages/create/p123-567
+          action:
+            href: /api/v3/actions/work_packages/create
+            title: Add work package
+          context:
+            href: /api/v3/projects/123
+            title: A project
+          principal:
+            href: /api/v3/users/567
+            title: Some user
+        _type: Capability
+        id: work_packages/create/p123-567
+    View_actionModel:
+      type: object
+      example:
+        _links:
+          self:
+            href: /api/v3/actions/work_packages/create
+            title: Add work package
+        _type: Action
+        id: work_packages/create
+        name: Add work package
+        description: Creating a work package within a project including the uploading of attachments. Some attributes might not be selected, e.g version which requires a second permission
+        modules:
+        - work_packages
+    List_actionsModel:
+      type: object
+      example:
+        _links:
+          self:
+            href: /api/v3/actions
+        total: 2
+        count: 2
+        _type: Collection
         _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
+          elements:
+          - _links:
+              self:
+                href: /api/v3/actions/work_packages/create
+                title: Add work package
+            _type: Action
+            id: work_packages/create
+            name: Add work package
+            description: Creating a work package within a project including the uploading of attachments. Some attributes might not be selected, e.g version which requires a second permission
+            modules:
+            - work_packages
+          - _links:
+              self:
+                href: /api/v3/actions/work_packages/assign_versions
+                title: Assigning version
+            _type: Action
+            id: work_packages/assign_versions
+            name: Assign version
+            description: Assigning a work package to a version when creating/updating a work package. Only principals having this permission can assign a value to the version property of the work package resource.
+            modules:
+            - work_packages
+            - versions
+    View_global_contextModel:
+      type: object
+      example:
+        _links:
+          self:
+            href: /api/v3/capabilities/context/global
+        _type: CapabilityContext::Global
+        id: global
   securitySchemes:
     BasicAuth:
       type: http

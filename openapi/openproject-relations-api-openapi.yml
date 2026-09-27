@@ -342,152 +342,29 @@ paths:
                     errorIdentifier: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
                     message: Lag must be a number greater than or equal to 0
 components:
-  examples:
-    RelationCollectionResponse:
-      description: Simple response of a relation collection.
-      value:
-        _type: Collection
-        total: 40
-        count: 20
-        pageSize: 20
-        offset: 1
-        _embedded:
-          elements:
-          - _type: Relation
-            id: 650
-            name: duplicated by
-            type: duplicated
-            reverseType: duplicates
-            lag: null
-            description: Those are the same... stupid Stormtroopers!
-            _links:
-              self:
-                href: /api/v3/relations/650
-              updateImmediately:
-                href: /api/v3/relations/650
-                method: patch
-              delete:
-                href: /api/v3/relations/650
-                method: delete,
-                title: Remove relation
-              from:
-                href: /api/v3/work_packages/108
-                title: Destroy Rebel Base
-              to:
-                href: /api/v3/work_packages/78
-                title: Annihilate Yavin 4
-          - _type: Relation
-            id: 652
-            name: relates to
-            type: relates
-            reverseType: relates
-            _hint: Relation resource shortened for brevity.
-          - _hint: Further relation resources shortened for brevity.
-        _links:
-          self:
-            href: /api/v3/relations?filters=%5B%5D&offset=1&pageSize=20
-          jumpTo:
-            href: /api/v3/relations?filters=%5B%5D&offset=%7Boffset%7D&pageSize=20
-            templated: true
-          changeSize:
-            href: /api/v3/relations?filters=%5B%5D&offset=1&pageSize=%7Bsize%7D
-            templated: true
-          nextByOffset:
-            href: /api/v3/relations?filters=%5B%5D&offset=2&pageSize=20
-    RelationCreateRequest:
-      description: Example request to create a relation between two work packages.
-      value:
-        type: follows
-        lag: 2
-        description: Build hangar AFTER improving external skeleton of Death Star.
-        _links:
-          to:
-            href: /api/v3/work_packages/1337
-    RelationResponse:
-      description: Simple response of a 'duplicated by' relation between two work packages.
-      value:
-        _type: Relation
-        id: 650
-        name: duplicated by
-        type: duplicated
-        reverseType: duplicates
-        lag: null
-        description: Those are the same... stupid Stormtroopers!
-        _embedded:
-          from:
-            id: 108
-            _type: WorkPackage
-            _abbreviated: Work package resource shortened for brevity.
-          to:
-            id: 78
-            _type: WorkPackage
-            _abbreviated: Work package resource shortened for brevity.
-        _links:
-          self:
-            href: /api/v3/relations/650
-          updateImmediately:
-            href: /api/v3/relations/650
-            method: patch
-          delete:
-            href: /api/v3/relations/650
-            method: delete,
-            title: Remove relation
-          from:
-            href: /api/v3/work_packages/108
-            title: Destroy Rebel Base
-          to:
-            href: /api/v3/work_packages/78
-            title: Annihilate Yavin 4
-    RelationUpdateRequest:
-      description: Example request to update the relation's description.
-      value:
-        description: This is the new description.
   schemas:
-    CollectionLinks:
+    CollectionModel:
       type: object
       required:
-      - self
+      - _type
+      - total
+      - count
+      - _links
       properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This collection resource.
-
-
-              **Resource**: Collection'
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
+        _type:
           type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
     WorkPackageModel:
       allOf:
       - $ref: '#/components/schemas/CustomFieldProperties'
@@ -1232,6 +1109,118 @@ components:
         customField2: 42
         createdAt: '2014-08-29T12:40:53.373Z'
         updatedAt: '2014-08-29T12:44:41.981Z'
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
+    RelationWriteModel:
+      type: object
+      required:
+      - _links
+      - type
+      properties:
+        type:
+          type: string
+          description: The relation type.
+          enum:
+          - relates
+          - duplicates
+          - duplicated
+          - blocks
+          - blocked
+          - precedes
+          - follows
+          - includes
+          - partof
+          - requires
+          - required
+        description:
+          type:
+          - string
+          - 'null'
+          description: A descriptive text for the relation.
+        lag:
+          type:
+          - integer
+          - 'null'
+          description: The lag in days between closing of `from` and start of `to`
+          minimum: 0
+        _links:
+          type: object
+          properties:
+            to:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The work package the relation ends in. Only available on relation creation, not on update.
+
+
+                  **Resource**: WorkPackage
+
+
+                  # Conditions
+
+
+                  **Permission**: view work packages'
+    CustomFieldProperties:
+      type: object
+      patternProperties:
+        ^customField\d+$:
+          type:
+          - 'null'
+          - number
+          - boolean
+          - string
+          - object
+          description: 'A custom field value, that belongs to a custom field of a simple type:
+
+
+            - Boolean
+
+            - Date
+
+            - Float
+
+            - Integer
+
+            - Link (URL)
+
+            - Text
+
+            - Long text'
     RelationCollectionModel:
       allOf:
       - $ref: '#/components/schemas/CollectionModel'
@@ -1261,28 +1250,6 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/RelationReadModel'
-    CollectionModel:
-      type: object
-      required:
-      - _type
-      - total
-      - count
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - Collection
-        total:
-          type: integer
-          description: The total amount of elements available in the collection.
-          minimum: 0
-        count:
-          type: integer
-          description: Actual amount of elements in this response.
-          minimum: 0
-        _links:
-          $ref: '#/components/schemas/CollectionLinks'
     Formattable:
       type: object
       required:
@@ -1310,6 +1277,39 @@ components:
         format: markdown
         raw: I am formatted!
         html: I am formatted!
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
     RelationReadModel:
       type: object
       properties:
@@ -1433,106 +1433,6 @@ components:
 
 
                   **Permission**: view work packages'
-    CustomFieldProperties:
-      type: object
-      patternProperties:
-        ^customField\d+$:
-          type:
-          - 'null'
-          - number
-          - boolean
-          - string
-          - object
-          description: 'A custom field value, that belongs to a custom field of a simple type:
-
-
-            - Boolean
-
-            - Date
-
-            - Float
-
-            - Integer
-
-            - Link (URL)
-
-            - Text
-
-            - Long text'
-    RelationWriteModel:
-      type: object
-      required:
-      - _links
-      - type
-      properties:
-        type:
-          type: string
-          description: The relation type.
-          enum:
-          - relates
-          - duplicates
-          - duplicated
-          - blocks
-          - blocked
-          - precedes
-          - follows
-          - includes
-          - partof
-          - requires
-          - required
-        description:
-          type:
-          - string
-          - 'null'
-          description: A descriptive text for the relation.
-        lag:
-          type:
-          - integer
-          - 'null'
-          description: The lag in days between closing of `from` and start of `to`
-          minimum: 0
-        _links:
-          type: object
-          properties:
-            to:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The work package the relation ends in. Only available on relation creation, not on update.
-
-
-                  **Resource**: WorkPackage
-
-
-                  # Conditions
-
-
-                  **Permission**: view work packages'
-    ErrorResponse:
-      type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
   responses:
     MissingContentType:
       description: Occurs when the client did not send a Content-Type header
@@ -1541,16 +1441,6 @@ components:
           schema:
             type: string
           example: Missing content-type header
-    UnsupportedMediaType:
-      description: Occurs when the client sends an unsupported Content-Type header.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
-            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
     InvalidRequestBody:
       description: Occurs when the client did not send a valid JSON object in the request body.
       content:
@@ -1561,6 +1451,116 @@ components:
             _type: Error
             errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
             message: The request body was not a single JSON object.
+    UnsupportedMediaType:
+      description: Occurs when the client sends an unsupported Content-Type header.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
+            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+  examples:
+    RelationUpdateRequest:
+      description: Example request to update the relation's description.
+      value:
+        description: This is the new description.
+    RelationResponse:
+      description: Simple response of a 'duplicated by' relation between two work packages.
+      value:
+        _type: Relation
+        id: 650
+        name: duplicated by
+        type: duplicated
+        reverseType: duplicates
+        lag: null
+        description: Those are the same... stupid Stormtroopers!
+        _embedded:
+          from:
+            id: 108
+            _type: WorkPackage
+            _abbreviated: Work package resource shortened for brevity.
+          to:
+            id: 78
+            _type: WorkPackage
+            _abbreviated: Work package resource shortened for brevity.
+        _links:
+          self:
+            href: /api/v3/relations/650
+          updateImmediately:
+            href: /api/v3/relations/650
+            method: patch
+          delete:
+            href: /api/v3/relations/650
+            method: delete,
+            title: Remove relation
+          from:
+            href: /api/v3/work_packages/108
+            title: Destroy Rebel Base
+          to:
+            href: /api/v3/work_packages/78
+            title: Annihilate Yavin 4
+    RelationCollectionResponse:
+      description: Simple response of a relation collection.
+      value:
+        _type: Collection
+        total: 40
+        count: 20
+        pageSize: 20
+        offset: 1
+        _embedded:
+          elements:
+          - _type: Relation
+            id: 650
+            name: duplicated by
+            type: duplicated
+            reverseType: duplicates
+            lag: null
+            description: Those are the same... stupid Stormtroopers!
+            _links:
+              self:
+                href: /api/v3/relations/650
+              updateImmediately:
+                href: /api/v3/relations/650
+                method: patch
+              delete:
+                href: /api/v3/relations/650
+                method: delete,
+                title: Remove relation
+              from:
+                href: /api/v3/work_packages/108
+                title: Destroy Rebel Base
+              to:
+                href: /api/v3/work_packages/78
+                title: Annihilate Yavin 4
+          - _type: Relation
+            id: 652
+            name: relates to
+            type: relates
+            reverseType: relates
+            _hint: Relation resource shortened for brevity.
+          - _hint: Further relation resources shortened for brevity.
+        _links:
+          self:
+            href: /api/v3/relations?filters=%5B%5D&offset=1&pageSize=20
+          jumpTo:
+            href: /api/v3/relations?filters=%5B%5D&offset=%7Boffset%7D&pageSize=20
+            templated: true
+          changeSize:
+            href: /api/v3/relations?filters=%5B%5D&offset=1&pageSize=%7Bsize%7D
+            templated: true
+          nextByOffset:
+            href: /api/v3/relations?filters=%5B%5D&offset=2&pageSize=20
+    RelationCreateRequest:
+      description: Example request to create a relation between two work packages.
+      value:
+        type: follows
+        lag: 2
+        description: Build hangar AFTER improving external skeleton of Death Star.
+        _links:
+          to:
+            href: /api/v3/work_packages/1337
   securitySchemes:
     BasicAuth:
       type: http

@@ -671,71 +671,293 @@ paths:
 
             * a constraint for a property was violated (`PropertyConstraintViolation`)'
 components:
-  examples:
-    UserResponse:
-      value:
-        _type: User
-        id: 14
-        name: Mara Jade
-        createdAt: '2022-04-04T08:07:22.910Z'
-        updatedAt: '2024-02-09T09:01:17.382Z'
-        login: member
-        admin: false
-        firstName: Mara
-        lastName: Jade
-        email: m.jade@empire.org
-        avatar: https://secure.gravatar.com/avatar/17dd23570f3bd129d06db9b48b7a41b8?default=404&secure=true
-        status: active
-        identityUrl: null
-        language: en
-        _links:
-          self:
-            href: /api/v3/users/14
-            title: Mara Jade
-          memberships:
-            href: /api/v3/memberships?filters=%5B%7B%22principal%22%3A%7B%22operator%22%3A%22%3D%22%2C%22values%22%3A%5B%2214%22%5D%7D%7D%5D
-            title: Memberships
-          showUser:
-            href: /users/14
-            type: text/html
-          updateImmediately:
-            href: /api/v3/users/14
-            title: Update member
-            method: patch
-          lock:
-            href: /api/v3/users/14/lock
-            title: Set lock on member
-            method: post
-          delete:
-            href: /api/v3/users/14
-            title: Delete member
-            method: delete
-    PlaceholderUserResponse:
-      value:
-        _type: PlaceholderUser
-        id: 27
-        name: Akolyth
-        createdAt: '2024-02-12T11:52:24.708Z'
-        updatedAt: '2024-02-12T11:52:24.708Z'
-        _links:
-          self:
-            href: /api/v3/placeholder_users/27
-            title: Akolyth
-          memberships:
-            href: /api/v3/memberships?filters=%5B%7B%22principal%22%3A%7B%22operator%22%3A%22%3D%22%2C%22values%22%3A%5B%2227%22%5D%7D%7D%5D
-            title: Memberships
-          updateImmediately:
-            href: /api/v3/placeholder_users/27
-            title: Update Akolyth
-            method: patch
-          delete:
-            href: /api/v3/placeholder_users/27
-            title: Delete Akolyth
-            method: delete
-          showUser:
-            href: /placeholder_users/27
-            type: text/html
   schemas:
+    UserCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This user collection
+
+
+                    **Resource**: Collection'
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserModel'
+      example:
+        _type: Collection
+        total: 2
+        count: 2
+        _links:
+          self:
+            href: /api/v3/users
+        _embedded:
+          elements:
+          - _abbreviated: User resource shortened for brevity
+            _type: User
+            id: 1337
+          - _abbreviated: User resource shortened for brevity
+            _type: User
+            id: 1338
+    OffsetPaginatedCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - pageSize
+        - offset
+        - _links
+        properties:
+          pageSize:
+            type: integer
+            description: 'The amount of elements per page. If not set by the request this value defaults to the server''s system
+
+              settings.'
+            minimum: 0
+          offset:
+            type: integer
+            description: The page offset indicating on which page the element collection starts.
+            minimum: 0
+          _links:
+            $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
+    PrincipalCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/OffsetPaginatedCollectionModel'
+      - type: object
+        required:
+        - _embedded
+        properties:
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                items:
+                  anyOf:
+                  - $ref: '#/components/schemas/UserModel'
+                  - $ref: '#/components/schemas/PlaceholderUserModel'
+                  - $ref: '#/components/schemas/GroupModel'
+      example:
+        _type: Collection
+        total: 3
+        count: 3
+        _links:
+          self:
+            href: /api/v3/principals
+        _embedded:
+          elements:
+          - _abbreviated: User resource shortened for brevity
+            _type: User
+            id: 1337
+          - _abbreviated: Group resource shortened for brevity
+            _type: Group
+            id: 1338
+          - _abbreviated: PlaceholderUser resource shortened for brevity
+            _type: PlaceholderUser
+            id: 1339
+    CustomFieldProperties:
+      type: object
+      patternProperties:
+        ^customField\d+$:
+          type:
+          - 'null'
+          - number
+          - boolean
+          - string
+          - object
+          description: 'A custom field value, that belongs to a custom field of a simple type:
+
+
+            - Boolean
+
+            - Date
+
+            - Float
+
+            - Integer
+
+            - Link (URL)
+
+            - Text
+
+            - Long text'
+    UserCreateModel:
+      type: object
+      required:
+      - admin
+      - email
+      - login
+      - firstName
+      - lastName
+      - language
+      properties:
+        admin:
+          type: boolean
+        email:
+          type: string
+          maxLength: 60
+        login:
+          type: string
+          maxLength: 256
+        password:
+          type: string
+          description: 'The user''s password.
+
+
+            *Conditions:*
+
+
+            Writable on create.
+
+
+            Writable on update only when:
+
+            - the caller updates their own account
+
+            - `currentPassword` is provided and valid'
+        currentPassword:
+          type: string
+          description: 'The user''s current password.
+
+
+            *Conditions:*
+
+
+            Required when changing `password` for a self update (`PATCH /api/v3/users/me` or `PATCH /api/v3/users/{id}` where `id` is the caller).
+
+
+            Ignored for non-self updates (for example, administrators updating other users).'
+        firstName:
+          type: string
+          maxLength: 30
+        lastName:
+          type: string
+          maxLength: 30
+        status:
+          type: string
+          description: 'The current activation status of the user.
+
+
+            *Conditions:*
+
+
+            Only writable on creation, not on update.'
+        language:
+          type: string
+      example:
+        login: j.sheppard
+        password: idestroyedsouvereign
+        currentPassword: iusedtobuildstarships
+        firstName: John
+        lastName: Sheppard
+        email: shep@mail.com
+        admin: true
+        status: active
+        language: en
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
+    PlaceholderUserModel:
+      allOf:
+      - $ref: '#/components/schemas/PrincipalModel'
+      - type: object
+        required:
+        - _type
+        properties:
+          _type:
+            type: string
+            enum:
+            - PlaceholderUser
+          status:
+            type: string
+            description: 'The current activation status of the placeholder user.
+
+
+              # Conditions
+
+
+              - User has `manage_placeholder_user` permission globally'
+          _links:
+            type: object
+            required:
+            - showUser
+            properties:
+              showUser:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: A relative path to show the placeholder user in the web application.
+              delete:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'An href to delete the placeholder user.
+
+
+                    # Conditions:
+
+
+                    - `manage_placeholder_user`'
+              updateImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'An href to update the placeholder user.
+
+
+                    # Conditions:
+
+
+                    - `manage_placeholder_user`
+
+
+                    **Resource**: PlaceholderUser'
     OffsetPaginatedCollectionLinks:
       allOf:
       - $ref: '#/components/schemas/CollectionLinks'
@@ -770,32 +992,202 @@ components:
                 # Conditions
 
                 - The collection is not on the last page.'
-    CustomFieldProperties:
+    GroupModel:
+      allOf:
+      - $ref: '#/components/schemas/PrincipalModel'
+      - $ref: '#/components/schemas/CustomFieldProperties'
+      - type: object
+        required:
+        - _type
+        - _embedded
+        properties:
+          _type:
+            type: string
+            enum:
+            - Group
+          _embedded:
+            type: object
+            properties:
+              members:
+                type: array
+                description: Embedded list of members.
+                items:
+                  $ref: '#/components/schemas/UserModel'
+          _links:
+            type: object
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This group resource
+
+
+                    **Resource**: Group'
+              members:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'A member of the group
+
+
+                      # Conditions:
+
+
+                      - user has permission `manage_members` in any project
+
+
+                      **Resource**: User'
+              memberships:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'An collection of all memberships of the group.
+
+
+                    **Resource**: MembershipCollection'
+              delete:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'An href to delete the group.
+
+
+                    # Conditions:
+
+
+                    - `admin`'
+              updateImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'An href to update the group.
+
+
+                    # Conditions:
+
+
+                    - `admin`
+
+
+                    **Resource**: Group'
+    PrincipalModel:
       type: object
-      patternProperties:
-        ^customField\d+$:
-          type:
-          - 'null'
-          - number
-          - boolean
-          - string
-          - object
-          description: 'A custom field value, that belongs to a custom field of a simple type:
+      required:
+      - _type
+      - id
+      - name
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - User
+          - Group
+          - PlaceholderUser
+        id:
+          type: integer
+          description: The principal's unique identifier.
+          minimum: 1
+        name:
+          type: string
+          description: The principal's display name, layout depends on instance settings.
+        createdAt:
+          type: string
+          format: date-time
+          description: Time of creation
+        updatedAt:
+          type: string
+          format: date-time
+          description: Time of the most recent change to the principal
+        _links:
+          type: object
+          required:
+          - self
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This principal resource.
 
 
-            - Boolean
+                  **Resource**: User|Group|PlaceholderUser'
+            memberships:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'An href to the collection of the principal''s memberships.
 
-            - Date
 
-            - Float
+                  # Conditions:
 
-            - Integer
 
-            - Link (URL)
+                  - user has permission `view_members` or `manage_members` in any project
 
-            - Text
 
-            - Long text'
+                  **Resource**: Collection'
+    CollectionModel:
+      type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
+    PlaceholderUserCreateModel:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The new name of the placeholder user to be created.
     UserModel:
       allOf:
       - $ref: '#/components/schemas/PrincipalModel'
@@ -973,463 +1365,14 @@ components:
                     - LDAP authentication configured
 
                     - `admin`'
-    PlaceholderUserCreateModel:
-      type: object
-      properties:
-        name:
-          type: string
-          description: The new name of the placeholder user to be created.
-    PlaceholderUserModel:
-      allOf:
-      - $ref: '#/components/schemas/PrincipalModel'
-      - type: object
-        required:
-        - _type
-        properties:
-          _type:
-            type: string
-            enum:
-            - PlaceholderUser
-          status:
-            type: string
-            description: 'The current activation status of the placeholder user.
-
-
-              # Conditions
-
-
-              - User has `manage_placeholder_user` permission globally'
-          _links:
-            type: object
-            required:
-            - showUser
-            properties:
-              showUser:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: A relative path to show the placeholder user in the web application.
-              delete:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'An href to delete the placeholder user.
-
-
-                    # Conditions:
-
-
-                    - `manage_placeholder_user`'
-              updateImmediately:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'An href to update the placeholder user.
-
-
-                    # Conditions:
-
-
-                    - `manage_placeholder_user`
-
-
-                    **Resource**: PlaceholderUser'
-    UserCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'This user collection
-
-
-                    **Resource**: Collection'
-          _embedded:
-            type: object
-            required:
-            - elements
-            properties:
-              elements:
-                type: array
-                items:
-                  $ref: '#/components/schemas/UserModel'
-      example:
-        _type: Collection
-        total: 2
-        count: 2
-        _links:
-          self:
-            href: /api/v3/users
-        _embedded:
-          elements:
-          - _abbreviated: User resource shortened for brevity
-            _type: User
-            id: 1337
-          - _abbreviated: User resource shortened for brevity
-            _type: User
-            id: 1338
-    PrincipalCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/OffsetPaginatedCollectionModel'
-      - type: object
-        required:
-        - _embedded
-        properties:
-          _embedded:
-            type: object
-            required:
-            - elements
-            properties:
-              elements:
-                type: array
-                items:
-                  anyOf:
-                  - $ref: '#/components/schemas/UserModel'
-                  - $ref: '#/components/schemas/PlaceholderUserModel'
-                  - $ref: '#/components/schemas/GroupModel'
-      example:
-        _type: Collection
-        total: 3
-        count: 3
-        _links:
-          self:
-            href: /api/v3/principals
-        _embedded:
-          elements:
-          - _abbreviated: User resource shortened for brevity
-            _type: User
-            id: 1337
-          - _abbreviated: Group resource shortened for brevity
-            _type: Group
-            id: 1338
-          - _abbreviated: PlaceholderUser resource shortened for brevity
-            _type: PlaceholderUser
-            id: 1339
-    CollectionLinks:
-      type: object
-      required:
-      - self
-      properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This collection resource.
-
-
-              **Resource**: Collection'
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
-          type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
-    GroupModel:
-      allOf:
-      - $ref: '#/components/schemas/PrincipalModel'
-      - $ref: '#/components/schemas/CustomFieldProperties'
-      - type: object
-        required:
-        - _type
-        - _embedded
-        properties:
-          _type:
-            type: string
-            enum:
-            - Group
-          _embedded:
-            type: object
-            properties:
-              members:
-                type: array
-                description: Embedded list of members.
-                items:
-                  $ref: '#/components/schemas/UserModel'
-          _links:
-            type: object
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'This group resource
-
-
-                    **Resource**: Group'
-              members:
-                type: array
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/Link'
-                  - description: 'A member of the group
-
-
-                      # Conditions:
-
-
-                      - user has permission `manage_members` in any project
-
-
-                      **Resource**: User'
-              memberships:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'An collection of all memberships of the group.
-
-
-                    **Resource**: MembershipCollection'
-              delete:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'An href to delete the group.
-
-
-                    # Conditions:
-
-
-                    - `admin`'
-              updateImmediately:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'An href to update the group.
-
-
-                    # Conditions:
-
-
-                    - `admin`
-
-
-                    **Resource**: Group'
-    OffsetPaginatedCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - pageSize
-        - offset
-        - _links
-        properties:
-          pageSize:
-            type: integer
-            description: 'The amount of elements per page. If not set by the request this value defaults to the server''s system
-
-              settings.'
-            minimum: 0
-          offset:
-            type: integer
-            description: The page offset indicating on which page the element collection starts.
-            minimum: 0
-          _links:
-            $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
-    ErrorResponse:
-      type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
-    UserCreateModel:
-      type: object
-      required:
-      - admin
-      - email
-      - login
-      - firstName
-      - lastName
-      - language
-      properties:
-        admin:
-          type: boolean
-        email:
-          type: string
-          maxLength: 60
-        login:
-          type: string
-          maxLength: 256
-        password:
-          type: string
-          description: 'The user''s password.
-
-
-            *Conditions:*
-
-
-            Writable on create.
-
-
-            Writable on update only when:
-
-            - the caller updates their own account
-
-            - `currentPassword` is provided and valid'
-        currentPassword:
-          type: string
-          description: 'The user''s current password.
-
-
-            *Conditions:*
-
-
-            Required when changing `password` for a self update (`PATCH /api/v3/users/me` or `PATCH /api/v3/users/{id}` where `id` is the caller).
-
-
-            Ignored for non-self updates (for example, administrators updating other users).'
-        firstName:
-          type: string
-          maxLength: 30
-        lastName:
-          type: string
-          maxLength: 30
-        status:
-          type: string
-          description: 'The current activation status of the user.
-
-
-            *Conditions:*
-
-
-            Only writable on creation, not on update.'
-        language:
-          type: string
-      example:
-        login: j.sheppard
-        password: idestroyedsouvereign
-        currentPassword: iusedtobuildstarships
-        firstName: John
-        lastName: Sheppard
-        email: shep@mail.com
-        admin: true
-        status: active
-        language: en
-    CollectionModel:
-      type: object
-      required:
-      - _type
-      - total
-      - count
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - Collection
-        total:
-          type: integer
-          description: The total amount of elements available in the collection.
-          minimum: 0
-        count:
-          type: integer
-          description: Actual amount of elements in this response.
-          minimum: 0
-        _links:
-          $ref: '#/components/schemas/CollectionLinks'
-    PrincipalModel:
-      type: object
-      required:
-      - _type
-      - id
-      - name
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - User
-          - Group
-          - PlaceholderUser
-        id:
-          type: integer
-          description: The principal's unique identifier.
-          minimum: 1
-        name:
-          type: string
-          description: The principal's display name, layout depends on instance settings.
-        createdAt:
-          type: string
-          format: date-time
-          description: Time of creation
-        updatedAt:
-          type: string
-          format: date-time
-          description: Time of the most recent change to the principal
-        _links:
-          type: object
-          required:
-          - self
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This principal resource.
-
-
-                  **Resource**: User|Group|PlaceholderUser'
-            memberships:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'An href to the collection of the principal''s memberships.
-
-
-                  # Conditions:
-
-
-                  - user has permission `view_members` or `manage_members` in any project
-
-
-                  **Resource**: Collection'
   responses:
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
     UnsupportedMediaType:
       description: Occurs when the client sends an unsupported Content-Type header.
       content:
@@ -1450,13 +1393,70 @@ components:
             _type: Error
             errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
             message: The request body was not a single JSON object.
-    MissingContentType:
-      description: Occurs when the client did not send a Content-Type header
-      content:
-        text/plain:
-          schema:
-            type: string
-          example: Missing content-type header
+  examples:
+    UserResponse:
+      value:
+        _type: User
+        id: 14
+        name: Mara Jade
+        createdAt: '2022-04-04T08:07:22.910Z'
+        updatedAt: '2024-02-09T09:01:17.382Z'
+        login: member
+        admin: false
+        firstName: Mara
+        lastName: Jade
+        email: m.jade@empire.org
+        avatar: https://secure.gravatar.com/avatar/17dd23570f3bd129d06db9b48b7a41b8?default=404&secure=true
+        status: active
+        identityUrl: null
+        language: en
+        _links:
+          self:
+            href: /api/v3/users/14
+            title: Mara Jade
+          memberships:
+            href: /api/v3/memberships?filters=%5B%7B%22principal%22%3A%7B%22operator%22%3A%22%3D%22%2C%22values%22%3A%5B%2214%22%5D%7D%7D%5D
+            title: Memberships
+          showUser:
+            href: /users/14
+            type: text/html
+          updateImmediately:
+            href: /api/v3/users/14
+            title: Update member
+            method: patch
+          lock:
+            href: /api/v3/users/14/lock
+            title: Set lock on member
+            method: post
+          delete:
+            href: /api/v3/users/14
+            title: Delete member
+            method: delete
+    PlaceholderUserResponse:
+      value:
+        _type: PlaceholderUser
+        id: 27
+        name: Akolyth
+        createdAt: '2024-02-12T11:52:24.708Z'
+        updatedAt: '2024-02-12T11:52:24.708Z'
+        _links:
+          self:
+            href: /api/v3/placeholder_users/27
+            title: Akolyth
+          memberships:
+            href: /api/v3/memberships?filters=%5B%7B%22principal%22%3A%7B%22operator%22%3A%22%3D%22%2C%22values%22%3A%5B%2227%22%5D%7D%7D%5D
+            title: Memberships
+          updateImmediately:
+            href: /api/v3/placeholder_users/27
+            title: Update Akolyth
+            method: patch
+          delete:
+            href: /api/v3/placeholder_users/27
+            title: Delete Akolyth
+            method: delete
+          showUser:
+            href: /placeholder_users/27
+            type: text/html
   securitySchemes:
     BasicAuth:
       type: http
