@@ -459,22 +459,102 @@ components:
           minimum: 0
         _links:
           $ref: '#/components/schemas/CollectionLinks'
-    WeekDaySelfLinkModel:
+    ErrorResponse:
       type: object
-      description: Identify a particular week day by its href.
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    CollectionLinks:
+      type: object
+      required:
+      - self
       properties:
         self:
           allOf:
           - $ref: '#/components/schemas/Link'
-          - description: 'This week day resource link.
+          - description: 'This collection resource.
 
 
-              **Resource**: WeekDay'
-            readOnly: true
+              **Resource**: Collection'
+    DayModel:
+      type: object
+      required:
+      - _type
+      - date
+      - name
+      - working
+      properties:
+        _type:
+          type: string
+          enum:
+          - Day
+        date:
+          type: string
+          format: date
+          description: Date of the day.
+        name:
+          type: string
+          description: Descriptive name for the day.
+        working:
+          type: boolean
+          description: '`true` for a working day, `false` otherwise.'
+        _links:
+          type: object
+          required:
+          - self
+          properties:
+            self:
+              $ref: '#/components/schemas/Link'
+            nonWorkingReasons:
+              type: array
+              description: 'A list of resources describing why this day is a non-working day.
+
+                Linked resources can be `NonWorkingDay` and `WeekDay` resources.
+
+                This property is absent for working days.'
+              items:
+                $ref: '#/components/schemas/Link'
+            weekDay:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: The week day for this day.
       example:
-        self:
-          href: /api/v3/days/week/3
-          title: Wednesday
+        _type: Day
+        date: '2022-12-25'
+        name: Sunday (Christmas)
+        working: false
+        _links:
+          self:
+            href: /api/v3/days/2022-12-25
+          nonWorkingReasons:
+          - href: /api/v3/days/week/7
+            title: Sunday
+          - href: /api/v3/days/non_working/2022-12-25
+            title: Christmas
+          weekday:
+            href: /api/v3/days/week/7
+            title: Sunday
     WeekDayCollectionModel:
       allOf:
       - $ref: '#/components/schemas/CollectionModel'
@@ -572,32 +652,6 @@ components:
               self:
                 href: /api/v3/days/week/7
                 title: Sunday
-    ErrorResponse:
-      type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
     WeekDayModel:
       type: object
       required:
@@ -634,6 +688,98 @@ components:
           self:
             href: /api/v3/day/week/5
             title: Friday
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
+    WeekDayCollectionWriteModel:
+      type: object
+      required:
+      - _type
+      - _embedded
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        _embedded:
+          type: object
+          required:
+          - elements
+          properties:
+            elements:
+              type: array
+              description: The array of week days.
+              minItems: 1
+              maxItems: 7
+              items:
+                allOf:
+                - $ref: '#/components/schemas/WeekDayWriteModel'
+                - type: object
+                  required:
+                  - _links
+                  properties:
+                    _links:
+                      allOf:
+                      - $ref: '#/components/schemas/WeekDaySelfLinkModel'
+      example:
+        _type: Collection
+        _embedded:
+          elements:
+          - _type: WeekDay
+            working: true
+            _links:
+              self:
+                href: /api/v3/days/week/1
+          - _type: WeekDay
+            working: true
+            _links:
+              self:
+                href: /api/v3/days/week/2
+          - _type: WeekDay
+            working: true
+            _links:
+              self:
+                href: /api/v3/days/week/4
+          - _type: WeekDay
+            working: false
+            _links:
+              self:
+                href: /api/v3/days/week/6
+          - _type: WeekDay
+            working: false
+            _links:
+              self:
+                href: /api/v3/days/week/7
     NonWorkingDayModel:
       type: object
       required:
@@ -672,35 +818,6 @@ components:
           self:
             href: /api/v3/days/non_working/2022-12-25
             title: Christmas
-    CollectionLinks:
-      type: object
-      required:
-      - self
-      properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This collection resource.
-
-
-              **Resource**: Collection'
-    WeekDayWriteModel:
-      type: object
-      description: Describes a week day as a working day or a non-working day (weekend).
-      required:
-      - _type
-      - working
-      properties:
-        _type:
-          type: string
-          enum:
-          - WeekDay
-        working:
-          type: boolean
-          description: '`true` for a working day. `false` for a weekend day.'
-      example:
-        _type: WeekDay
-        working: false
     DayCollectionModel:
       allOf:
       - $ref: '#/components/schemas/CollectionModel'
@@ -800,98 +917,39 @@ components:
               weekday:
                 href: /api/v3/days/week/2
                 title: Tuesday
-    Link:
+    WeekDaySelfLinkModel:
       type: object
-      required:
-      - href
+      description: Identify a particular week day by its href.
       properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
-          type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This week day resource link.
+
+
+              **Resource**: WeekDay'
+            readOnly: true
       example:
-        href: /api/v3/work_packages
-        method: POST
-    WeekDayCollectionWriteModel:
+        self:
+          href: /api/v3/days/week/3
+          title: Wednesday
+    WeekDayWriteModel:
       type: object
+      description: Describes a week day as a working day or a non-working day (weekend).
       required:
       - _type
-      - _embedded
+      - working
       properties:
         _type:
           type: string
           enum:
-          - Collection
-        _embedded:
-          type: object
-          required:
-          - elements
-          properties:
-            elements:
-              type: array
-              description: The array of week days.
-              minItems: 1
-              maxItems: 7
-              items:
-                allOf:
-                - $ref: '#/components/schemas/WeekDayWriteModel'
-                - type: object
-                  required:
-                  - _links
-                  properties:
-                    _links:
-                      allOf:
-                      - $ref: '#/components/schemas/WeekDaySelfLinkModel'
+          - WeekDay
+        working:
+          type: boolean
+          description: '`true` for a working day. `false` for a weekend day.'
       example:
-        _type: Collection
-        _embedded:
-          elements:
-          - _type: WeekDay
-            working: true
-            _links:
-              self:
-                href: /api/v3/days/week/1
-          - _type: WeekDay
-            working: true
-            _links:
-              self:
-                href: /api/v3/days/week/2
-          - _type: WeekDay
-            working: true
-            _links:
-              self:
-                href: /api/v3/days/week/4
-          - _type: WeekDay
-            working: false
-            _links:
-              self:
-                href: /api/v3/days/week/6
-          - _type: WeekDay
-            working: false
-            _links:
-              self:
-                href: /api/v3/days/week/7
+        _type: WeekDay
+        working: false
     NonWorkingDayCollectionModel:
       allOf:
       - $ref: '#/components/schemas/CollectionModel'
@@ -949,64 +1007,6 @@ components:
               weekday:
                 href: /api/v3/days/week/7
                 title: Sunday
-    DayModel:
-      type: object
-      required:
-      - _type
-      - date
-      - name
-      - working
-      properties:
-        _type:
-          type: string
-          enum:
-          - Day
-        date:
-          type: string
-          format: date
-          description: Date of the day.
-        name:
-          type: string
-          description: Descriptive name for the day.
-        working:
-          type: boolean
-          description: '`true` for a working day, `false` otherwise.'
-        _links:
-          type: object
-          required:
-          - self
-          properties:
-            self:
-              $ref: '#/components/schemas/Link'
-            nonWorkingReasons:
-              type: array
-              description: 'A list of resources describing why this day is a non-working day.
-
-                Linked resources can be `NonWorkingDay` and `WeekDay` resources.
-
-                This property is absent for working days.'
-              items:
-                $ref: '#/components/schemas/Link'
-            weekDay:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: The week day for this day.
-      example:
-        _type: Day
-        date: '2022-12-25'
-        name: Sunday (Christmas)
-        working: false
-        _links:
-          self:
-            href: /api/v3/days/2022-12-25
-          nonWorkingReasons:
-          - href: /api/v3/days/week/7
-            title: Sunday
-          - href: /api/v3/days/non_working/2022-12-25
-            title: Christmas
-          weekday:
-            href: /api/v3/days/week/7
-            title: Sunday
   responses:
     MissingContentType:
       description: Occurs when the client did not send a Content-Type header
@@ -1015,16 +1015,6 @@ components:
           schema:
             type: string
           example: Missing content-type header
-    UnsupportedMediaType:
-      description: Occurs when the client sends an unsupported Content-Type header.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
-            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
     InvalidRequestBody:
       description: Occurs when the client did not send a valid JSON object in the request body.
       content:
@@ -1035,6 +1025,16 @@ components:
             _type: Error
             errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
             message: The request body was not a single JSON object.
+    UnsupportedMediaType:
+      description: Occurs when the client sends an unsupported Content-Type header.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
+            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
   securitySchemes:
     BasicAuth:
       type: http

@@ -521,1086 +521,7 @@ paths:
         '415':
           $ref: '#/components/responses/UnsupportedMediaType'
 components:
-  examples:
-    ProjectCollection:
-      value:
-        _type: Collection
-        count: 2
-        total: 2
-        pageSize: 20
-        offset: 1
-        _embedded:
-          elements:
-          - _abbreviated: Project resource shortened for brevity
-            id: 1
-            identifier: initialproject
-            name: DeathStar construction
-            active: true
-            public: true
-          - _abbreviated: Project resource shortened for brevity
-            id: 2
-            identifier: mysecret
-            name: Palpatine's secret plan
-            active: true
-            public: false
-        _links:
-          self:
-            href: /api/v3/projects?filters=%5B%5D&offset=1&pageSize=20
-          jumpTo:
-            href: /api/v3/projects?filters=%5B%5D&offset=%7Boffset%7D&pageSize=20
-            templated: true
-          changeSize:
-            href: /api/v3/projects?filters=%5B%5D&offset=1&pageSize=%7Bsize%7D
-            templated: true
-          representations:
-          - href: /projects.csv?filters=%5B%5D&offset=1&pageSize=20
-            identifier: csv
-            type: text/csv
-            title: CSV
-          - href: /projects.xls?filters=%5B%5D&offset=1&pageSize=20
-            identifier: xls
-            type: application/vnd.ms-excel
-            title: XLS
-    MembershipUpdateAdditionalRoles:
-      description: Updates a membership and add multiple roles.
-      value:
-        _links:
-          roles:
-          - href: /api/v3/roles/5
-          - href: /api/v3/roles/6
-    MembershipCreateRequestNoNotification:
-      description: Create a membership without sending a notification message.
-      value:
-        _links:
-          principal:
-            href: /api/v3/users/14
-          project:
-            href: /api/v3/projects/21
-          roles:
-          - href: /api/v3/roles/4
-        _meta:
-          sendNotification: false
-    MembershipCreateRequestCustomMessage:
-      description: Create a membership and send a custom notification message.
-      value:
-        _links:
-          principal:
-            href: /api/v3/users/14
-          project:
-            href: /api/v3/projects/21
-          roles:
-          - href: /api/v3/roles/4
-        _meta:
-          notificationMessage:
-            format: markdown
-            raw: Granted permission to execute Order *66*.
-    MembershipSimpleResponse:
-      description: A simple membership response example.
-      value:
-        _type: Membership
-        id: 11
-        createdAt: '2015-03-20T12:56:56.626Z'
-        updatedAt: '2018-12-20T18:16:11.563Z'
-        _embedded:
-          project:
-            _type: Project
-            id: 3
-            _abbreviated: Project resource shortened for brevity
-          principal:
-            _type: User
-            id: 5
-            _abbreviated: User resource shortened for brevity
-          roles:
-          - _type: Role
-            id: 4
-            _abbreviated: Roles resource shortened for brevity
-        _links:
-          self:
-            href: /api/v3/memberships/11
-            title: Darth Vader
-          schema:
-            href: /api/v3/memberships/schema
-          update:
-            href: /api/v3/memberships/11/form
-            method: post
-          updateImmediately:
-            href: /api/v3/memberships/11
-            method: patch
-          project:
-            href: /api/v3/projects/3
-            title: Death Start v3
-          principal:
-            href: /api/v3/users/5
-            title: Darth Vader
-          roles:
-          - href: /api/v3/roles/4
-            title: Sith Lord
-    MembershipCreateRequestGlobalRole:
-      description: Create a membership for a global role. To address global roles, no project must be set.
-      value:
-        _links:
-          principal:
-            href: /api/v3/users/14
-          roles:
-          - href: /api/v3/roles/4
-    MembershipFormResponse:
-      description: A simple form response example.
-      value:
-        _type: Form
-        _embedded:
-          payload:
-            _meta:
-              notificationMessage:
-                format: markdown
-                raw: '*Hallo*'
-                html: <p class="op-uc-p"><em>Hallo</em></p>
-            _links:
-              project:
-                href: /api/v3/projects/21
-                title: Death Star v3
-              principal:
-                href: /api/v3/users/14
-                title: Mara Jade
-              roles: []
-          schema:
-            _type: Schema
-            _abbreviated: Schema resource shortened for brevity
-          validationErrors:
-            roles:
-              _type: Error
-              errorIdentifier: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-              message: Roles need to be assigned.
-              _embedded:
-                details:
-                  attribute: roles
-        _links:
-          self:
-            href: /api/v3/memberships/form
-            method: post
-          validate:
-            href: /api/v3/memberships/form
-            method: post
-    MembershipSchemaResponse:
-      description: A simple schema response example.
-      value:
-        _type: Schema
-        _dependencies: []
-        id:
-          type: Integer
-          name: ID
-          required: true
-          hasDefault: false
-          writable: false
-          options: {}
-        createdAt:
-          type: DateTime
-          name: Created on
-          required: true
-          hasDefault: false
-          writable: false
-          options: {}
-        updatedAt:
-          type: DateTime
-          name: Updated on
-          required: true
-          hasDefault: false
-          writable: false
-          options: {}
-        notificationMessage:
-          type: Formattable
-          name: Message
-          required: false
-          hasDefault: false
-          writable: true
-          options: {}
-          location: _meta
-        project:
-          type: Project
-          name: Project
-          required: false
-          hasDefault: false
-          writable: true
-          location: _links
-          _links:
-            allowedValues:
-              href: /api/v3/memberships/available_projects?filters=%5B%7B%22principal%22%3A%7B%22operator%22%3A%22%21%22%2C%22values%22%3A%5B%2214%22%5D%7D%7D%5D
-        principal:
-          type: Principal
-          name: Principal
-          required: true
-          hasDefault: false
-          writable: true
-          location: _links
-          _links:
-            allowedValues:
-              href: /api/v3/principals?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22%21%22%2C%22values%22%3A%5B%223%22%5D%7D%7D%2C%7B%22member%22%3A%7B%22operator%22%3A%22%21%22%2C%22values%22%3A%5B%2221%22%5D%7D%7D%5D
-        roles:
-          type: '[]Role'
-          name: Role
-          required: true
-          hasDefault: false
-          writable: true
-          location: _links
-          _links:
-            allowedValues:
-              href: /api/v3/roles
-        _links:
-          self:
-            href: /api/v3/memberships/schema
-    MembershipSimpleCollectionResponse:
-      description: A simple membership collection response example.
-      value:
-        _type: Collection
-        total: 1
-        count: 1
-        pageSize: 20
-        offset: 1
-        _embedded:
-          elements:
-          - _type: Membership
-            id: 11
-            createdAt: '2015-03-20T12:56:56.643Z'
-            updatedAt: '2018-12-20T18:16:11.643Z'
-            _links:
-              self:
-                href: /api/v3/memberships/11
-                title: Darth Vader
-              schema:
-                href: /api/v3/memberships/schema
-              update:
-                href: /api/v3/memberships/11/form
-                method: post
-              updateImmediately:
-                href: /api/v3/memberships/11
-                method: patch
-              project:
-                href: /api/v3/projects/3
-                title: Death Start v3
-              principal:
-                href: /api/v3/users/5
-                title: Darth Vader
-              roles:
-              - href: /api/v3/roles/4
-                title: Sith Lord
-        _links:
-          self:
-            href: /api/v3/memberships
-          jumpTo:
-            href: /api/v3/memberships?filters=%5B%5D&offset=%7Boffset%7D&pageSize=20
-            templated: true
-          changeSize:
-            href: /api/v3/memberships?filters=%5B%5D&offset=1&pageSize=%7Bsize%7D
-            templated: true
-          nextByOffset:
-            href: /api/v3/memberships?filters=%5B%5D&offset=2&pageSize=20
   schemas:
-    OffsetPaginatedCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - pageSize
-        - offset
-        - _links
-        properties:
-          pageSize:
-            type: integer
-            description: 'The amount of elements per page. If not set by the request this value defaults to the server''s system
-
-              settings.'
-            minimum: 0
-          offset:
-            type: integer
-            description: The page offset indicating on which page the element collection starts.
-            minimum: 0
-          _links:
-            $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
-    MembershipSchemaModel:
-      allOf:
-      - $ref: '#/components/schemas/SchemaModel'
-      - type: object
-        required:
-        - id
-        - createdAt
-        - updatedAt
-        - notificationMessage
-        - project
-        - principal
-        - roles
-        properties:
-          id:
-            $ref: '#/components/schemas/SchemaPropertyModel'
-          createdAt:
-            $ref: '#/components/schemas/SchemaPropertyModel'
-          updatedAt:
-            $ref: '#/components/schemas/SchemaPropertyModel'
-          notificationMessage:
-            $ref: '#/components/schemas/SchemaPropertyModel'
-          project:
-            $ref: '#/components/schemas/SchemaPropertyModel'
-          principal:
-            $ref: '#/components/schemas/SchemaPropertyModel'
-          roles:
-            $ref: '#/components/schemas/SchemaPropertyModel'
-    CustomFieldProperties:
-      type: object
-      patternProperties:
-        ^customField\d+$:
-          type:
-          - 'null'
-          - number
-          - boolean
-          - string
-          - object
-          description: 'A custom field value, that belongs to a custom field of a simple type:
-
-
-            - Boolean
-
-            - Date
-
-            - Float
-
-            - Integer
-
-            - Link (URL)
-
-            - Text
-
-            - Long text'
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
-          type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
-    SchemaPropertyModel:
-      type: object
-      required:
-      - type
-      - name
-      - required
-      - hasDefault
-      - writable
-      properties:
-        type:
-          type: string
-          description: The resource type for this property.
-        name:
-          type: string
-          description: The name of the property.
-        required:
-          type: boolean
-          description: Indicates, if the property is required for submitting a request of this schema.
-        hasDefault:
-          type: boolean
-          description: Indicates, if the property has a default.
-        writable:
-          type: boolean
-          description: Indicates, if the property is writable when sending a request of this schema.
-        options:
-          type: object
-          description: Additional options for the property.
-        location:
-          type: string
-          description: Defines the json path where the property is located in the payload.
-          default: ''
-        placeholder:
-          type: string
-          description: A placeholder for the property to display if the property has no value.
-        _links:
-          type: object
-          description: Useful links for this property (e.g. an endpoint to fetch allowed values)
-    OffsetPaginatedCollectionLinks:
-      allOf:
-      - $ref: '#/components/schemas/CollectionLinks'
-      - type: object
-        required:
-        - jumpTo
-        - changeSize
-        properties:
-          jumpTo:
-            allOf:
-            - $ref: '#/components/schemas/Link'
-            - description: A templated link to jump to a given offset.
-          changeSize:
-            allOf:
-            - $ref: '#/components/schemas/Link'
-            - description: A templated link to change the current page size.
-          previousByOffset:
-            allOf:
-            - $ref: '#/components/schemas/Link'
-            - description: 'A link to the previous page of the collection.
-
-
-                # Conditions
-
-                - The collection is not on the first page.'
-          nextByOffset:
-            allOf:
-            - $ref: '#/components/schemas/Link'
-            - description: 'A link to the next page of the collection.
-
-
-                # Conditions
-
-                - The collection is not on the last page.'
-    CustomCommentProperties:
-      type: object
-      patternProperties:
-        ^customComment\d+$:
-          type:
-          - 'null'
-          - string
-          description: 'A plain-text comment associated with a project custom field that has comments enabled.
-
-
-            The property is only present when the corresponding `customField{N}` has `has_comment` set to `true`.'
-    ProgramModel:
-      allOf:
-      - $ref: '#/components/schemas/CustomFieldProperties'
-      - $ref: '#/components/schemas/CustomCommentProperties'
-      - type: object
-        properties:
-          _type:
-            type: string
-            enum:
-            - Program
-          id:
-            type: integer
-            description: Programs' id
-            minimum: 1
-          identifier:
-            type: string
-          name:
-            type: string
-          active:
-            type: boolean
-            description: Indicates whether the program is currently active or already archived
-          favorited:
-            type: boolean
-            description: Indicates whether the program is favorited by the current user
-          statusExplanation:
-            allOf:
-            - $ref: '#/components/schemas/Formattable'
-            - description: A text detailing and explaining why the program has the reported status
-          public:
-            type: boolean
-            description: Indicates whether the program is accessible for everybody
-          description:
-            $ref: '#/components/schemas/Formattable'
-          createdAt:
-            type: string
-            format: date-time
-            description: Time of creation. Can be writable by admins with the `apiv3_write_readonly_attributes` setting enabled.
-          updatedAt:
-            type: string
-            format: date-time
-            description: Time of the most recent change to the program
-          _links:
-            type: object
-            required:
-            - self
-            - categories
-            properties:
-              update:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Form endpoint that aids in updating this program
-
-
-                    # Conditions
-
-
-                    **Permission**: edit workspace'
-              updateImmediately:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Directly update this program
-
-
-                    # Conditions
-
-
-                    **Permission**: edit workspace'
-              delete:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Delete this program
-
-
-                    # Conditions
-
-
-                    **Permission**: admin'
-              favor:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Mark this program as favorited by the current user
-
-
-                    # Conditions
-
-
-                    Only present if the program is not yet favorited
-
-
-                    Permission**: none but login is required'
-              disfavor:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Mark this program as not favorited by the current user
-
-
-                    # Conditions
-
-                    Only present if the program is favorited by the current user
-
-
-                    Permission**: none but login is required'
-              createWorkPackage:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Form endpoint that aids in preparing and creating a work package
-
-
-                    # Conditions
-
-
-                    **Permission**: add work packages'
-              createWorkPackageImmediately:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Directly creates a work package in the program
-
-
-                    # Conditions
-
-
-                    **Permission**: add work packages'
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'This program
-
-
-                    **Resource**: Program'
-              categories:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Categories available in this program
-
-
-                    **Resource**: Collection'
-              types:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Types available in this program
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view work packages or manage types'
-              versions:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Versions available in this program
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view work packages or manage versions'
-              memberships:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Memberships in the  program
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view members'
-              workPackages:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Work Packages of this program
-
-
-                    **Resource**: Collection'
-              parent:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Parent of the program
-
-
-                    **Resource**: Program
-
-
-                    # Conditions
-
-
-                    **Permission** edit workspace'
-              status:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Denotes the status of the program, so whether the program is on track, at risk or is having trouble.
-
-
-                    **Resource**: ProjectStatus
-
-
-                    # Conditions
-
-
-                    **Permission** edit workspace'
-              storages:
-                type: array
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/Link'
-                  - description: 'The link to a storage that is active for this program.
-
-
-                      **Resource**: Storage
-
-
-                      # Conditions
-
-
-                      **Permission**: view_file_links'
-              projectStorages:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'The project storage collection of this program.
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view_file_links'
-              ancestors:
-                type: array
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/Link'
-                  - description: 'A collection of links to the ancestor workspace.
-
-
-                      **Resource**: Workspace'
-    MembershipFormModel:
-      type: object
-      required:
-      - _type
-      - _embedded
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - Form
-        _embedded:
-          type: object
-          required:
-          - payload
-          - schema
-          - validationError
-          properties:
-            payload:
-              $ref: '#/components/schemas/MembershipWriteModel'
-            schema:
-              $ref: '#/components/schemas/MembershipSchemaModel'
-            validationError:
-              type: object
-              properties:
-                base:
-                  $ref: '#/components/schemas/ErrorResponse'
-                principal:
-                  $ref: '#/components/schemas/ErrorResponse'
-                roles:
-                  $ref: '#/components/schemas/ErrorResponse'
-        _links:
-          type: object
-          required:
-          - self
-          - validate
-          - commit
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This form request.
-
-
-                  **Resource**: Form'
-            validate:
-              type: array
-              items:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: The endpoint to validate the membership payload.
-            commit:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The endpoint to create the membership with the same payload, as sent to the form.
-
-
-                  **Resource**: Membership'
-    MembershipCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedCollectionModel'
-      - type: object
-        required:
-        - _embedded
-        properties:
-          _embedded:
-            type: object
-            required:
-            - elements
-            properties:
-              elements:
-                type: array
-                items:
-                  $ref: '#/components/schemas/MembershipReadModel'
-    ProjectModel:
-      allOf:
-      - $ref: '#/components/schemas/CustomFieldProperties'
-      - $ref: '#/components/schemas/CustomCommentProperties'
-      - type: object
-        properties:
-          _type:
-            type: string
-            enum:
-            - Project
-          id:
-            type: integer
-            description: Projects' id
-            minimum: 1
-          identifier:
-            type: string
-          name:
-            type: string
-          active:
-            type: boolean
-            description: Indicates whether the project is currently active or already archived
-          favorited:
-            type: boolean
-            description: Indicates whether the project is favorited by the current user
-          statusExplanation:
-            allOf:
-            - $ref: '#/components/schemas/Formattable'
-            - description: A text detailing and explaining why the project has the reported status
-          public:
-            type: boolean
-            description: Indicates whether the project is accessible for everybody
-          description:
-            $ref: '#/components/schemas/Formattable'
-          createdAt:
-            type: string
-            format: date-time
-            description: Time of creation. Can be writable by admins with the `apiv3_write_readonly_attributes` setting enabled.
-          updatedAt:
-            type: string
-            format: date-time
-            description: Time of the most recent change to the project
-          _links:
-            type: object
-            required:
-            - self
-            - categories
-            properties:
-              update:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Form endpoint that aids in updating this project
-
-
-                    # Conditions
-
-
-                    **Permission**: edit workspace'
-              updateImmediately:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Directly update this project
-
-
-                    # Conditions
-
-
-                    **Permission**: edit workspace'
-              delete:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Delete this project
-
-
-                    # Conditions
-
-
-                    **Permission**: admin'
-              favor:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Mark this project as favorited by the current user
-
-
-                    # Conditions
-
-
-                    Only present if the project is not yet favorited
-
-
-                    Permission**: none but login is required'
-              disfavor:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Mark this project as not favorited by the current user
-
-
-                    # Conditions
-
-                    Only present if the project is favorited by the current user
-
-
-                    Permission**: none but login is required'
-              createWorkPackage:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Form endpoint that aids in preparing and creating a work package
-
-
-                    # Conditions
-
-
-                    **Permission**: add work packages'
-              createWorkPackageImmediately:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Directly creates a work package in the project
-
-
-                    # Conditions
-
-
-                    **Permission**: add work packages'
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'This project
-
-
-                    **Resource**: Project'
-              categories:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Categories available in this project
-
-
-                    **Resource**: Collection'
-              types:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Types available in this project
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view work packages or manage types'
-              versions:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Versions available in this project
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view work packages or manage versions'
-              memberships:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Memberships in the project
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view members'
-              workPackages:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Work Packages of this project
-
-
-                    **Resource**: Collection'
-              parent:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Parent of the project
-
-
-                    **Resource**: Workspace
-
-
-                    # Conditions
-
-
-                    **Permission** edit workspace'
-              status:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Denotes the status of the project, so whether the project is on track, at risk or is having trouble.
-
-
-                    **Resource**: ProjectStatus
-
-
-                    # Conditions
-
-
-                    **Permission** edit workspace'
-              storages:
-                type: array
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/Link'
-                  - description: 'The link to a storage that is active for this project.
-
-
-                      **Resource**: Storage
-
-
-                      # Conditions
-
-
-                      **Permission**: view_file_links'
-              projectStorages:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'The project storage collection of this project.
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view_file_links'
-              ancestors:
-                type: array
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/Link'
-                  - description: 'A collection of links to the ancestor workspaces.
-
-
-                      **Resource**: Workspace'
-    PrincipalModel:
-      type: object
-      required:
-      - _type
-      - id
-      - name
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - User
-          - Group
-          - PlaceholderUser
-        id:
-          type: integer
-          description: The principal's unique identifier.
-          minimum: 1
-        name:
-          type: string
-          description: The principal's display name, layout depends on instance settings.
-        createdAt:
-          type: string
-          format: date-time
-          description: Time of creation
-        updatedAt:
-          type: string
-          format: date-time
-          description: Time of the most recent change to the principal
-        _links:
-          type: object
-          required:
-          - self
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This principal resource.
-
-
-                  **Resource**: User|Group|PlaceholderUser'
-            memberships:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'An href to the collection of the principal''s memberships.
-
-
-                  # Conditions:
-
-
-                  - user has permission `view_members` or `manage_members` in any project
-
-
-                  **Resource**: Collection'
     MembershipReadModel:
       type: object
       required:
@@ -1708,104 +629,243 @@ components:
 
 
                     **Resource**: Role'
-    GroupModel:
-      allOf:
-      - $ref: '#/components/schemas/PrincipalModel'
-      - $ref: '#/components/schemas/CustomFieldProperties'
-      - type: object
-        required:
-        - _type
-        - _embedded
-        properties:
-          _type:
-            type: string
-            enum:
-            - Group
-          _embedded:
-            type: object
-            properties:
-              members:
-                type: array
-                description: Embedded list of members.
-                items:
-                  $ref: '#/components/schemas/UserModel'
-          _links:
-            type: object
-            properties:
-              self:
+    MembershipWriteModel:
+      type: object
+      required:
+      - _links
+      properties:
+        _links:
+          type: object
+          properties:
+            principal:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The principal that is to get a membership.
+
+
+                  **Resource**: Principal'
+            roles:
+              type: array
+              items:
                 allOf:
                 - $ref: '#/components/schemas/Link'
-                - description: 'This group resource
+                - description: 'A role the principal has.
 
 
-                    **Resource**: Group'
-              members:
-                type: array
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/Link'
-                  - description: 'A member of the group
+                    **Resource**: Role'
+            project:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The project that is to get a membership. If no project is given, the principal''s membership is supposed
+
+                  to be global.
 
 
-                      # Conditions:
+                  **Resource**: Project'
+        _meta:
+          type: object
+          properties:
+            notificationMessage:
+              allOf:
+              - $ref: '#/components/schemas/Formattable'
+              - description: A customised notification message, which will overwrite the standard notification.
+            sendNotification:
+              type: boolean
+              description: Set to false, if no notification should get sent.
+              default: true
+    RoleModel:
+      type: object
+      required:
+      - name
+      properties:
+        _type:
+          type: string
+          enum:
+          - Role
+        id:
+          type: integer
+          description: Role id
+          readOnly: true
+          minimum: 1
+        name:
+          type: string
+          description: Role name
+        _links:
+          type: object
+          required:
+          - self
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This role
 
 
-                      - user has permission `manage_members` in any project
-
-
-                      **Resource**: User'
-              memberships:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'An collection of all memberships of the group.
-
-
-                    **Resource**: MembershipCollection'
-              delete:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'An href to delete the group.
-
-
-                    # Conditions:
-
-
-                    - `admin`'
-              updateImmediately:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'An href to update the group.
-
-
-                    # Conditions:
-
-
-                    - `admin`
-
-
-                    **Resource**: Group'
-    CollectionModel:
+                  **Resource**: Role'
+                readOnly: true
+      example:
+        _type: Role
+        id: 3
+        name: Manager
+        _links:
+          self:
+            href: /api/v3/roles/3
+            title: Manager
+    PrincipalModel:
       type: object
       required:
       - _type
-      - total
-      - count
+      - id
+      - name
       - _links
       properties:
         _type:
           type: string
           enum:
-          - Collection
-        total:
+          - User
+          - Group
+          - PlaceholderUser
+        id:
           type: integer
-          description: The total amount of elements available in the collection.
-          minimum: 0
-        count:
-          type: integer
-          description: Actual amount of elements in this response.
-          minimum: 0
+          description: The principal's unique identifier.
+          minimum: 1
+        name:
+          type: string
+          description: The principal's display name, layout depends on instance settings.
+        createdAt:
+          type: string
+          format: date-time
+          description: Time of creation
+        updatedAt:
+          type: string
+          format: date-time
+          description: Time of the most recent change to the principal
         _links:
-          $ref: '#/components/schemas/CollectionLinks'
+          type: object
+          required:
+          - self
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This principal resource.
+
+
+                  **Resource**: User|Group|PlaceholderUser'
+            memberships:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'An href to the collection of the principal''s memberships.
+
+
+                  # Conditions:
+
+
+                  - user has permission `view_members` or `manage_members` in any project
+
+
+                  **Resource**: Collection'
+    MembershipCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedCollectionModel'
+      - type: object
+        required:
+        - _embedded
+        properties:
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MembershipReadModel'
+    Formattable:
+      type: object
+      required:
+      - format
+      properties:
+        format:
+          type: string
+          enum:
+          - plain
+          - markdown
+          - custom
+          readOnly: true
+          description: Indicates the formatting language of the raw text
+          example: markdown
+        raw:
+          type: string
+          description: The raw text, as entered by the user
+          example: I **am** formatted!
+        html:
+          type: string
+          readOnly: true
+          description: The text converted to HTML according to the format
+          example: I <strong>am</strong> formatted!
+      example:
+        format: markdown
+        raw: I am formatted!
+        html: I am formatted!
+    MembershipFormModel:
+      type: object
+      required:
+      - _type
+      - _embedded
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Form
+        _embedded:
+          type: object
+          required:
+          - payload
+          - schema
+          - validationError
+          properties:
+            payload:
+              $ref: '#/components/schemas/MembershipWriteModel'
+            schema:
+              $ref: '#/components/schemas/MembershipSchemaModel'
+            validationError:
+              type: object
+              properties:
+                base:
+                  $ref: '#/components/schemas/ErrorResponse'
+                principal:
+                  $ref: '#/components/schemas/ErrorResponse'
+                roles:
+                  $ref: '#/components/schemas/ErrorResponse'
+        _links:
+          type: object
+          required:
+          - self
+          - validate
+          - commit
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This form request.
+
+
+                  **Resource**: Form'
+            validate:
+              type: array
+              items:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: The endpoint to validate the membership payload.
+            commit:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The endpoint to create the membership with the same payload, as sent to the form.
+
+
+                  **Resource**: Membership'
     PortfolioModel:
       allOf:
       - $ref: '#/components/schemas/CustomFieldProperties'
@@ -2051,58 +1111,6 @@ components:
 
 
                       **Resource**: Portfolio'
-    SchemaModel:
-      type: object
-      required:
-      - _type
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - Schema
-        _dependencies:
-          type: array
-          description: A list of dependencies between one property's value and another property
-          items:
-            type: string
-        _links:
-          type: object
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This schema
-
-
-                  **Resource**: Schema'
-    Formattable:
-      type: object
-      required:
-      - format
-      properties:
-        format:
-          type: string
-          enum:
-          - plain
-          - markdown
-          - custom
-          readOnly: true
-          description: Indicates the formatting language of the raw text
-          example: markdown
-        raw:
-          type: string
-          description: The raw text, as entered by the user
-          example: I **am** formatted!
-        html:
-          type: string
-          readOnly: true
-          description: The text converted to HTML according to the format
-          example: I <strong>am</strong> formatted!
-      example:
-        format: markdown
-        raw: I am formatted!
-        html: I am formatted!
     PaginatedCollectionModel:
       allOf:
       - $ref: '#/components/schemas/CollectionModel'
@@ -2139,44 +1147,31 @@ components:
 
 
                     **Resource**: Collection'
-    ErrorResponse:
+    SchemaModel:
       type: object
       required:
       - _type
-      - errorIdentifier
-      - message
+      - _links
       properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
         _type:
           type: string
           enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
-    CollectionLinks:
-      type: object
-      required:
-      - self
-      properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This collection resource.
+          - Schema
+        _dependencies:
+          type: array
+          description: A list of dependencies between one property's value and another property
+          items:
+            type: string
+        _links:
+          type: object
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This schema
 
 
-              **Resource**: Collection'
+                  **Resource**: Schema'
     ProjectCollectionModel:
       allOf:
       - $ref: '#/components/schemas/OffsetPaginatedCollectionModel'
@@ -2205,50 +1200,6 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/ProjectModel'
-    MembershipWriteModel:
-      type: object
-      required:
-      - _links
-      properties:
-        _links:
-          type: object
-          properties:
-            principal:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The principal that is to get a membership.
-
-
-                  **Resource**: Principal'
-            roles:
-              type: array
-              items:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'A role the principal has.
-
-
-                    **Resource**: Role'
-            project:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The project that is to get a membership. If no project is given, the principal''s membership is supposed
-
-                  to be global.
-
-
-                  **Resource**: Project'
-        _meta:
-          type: object
-          properties:
-            notificationMessage:
-              allOf:
-              - $ref: '#/components/schemas/Formattable'
-              - description: A customised notification message, which will overwrite the standard notification.
-            sendNotification:
-              type: boolean
-              description: Set to false, if no notification should get sent.
-              default: true
     UserModel:
       allOf:
       - $ref: '#/components/schemas/PrincipalModel'
@@ -2426,45 +1377,1104 @@ components:
                     - LDAP authentication configured
 
                     - `admin`'
-    RoleModel:
+    ProjectModel:
+      allOf:
+      - $ref: '#/components/schemas/CustomFieldProperties'
+      - $ref: '#/components/schemas/CustomCommentProperties'
+      - type: object
+        properties:
+          _type:
+            type: string
+            enum:
+            - Project
+          id:
+            type: integer
+            description: Projects' id
+            minimum: 1
+          identifier:
+            type: string
+          name:
+            type: string
+          active:
+            type: boolean
+            description: Indicates whether the project is currently active or already archived
+          favorited:
+            type: boolean
+            description: Indicates whether the project is favorited by the current user
+          statusExplanation:
+            allOf:
+            - $ref: '#/components/schemas/Formattable'
+            - description: A text detailing and explaining why the project has the reported status
+          public:
+            type: boolean
+            description: Indicates whether the project is accessible for everybody
+          description:
+            $ref: '#/components/schemas/Formattable'
+          createdAt:
+            type: string
+            format: date-time
+            description: Time of creation. Can be writable by admins with the `apiv3_write_readonly_attributes` setting enabled.
+          updatedAt:
+            type: string
+            format: date-time
+            description: Time of the most recent change to the project
+          _links:
+            type: object
+            required:
+            - self
+            - categories
+            properties:
+              update:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Form endpoint that aids in updating this project
+
+
+                    # Conditions
+
+
+                    **Permission**: edit workspace'
+              updateImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Directly update this project
+
+
+                    # Conditions
+
+
+                    **Permission**: edit workspace'
+              delete:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Delete this project
+
+
+                    # Conditions
+
+
+                    **Permission**: admin'
+              favor:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Mark this project as favorited by the current user
+
+
+                    # Conditions
+
+
+                    Only present if the project is not yet favorited
+
+
+                    Permission**: none but login is required'
+              disfavor:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Mark this project as not favorited by the current user
+
+
+                    # Conditions
+
+                    Only present if the project is favorited by the current user
+
+
+                    Permission**: none but login is required'
+              createWorkPackage:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Form endpoint that aids in preparing and creating a work package
+
+
+                    # Conditions
+
+
+                    **Permission**: add work packages'
+              createWorkPackageImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Directly creates a work package in the project
+
+
+                    # Conditions
+
+
+                    **Permission**: add work packages'
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This project
+
+
+                    **Resource**: Project'
+              categories:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Categories available in this project
+
+
+                    **Resource**: Collection'
+              types:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Types available in this project
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view work packages or manage types'
+              versions:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Versions available in this project
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view work packages or manage versions'
+              memberships:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Memberships in the project
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view members'
+              workPackages:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Work Packages of this project
+
+
+                    **Resource**: Collection'
+              parent:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Parent of the project
+
+
+                    **Resource**: Workspace
+
+
+                    # Conditions
+
+
+                    **Permission** edit workspace'
+              status:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Denotes the status of the project, so whether the project is on track, at risk or is having trouble.
+
+
+                    **Resource**: ProjectStatus
+
+
+                    # Conditions
+
+
+                    **Permission** edit workspace'
+              storages:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'The link to a storage that is active for this project.
+
+
+                      **Resource**: Storage
+
+
+                      # Conditions
+
+
+                      **Permission**: view_file_links'
+              projectStorages:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The project storage collection of this project.
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view_file_links'
+              ancestors:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'A collection of links to the ancestor workspaces.
+
+
+                      **Resource**: Workspace'
+    CustomCommentProperties:
+      type: object
+      patternProperties:
+        ^customComment\d+$:
+          type:
+          - 'null'
+          - string
+          description: 'A plain-text comment associated with a project custom field that has comments enabled.
+
+
+            The property is only present when the corresponding `customField{N}` has `has_comment` set to `true`.'
+    GroupModel:
+      allOf:
+      - $ref: '#/components/schemas/PrincipalModel'
+      - $ref: '#/components/schemas/CustomFieldProperties'
+      - type: object
+        required:
+        - _type
+        - _embedded
+        properties:
+          _type:
+            type: string
+            enum:
+            - Group
+          _embedded:
+            type: object
+            properties:
+              members:
+                type: array
+                description: Embedded list of members.
+                items:
+                  $ref: '#/components/schemas/UserModel'
+          _links:
+            type: object
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This group resource
+
+
+                    **Resource**: Group'
+              members:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'A member of the group
+
+
+                      # Conditions:
+
+
+                      - user has permission `manage_members` in any project
+
+
+                      **Resource**: User'
+              memberships:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'An collection of all memberships of the group.
+
+
+                    **Resource**: MembershipCollection'
+              delete:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'An href to delete the group.
+
+
+                    # Conditions:
+
+
+                    - `admin`'
+              updateImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'An href to update the group.
+
+
+                    # Conditions:
+
+
+                    - `admin`
+
+
+                    **Resource**: Group'
+    CollectionModel:
       type: object
       required:
-      - name
+      - _type
+      - total
+      - count
+      - _links
       properties:
         _type:
           type: string
           enum:
-          - Role
-        id:
+          - Collection
+        total:
           type: integer
-          description: Role id
-          readOnly: true
-          minimum: 1
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    ProgramModel:
+      allOf:
+      - $ref: '#/components/schemas/CustomFieldProperties'
+      - $ref: '#/components/schemas/CustomCommentProperties'
+      - type: object
+        properties:
+          _type:
+            type: string
+            enum:
+            - Program
+          id:
+            type: integer
+            description: Programs' id
+            minimum: 1
+          identifier:
+            type: string
+          name:
+            type: string
+          active:
+            type: boolean
+            description: Indicates whether the program is currently active or already archived
+          favorited:
+            type: boolean
+            description: Indicates whether the program is favorited by the current user
+          statusExplanation:
+            allOf:
+            - $ref: '#/components/schemas/Formattable'
+            - description: A text detailing and explaining why the program has the reported status
+          public:
+            type: boolean
+            description: Indicates whether the program is accessible for everybody
+          description:
+            $ref: '#/components/schemas/Formattable'
+          createdAt:
+            type: string
+            format: date-time
+            description: Time of creation. Can be writable by admins with the `apiv3_write_readonly_attributes` setting enabled.
+          updatedAt:
+            type: string
+            format: date-time
+            description: Time of the most recent change to the program
+          _links:
+            type: object
+            required:
+            - self
+            - categories
+            properties:
+              update:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Form endpoint that aids in updating this program
+
+
+                    # Conditions
+
+
+                    **Permission**: edit workspace'
+              updateImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Directly update this program
+
+
+                    # Conditions
+
+
+                    **Permission**: edit workspace'
+              delete:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Delete this program
+
+
+                    # Conditions
+
+
+                    **Permission**: admin'
+              favor:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Mark this program as favorited by the current user
+
+
+                    # Conditions
+
+
+                    Only present if the program is not yet favorited
+
+
+                    Permission**: none but login is required'
+              disfavor:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Mark this program as not favorited by the current user
+
+
+                    # Conditions
+
+                    Only present if the program is favorited by the current user
+
+
+                    Permission**: none but login is required'
+              createWorkPackage:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Form endpoint that aids in preparing and creating a work package
+
+
+                    # Conditions
+
+
+                    **Permission**: add work packages'
+              createWorkPackageImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Directly creates a work package in the program
+
+
+                    # Conditions
+
+
+                    **Permission**: add work packages'
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This program
+
+
+                    **Resource**: Program'
+              categories:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Categories available in this program
+
+
+                    **Resource**: Collection'
+              types:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Types available in this program
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view work packages or manage types'
+              versions:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Versions available in this program
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view work packages or manage versions'
+              memberships:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Memberships in the  program
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view members'
+              workPackages:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Work Packages of this program
+
+
+                    **Resource**: Collection'
+              parent:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Parent of the program
+
+
+                    **Resource**: Program
+
+
+                    # Conditions
+
+
+                    **Permission** edit workspace'
+              status:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Denotes the status of the program, so whether the program is on track, at risk or is having trouble.
+
+
+                    **Resource**: ProjectStatus
+
+
+                    # Conditions
+
+
+                    **Permission** edit workspace'
+              storages:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'The link to a storage that is active for this program.
+
+
+                      **Resource**: Storage
+
+
+                      # Conditions
+
+
+                      **Permission**: view_file_links'
+              projectStorages:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The project storage collection of this program.
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view_file_links'
+              ancestors:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'A collection of links to the ancestor workspace.
+
+
+                      **Resource**: Workspace'
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
+    SchemaPropertyModel:
+      type: object
+      required:
+      - type
+      - name
+      - required
+      - hasDefault
+      - writable
+      properties:
+        type:
+          type: string
+          description: The resource type for this property.
         name:
           type: string
-          description: Role name
+          description: The name of the property.
+        required:
+          type: boolean
+          description: Indicates, if the property is required for submitting a request of this schema.
+        hasDefault:
+          type: boolean
+          description: Indicates, if the property has a default.
+        writable:
+          type: boolean
+          description: Indicates, if the property is writable when sending a request of this schema.
+        options:
+          type: object
+          description: Additional options for the property.
+        location:
+          type: string
+          description: Defines the json path where the property is located in the payload.
+          default: ''
+        placeholder:
+          type: string
+          description: A placeholder for the property to display if the property has no value.
         _links:
           type: object
-          required:
-          - self
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This role
+          description: Useful links for this property (e.g. an endpoint to fetch allowed values)
+    OffsetPaginatedCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - pageSize
+        - offset
+        - _links
+        properties:
+          pageSize:
+            type: integer
+            description: 'The amount of elements per page. If not set by the request this value defaults to the server''s system
+
+              settings.'
+            minimum: 0
+          offset:
+            type: integer
+            description: The page offset indicating on which page the element collection starts.
+            minimum: 0
+          _links:
+            $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
+    MembershipSchemaModel:
+      allOf:
+      - $ref: '#/components/schemas/SchemaModel'
+      - type: object
+        required:
+        - id
+        - createdAt
+        - updatedAt
+        - notificationMessage
+        - project
+        - principal
+        - roles
+        properties:
+          id:
+            $ref: '#/components/schemas/SchemaPropertyModel'
+          createdAt:
+            $ref: '#/components/schemas/SchemaPropertyModel'
+          updatedAt:
+            $ref: '#/components/schemas/SchemaPropertyModel'
+          notificationMessage:
+            $ref: '#/components/schemas/SchemaPropertyModel'
+          project:
+            $ref: '#/components/schemas/SchemaPropertyModel'
+          principal:
+            $ref: '#/components/schemas/SchemaPropertyModel'
+          roles:
+            $ref: '#/components/schemas/SchemaPropertyModel'
+    OffsetPaginatedCollectionLinks:
+      allOf:
+      - $ref: '#/components/schemas/CollectionLinks'
+      - type: object
+        required:
+        - jumpTo
+        - changeSize
+        properties:
+          jumpTo:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: A templated link to jump to a given offset.
+          changeSize:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: A templated link to change the current page size.
+          previousByOffset:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: 'A link to the previous page of the collection.
 
 
-                  **Resource**: Role'
-                readOnly: true
-      example:
-        _type: Role
-        id: 3
-        name: Manager
+                # Conditions
+
+                - The collection is not on the first page.'
+          nextByOffset:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: 'A link to the next page of the collection.
+
+
+                # Conditions
+
+                - The collection is not on the last page.'
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
+    CustomFieldProperties:
+      type: object
+      patternProperties:
+        ^customField\d+$:
+          type:
+          - 'null'
+          - number
+          - boolean
+          - string
+          - object
+          description: 'A custom field value, that belongs to a custom field of a simple type:
+
+
+            - Boolean
+
+            - Date
+
+            - Float
+
+            - Integer
+
+            - Link (URL)
+
+            - Text
+
+            - Long text'
+  examples:
+    ProjectCollection:
+      value:
+        _type: Collection
+        count: 2
+        total: 2
+        pageSize: 20
+        offset: 1
+        _embedded:
+          elements:
+          - _abbreviated: Project resource shortened for brevity
+            id: 1
+            identifier: initialproject
+            name: DeathStar construction
+            active: true
+            public: true
+          - _abbreviated: Project resource shortened for brevity
+            id: 2
+            identifier: mysecret
+            name: Palpatine's secret plan
+            active: true
+            public: false
         _links:
           self:
-            href: /api/v3/roles/3
-            title: Manager
+            href: /api/v3/projects?filters=%5B%5D&offset=1&pageSize=20
+          jumpTo:
+            href: /api/v3/projects?filters=%5B%5D&offset=%7Boffset%7D&pageSize=20
+            templated: true
+          changeSize:
+            href: /api/v3/projects?filters=%5B%5D&offset=1&pageSize=%7Bsize%7D
+            templated: true
+          representations:
+          - href: /projects.csv?filters=%5B%5D&offset=1&pageSize=20
+            identifier: csv
+            type: text/csv
+            title: CSV
+          - href: /projects.xls?filters=%5B%5D&offset=1&pageSize=20
+            identifier: xls
+            type: application/vnd.ms-excel
+            title: XLS
+    MembershipSimpleCollectionResponse:
+      description: A simple membership collection response example.
+      value:
+        _type: Collection
+        total: 1
+        count: 1
+        pageSize: 20
+        offset: 1
+        _embedded:
+          elements:
+          - _type: Membership
+            id: 11
+            createdAt: '2015-03-20T12:56:56.643Z'
+            updatedAt: '2018-12-20T18:16:11.643Z'
+            _links:
+              self:
+                href: /api/v3/memberships/11
+                title: Darth Vader
+              schema:
+                href: /api/v3/memberships/schema
+              update:
+                href: /api/v3/memberships/11/form
+                method: post
+              updateImmediately:
+                href: /api/v3/memberships/11
+                method: patch
+              project:
+                href: /api/v3/projects/3
+                title: Death Start v3
+              principal:
+                href: /api/v3/users/5
+                title: Darth Vader
+              roles:
+              - href: /api/v3/roles/4
+                title: Sith Lord
+        _links:
+          self:
+            href: /api/v3/memberships
+          jumpTo:
+            href: /api/v3/memberships?filters=%5B%5D&offset=%7Boffset%7D&pageSize=20
+            templated: true
+          changeSize:
+            href: /api/v3/memberships?filters=%5B%5D&offset=1&pageSize=%7Bsize%7D
+            templated: true
+          nextByOffset:
+            href: /api/v3/memberships?filters=%5B%5D&offset=2&pageSize=20
+    MembershipCreateRequestNoNotification:
+      description: Create a membership without sending a notification message.
+      value:
+        _links:
+          principal:
+            href: /api/v3/users/14
+          project:
+            href: /api/v3/projects/21
+          roles:
+          - href: /api/v3/roles/4
+        _meta:
+          sendNotification: false
+    MembershipSimpleResponse:
+      description: A simple membership response example.
+      value:
+        _type: Membership
+        id: 11
+        createdAt: '2015-03-20T12:56:56.626Z'
+        updatedAt: '2018-12-20T18:16:11.563Z'
+        _embedded:
+          project:
+            _type: Project
+            id: 3
+            _abbreviated: Project resource shortened for brevity
+          principal:
+            _type: User
+            id: 5
+            _abbreviated: User resource shortened for brevity
+          roles:
+          - _type: Role
+            id: 4
+            _abbreviated: Roles resource shortened for brevity
+        _links:
+          self:
+            href: /api/v3/memberships/11
+            title: Darth Vader
+          schema:
+            href: /api/v3/memberships/schema
+          update:
+            href: /api/v3/memberships/11/form
+            method: post
+          updateImmediately:
+            href: /api/v3/memberships/11
+            method: patch
+          project:
+            href: /api/v3/projects/3
+            title: Death Start v3
+          principal:
+            href: /api/v3/users/5
+            title: Darth Vader
+          roles:
+          - href: /api/v3/roles/4
+            title: Sith Lord
+    MembershipCreateRequestCustomMessage:
+      description: Create a membership and send a custom notification message.
+      value:
+        _links:
+          principal:
+            href: /api/v3/users/14
+          project:
+            href: /api/v3/projects/21
+          roles:
+          - href: /api/v3/roles/4
+        _meta:
+          notificationMessage:
+            format: markdown
+            raw: Granted permission to execute Order *66*.
+    MembershipFormResponse:
+      description: A simple form response example.
+      value:
+        _type: Form
+        _embedded:
+          payload:
+            _meta:
+              notificationMessage:
+                format: markdown
+                raw: '*Hallo*'
+                html: <p class="op-uc-p"><em>Hallo</em></p>
+            _links:
+              project:
+                href: /api/v3/projects/21
+                title: Death Star v3
+              principal:
+                href: /api/v3/users/14
+                title: Mara Jade
+              roles: []
+          schema:
+            _type: Schema
+            _abbreviated: Schema resource shortened for brevity
+          validationErrors:
+            roles:
+              _type: Error
+              errorIdentifier: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+              message: Roles need to be assigned.
+              _embedded:
+                details:
+                  attribute: roles
+        _links:
+          self:
+            href: /api/v3/memberships/form
+            method: post
+          validate:
+            href: /api/v3/memberships/form
+            method: post
+    MembershipCreateRequestGlobalRole:
+      description: Create a membership for a global role. To address global roles, no project must be set.
+      value:
+        _links:
+          principal:
+            href: /api/v3/users/14
+          roles:
+          - href: /api/v3/roles/4
+    MembershipUpdateAdditionalRoles:
+      description: Updates a membership and add multiple roles.
+      value:
+        _links:
+          roles:
+          - href: /api/v3/roles/5
+          - href: /api/v3/roles/6
+    MembershipSchemaResponse:
+      description: A simple schema response example.
+      value:
+        _type: Schema
+        _dependencies: []
+        id:
+          type: Integer
+          name: ID
+          required: true
+          hasDefault: false
+          writable: false
+          options: {}
+        createdAt:
+          type: DateTime
+          name: Created on
+          required: true
+          hasDefault: false
+          writable: false
+          options: {}
+        updatedAt:
+          type: DateTime
+          name: Updated on
+          required: true
+          hasDefault: false
+          writable: false
+          options: {}
+        notificationMessage:
+          type: Formattable
+          name: Message
+          required: false
+          hasDefault: false
+          writable: true
+          options: {}
+          location: _meta
+        project:
+          type: Project
+          name: Project
+          required: false
+          hasDefault: false
+          writable: true
+          location: _links
+          _links:
+            allowedValues:
+              href: /api/v3/memberships/available_projects?filters=%5B%7B%22principal%22%3A%7B%22operator%22%3A%22%21%22%2C%22values%22%3A%5B%2214%22%5D%7D%7D%5D
+        principal:
+          type: Principal
+          name: Principal
+          required: true
+          hasDefault: false
+          writable: true
+          location: _links
+          _links:
+            allowedValues:
+              href: /api/v3/principals?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22%21%22%2C%22values%22%3A%5B%223%22%5D%7D%7D%2C%7B%22member%22%3A%7B%22operator%22%3A%22%21%22%2C%22values%22%3A%5B%2221%22%5D%7D%7D%5D
+        roles:
+          type: '[]Role'
+          name: Role
+          required: true
+          hasDefault: false
+          writable: true
+          location: _links
+          _links:
+            allowedValues:
+              href: /api/v3/roles
+        _links:
+          self:
+            href: /api/v3/memberships/schema
   responses:
+    UnsupportedMediaType:
+      description: Occurs when the client sends an unsupported Content-Type header.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
+            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
     MissingContentType:
       description: Occurs when the client did not send a Content-Type header
       content:
@@ -2482,16 +2492,6 @@ components:
             _type: Error
             errorIdentifier: urn:openproject-org:api:v3:errors:InvalidQuery
             message: Filters Invalid filter does not exist.
-    UnsupportedMediaType:
-      description: Occurs when the client sends an unsupported Content-Type header.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
-            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
     InvalidRequestBody:
       description: Occurs when the client did not send a valid JSON object in the request body.
       content:

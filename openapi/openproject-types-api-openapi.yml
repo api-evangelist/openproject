@@ -324,6 +324,37 @@ components:
           minimum: 0
         _links:
           $ref: '#/components/schemas/CollectionLinks'
+    Types_by_WorkspaceModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The types collection
+
+
+                    **Resource**: TypesCollection'
+                  readOnly: true
+          _embedded:
+            type: object
+            properties:
+              elements:
+                type: array
+                readOnly: true
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/TypeModel'
+                  - description: Collection of Types
     ErrorResponse:
       type: object
       required:
@@ -395,37 +426,6 @@ components:
       example:
         href: /api/v3/work_packages
         method: POST
-    Types_by_WorkspaceModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'The types collection
-
-
-                    **Resource**: TypesCollection'
-                  readOnly: true
-          _embedded:
-            type: object
-            properties:
-              elements:
-                type: array
-                readOnly: true
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/TypeModel'
-                  - description: Collection of Types
     TypesModel:
       type: object
       example:

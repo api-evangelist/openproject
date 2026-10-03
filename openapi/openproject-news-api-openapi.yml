@@ -397,6 +397,34 @@ paths:
                 message: The specified news does not exist.
           description: Returned if the news does not exist.
 components:
+  responses:
+    InvalidRequestBody:
+      description: Occurs when the client did not send a valid JSON object in the request body.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+            message: The request body was not a single JSON object.
+    UnsupportedMediaType:
+      description: Occurs when the client sends an unsupported Content-Type header.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
+            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
   schemas:
     ErrorResponse:
       type: object
@@ -424,6 +452,75 @@ components:
         message:
           type: string
           example: Project can't be blank.
+    NewsCreateModel:
+      type: object
+      properties:
+        title:
+          type: string
+          description: The headline of the news
+          readOnly: true
+        summary:
+          type: string
+          description: A short summary
+          readOnly: true
+        description:
+          allOf:
+          - $ref: '#/components/schemas/Formattable'
+          - description: The main body of the news with all the details
+        _links:
+          type: object
+          required:
+          - project
+          properties:
+            project:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The project the news is situated in
+
+
+                  **Resource**: Project'
+      example:
+        title: asperiores possimus nam doloribus ab
+        summary: Celebrer spiculum colo viscus claustrum atque. Id nulla culpa sumptus. Comparo crapula depopulo demonstro.
+        description:
+          format: markdown
+          raw: '**Videlicet deserunt aequitas cognatus**. Concedo quia est quia pariatur vorago vallum. Calco autem atavus accusamus conscendo cornu ulterius. Tam patria ago consectetur ventito sustineo nihil caecus. Supra officiis eos velociter somniculosus tonsor qui. Suffragium aduro arguo angustus cogito quia tolero vulnus. Supplanto sortitus cresco apud vestrum qui.'
+        _links:
+          project:
+            href: /api/v3/projects/1
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
     NewsModel:
       type: object
       properties:
@@ -623,103 +720,6 @@ components:
         format: markdown
         raw: I am formatted!
         html: I am formatted!
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
-          type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
-    NewsCreateModel:
-      type: object
-      properties:
-        title:
-          type: string
-          description: The headline of the news
-          readOnly: true
-        summary:
-          type: string
-          description: A short summary
-          readOnly: true
-        description:
-          allOf:
-          - $ref: '#/components/schemas/Formattable'
-          - description: The main body of the news with all the details
-        _links:
-          type: object
-          required:
-          - project
-          properties:
-            project:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The project the news is situated in
-
-
-                  **Resource**: Project'
-      example:
-        title: asperiores possimus nam doloribus ab
-        summary: Celebrer spiculum colo viscus claustrum atque. Id nulla culpa sumptus. Comparo crapula depopulo demonstro.
-        description:
-          format: markdown
-          raw: '**Videlicet deserunt aequitas cognatus**. Concedo quia est quia pariatur vorago vallum. Calco autem atavus accusamus conscendo cornu ulterius. Tam patria ago consectetur ventito sustineo nihil caecus. Supra officiis eos velociter somniculosus tonsor qui. Suffragium aduro arguo angustus cogito quia tolero vulnus. Supplanto sortitus cresco apud vestrum qui.'
-        _links:
-          project:
-            href: /api/v3/projects/1
-  responses:
-    MissingContentType:
-      description: Occurs when the client did not send a Content-Type header
-      content:
-        text/plain:
-          schema:
-            type: string
-          example: Missing content-type header
-    UnsupportedMediaType:
-      description: Occurs when the client sends an unsupported Content-Type header.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
-            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
-    InvalidRequestBody:
-      description: Occurs when the client did not send a valid JSON object in the request body.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
-            message: The request body was not a single JSON object.
   securitySchemes:
     BasicAuth:
       type: http

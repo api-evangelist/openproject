@@ -81,6 +81,108 @@ paths:
             **Required permission:** view project phase OR select project phase'
 components:
   schemas:
+    ProjectPhaseDefinitionModel:
+      type: object
+      required:
+      - _type
+      - id
+      - name
+      - startGate
+      - startGateName
+      - finishGate
+      - finishGateName
+      - createdAt
+      - updatedAt
+      properties:
+        _type:
+          type: string
+          enum:
+          - ProjectPhaseDefinition
+        id:
+          type: integer
+          description: The project phase definition's id
+          minimum: 1
+        name:
+          type: string
+        startGate:
+          type: boolean
+        startGateName:
+          type:
+          - string
+          - 'null'
+        finishGate:
+          type: boolean
+        finishGateName:
+          type:
+          - string
+          - 'null'
+        createdAt:
+          type: string
+          format: date-time
+          description: Time of creation
+        updatedAt:
+          type: string
+          format: date-time
+          description: Time of the most recent change to the project phase definition
+        _links:
+          type: object
+          required:
+          - self
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This project phase definition.
+
+
+                  **Resource**: ProjectPhaseDefinition'
+      example:
+        _type: ProjectPhaseDefinition
+        id: 1337
+        name: Initiating
+        startGate: true
+        startGateName: Before Initiating
+        finishGate: true
+        finishGateName: null
+        createdAt: '2023-01-20T14:30:00.368Z'
+        updatedAt: '2023-05-23T11:57:48.618Z'
+        _links:
+          self:
+            href: /api/v3/project_phase_definitions/23
+    OffsetPaginatedCollectionLinks:
+      allOf:
+      - $ref: '#/components/schemas/CollectionLinks'
+      - type: object
+        required:
+        - jumpTo
+        - changeSize
+        properties:
+          jumpTo:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: A templated link to jump to a given offset.
+          changeSize:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: A templated link to change the current page size.
+          previousByOffset:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: 'A link to the previous page of the collection.
+
+
+                # Conditions
+
+                - The collection is not on the first page.'
+          nextByOffset:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: 'A link to the next page of the collection.
+
+
+                # Conditions
+
+                - The collection is not on the last page.'
     CollectionModel:
       type: object
       required:
@@ -129,40 +231,6 @@ components:
         message:
           type: string
           example: Project can't be blank.
-    OffsetPaginatedCollectionLinks:
-      allOf:
-      - $ref: '#/components/schemas/CollectionLinks'
-      - type: object
-        required:
-        - jumpTo
-        - changeSize
-        properties:
-          jumpTo:
-            allOf:
-            - $ref: '#/components/schemas/Link'
-            - description: A templated link to jump to a given offset.
-          changeSize:
-            allOf:
-            - $ref: '#/components/schemas/Link'
-            - description: A templated link to change the current page size.
-          previousByOffset:
-            allOf:
-            - $ref: '#/components/schemas/Link'
-            - description: 'A link to the previous page of the collection.
-
-
-                # Conditions
-
-                - The collection is not on the first page.'
-          nextByOffset:
-            allOf:
-            - $ref: '#/components/schemas/Link'
-            - description: 'A link to the next page of the collection.
-
-
-                # Conditions
-
-                - The collection is not on the last page.'
     CollectionLinks:
       type: object
       required:
@@ -175,27 +243,6 @@ components:
 
 
               **Resource**: Collection'
-    OffsetPaginatedCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - pageSize
-        - offset
-        - _links
-        properties:
-          pageSize:
-            type: integer
-            description: 'The amount of elements per page. If not set by the request this value defaults to the server''s system
-
-              settings.'
-            minimum: 0
-          offset:
-            type: integer
-            description: The page offset indicating on which page the element collection starts.
-            minimum: 0
-          _links:
-            $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
     ProjectPhaseDefinitionCollectionModel:
       allOf:
       - $ref: '#/components/schemas/OffsetPaginatedCollectionModel'
@@ -275,74 +322,27 @@ components:
       example:
         href: /api/v3/work_packages
         method: POST
-    ProjectPhaseDefinitionModel:
-      type: object
-      required:
-      - _type
-      - id
-      - name
-      - startGate
-      - startGateName
-      - finishGate
-      - finishGateName
-      - createdAt
-      - updatedAt
-      properties:
-        _type:
-          type: string
-          enum:
-          - ProjectPhaseDefinition
-        id:
-          type: integer
-          description: The project phase definition's id
-          minimum: 1
-        name:
-          type: string
-        startGate:
-          type: boolean
-        startGateName:
-          type:
-          - string
-          - 'null'
-        finishGate:
-          type: boolean
-        finishGateName:
-          type:
-          - string
-          - 'null'
-        createdAt:
-          type: string
-          format: date-time
-          description: Time of creation
-        updatedAt:
-          type: string
-          format: date-time
-          description: Time of the most recent change to the project phase definition
-        _links:
-          type: object
-          required:
-          - self
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This project phase definition.
+    OffsetPaginatedCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - pageSize
+        - offset
+        - _links
+        properties:
+          pageSize:
+            type: integer
+            description: 'The amount of elements per page. If not set by the request this value defaults to the server''s system
 
-
-                  **Resource**: ProjectPhaseDefinition'
-      example:
-        _type: ProjectPhaseDefinition
-        id: 1337
-        name: Initiating
-        startGate: true
-        startGateName: Before Initiating
-        finishGate: true
-        finishGateName: null
-        createdAt: '2023-01-20T14:30:00.368Z'
-        updatedAt: '2023-05-23T11:57:48.618Z'
-        _links:
-          self:
-            href: /api/v3/project_phase_definitions/23
+              settings.'
+            minimum: 0
+          offset:
+            type: integer
+            description: The page offset indicating on which page the element collection starts.
+            minimum: 0
+          _links:
+            $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
   securitySchemes:
     BasicAuth:
       type: http

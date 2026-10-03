@@ -821,132 +821,93 @@ paths:
       operationId: List_versions_available_in_a_workspace
       summary: List versions available in a workspace
 components:
+  responses:
+    UnsupportedMediaType:
+      description: Occurs when the client sends an unsupported Content-Type header.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
+            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
+    InvalidRequestBody:
+      description: Occurs when the client did not send a valid JSON object in the request body.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+            message: The request body was not a single JSON object.
   schemas:
-    VersionWriteModel:
-      allOf:
-      - $ref: '#/components/schemas/CustomFieldProperties'
-      - type: object
-        properties:
-          name:
-            type: string
-            description: Version name
-          description:
-            $ref: '#/components/schemas/Formattable'
-          startDate:
-            type:
-            - string
-            - 'null'
-            format: date
-          endDate:
-            type:
-            - string
-            - 'null'
-            format: date
-          status:
-            type: string
-            description: 'The current status of the version. This could be:
-
-
-              - *open*: if the version is available to be assigned to work packages in all shared projects
-
-              - *locked*: if the version is not finished, but locked for further assignments to work packages
-
-              - *closed*: if the version is finished'
-            enum:
-            - open
-            - locked
-            - closed
-          sharing:
-            type: string
-            description: 'The indicator of how the version is shared between projects. This could be:
-
-
-              - *none*: if the version is only available in the defining project
-
-              - *descendants*: if the version is shared with the descendants of the defining project
-
-              - *hierarchy*: if the version is shared with the descendants and the ancestors of the defining project
-
-              - *tree*: if the version is shared with the root project of the defining project and all descendants of the root project
-
-              - *system*: if the version is shared globally'
-            enum:
-            - none
-            - descendants
-            - hierarchy
-            - tree
-            - system
-          _links:
-            allOf:
-            - $ref: '#/components/schemas/CustomFieldLinkedProperties'
-            - type: object
-              properties:
-                definingProject:
-                  allOf:
-                  - $ref: '#/components/schemas/Link'
-                  - description: 'The workspace to which the version belongs
-
-
-                      **Resource**: Workspace'
-    CustomFieldProperties:
-      type: object
-      patternProperties:
-        ^customField\d+$:
-          type:
-          - 'null'
-          - number
-          - boolean
-          - string
-          - object
-          description: 'A custom field value, that belongs to a custom field of a simple type:
-
-
-            - Boolean
-
-            - Date
-
-            - Float
-
-            - Integer
-
-            - Link (URL)
-
-            - Text
-
-            - Long text'
-    Link:
+    Formattable:
       type: object
       required:
-      - href
+      - format
       properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
+        format:
           type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
+          enum:
+          - plain
+          - markdown
+          - custom
+          readOnly: true
+          description: Indicates the formatting language of the raw text
+          example: markdown
+        raw:
           type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
+          description: The raw text, as entered by the user
+          example: I **am** formatted!
+        html:
           type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
+          readOnly: true
+          description: The text converted to HTML according to the format
+          example: I <strong>am</strong> formatted!
       example:
-        href: /api/v3/work_packages
-        method: POST
+        format: markdown
+        raw: I am formatted!
+        html: I am formatted!
+    Versions_by_WorkspaceModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The versions collection
+
+
+                    **Resource**: VersionsCollection'
+                  readOnly: true
+          _embedded:
+            type: object
+            properties:
+              elements:
+                type: array
+                readOnly: true
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/VersionReadModel'
+                  - description: Collection of Versions
     Available_projects_for_versionsModel:
       type: object
       example:
@@ -1006,244 +967,6 @@ components:
             createdAt: '2016-02-29T12:50:20+00:00'
             updatedAt: '2016-02-29T12:50:20+00:00'
             type: null
-    Versions_by_WorkspaceModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'The versions collection
-
-
-                    **Resource**: VersionsCollection'
-                  readOnly: true
-          _embedded:
-            type: object
-            properties:
-              elements:
-                type: array
-                readOnly: true
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/VersionReadModel'
-                  - description: Collection of Versions
-    VersionCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'This version collection
-
-
-                    **Resource**: Collection'
-          _embedded:
-            type: object
-            required:
-            - elements
-            properties:
-              elements:
-                type: array
-                items:
-                  $ref: '#/components/schemas/VersionReadModel'
-    CollectionModel:
-      type: object
-      required:
-      - _type
-      - total
-      - count
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - Collection
-        total:
-          type: integer
-          description: The total amount of elements available in the collection.
-          minimum: 0
-        count:
-          type: integer
-          description: Actual amount of elements in this response.
-          minimum: 0
-        _links:
-          $ref: '#/components/schemas/CollectionLinks'
-    Version_schemaModel:
-      type: object
-      example:
-        _type: Schema
-        _dependencies: []
-        id:
-          type: Integer
-          name: ID
-          required: true
-          hasDefault: false
-          writable: false
-        name:
-          type: String
-          name: Name
-          required: true
-          hasDefault: false
-          writable: true
-          minLength: 1
-          maxLength: 60
-        description:
-          type: Formattable
-          name: Description
-          required: false
-          hasDefault: false
-          writable: true
-        startDate:
-          type: Date
-          name: Start date
-          required: false
-          hasDefault: false
-          writable: true
-        endDate:
-          type: Date
-          name: Finish date
-          required: false
-          hasDefault: false
-          writable: false
-        status:
-          type: String
-          name: Status
-          required: true
-          hasDefault: false
-          writable: true
-          visibility: default
-          _links: {}
-        sharing:
-          type: String
-          name: Sharing
-          required: true
-          hasDefault: false
-          writable: true
-          visibility: default
-          _links: {}
-        createdAt:
-          type: DateTime
-          name: Created on
-          required: true
-          hasDefault: false
-          writable: false
-        updatedAt:
-          type: DateTime
-          name: Updated on
-          required: true
-          hasDefault: false
-          writable: false
-        definingProject:
-          type: Project
-          name: Project
-          required: true
-          hasDefault: false
-          writable: true
-          _links: {}
-        customField14:
-          type: String
-          name: text CF
-          required: false
-          hasDefault: false
-          writable: true
-          visibility: default
-        customField40:
-          type: CustomOption
-          name: List CF
-          required: false
-          hasDefault: false
-          writable: true
-          location: _links
-          visibility: default
-          _links: {}
-        _links:
-          self:
-            href: /api/v3/versions/schema
-    Formattable:
-      type: object
-      required:
-      - format
-      properties:
-        format:
-          type: string
-          enum:
-          - plain
-          - markdown
-          - custom
-          readOnly: true
-          description: Indicates the formatting language of the raw text
-          example: markdown
-        raw:
-          type: string
-          description: The raw text, as entered by the user
-          example: I **am** formatted!
-        html:
-          type: string
-          readOnly: true
-          description: The text converted to HTML according to the format
-          example: I <strong>am</strong> formatted!
-      example:
-        format: markdown
-        raw: I am formatted!
-        html: I am formatted!
-    ErrorResponse:
-      type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
-    CollectionLinks:
-      type: object
-      required:
-      - self
-      properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This collection resource.
-
-
-              **Resource**: Collection'
     VersionReadModel:
       allOf:
       - $ref: '#/components/schemas/CustomFieldProperties'
@@ -1393,6 +1116,244 @@ components:
 
 
                       **Resource**: Workspace'
+    CollectionModel:
+      type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
+    Version_schemaModel:
+      type: object
+      example:
+        _type: Schema
+        _dependencies: []
+        id:
+          type: Integer
+          name: ID
+          required: true
+          hasDefault: false
+          writable: false
+        name:
+          type: String
+          name: Name
+          required: true
+          hasDefault: false
+          writable: true
+          minLength: 1
+          maxLength: 60
+        description:
+          type: Formattable
+          name: Description
+          required: false
+          hasDefault: false
+          writable: true
+        startDate:
+          type: Date
+          name: Start date
+          required: false
+          hasDefault: false
+          writable: true
+        endDate:
+          type: Date
+          name: Finish date
+          required: false
+          hasDefault: false
+          writable: false
+        status:
+          type: String
+          name: Status
+          required: true
+          hasDefault: false
+          writable: true
+          visibility: default
+          _links: {}
+        sharing:
+          type: String
+          name: Sharing
+          required: true
+          hasDefault: false
+          writable: true
+          visibility: default
+          _links: {}
+        createdAt:
+          type: DateTime
+          name: Created on
+          required: true
+          hasDefault: false
+          writable: false
+        updatedAt:
+          type: DateTime
+          name: Updated on
+          required: true
+          hasDefault: false
+          writable: false
+        definingProject:
+          type: Project
+          name: Project
+          required: true
+          hasDefault: false
+          writable: true
+          _links: {}
+        customField14:
+          type: String
+          name: text CF
+          required: false
+          hasDefault: false
+          writable: true
+          visibility: default
+        customField40:
+          type: CustomOption
+          name: List CF
+          required: false
+          hasDefault: false
+          writable: true
+          location: _links
+          visibility: default
+          _links: {}
+        _links:
+          self:
+            href: /api/v3/versions/schema
+    VersionWriteModel:
+      allOf:
+      - $ref: '#/components/schemas/CustomFieldProperties'
+      - type: object
+        properties:
+          name:
+            type: string
+            description: Version name
+          description:
+            $ref: '#/components/schemas/Formattable'
+          startDate:
+            type:
+            - string
+            - 'null'
+            format: date
+          endDate:
+            type:
+            - string
+            - 'null'
+            format: date
+          status:
+            type: string
+            description: 'The current status of the version. This could be:
+
+
+              - *open*: if the version is available to be assigned to work packages in all shared projects
+
+              - *locked*: if the version is not finished, but locked for further assignments to work packages
+
+              - *closed*: if the version is finished'
+            enum:
+            - open
+            - locked
+            - closed
+          sharing:
+            type: string
+            description: 'The indicator of how the version is shared between projects. This could be:
+
+
+              - *none*: if the version is only available in the defining project
+
+              - *descendants*: if the version is shared with the descendants of the defining project
+
+              - *hierarchy*: if the version is shared with the descendants and the ancestors of the defining project
+
+              - *tree*: if the version is shared with the root project of the defining project and all descendants of the root project
+
+              - *system*: if the version is shared globally'
+            enum:
+            - none
+            - descendants
+            - hierarchy
+            - tree
+            - system
+          _links:
+            allOf:
+            - $ref: '#/components/schemas/CustomFieldLinkedProperties'
+            - type: object
+              properties:
+                definingProject:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'The workspace to which the version belongs
+
+
+                      **Resource**: Workspace'
     CustomFieldLinkedProperties:
       type: object
       patternProperties:
@@ -1411,7 +1372,90 @@ components:
               - Version
 
               - Weighted item list'
+    VersionCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This version collection
+
+
+                    **Resource**: Collection'
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VersionReadModel'
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
+    CustomFieldProperties:
+      type: object
+      patternProperties:
+        ^customField\d+$:
+          type:
+          - 'null'
+          - number
+          - boolean
+          - string
+          - object
+          description: 'A custom field value, that belongs to a custom field of a simple type:
+
+
+            - Boolean
+
+            - Date
+
+            - Float
+
+            - Integer
+
+            - Link (URL)
+
+            - Text
+
+            - Long text'
   examples:
+    VersionCreateRequest:
+      description: Request to create a basic version with custom fields
+      value:
+        name: v0.9.1-alpha
+        startDate: '2026-02-02'
+        endDate: '2026-02-09'
+        status: open
+        sharing: tree
+        customField14: true
+        _links:
+          definingProject:
+            href: /api/v3/projects/10
+            title: Death Star
+          customField23:
+            href: /api/v3/users/18
+            title: Mara Jade
     VersionSimpleResponse:
       description: Simple response showing a single version
       value:
@@ -1452,54 +1496,10 @@ components:
           customField23:
             href: /api/v3/users/18
             title: Mara Jade
-    VersionCreateRequest:
-      description: Request to create a basic version with custom fields
-      value:
-        name: v0.9.1-alpha
-        startDate: '2026-02-02'
-        endDate: '2026-02-09'
-        status: open
-        sharing: tree
-        customField14: true
-        _links:
-          definingProject:
-            href: /api/v3/projects/10
-            title: Death Star
-          customField23:
-            href: /api/v3/users/18
-            title: Mara Jade
     VersionUpdateNameRequest:
       description: Example request body to update the name of a version.
       value:
         name: v0.9.1-alpha
-  responses:
-    MissingContentType:
-      description: Occurs when the client did not send a Content-Type header
-      content:
-        text/plain:
-          schema:
-            type: string
-          example: Missing content-type header
-    UnsupportedMediaType:
-      description: Occurs when the client sends an unsupported Content-Type header.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
-            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
-    InvalidRequestBody:
-      description: Occurs when the client did not send a valid JSON object in the request body.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
-            message: The request body was not a single JSON object.
   securitySchemes:
     BasicAuth:
       type: http

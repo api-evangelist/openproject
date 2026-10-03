@@ -124,6 +124,18 @@ components:
           minimum: 0
         _links:
           $ref: '#/components/schemas/CollectionLinks'
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
     ErrorResponse:
       type: object
       required:
@@ -150,18 +162,6 @@ components:
         message:
           type: string
           example: Project can't be blank.
-    CollectionLinks:
-      type: object
-      required:
-      - self
-      properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This collection resource.
-
-
-              **Resource**: Collection'
     Link:
       type: object
       required:
@@ -195,22 +195,6 @@ components:
       example:
         href: /api/v3/work_packages
         method: POST
-    StatusCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - _embedded
-        properties:
-          _embedded:
-            type: object
-            required:
-            - elements
-            properties:
-              elements:
-                type: array
-                items:
-                  $ref: '#/components/schemas/StatusModel'
     StatusModel:
       type: object
       properties:
@@ -265,7 +249,40 @@ components:
 
 
                   **Resource**: Status'
+    StatusCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _embedded
+        properties:
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StatusModel'
   examples:
+    StatusResponse:
+      description: A standard status resource response.
+      value:
+        _type: Status
+        id: 13
+        name: Waiting for Darth-approval
+        isClosed: false
+        color: '#FE005D'
+        isDefault: false
+        isReadonly: false
+        excludedFromTotals: false
+        defaultDoneRatio: 66
+        position: 4
+        _links:
+          self:
+            href: /api/v3/statuses/13
+            title: Waiting for Darth-approval
     StatusCollection:
       description: A standard, unpaginated collection of statuses.
       value:
@@ -355,23 +372,6 @@ components:
         _links:
           self:
             href: /api/v3/statuses
-    StatusResponse:
-      description: A standard status resource response.
-      value:
-        _type: Status
-        id: 13
-        name: Waiting for Darth-approval
-        isClosed: false
-        color: '#FE005D'
-        isDefault: false
-        isReadonly: false
-        excludedFromTotals: false
-        defaultDoneRatio: 66
-        position: 4
-        _links:
-          self:
-            href: /api/v3/statuses/13
-            title: Waiting for Darth-approval
   securitySchemes:
     BasicAuth:
       type: http

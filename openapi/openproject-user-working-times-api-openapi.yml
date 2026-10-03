@@ -827,6 +827,78 @@ paths:
             or if the requesting user does not have permission to view it.'
 components:
   schemas:
+    UserWorkingHoursCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This collection of working hours records.
+
+                    **Resource**: UserWorkingHoursCollectionModel'
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                description: The array of working hours records for the user, ordered by `validFrom` descending.
+                items:
+                  $ref: '#/components/schemas/UserWorkingHoursModel'
+      example:
+        _type: Collection
+        total: 2
+        count: 2
+        _links:
+          self:
+            href: /api/v3/users/42/working_hours
+        _embedded:
+          elements:
+          - _type: UserWorkingHours
+            id: 2
+            validFrom: '2025-01-01'
+            mondayHours: 6.0
+            tuesdayHours: 6.0
+            wednesdayHours: 6.0
+            thursdayHours: 6.0
+            fridayHours: 6.0
+            saturdayHours: 0.0
+            sundayHours: 0.0
+            availabilityFactor: 80
+            _links:
+              self:
+                href: /api/v3/users/42/working_hours/2
+              user:
+                href: /api/v3/users/42
+                title: Jane Doe
+          - _type: UserWorkingHours
+            id: 1
+            validFrom: '2024-01-01'
+            mondayHours: 8.0
+            tuesdayHours: 8.0
+            wednesdayHours: 8.0
+            thursdayHours: 8.0
+            fridayHours: 8.0
+            saturdayHours: 0.0
+            sundayHours: 0.0
+            availabilityFactor: 100
+            _links:
+              self:
+                href: /api/v3/users/42/working_hours/1
+              user:
+                href: /api/v3/users/42
+                title: Jane Doe
     CollectionModel:
       type: object
       required:
@@ -849,6 +921,102 @@ components:
           minimum: 0
         _links:
           $ref: '#/components/schemas/CollectionLinks'
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    UserNonWorkingTimeCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This collection of non-working times records.
+
+                    **Resource**: UserNonWorkingTimeCollectionModel'
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                description: The array of personal non-working times for the user, ordered by start date ascending.
+                items:
+                  $ref: '#/components/schemas/UserNonWorkingTimeModel'
+      example:
+        _type: Collection
+        total: 2
+        count: 2
+        _links:
+          self:
+            href: /api/v3/users/42/non_working_times
+        _embedded:
+          elements:
+          - _type: UserNonWorkingTime
+            id: 7
+            startDate: '2025-06-16'
+            endDate: '2025-06-20'
+            _links:
+              self:
+                href: /api/v3/users/42/non_working_times/7
+              user:
+                href: /api/v3/users/42
+                title: Jane Doe
+          - _type: UserNonWorkingTime
+            id: 8
+            startDate: '2025-12-24'
+            endDate: '2025-12-24'
+            _links:
+              self:
+                href: /api/v3/users/42/non_working_times/8
+              user:
+                href: /api/v3/users/42
+                title: Jane Doe
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
     UserWorkingHoursModel:
       type: object
       required:
@@ -956,102 +1124,6 @@ components:
           user:
             href: /api/v3/users/42
             title: Jane Doe
-    ErrorResponse:
-      type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
-    CollectionLinks:
-      type: object
-      required:
-      - self
-      properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This collection resource.
-
-
-              **Resource**: Collection'
-    UserNonWorkingTimeCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'This collection of non-working times records.
-
-                    **Resource**: UserNonWorkingTimeCollectionModel'
-          _embedded:
-            type: object
-            required:
-            - elements
-            properties:
-              elements:
-                type: array
-                description: The array of personal non-working times for the user, ordered by start date ascending.
-                items:
-                  $ref: '#/components/schemas/UserNonWorkingTimeModel'
-      example:
-        _type: Collection
-        total: 2
-        count: 2
-        _links:
-          self:
-            href: /api/v3/users/42/non_working_times
-        _embedded:
-          elements:
-          - _type: UserNonWorkingTime
-            id: 7
-            startDate: '2025-06-16'
-            endDate: '2025-06-20'
-            _links:
-              self:
-                href: /api/v3/users/42/non_working_times/7
-              user:
-                href: /api/v3/users/42
-                title: Jane Doe
-          - _type: UserNonWorkingTime
-            id: 8
-            startDate: '2025-12-24'
-            endDate: '2025-12-24'
-            _links:
-              self:
-                href: /api/v3/users/42/non_working_times/8
-              user:
-                href: /api/v3/users/42
-                title: Jane Doe
     Link:
       type: object
       required:
@@ -1140,96 +1212,7 @@ components:
           user:
             href: /api/v3/users/42
             title: Jane Doe
-    UserWorkingHoursCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'This collection of working hours records.
-
-                    **Resource**: UserWorkingHoursCollectionModel'
-          _embedded:
-            type: object
-            required:
-            - elements
-            properties:
-              elements:
-                type: array
-                description: The array of working hours records for the user, ordered by `validFrom` descending.
-                items:
-                  $ref: '#/components/schemas/UserWorkingHoursModel'
-      example:
-        _type: Collection
-        total: 2
-        count: 2
-        _links:
-          self:
-            href: /api/v3/users/42/working_hours
-        _embedded:
-          elements:
-          - _type: UserWorkingHours
-            id: 2
-            validFrom: '2025-01-01'
-            mondayHours: 6.0
-            tuesdayHours: 6.0
-            wednesdayHours: 6.0
-            thursdayHours: 6.0
-            fridayHours: 6.0
-            saturdayHours: 0.0
-            sundayHours: 0.0
-            availabilityFactor: 80
-            _links:
-              self:
-                href: /api/v3/users/42/working_hours/2
-              user:
-                href: /api/v3/users/42
-                title: Jane Doe
-          - _type: UserWorkingHours
-            id: 1
-            validFrom: '2024-01-01'
-            mondayHours: 8.0
-            tuesdayHours: 8.0
-            wednesdayHours: 8.0
-            thursdayHours: 8.0
-            fridayHours: 8.0
-            saturdayHours: 0.0
-            sundayHours: 0.0
-            availabilityFactor: 100
-            _links:
-              self:
-                href: /api/v3/users/42/working_hours/1
-              user:
-                href: /api/v3/users/42
-                title: Jane Doe
   responses:
-    MissingContentType:
-      description: Occurs when the client did not send a Content-Type header
-      content:
-        text/plain:
-          schema:
-            type: string
-          example: Missing content-type header
-    UnsupportedMediaType:
-      description: Occurs when the client sends an unsupported Content-Type header.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
-            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
     InvalidRequestBody:
       description: Occurs when the client did not send a valid JSON object in the request body.
       content:
@@ -1240,6 +1223,23 @@ components:
             _type: Error
             errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
             message: The request body was not a single JSON object.
+    UnsupportedMediaType:
+      description: Occurs when the client sends an unsupported Content-Type header.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
+            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
   securitySchemes:
     BasicAuth:
       type: http

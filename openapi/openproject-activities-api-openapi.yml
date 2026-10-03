@@ -478,6 +478,62 @@ components:
           minimum: 0
         _links:
           $ref: '#/components/schemas/CollectionLinks'
+    ActivityCommentWriteModel:
+      type: object
+      properties:
+        comment:
+          type: object
+          properties:
+            raw:
+              type: string
+              description: The raw content of the comment
+        internal:
+          type: boolean
+          description: 'Determines whether this comment is internal. This is only available to users
+
+            with `add_internal_comments` permission. It defaults to `false`, if unset.'
+          default: false
+      example:
+        comment:
+          raw: I think this is awesome!
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
     WorkPackageModel:
       allOf:
       - $ref: '#/components/schemas/CustomFieldProperties'
@@ -1222,44 +1278,160 @@ components:
         customField2: 42
         createdAt: '2014-08-29T12:40:53.373Z'
         updatedAt: '2014-08-29T12:44:41.981Z'
-    ErrorResponse:
+    Link:
       type: object
       required:
-      - _type
-      - errorIdentifier
-      - message
+      - href
       properties:
-        _embedded:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
           type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
+    CustomFieldProperties:
+      type: object
+      patternProperties:
+        ^customField\d+$:
+          type:
+          - 'null'
+          - number
+          - boolean
+          - string
+          - object
+          description: 'A custom field value, that belongs to a custom field of a simple type:
+
+
+            - Boolean
+
+            - Date
+
+            - Float
+
+            - Integer
+
+            - Link (URL)
+
+            - Text
+
+            - Long text'
+    Attachments_Model:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The attachments collection
+
+
+                    **Resource**: AttachmentsCollection'
+                  readOnly: true
+          _embedded:
+            type: object
+            properties:
+              elements:
+                type: array
+                readOnly: true
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/AttachmentModel'
+                  - description: Collection of Attachments
+    EmojiReactionModel:
+      type: object
+      properties:
         _type:
           type: string
           enum:
-          - Error
-        errorIdentifier:
+          - EmojiReaction
+        id:
           type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
+          description: 'Emoji reaction id (format: reactable_id-reaction)'
+          example: 1-thumbs_up
+        reaction:
           type: string
-          example: Project can't be blank.
-    CollectionLinks:
-      type: object
-      required:
-      - self
-      properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This collection resource.
-
-
-              **Resource**: Collection'
+          description: The reaction identifier
+          example: thumbs_up
+        emoji:
+          type: string
+          description: The emoji character
+          example: 👍
+        reactionsCount:
+          type: integer
+          description: Number of users who reacted with this emoji
+          minimum: 1
+          example: 3
+        firstReactionAt:
+          type: string
+          format: date-time
+          description: Time of the first reaction
+        _links:
+          type: object
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: This emoji reaction
+            reactable:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: The activity this emoji reaction belongs to
+            reactingUsers:
+              type: array
+              items:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: The users who reacted with this emoji
+      example:
+        _type: EmojiReaction
+        id: 1-thumbs_up
+        reaction: thumbs_up
+        emoji: 👍
+        reactionsCount: 3
+        firstReactionAt: '2024-04-08T15:37:19.275Z'
+        _links:
+          self:
+            href: /api/v3/emoji_reactions/1-thumbs_up
+          reactable:
+            href: /api/v3/activities/1
+          reactingUsers:
+          - href: /api/v3/users/435
+            title: John Doe
+          - href: /api/v3/users/436
+            title: Jane Smith
+          - href: /api/v3/users/437
+            title: Bob Johnson
     AttachmentModel:
       type: object
       required:
@@ -1385,222 +1557,6 @@ components:
           algorithm: md5
           hash: 64c26a8403cd796ea4cf913cda2ee4a9
         createdAt: '2014-05-21T08:51:20.396Z'
-    FileUploadForm:
-      type: object
-      properties:
-        metadata:
-          type: object
-          properties:
-            fileName:
-              type: string
-        file:
-          type: string
-          format: binary
-    CustomFieldProperties:
-      type: object
-      patternProperties:
-        ^customField\d+$:
-          type:
-          - 'null'
-          - number
-          - boolean
-          - string
-          - object
-          description: 'A custom field value, that belongs to a custom field of a simple type:
-
-
-            - Boolean
-
-            - Date
-
-            - Float
-
-            - Integer
-
-            - Link (URL)
-
-            - Text
-
-            - Long text'
-    EmojiReactions_Model:
-      type: object
-      properties:
-        _type:
-          type: string
-          enum:
-          - Collection
-        total:
-          type: integer
-          description: Total number of emoji reactions
-          minimum: 0
-        count:
-          type: integer
-          description: Number of emoji reactions in this response
-          minimum: 0
-        _embedded:
-          type: object
-          properties:
-            elements:
-              type: array
-              items:
-                $ref: '#/components/schemas/EmojiReactionModel'
-        _links:
-          type: object
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: This collection
-      example:
-        _type: Collection
-        total: 2
-        count: 2
-        _embedded:
-          elements:
-          - _type: EmojiReaction
-            id: 1-thumbs_up
-            reaction: thumbs_up
-            emoji: 👍
-            reactionsCount: 3
-            firstReactionAt: '2024-04-08T15:37:19.275Z'
-            _links:
-              self:
-                href: /api/v3/emoji_reactions/1-thumbs_up
-              reactable:
-                href: /api/v3/activities/1
-              reactingUsers:
-              - href: /api/v3/users/435
-                title: John Doe
-              - href: /api/v3/users/436
-                title: Jane Smith
-              - href: /api/v3/users/437
-                title: Bob Johnson
-          - _type: EmojiReaction
-            id: 1-heart
-            reaction: heart
-            emoji: ❤️
-            reactionsCount: 1
-            firstReactionAt: '2024-04-08T15:38:19.275Z'
-            _links:
-              self:
-                href: /api/v3/emoji_reactions/1-heart
-              reactable:
-                href: /api/v3/activities/1
-              reactingUsers:
-              - href: /api/v3/users/435
-                title: John Doe
-        _links:
-          self:
-            href: /api/v3/activities/1/emoji_reactions
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
-          type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
-    Formattable:
-      type: object
-      required:
-      - format
-      properties:
-        format:
-          type: string
-          enum:
-          - plain
-          - markdown
-          - custom
-          readOnly: true
-          description: Indicates the formatting language of the raw text
-          example: markdown
-        raw:
-          type: string
-          description: The raw text, as entered by the user
-          example: I **am** formatted!
-        html:
-          type: string
-          readOnly: true
-          description: The text converted to HTML according to the format
-          example: I <strong>am</strong> formatted!
-      example:
-        format: markdown
-        raw: I am formatted!
-        html: I am formatted!
-    Attachments_Model:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'The attachments collection
-
-
-                    **Resource**: AttachmentsCollection'
-                  readOnly: true
-          _embedded:
-            type: object
-            properties:
-              elements:
-                type: array
-                readOnly: true
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/AttachmentModel'
-                  - description: Collection of Attachments
-    ActivityCommentWriteModel:
-      type: object
-      properties:
-        comment:
-          type: object
-          properties:
-            raw:
-              type: string
-              description: The raw content of the comment
-        internal:
-          type: boolean
-          description: 'Determines whether this comment is internal. This is only available to users
-
-            with `add_internal_comments` permission. It defaults to `false`, if unset.'
-          default: false
-      example:
-        comment:
-          raw: I think this is awesome!
     ActivityModel:
       type: object
       properties:
@@ -1870,88 +1826,115 @@ components:
         createdAt: '2014-05-21T08:51:20.721Z'
         updatedAt: '2014-05-21T09:14:02.929Z'
         version: 31
-    EmojiReactionModel:
+    FileUploadForm:
+      type: object
+      properties:
+        metadata:
+          type: object
+          properties:
+            fileName:
+              type: string
+        file:
+          type: string
+          format: binary
+    EmojiReactions_Model:
       type: object
       properties:
         _type:
           type: string
           enum:
-          - EmojiReaction
-        id:
-          type: string
-          description: 'Emoji reaction id (format: reactable_id-reaction)'
-          example: 1-thumbs_up
-        reaction:
-          type: string
-          description: The reaction identifier
-          example: thumbs_up
-        emoji:
-          type: string
-          description: The emoji character
-          example: 👍
-        reactionsCount:
+          - Collection
+        total:
           type: integer
-          description: Number of users who reacted with this emoji
-          minimum: 1
-          example: 3
-        firstReactionAt:
-          type: string
-          format: date-time
-          description: Time of the first reaction
+          description: Total number of emoji reactions
+          minimum: 0
+        count:
+          type: integer
+          description: Number of emoji reactions in this response
+          minimum: 0
+        _embedded:
+          type: object
+          properties:
+            elements:
+              type: array
+              items:
+                $ref: '#/components/schemas/EmojiReactionModel'
         _links:
           type: object
           properties:
             self:
               allOf:
               - $ref: '#/components/schemas/Link'
-              - description: This emoji reaction
-            reactable:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: The activity this emoji reaction belongs to
-            reactingUsers:
-              type: array
-              items:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: The users who reacted with this emoji
+              - description: This collection
       example:
-        _type: EmojiReaction
-        id: 1-thumbs_up
-        reaction: thumbs_up
-        emoji: 👍
-        reactionsCount: 3
-        firstReactionAt: '2024-04-08T15:37:19.275Z'
+        _type: Collection
+        total: 2
+        count: 2
+        _embedded:
+          elements:
+          - _type: EmojiReaction
+            id: 1-thumbs_up
+            reaction: thumbs_up
+            emoji: 👍
+            reactionsCount: 3
+            firstReactionAt: '2024-04-08T15:37:19.275Z'
+            _links:
+              self:
+                href: /api/v3/emoji_reactions/1-thumbs_up
+              reactable:
+                href: /api/v3/activities/1
+              reactingUsers:
+              - href: /api/v3/users/435
+                title: John Doe
+              - href: /api/v3/users/436
+                title: Jane Smith
+              - href: /api/v3/users/437
+                title: Bob Johnson
+          - _type: EmojiReaction
+            id: 1-heart
+            reaction: heart
+            emoji: ❤️
+            reactionsCount: 1
+            firstReactionAt: '2024-04-08T15:38:19.275Z'
+            _links:
+              self:
+                href: /api/v3/emoji_reactions/1-heart
+              reactable:
+                href: /api/v3/activities/1
+              reactingUsers:
+              - href: /api/v3/users/435
+                title: John Doe
         _links:
           self:
-            href: /api/v3/emoji_reactions/1-thumbs_up
-          reactable:
-            href: /api/v3/activities/1
-          reactingUsers:
-          - href: /api/v3/users/435
-            title: John Doe
-          - href: /api/v3/users/436
-            title: Jane Smith
-          - href: /api/v3/users/437
-            title: Bob Johnson
+            href: /api/v3/activities/1/emoji_reactions
+    Formattable:
+      type: object
+      required:
+      - format
+      properties:
+        format:
+          type: string
+          enum:
+          - plain
+          - markdown
+          - custom
+          readOnly: true
+          description: Indicates the formatting language of the raw text
+          example: markdown
+        raw:
+          type: string
+          description: The raw text, as entered by the user
+          example: I **am** formatted!
+        html:
+          type: string
+          readOnly: true
+          description: The text converted to HTML according to the format
+          example: I <strong>am</strong> formatted!
+      example:
+        format: markdown
+        raw: I am formatted!
+        html: I am formatted!
   responses:
-    MissingContentType:
-      description: Occurs when the client did not send a Content-Type header
-      content:
-        text/plain:
-          schema:
-            type: string
-          example: Missing content-type header
-    UnsupportedMediaType:
-      description: Occurs when the client sends an unsupported Content-Type header.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
-            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
     InvalidRequestBody:
       description: Occurs when the client did not send a valid JSON object in the request body.
       content:
@@ -1962,6 +1945,23 @@ components:
             _type: Error
             errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
             message: The request body was not a single JSON object.
+    UnsupportedMediaType:
+      description: Occurs when the client sends an unsupported Content-Type header.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
+            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
   examples:
     ActivityResponse:
       description: A simple response example for an activity comment.

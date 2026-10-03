@@ -661,28 +661,6 @@ paths:
           $ref: '#/components/responses/UnsupportedMediaType'
 components:
   schemas:
-    CollectionModel:
-      type: object
-      required:
-      - _type
-      - total
-      - count
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - Collection
-        total:
-          type: integer
-          description: The total amount of elements available in the collection.
-          minimum: 0
-        count:
-          type: integer
-          description: Actual amount of elements in this response.
-          minimum: 0
-        _links:
-          $ref: '#/components/schemas/CollectionLinks'
     UserCollectionModel:
       allOf:
       - $ref: '#/components/schemas/CollectionModel'
@@ -727,126 +705,28 @@ components:
           - _abbreviated: User resource shortened for brevity
             _type: User
             id: 1338
-    View_user_schemaModel:
+    CollectionModel:
       type: object
-      example:
-        _type: Schema
-        _dependencies: []
-        id:
-          type: Integer
-          name: ID
-          required: true
-          hasDefault: false
-          writable: false
-          options: {}
-        login:
-          type: String
-          name: Username
-          required: true
-          hasDefault: false
-          writable: true
-          minLength: 1
-          maxLength: 255
-          options: {}
-        admin:
-          type: Boolean
-          name: Administrator
-          required: false
-          hasDefault: false
-          writable: true
-          options: {}
-        mail:
-          type: String
-          name: Email
-          required: true
-          hasDefault: false
-          writable: true
-          minLength: 1
-          maxLength: 255
-          options: {}
-        firstName:
-          type: String
-          name: First name
-          required: true
-          hasDefault: false
-          writable: false
-          minLength: 1
-          maxLength: 255
-          options: {}
-        lastName:
-          type: String
-          name: Last name
-          required: true
-          hasDefault: false
-          writable: false
-          minLength: 1
-          maxLength: 255
-          options: {}
-        avatar:
-          type: String
-          name: Avatar
-          required: false
-          hasDefault: false
-          writable: false
-          options: {}
-        status:
-          type: String
-          name: Status
-          required: false
-          hasDefault: false
-          writable: true
-          options: {}
-        identityUrl:
-          type: String
-          name: Identity url
-          required: false
-          hasDefault: false
-          writable: true
-          options: {}
-        language:
-          type: String
-          name: Language
-          required: false
-          hasDefault: false
-          writable: true
-          options: {}
-        password:
-          type: Password
-          name: Password
-          required: false
-          hasDefault: false
-          writable: false
-          options: {}
-        createdAt:
-          type: DateTime
-          name: Created on
-          required: true
-          hasDefault: false
-          writable: false
-          options: {}
-        updatedAt:
-          type: DateTime
-          name: Updated on
-          required: true
-          hasDefault: false
-          writable: false
-          options: {}
-        customField1:
-          type: String
-          name: User String CF
-          required: false
-          hasDefault: false
-          writable: true
-        customField2:
-          type: CustomOption
-          name: User List cf
-          required: false
-          hasDefault: false
-          writable: true
-          location: _links
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
         _links:
-          self:
-            href: /api/v3/users/schema
+          $ref: '#/components/schemas/CollectionLinks'
     ErrorResponse:
       type: object
       required:
@@ -885,32 +765,60 @@ components:
 
 
               **Resource**: Collection'
-    CustomFieldProperties:
+    PrincipalModel:
       type: object
-      patternProperties:
-        ^customField\d+$:
-          type:
-          - 'null'
-          - number
-          - boolean
-          - string
-          - object
-          description: 'A custom field value, that belongs to a custom field of a simple type:
+      required:
+      - _type
+      - id
+      - name
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - User
+          - Group
+          - PlaceholderUser
+        id:
+          type: integer
+          description: The principal's unique identifier.
+          minimum: 1
+        name:
+          type: string
+          description: The principal's display name, layout depends on instance settings.
+        createdAt:
+          type: string
+          format: date-time
+          description: Time of creation
+        updatedAt:
+          type: string
+          format: date-time
+          description: Time of the most recent change to the principal
+        _links:
+          type: object
+          required:
+          - self
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This principal resource.
 
 
-            - Boolean
+                  **Resource**: User|Group|PlaceholderUser'
+            memberships:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'An href to the collection of the principal''s memberships.
 
-            - Date
 
-            - Float
+                  # Conditions:
 
-            - Integer
 
-            - Link (URL)
+                  - user has permission `view_members` or `manage_members` in any project
 
-            - Text
 
-            - Long text'
+                  **Resource**: Collection'
     UserCreateModel:
       type: object
       required:
@@ -1017,60 +925,6 @@ components:
       example:
         href: /api/v3/work_packages
         method: POST
-    PrincipalModel:
-      type: object
-      required:
-      - _type
-      - id
-      - name
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - User
-          - Group
-          - PlaceholderUser
-        id:
-          type: integer
-          description: The principal's unique identifier.
-          minimum: 1
-        name:
-          type: string
-          description: The principal's display name, layout depends on instance settings.
-        createdAt:
-          type: string
-          format: date-time
-          description: Time of creation
-        updatedAt:
-          type: string
-          format: date-time
-          description: Time of the most recent change to the principal
-        _links:
-          type: object
-          required:
-          - self
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This principal resource.
-
-
-                  **Resource**: User|Group|PlaceholderUser'
-            memberships:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'An href to the collection of the principal''s memberships.
-
-
-                  # Conditions:
-
-
-                  - user has permission `view_members` or `manage_members` in any project
-
-
-                  **Resource**: Collection'
     UserModel:
       allOf:
       - $ref: '#/components/schemas/PrincipalModel'
@@ -1248,34 +1102,152 @@ components:
                     - LDAP authentication configured
 
                     - `admin`'
-  responses:
-    MissingContentType:
-      description: Occurs when the client did not send a Content-Type header
-      content:
-        text/plain:
-          schema:
-            type: string
-          example: Missing content-type header
-    UnsupportedMediaType:
-      description: Occurs when the client sends an unsupported Content-Type header.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
-            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
-    InvalidRequestBody:
-      description: Occurs when the client did not send a valid JSON object in the request body.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
-            message: The request body was not a single JSON object.
+    View_user_schemaModel:
+      type: object
+      example:
+        _type: Schema
+        _dependencies: []
+        id:
+          type: Integer
+          name: ID
+          required: true
+          hasDefault: false
+          writable: false
+          options: {}
+        login:
+          type: String
+          name: Username
+          required: true
+          hasDefault: false
+          writable: true
+          minLength: 1
+          maxLength: 255
+          options: {}
+        admin:
+          type: Boolean
+          name: Administrator
+          required: false
+          hasDefault: false
+          writable: true
+          options: {}
+        mail:
+          type: String
+          name: Email
+          required: true
+          hasDefault: false
+          writable: true
+          minLength: 1
+          maxLength: 255
+          options: {}
+        firstName:
+          type: String
+          name: First name
+          required: true
+          hasDefault: false
+          writable: false
+          minLength: 1
+          maxLength: 255
+          options: {}
+        lastName:
+          type: String
+          name: Last name
+          required: true
+          hasDefault: false
+          writable: false
+          minLength: 1
+          maxLength: 255
+          options: {}
+        avatar:
+          type: String
+          name: Avatar
+          required: false
+          hasDefault: false
+          writable: false
+          options: {}
+        status:
+          type: String
+          name: Status
+          required: false
+          hasDefault: false
+          writable: true
+          options: {}
+        identityUrl:
+          type: String
+          name: Identity url
+          required: false
+          hasDefault: false
+          writable: true
+          options: {}
+        language:
+          type: String
+          name: Language
+          required: false
+          hasDefault: false
+          writable: true
+          options: {}
+        password:
+          type: Password
+          name: Password
+          required: false
+          hasDefault: false
+          writable: false
+          options: {}
+        createdAt:
+          type: DateTime
+          name: Created on
+          required: true
+          hasDefault: false
+          writable: false
+          options: {}
+        updatedAt:
+          type: DateTime
+          name: Updated on
+          required: true
+          hasDefault: false
+          writable: false
+          options: {}
+        customField1:
+          type: String
+          name: User String CF
+          required: false
+          hasDefault: false
+          writable: true
+        customField2:
+          type: CustomOption
+          name: User List cf
+          required: false
+          hasDefault: false
+          writable: true
+          location: _links
+        _links:
+          self:
+            href: /api/v3/users/schema
+    CustomFieldProperties:
+      type: object
+      patternProperties:
+        ^customField\d+$:
+          type:
+          - 'null'
+          - number
+          - boolean
+          - string
+          - object
+          description: 'A custom field value, that belongs to a custom field of a simple type:
+
+
+            - Boolean
+
+            - Date
+
+            - Float
+
+            - Integer
+
+            - Link (URL)
+
+            - Text
+
+            - Long text'
   examples:
     UserResponse:
       value:
@@ -1315,6 +1287,34 @@ components:
             href: /api/v3/users/14
             title: Delete member
             method: delete
+  responses:
+    InvalidRequestBody:
+      description: Occurs when the client did not send a valid JSON object in the request body.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+            message: The request body was not a single JSON object.
+    UnsupportedMediaType:
+      description: Occurs when the client sends an unsupported Content-Type header.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
+            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
   securitySchemes:
     BasicAuth:
       type: http

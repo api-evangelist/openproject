@@ -382,32 +382,6 @@ components:
 
 
               **Resource**: Collection'
-    CustomFieldProperties:
-      type: object
-      patternProperties:
-        ^customField\d+$:
-          type:
-          - 'null'
-          - number
-          - boolean
-          - string
-          - object
-          description: 'A custom field value, that belongs to a custom field of a simple type:
-
-
-            - Boolean
-
-            - Date
-
-            - Float
-
-            - Integer
-
-            - Link (URL)
-
-            - Text
-
-            - Long text'
     Link:
       type: object
       required:
@@ -441,199 +415,6 @@ components:
       example:
         href: /api/v3/work_packages
         method: POST
-    GroupCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'This group collection
-
-
-                    **Resource**: Collection'
-          _embedded:
-            type: object
-            required:
-            - elements
-            properties:
-              elements:
-                type: array
-                items:
-                  $ref: '#/components/schemas/GroupModel'
-      example:
-        _type: Collection
-        total: 2
-        count: 2
-        _links:
-          self:
-            href: /api/v3/groups
-        _embedded:
-          elements:
-          - _type: Group
-            id: 1337
-            name: Stormtroopers
-            createdAt: '2022-09-23T11:06:36.300Z'
-            updatedAt: '2022-09-23T11:06:36.300Z'
-            _links:
-              self:
-                href: /api/v3/groups/9
-                title: Stormtroopers
-              delete:
-                href: /api/v3/group/9
-                method: delete
-              memberships:
-                href: /api/v3/memberships?filters=[{"principal":{"operator":"=","values":["9"]}}]
-                title: Memberships
-              updateImmediately:
-                href: /api/v3/group/9
-                method: patch
-              members:
-              - href: /api/v3/users/363
-                title: ST-097E
-              - href: /api/v3/users/60
-                title: ST-C-334
-          - _abbreviated: Group resource shortened for brevity
-            id: 1338
-    PrincipalModel:
-      type: object
-      required:
-      - _type
-      - id
-      - name
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - User
-          - Group
-          - PlaceholderUser
-        id:
-          type: integer
-          description: The principal's unique identifier.
-          minimum: 1
-        name:
-          type: string
-          description: The principal's display name, layout depends on instance settings.
-        createdAt:
-          type: string
-          format: date-time
-          description: Time of creation
-        updatedAt:
-          type: string
-          format: date-time
-          description: Time of the most recent change to the principal
-        _links:
-          type: object
-          required:
-          - self
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This principal resource.
-
-
-                  **Resource**: User|Group|PlaceholderUser'
-            memberships:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'An href to the collection of the principal''s memberships.
-
-
-                  # Conditions:
-
-
-                  - user has permission `view_members` or `manage_members` in any project
-
-
-                  **Resource**: Collection'
-    GroupModel:
-      allOf:
-      - $ref: '#/components/schemas/PrincipalModel'
-      - $ref: '#/components/schemas/CustomFieldProperties'
-      - type: object
-        required:
-        - _type
-        - _embedded
-        properties:
-          _type:
-            type: string
-            enum:
-            - Group
-          _embedded:
-            type: object
-            properties:
-              members:
-                type: array
-                description: Embedded list of members.
-                items:
-                  $ref: '#/components/schemas/UserModel'
-          _links:
-            type: object
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'This group resource
-
-
-                    **Resource**: Group'
-              members:
-                type: array
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/Link'
-                  - description: 'A member of the group
-
-
-                      # Conditions:
-
-
-                      - user has permission `manage_members` in any project
-
-
-                      **Resource**: User'
-              memberships:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'An collection of all memberships of the group.
-
-
-                    **Resource**: MembershipCollection'
-              delete:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'An href to delete the group.
-
-
-                    # Conditions:
-
-
-                    - `admin`'
-              updateImmediately:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'An href to update the group.
-
-
-                    # Conditions:
-
-
-                    - `admin`
-
-
-                    **Resource**: Group'
     UserModel:
       allOf:
       - $ref: '#/components/schemas/PrincipalModel'
@@ -811,6 +592,32 @@ components:
                     - LDAP authentication configured
 
                     - `admin`'
+    CustomFieldProperties:
+      type: object
+      patternProperties:
+        ^customField\d+$:
+          type:
+          - 'null'
+          - number
+          - boolean
+          - string
+          - object
+          description: 'A custom field value, that belongs to a custom field of a simple type:
+
+
+            - Boolean
+
+            - Date
+
+            - Float
+
+            - Integer
+
+            - Link (URL)
+
+            - Text
+
+            - Long text'
     GroupWriteModel:
       type: object
       properties:
@@ -836,6 +643,199 @@ components:
           - href: /api/v3/users/42
           - href: /api/v3/users/43
           - href: /api/v3/users/44
+    PrincipalModel:
+      type: object
+      required:
+      - _type
+      - id
+      - name
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - User
+          - Group
+          - PlaceholderUser
+        id:
+          type: integer
+          description: The principal's unique identifier.
+          minimum: 1
+        name:
+          type: string
+          description: The principal's display name, layout depends on instance settings.
+        createdAt:
+          type: string
+          format: date-time
+          description: Time of creation
+        updatedAt:
+          type: string
+          format: date-time
+          description: Time of the most recent change to the principal
+        _links:
+          type: object
+          required:
+          - self
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This principal resource.
+
+
+                  **Resource**: User|Group|PlaceholderUser'
+            memberships:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'An href to the collection of the principal''s memberships.
+
+
+                  # Conditions:
+
+
+                  - user has permission `view_members` or `manage_members` in any project
+
+
+                  **Resource**: Collection'
+    GroupCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This group collection
+
+
+                    **Resource**: Collection'
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GroupModel'
+      example:
+        _type: Collection
+        total: 2
+        count: 2
+        _links:
+          self:
+            href: /api/v3/groups
+        _embedded:
+          elements:
+          - _type: Group
+            id: 1337
+            name: Stormtroopers
+            createdAt: '2022-09-23T11:06:36.300Z'
+            updatedAt: '2022-09-23T11:06:36.300Z'
+            _links:
+              self:
+                href: /api/v3/groups/9
+                title: Stormtroopers
+              delete:
+                href: /api/v3/group/9
+                method: delete
+              memberships:
+                href: /api/v3/memberships?filters=[{"principal":{"operator":"=","values":["9"]}}]
+                title: Memberships
+              updateImmediately:
+                href: /api/v3/group/9
+                method: patch
+              members:
+              - href: /api/v3/users/363
+                title: ST-097E
+              - href: /api/v3/users/60
+                title: ST-C-334
+          - _abbreviated: Group resource shortened for brevity
+            id: 1338
+    GroupModel:
+      allOf:
+      - $ref: '#/components/schemas/PrincipalModel'
+      - $ref: '#/components/schemas/CustomFieldProperties'
+      - type: object
+        required:
+        - _type
+        - _embedded
+        properties:
+          _type:
+            type: string
+            enum:
+            - Group
+          _embedded:
+            type: object
+            properties:
+              members:
+                type: array
+                description: Embedded list of members.
+                items:
+                  $ref: '#/components/schemas/UserModel'
+          _links:
+            type: object
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This group resource
+
+
+                    **Resource**: Group'
+              members:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'A member of the group
+
+
+                      # Conditions:
+
+
+                      - user has permission `manage_members` in any project
+
+
+                      **Resource**: User'
+              memberships:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'An collection of all memberships of the group.
+
+
+                    **Resource**: MembershipCollection'
+              delete:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'An href to delete the group.
+
+
+                    # Conditions:
+
+
+                    - `admin`'
+              updateImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'An href to update the group.
+
+
+                    # Conditions:
+
+
+                    - `admin`
+
+
+                    **Resource**: Group'
   responses:
     MissingContentType:
       description: Occurs when the client did not send a Content-Type header
@@ -844,16 +844,6 @@ components:
           schema:
             type: string
           example: Missing content-type header
-    UnsupportedMediaType:
-      description: Occurs when the client sends an unsupported Content-Type header.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
-            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
     InvalidRequestBody:
       description: Occurs when the client did not send a valid JSON object in the request body.
       content:
@@ -864,6 +854,16 @@ components:
             _type: Error
             errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
             message: The request body was not a single JSON object.
+    UnsupportedMediaType:
+      description: Occurs when the client sends an unsupported Content-Type header.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
+            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
   examples:
     GroupResponse:
       value:

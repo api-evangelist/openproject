@@ -2972,6 +2972,1583 @@ paths:
             That''s why a 404 is returned here, even if a 403 might be more appropriate.*'
 components:
   schemas:
+    OAuthApplicationReadModel:
+      type: object
+      required:
+      - id
+      - _type
+      - name
+      - clientId
+      - confidential
+      - _links
+      properties:
+        id:
+          type: integer
+          minimum: 1
+        _type:
+          type: string
+          enum:
+          - OAuthApplication
+        name:
+          type: string
+          description: The name of the OAuth 2 application
+        clientId:
+          type: string
+          description: OAuth 2 client id
+        clientSecret:
+          type: string
+          description: OAuth 2 client secret. This is only returned when creating a new OAuth application.
+        confidential:
+          type: boolean
+          description: true, if OAuth 2 credentials are confidential, false, if no secret is stored
+        createdAt:
+          type: string
+          format: date-time
+          description: The time the OAuth 2 Application was created at
+        updatedAt:
+          type: string
+          format: date-time
+          description: The time the OAuth 2 Application was last updated
+        scopes:
+          type: array
+          description: An array of the scopes of the OAuth 2 Application
+          items:
+            type: string
+        _links:
+          type: object
+          required:
+          - self
+          - owner
+          - redirectUri
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This OAuth application
+
+
+                  **Resource**: OAuthApplication'
+            owner:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The user that created the OAuth application.
+
+
+                  **Resource**: User'
+            integration:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The resource that integrates this OAuth application into itself. Currently, only `Storage` resources are
+
+                  able to create and maintain own OAuth application.
+
+
+                  **Resource**: Storage'
+            redirectUri:
+              type: array
+              items:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'A redirect URI of the OAuth application
+
+
+                    **Resource**: N/A'
+      example:
+        id: 1337
+        _type: OAuthApplication
+        name: Vader's secure OAuth app
+        clientId: O5h6WObhMg1Z8IcLHRE3_LMh4jJYmmca2V6OTFSv8DA
+        confidential: true
+        createdAt: '2022-12-07T12:56:42.626Z'
+        updatedAt: '2022-12-07T12:56:42.626Z'
+        scopes:
+        - api_v3
+        _links:
+          self:
+            href: /api/v3/oauth_applications/1337
+          owner:
+            href: /api/v3/users/13
+            title: Darth Vader
+          integration:
+            href: /api/v3/storages/42
+            title: Death Star Cloud
+          redirectUri:
+          - href: https://death-star.cloud.tools/index.php/apps/integration_openproject/oauth-redirect
+    WorkPackagePatchModel:
+      allOf:
+      - $ref: '#/components/schemas/WorkPackageWriteModel'
+      - type: object
+        required:
+        - lockVersion
+        properties:
+          lockVersion:
+            type: integer
+            description: The version of the item as used for optimistic locking
+    Work_PackagesModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The work package collection
+
+
+                    **Resource**: WorkPackageCollection'
+                  readOnly: true
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkPackageModel'
+      example:
+        _links:
+          self:
+            href: /api/v3/work_packages
+        total: 2
+        count: 2
+        _type: Collection
+        _embedded:
+          elements:
+          - _abbreviated: Work package resource shortened for brevity
+            _type: WorkPackage
+            _links:
+              self:
+                href: /api/v3/work_packages/1
+            id: 1
+          - _abbreviated: Work package resource shortened for brevity
+            _type: WorkPackage
+            _links:
+              self:
+                href: /api/v3/work_packages/2
+            id: 2
+    WatchersModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The watcher list
+
+
+                    **Resource**: WatchersModel'
+                  readOnly: true
+          _embedded:
+            type: object
+            properties:
+              elements:
+                type: array
+                readOnly: true
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/UserModel'
+                  - description: Collection of Users
+      example:
+        _links:
+          self:
+            href: /api/v3/work_packages/14/watchers
+        total: 2
+        count: 2
+        _type: Collection
+        _embedded:
+          elements:
+          - _type: User
+            _links:
+              self:
+                href: /api/v3/users/1
+                title: John Sheppard - j.sheppard
+              showUser:
+                href: /users/1
+                type: text/html
+              lock:
+                href: /api/v3/users/1/lock
+                title: Set lock on j.sheppard
+                method: POST
+              delete:
+                href: /api/v3/users/1
+                title: Delete j.sheppard
+                method: DELETE
+            id: 1
+            login: j.sheppard
+            firstName: John
+            lastName: Sheppard
+            name: John Sheppard
+            mail: shep@mail.com
+            avatar: https://example.org/users/1/avatar
+            status: active
+            createdAt: '2014-05-21T08:51:20.396Z'
+            updatedAt: '2014-05-21T08:51:20.396Z'
+          - _type: User
+            _links:
+              self:
+                href: /api/v3/users/2
+                title: Jim Sheppard - j.sheppard2
+              lock:
+                href: /api/v3/users/2/lock
+                title: Set lock on j.sheppard2
+                method: POST
+              delete:
+                href: /api/v3/users/2
+                title: Delete j.sheppard2
+                method: DELETE
+            id: 2
+            login: j.sheppard2
+            firstName: Jim
+            lastName: Sheppard
+            name: Jim Sheppard
+            mail: shep@mail.net
+            avatar: https://example.org/users/1/avatar
+            status: active
+            createdAt: '2014-05-21T08:51:20.396Z'
+            updatedAt: '2014-05-21T08:51:20.396Z'
+    PrincipalModel:
+      type: object
+      required:
+      - _type
+      - id
+      - name
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - User
+          - Group
+          - PlaceholderUser
+        id:
+          type: integer
+          description: The principal's unique identifier.
+          minimum: 1
+        name:
+          type: string
+          description: The principal's display name, layout depends on instance settings.
+        createdAt:
+          type: string
+          format: date-time
+          description: Time of creation
+        updatedAt:
+          type: string
+          format: date-time
+          description: Time of the most recent change to the principal
+        _links:
+          type: object
+          required:
+          - self
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This principal resource.
+
+
+                  **Resource**: User|Group|PlaceholderUser'
+            memberships:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'An href to the collection of the principal''s memberships.
+
+
+                  # Conditions:
+
+
+                  - user has permission `view_members` or `manage_members` in any project
+
+
+                  **Resource**: Collection'
+    WorkPackageFormModel:
+      type: object
+      description: 'The work package creation form. This object is returned, whenever a work package form endpoint is called. It contains
+
+        an allowed payload definition, the full schema and any validation errors on the current request body.'
+      properties:
+        _type:
+          type: string
+          enum:
+          - Form
+        _embedded:
+          type: object
+          properties:
+            payload:
+              $ref: '#/components/schemas/WorkPackageWriteModel'
+            schema:
+              $ref: '#/components/schemas/WorkPackageSchemaModel'
+            validationErrors:
+              type: object
+              description: 'All validation errors, where the key is the faulty property. The object is empty, if the request body is
+
+                valid.'
+        _links:
+          type: object
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This form endpoint
+
+
+                  **Resource** : Form'
+            validate:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: The endpoint for validating the request bodies. Often referring to this very form endpoint.
+            previewMarkup:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: Renders a markup preview for the work package form.
+            customFields:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: Link to the HTML page for the custom field definitions.
+            configureForm:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: Link to the HTML page for the form configuration.
+    Available_WatchersModel:
+      type: object
+      example:
+        _links:
+          self:
+            href: /api/v3/work_packages/1/available_watchers
+        total: 2
+        count: 2
+        _type: Collection
+        _embedded:
+          elements:
+          - _type: User
+            _links:
+              self:
+                href: /api/v3/users/1
+                title: John Sheppard - j.sheppard
+              lock:
+                href: /api/v3/users/1/lock
+                title: Set lock on j.sheppard
+                method: POST
+              delete:
+                href: /api/v3/users/1
+                title: Delete j.sheppard
+                method: DELETE
+            id: 1
+            login: j.sheppard
+            firstName: John
+            lastName: Sheppard
+            email: shep@mail.com
+            avatar: https://example.org/users/1/avatar
+            status: active
+            createdAt: '2014-05-21T08:51:20.286Z'
+            updatedAt: '2014-05-21T08:51:20.286Z'
+          - _type: User
+            _links:
+              self:
+                href: /api/v3/users/2
+                title: Jim Sheppard - j.sheppard2
+              lock:
+                href: /api/v3/users/2/lock
+                title: Set lock on j.sheppard2
+                method: POST
+              delete:
+                href: /api/v3/users/2
+                title: Delete j.sheppard2
+                method: DELETE
+            id: 2
+            login: j.sheppard2
+            firstName: Jim
+            lastName: Sheppard
+            email: shep@mail.net
+            avatar: https://example.org/users/1/avatar
+            status: active
+            createdAt: '2014-05-21T08:51:20.286Z'
+            updatedAt: '2014-05-21T08:51:20.286Z'
+    Formattable:
+      type: object
+      required:
+      - format
+      properties:
+        format:
+          type: string
+          enum:
+          - plain
+          - markdown
+          - custom
+          readOnly: true
+          description: Indicates the formatting language of the raw text
+          example: markdown
+        raw:
+          type: string
+          description: The raw text, as entered by the user
+          example: I **am** formatted!
+        html:
+          type: string
+          readOnly: true
+          description: The text converted to HTML according to the format
+          example: I <strong>am</strong> formatted!
+      example:
+        format: markdown
+        raw: I am formatted!
+        html: I am formatted!
+    FileLinkOriginDataModel:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: string
+          description: Linked file's id on the origin
+        name:
+          type: string
+          description: Linked file's name on the origin
+        mimeType:
+          type: string
+          minLength: 0
+          description: 'MIME type of the linked file.
+
+
+            To link a folder entity, the custom MIME type `application/x-op-directory` MUST be provided. Otherwise it defaults back to
+
+            an unknown MIME type.'
+        size:
+          type: integer
+          minimum: 0
+          description: file size on origin in bytes
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp of the creation datetime of the file on the origin
+        lastModifiedAt:
+          type: string
+          format: date-time
+          description: Timestamp of the datetime of the last modification of the file on the origin
+        createdByName:
+          type: string
+          description: Display name of the author that created the file on the origin
+        lastModifiedByName:
+          type: string
+          description: Display name of the author that modified the file on the origin last
+    ActivityCommentWriteModel:
+      type: object
+      properties:
+        comment:
+          type: object
+          properties:
+            raw:
+              type: string
+              description: The raw content of the comment
+        internal:
+          type: boolean
+          description: 'Determines whether this comment is internal. This is only available to users
+
+            with `add_internal_comments` permission. It defaults to `false`, if unset.'
+          default: false
+      example:
+        comment:
+          raw: I think this is awesome!
+    RevisionsModel:
+      type: object
+      example:
+        _links:
+          self:
+            href: /api/v3/work_packages/42/revisions
+        total: 2
+        count: 2
+        _type: Collection
+        _embedded:
+          elements:
+          - _type: Revision
+            _links:
+              self:
+                href: /api/v3/revisions/13
+              project:
+                href: /api/v3/projects/1
+                title: A Test Project
+              author:
+                href: /api/v3/users/1
+                title: John Sheppard - j.sheppard
+              showRevision:
+                href: /projects/identifier/repository/revision/11f4b07
+            id: 13
+            identifier: 11f4b07dff4f4ce9548a52b7d002daca7cd63ec6
+            formattedIdentifier: 11f4b07
+            authorName: John Sheppard
+            message:
+              format: plain
+              raw: 'This revision provides new features
+
+
+                An elaborate description'
+              html: <p>This revision provides new features<br/><br/>An elaborate description</p>
+            createdAt: '2015-07-21T13:36:59.201Z'
+          - _type: Revision
+            _links:
+              self:
+                href: /api/v3/revisions/14
+              project:
+                href: /api/v3/projects/1
+                title: A Test Project
+              author:
+                href: /api/v3/users/2
+                title: Jim Sheppard - j.sheppard
+              showRevision:
+                href: /projects/identifier/repository/revision/029ed72a
+            id: 13
+            identifier: 029ed72a3b7b7c4ab332b1f6eaa6576e7c946059
+            formattedIdentifier: 029ed72a
+            authorName: j1msheppard
+            message:
+              format: plain
+              raw: 'This revision fixes some stuff
+
+
+                More information here'
+              html: <p>This revision fixes some stuff<br/><br/>More information here</p>
+            createdAt: '2015-06-30T08:47:00.548Z'
+    WorkPackageWriteModel:
+      type: object
+      description: 'This model is used for creating and updating work packages. It can also be used for validation against the work
+
+        package form endpoints.'
+      properties:
+        subject:
+          type: string
+          description: Work package subject
+        description:
+          allOf:
+          - $ref: '#/components/schemas/Formattable'
+          - description: The work package description
+        scheduleManually:
+          type: boolean
+          description: 'Uses manual scheduling mode when true (default). Uses automatic scheduling
+
+            mode when false. Can be automatic only when predecessors or children are
+
+            present.'
+        startDate:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Scheduled beginning of a work package
+        dueDate:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Scheduled end of a work package
+        estimatedTime:
+          type:
+          - string
+          - 'null'
+          format: duration
+          description: Time a work package likely needs to be completed excluding its descendants
+        duration:
+          type:
+          - string
+          - 'null'
+          format: duration
+          description: 'The amount of time in hours the work package needs to be completed. This value must be bigger or equal to `P1D`,
+
+            and any the value will get floored to the nearest day.
+
+
+            The duration has no effect, unless either a start date or a due date is set.
+
+
+            Not available for milestone type of work packages.'
+        ignoreNonWorkingDays:
+          type: boolean
+          description: 'When scheduling, whether or not to ignore the non working days being defined.
+
+            A work package with the flag set to true will be allowed to be scheduled to a non working day.'
+        _links:
+          type: object
+          properties:
+            category:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The category of the work package
+
+
+                  **Resource**: Category'
+            type:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The type of the work package
+
+
+                  **Resource**: Type'
+            priority:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The priority of the work package
+
+
+                  **Resource**: Priority'
+            project:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The project to which the work package belongs
+
+
+                  **Resource**: Project'
+            status:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The current status of the work package
+
+
+                  **Resource**: Status'
+            responsible:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The person that is responsible for the overall outcome
+
+
+                  **Resource**: User'
+            assignee:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The person that is intended to work on the work package
+
+
+                  **Resource**: User'
+            version:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The version associated to the work package
+
+
+                  **Resource**: Version'
+            parent:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'Parent work package
+
+
+                  **Resource**: WorkPackage'
+        _meta:
+          type: object
+          description: Meta information for the work package request
+          properties:
+            validateCustomFields:
+              type: boolean
+              description: 'When set to true, explicitly validates all required custom fields on the work package, regardless of whether
+
+                they are provided in the request body. This overrides the default behavior where only custom fields included
+
+                in the request are validated. Use this parameter when you need to ensure all required custom fields have
+
+                valid values before allowing the update to proceed.'
+              default: false
+    StorageReadModel:
+      type: object
+      required:
+      - id
+      - _type
+      - name
+      - _links
+      properties:
+        id:
+          type: integer
+          description: Storage id
+        _type:
+          type: string
+          enum:
+          - Storage
+        name:
+          type: string
+          description: Storage name
+        storageAudience:
+          type: string
+          description: 'The audience that the storage expects in tokens for requests to it,
+
+            usually the storage''s client ID at the identity provider.
+
+
+            This is only required for authentication through single-sign-on and so far
+
+            only supported for provider type Nextcloud.'
+        tokenExchangeScope:
+          type: string
+          description: 'The scope that will be requested when requesting a token for the storage through token exchange. Has no effect if no
+
+            token exchange is performed.
+
+
+            This is only required for authentication through single-sign-on and so far only supported for provider type Nextcloud.'
+        tenantId:
+          type:
+          - string
+          - 'null'
+          description: 'The tenant id of a file storage of type OneDrive.
+
+
+            Ignored if the provider type is not OneDrive. May be null if the storage is not configured completely.'
+        driveId:
+          type:
+          - string
+          - 'null'
+          description: 'The drive id of a file storage of type OneDrive.
+
+
+            Ignored if the provider type is not OneDrive. May be null if the storage is not configured completely.'
+        hasApplicationPassword:
+          type: boolean
+          description: 'Whether the storage has the application password to use for the Nextcloud storage.
+
+
+            Ignored if the provider type is not Nextcloud.'
+        forbiddenFileNameCharacters:
+          type: string
+          description: 'A string with all the characters forbidden to be used for file and folder names in the storage. Used by OpenProject to avoid
+
+            creating files with unsupported names (e.g. when creating project folders).
+
+
+            Only supported for provider type Nextcloud so far.'
+        createdAt:
+          type: string
+          format: date-time
+          description: Time of creation
+        updatedAt:
+          type: string
+          format: date-time
+          description: Time of the most recent change to the storage
+        configured:
+          type: boolean
+          description: Indication, if the storage is fully configured
+        _embedded:
+          type: object
+          properties:
+            oauthApplication:
+              $ref: '#/components/schemas/OAuthApplicationReadModel'
+            oauthClientCredentials:
+              $ref: '#/components/schemas/OAuthClientCredentialsReadModel'
+        _links:
+          type: object
+          required:
+          - self
+          - type
+          - open
+          - authorizationState
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This storage resource. Contains the user defined storage name as title.
+
+
+                  **Resource**: Storage'
+            type:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The urn of the storage type. Currently Nextcloud and OneDrive storages are supported.
+
+
+                  - urn:openproject-org:api:v3:storages:Nextcloud
+
+                  - urn:openproject-org:api:v3:storages:OneDrive
+
+
+                  **Resource**: N/A'
+            authenticationMethod:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The urn of the authentication method. Currently only Nextcloud storages support this setting.
+
+
+                  - urn:openproject-org:api:v3:storages:authenticationMethod:TwoWayOAuth2 (default)
+
+                  - urn:openproject-org:api:v3:storages:authenticationMethod:OAuth2SSO
+
+
+                  **Resource**: N/A'
+            origin:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'Web URI of the storage instance. This link is ignored, if the storage is hosted in a cloud and has no own
+
+                  URL, like file storages of type OneDrive.
+
+
+                  **Resource**: N/A'
+            open:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'URI of the file storage location, from where the user usually starts browsing files.
+
+
+                  **Resource**: N/A'
+            authorizationState:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The urn of the storage connection state. Can be one of:
+
+
+                  - urn:openproject-org:api:v3:storages:authorization:Connected
+
+                  - urn:openproject-org:api:v3:storages:authorization:FailedAuthorization
+
+                  - urn:openproject-org:api:v3:storages:authorization:Error
+
+
+                  **Resource**: N/A'
+            authorize:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The link to the starting point of the authorization cycle for a configured storage provider.
+
+
+                  # Conditions
+
+
+                  `authorizationState` is:
+
+
+                  - urn:openproject-org:api:v3:storages:authorization:FailedAuthorization
+
+
+                  **Resource**: N/A'
+            oauthApplication:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The OAuth 2 provider application linked to the storage.
+
+
+                  # Conditions
+
+
+                  - User has role `admin`
+
+
+                  **Resource**: OAuthApplication'
+            oauthClientCredentials:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The OAuth 2 credentials resource linked to the storage.
+
+
+                  # Conditions
+
+
+                  - User has role `admin`
+
+
+                  **Resource**: OAuthClientCredentials'
+    PaginatedCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - pageSize
+        - offset
+        properties:
+          pageSize:
+            type: integer
+            description: Amount of elements that a response will hold.
+            minimum: 0
+          offset:
+            type: integer
+            description: The page number that is requested from paginated collection.
+            minimum: 1
+          _links:
+            type: object
+            required:
+            - jumpTo
+            - changeSize
+            properties:
+              jumpTo:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Templated link to another page offset.
+
+
+                    **Resource**: Collection'
+              changeSize:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Templated link for another page size.
+
+
+                    **Resource**: Collection'
+    ReminderModel:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Reminder id
+          readOnly: true
+          minimum: 1
+        note:
+          type: string
+          description: The note of the reminder
+        remindAt:
+          type: string
+          format: date-time
+          description: The date and time when the reminder is due
+        _links:
+          required:
+          - creator
+          - remindable
+          type: object
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This reminder
+
+
+                  **Resource**: Reminder'
+            creator:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The person that created the reminder
+
+
+                  **Resource**: User'
+            remindable:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The resource that the reminder is associated with
+
+
+                  **Resource**: WorkPackage'
+    WorkPackageSchemaModel:
+      type: object
+      description: 'A schema for a work package. This schema defines the attributes of a work package.
+
+
+        TODO: Incomplete, needs to be updated with the real behaviour of schemas (when does which attribute appear?).'
+      properties:
+        _type:
+          type: string
+          enum:
+          - Schema
+        _dependencies:
+          type: array
+          items:
+            type: string
+          description: TBD
+        _attributeGroups:
+          type: array
+          items:
+            type: object
+          description: TBD (WorkPackageFormAttributeGroup)
+        lockVersion:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        id:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        subject:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        description:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        duration:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        scheduleManually:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        ignoreNonWorkingDays:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        startDate:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        dueDate:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        derivedStartDate:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        derivedDueDate:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        estimatedTime:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        derivedEstimatedTime:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        remainingTime:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        derivedRemainingTime:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        percentageDone:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        derivedPercentageDone:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        readonly:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        createdAt:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        updatedAt:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        author:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        position:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        project:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        projectPhase:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        projectPhaseDefinition:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        parent:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        sprint:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        storyPoints:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        assignee:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        responsible:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        type:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        status:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        category:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        version:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        priority:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        _links:
+          type: object
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This work package schema
+
+
+                  **Resource**: Schema'
+    OAuthClientCredentialsReadModel:
+      type: object
+      required:
+      - id
+      - _type
+      - clientId
+      - confidential
+      - _links
+      properties:
+        id:
+          type: integer
+          minimum: 1
+        _type:
+          type: string
+          enum:
+          - OAuthClientCredentials
+        clientId:
+          type: string
+          description: OAuth 2 client id
+        confidential:
+          type: boolean
+          description: true, if OAuth 2 credentials are confidential, false, if no secret is stored
+        createdAt:
+          type: string
+          format: date-time
+          description: The time the OAuth client credentials were created at
+        updatedAt:
+          type: string
+          format: date-time
+          description: The time the OAuth client credentials were last updated
+        _links:
+          type: object
+          required:
+          - self
+          - integration
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This OAuth Client Credentials object
+
+
+                  **Resource**: OAuthClientCredentials'
+            integration:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The resource that integrates this OAuth client credentials. Currently, only `Storage` resources are
+
+                  able to contain OAuth client credentials.
+
+
+                  **Resource**: Storage'
+      example:
+        id: 1337
+        _type: OAuthClientCredentials
+        clientId: O5h6WObhMg1Z8IcLHRE3_LMh4jJYmmca2V6OTFSv8DA
+        confidential: true
+        createdAt: '2022-12-07T12:56:42.836Z'
+        updatedAt: '2022-12-07T12:56:42.836Z'
+        _links:
+          self:
+            href: /api/v3/oauth_client_credentials/1337
+          integration:
+            href: /api/v3/storages/42
+            title: Death Star Cloud
+    UserModel:
+      allOf:
+      - $ref: '#/components/schemas/PrincipalModel'
+      - $ref: '#/components/schemas/CustomFieldProperties'
+      - type: object
+        required:
+        - _type
+        - avatar
+        properties:
+          _type:
+            type: string
+            enum:
+            - User
+          avatar:
+            type:
+            - string
+            - 'null'
+            format: uri
+            description: URL to user's avatar
+          login:
+            type: string
+            description: 'The user''s login name
+
+
+              # Conditions
+
+
+              - User is self, or `create_user` or `manage_user` permission globally'
+            maxLength: 256
+          firstName:
+            type: string
+            description: 'The user''s first name
+
+
+              # Conditions
+
+
+              - User is self, or `create_user` or `manage_user` permission globally'
+            maxLength: 30
+          lastName:
+            type: string
+            description: 'The user''s last name
+
+
+              # Conditions
+
+
+              - User is self, or `create_user` or `manage_user` permission globally'
+            maxLength: 30
+          email:
+            type: string
+            description: 'The user''s email address
+
+
+              # Conditions
+
+
+              - E-Mail address not hidden
+
+              - User is not a new record
+
+              - User is self, or `create_user` or `manage_user` permission globally'
+            maxLength: 60
+          admin:
+            type: boolean
+            description: 'Flag indicating whether or not the user is an admin
+
+
+              # Conditions
+
+
+              - `admin`'
+          status:
+            type: string
+            description: 'The current activation status of the user.
+
+
+              # Conditions
+
+
+              - User is self, or `create_user` or `manage_user` permission globally'
+          language:
+            type: string
+            description: 'User''s language | ISO 639-1 format
+
+
+              # Conditions
+
+
+              - User is self, or `create_user` or `manage_user` permission globally'
+          identityUrl:
+            type:
+            - string
+            - 'null'
+            description: 'User''s identity_url for OmniAuth authentication.
+
+              **Deprecated:** It will be removed in the near future.
+
+
+              # Conditions
+
+
+              - User is self, or `create_user` or `manage_user` permission globally'
+            deprecated: true
+          createdAt:
+            type: string
+            format: date-time
+            description: Time of creation
+          updatedAt:
+            type: string
+            format: date-time
+            description: Time of the most recent change to the user
+          _links:
+            type: object
+            properties:
+              showUser:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'A relative path to show the user in the web application.
+
+
+                    # Condition
+
+
+                    - User is not a new record
+
+                    - User is not `locked`'
+              updateImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'A link to update the user resource.
+
+
+                    # Conditions
+
+
+                    - `admin`'
+              lock:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Restrict the user from logging in and performing any actions.
+
+
+                    # Conditions
+
+
+                    - User is not locked
+
+                    - `admin`'
+              unlock:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Allow a locked user to login and act again.
+
+
+                    # Conditions
+
+
+                    - User is not locked
+
+                    - `admin`'
+              delete:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: "Permanently remove a user from the instance\n\n# Conditions\n\neither:\n  - `admin`\n  - Setting `users_deletable_by_admin` is set\nor:\n  - User is self\n  - Setting `users_deletable_by_self` is set"
+              authSource:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Permanently remove a user from the instance
+
+
+                    # Conditions
+
+
+                    - LDAP authentication configured
+
+                    - `admin`'
+    FileLinkCollectionReadModel:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedCollectionModel'
+      - type: object
+        properties:
+          _links:
+            type: object
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This file links collection
+
+
+                    **Resource**: FileLinkCollectionReadModel'
+          _embedded:
+            type: object
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FileLinkReadModel'
+      example:
+        _type: Collection
+        total: 2
+        count: 2
+        pageSize: 30
+        offset: 1
+        _links:
+          self:
+            href: /api/v3/work_packages/42/file_links
+          jumpTo:
+            href: /api/v3/work_packages/42/file_links?offset=%7Boffset%7D&pageSize=30
+            templated: true
+          changeSize:
+            href: /api/v3/work_packages/42/file_links?offset=1&pageSize=%7Bsize%7D
+            templated: true
+        _embedded:
+          elements:
+          - id: 1337
+            _type: FileLink
+            createdAt: '2021-12-20T13:37:00.211Z'
+            updatedAt: '2021-12-20T13:37:00.211Z'
+            originData:
+              id: '5503'
+              name: logo.png
+              mimeType: image/png
+              size: 16042
+              createdAt: '2021-12-19T09:42:10.170Z'
+              lastModifiedAt: '2021-12-20T14:00:13.987Z'
+              createdByName: Luke Skywalker
+              lastModifiedByName: Anakin Skywalker
+            _links:
+              self:
+                href: /api/v3/work_package/17/file_links/1337
+                title: file link
+              storage:
+                href: /api/v3/storage/42
+                title: storage
+              container:
+                href: /api/v3/work_package/17
+                title: work package
+              creator:
+                href: /api/v3/users/33
+                title: Obi-Wan Kenobi
+              delete:
+                href: /api/v3/work_package/17/file_links/1337
+                method: delete
+              originOpen:
+                href: https://nextcloud.deathstar.rocks/index.php/f?fileid=5503
+              staticOriginOpen:
+                href: /api/v3/work_package/17/file_links/1337/open
+          - _hint: File Link resource shortened for brevity
+            id: 1338
+    CollectionModel:
+      type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
+    Available_relation_candidatesModel:
+      type: object
+      example:
+        _links:
+          self:
+            href: /api/v3/projects/14/work_packages
+        total: 2
+        count: 2
+        _type: Collection
+        _embedded:
+          elements:
+          - _type: WorkPackage
+            _links:
+              self:
+                href: /api/v3/work_packages/1
+            id: 1
+            subject: Skipped other properties for brevity
+          - _type: WorkPackage
+            _links:
+              self:
+                href: /api/v3/work_packages/2
+            id: 2
+            subject: Skipped other properties for brevity
+    FileLinkWriteModel:
+      type: object
+      required:
+      - originData
+      - _links
+      properties:
+        originData:
+          $ref: '#/components/schemas/FileLinkOriginDataModel'
+        _links:
+          oneOf:
+          - type: object
+            required:
+            - storage
+            properties:
+              storage:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The storage resource of the linked file.
+
+
+                    **Resource**: Storage'
+          - type: object
+            required:
+            - storageUrl
+            properties:
+              storageUrl:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The storage url the file link references to.
+
+
+                    **Resource**: N/A'
+      example:
+        originData:
+          id: '5503'
+          name: logo.png
+          mimeType: image/png
+          size: 16042
+          createdAt: '2021-12-19T09:42:10.170Z'
+          lastModifiedAt: '2021-12-20T14:00:13.987Z'
+          createdByName: Luke Skywalker
+          lastModifiedByName: Anakin Skywalker
+        _links:
+          storageUrl:
+            href: https://nextcloud.my-deathstar.org
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
+    SchemaPropertyModel:
+      type: object
+      required:
+      - type
+      - name
+      - required
+      - hasDefault
+      - writable
+      properties:
+        type:
+          type: string
+          description: The resource type for this property.
+        name:
+          type: string
+          description: The name of the property.
+        required:
+          type: boolean
+          description: Indicates, if the property is required for submitting a request of this schema.
+        hasDefault:
+          type: boolean
+          description: Indicates, if the property has a default.
+        writable:
+          type: boolean
+          description: Indicates, if the property is writable when sending a request of this schema.
+        options:
+          type: object
+          description: Additional options for the property.
+        location:
+          type: string
+          description: Defines the json path where the property is located in the payload.
+          default: ''
+        placeholder:
+          type: string
+          description: A placeholder for the property to display if the property has no value.
+        _links:
+          type: object
+          description: Useful links for this property (e.g. an endpoint to fetch allowed values)
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
     WorkPackageModel:
       allOf:
       - $ref: '#/components/schemas/CustomFieldProperties'
@@ -3716,30 +5293,7 @@ components:
         customField2: 42
         createdAt: '2014-08-29T12:40:53.373Z'
         updatedAt: '2014-08-29T12:44:41.981Z'
-    Available_relation_candidatesModel:
-      type: object
-      example:
-        _links:
-          self:
-            href: /api/v3/projects/14/work_packages
-        total: 2
-        count: 2
-        _type: Collection
-        _embedded:
-          elements:
-          - _type: WorkPackage
-            _links:
-              self:
-                href: /api/v3/work_packages/1
-            id: 1
-            subject: Skipped other properties for brevity
-          - _type: WorkPackage
-            _links:
-              self:
-                href: /api/v3/work_packages/2
-            id: 2
-            subject: Skipped other properties for brevity
-    Work_PackagesModel:
+    Available_AssigneesModel:
       allOf:
       - $ref: '#/components/schemas/CollectionModel'
       - type: object
@@ -3755,41 +5309,21 @@ components:
               self:
                 allOf:
                 - $ref: '#/components/schemas/Link'
-                - description: 'The work package collection
+                - description: 'The available assignees collection
 
 
-                    **Resource**: WorkPackageCollection'
+                    **Resource**: AvailableAssigneesCollection'
                   readOnly: true
           _embedded:
             type: object
-            required:
-            - elements
             properties:
               elements:
                 type: array
+                readOnly: true
                 items:
-                  $ref: '#/components/schemas/WorkPackageModel'
-      example:
-        _links:
-          self:
-            href: /api/v3/work_packages
-        total: 2
-        count: 2
-        _type: Collection
-        _embedded:
-          elements:
-          - _abbreviated: Work package resource shortened for brevity
-            _type: WorkPackage
-            _links:
-              self:
-                href: /api/v3/work_packages/1
-            id: 1
-          - _abbreviated: Work package resource shortened for brevity
-            _type: WorkPackage
-            _links:
-              self:
-                href: /api/v3/work_packages/2
-            id: 2
+                  allOf:
+                  - $ref: '#/components/schemas/UserModel'
+                  - description: Collection of Users
     CustomFieldProperties:
       type: object
       patternProperties:
@@ -3816,81 +5350,6 @@ components:
             - Text
 
             - Long text'
-    ReminderModel:
-      type: object
-      properties:
-        id:
-          type: integer
-          description: Reminder id
-          readOnly: true
-          minimum: 1
-        note:
-          type: string
-          description: The note of the reminder
-        remindAt:
-          type: string
-          format: date-time
-          description: The date and time when the reminder is due
-        _links:
-          required:
-          - creator
-          - remindable
-          type: object
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This reminder
-
-
-                  **Resource**: Reminder'
-            creator:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The person that created the reminder
-
-
-                  **Resource**: User'
-            remindable:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The resource that the reminder is associated with
-
-
-                  **Resource**: WorkPackage'
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
-          type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
     Available_projects_for_work_packageModel:
       type: object
       example:
@@ -3950,385 +5409,6 @@ components:
             createdAt: '2016-02-29T12:50:20+00:00'
             updatedAt: '2016-02-29T12:50:20+00:00'
             type: null
-    ActivityCommentWriteModel:
-      type: object
-      properties:
-        comment:
-          type: object
-          properties:
-            raw:
-              type: string
-              description: The raw content of the comment
-        internal:
-          type: boolean
-          description: 'Determines whether this comment is internal. This is only available to users
-
-            with `add_internal_comments` permission. It defaults to `false`, if unset.'
-          default: false
-      example:
-        comment:
-          raw: I think this is awesome!
-    SchemaPropertyModel:
-      type: object
-      required:
-      - type
-      - name
-      - required
-      - hasDefault
-      - writable
-      properties:
-        type:
-          type: string
-          description: The resource type for this property.
-        name:
-          type: string
-          description: The name of the property.
-        required:
-          type: boolean
-          description: Indicates, if the property is required for submitting a request of this schema.
-        hasDefault:
-          type: boolean
-          description: Indicates, if the property has a default.
-        writable:
-          type: boolean
-          description: Indicates, if the property is writable when sending a request of this schema.
-        options:
-          type: object
-          description: Additional options for the property.
-        location:
-          type: string
-          description: Defines the json path where the property is located in the payload.
-          default: ''
-        placeholder:
-          type: string
-          description: A placeholder for the property to display if the property has no value.
-        _links:
-          type: object
-          description: Useful links for this property (e.g. an endpoint to fetch allowed values)
-    Available_WatchersModel:
-      type: object
-      example:
-        _links:
-          self:
-            href: /api/v3/work_packages/1/available_watchers
-        total: 2
-        count: 2
-        _type: Collection
-        _embedded:
-          elements:
-          - _type: User
-            _links:
-              self:
-                href: /api/v3/users/1
-                title: John Sheppard - j.sheppard
-              lock:
-                href: /api/v3/users/1/lock
-                title: Set lock on j.sheppard
-                method: POST
-              delete:
-                href: /api/v3/users/1
-                title: Delete j.sheppard
-                method: DELETE
-            id: 1
-            login: j.sheppard
-            firstName: John
-            lastName: Sheppard
-            email: shep@mail.com
-            avatar: https://example.org/users/1/avatar
-            status: active
-            createdAt: '2014-05-21T08:51:20.286Z'
-            updatedAt: '2014-05-21T08:51:20.286Z'
-          - _type: User
-            _links:
-              self:
-                href: /api/v3/users/2
-                title: Jim Sheppard - j.sheppard2
-              lock:
-                href: /api/v3/users/2/lock
-                title: Set lock on j.sheppard2
-                method: POST
-              delete:
-                href: /api/v3/users/2
-                title: Delete j.sheppard2
-                method: DELETE
-            id: 2
-            login: j.sheppard2
-            firstName: Jim
-            lastName: Sheppard
-            email: shep@mail.net
-            avatar: https://example.org/users/1/avatar
-            status: active
-            createdAt: '2014-05-21T08:51:20.286Z'
-            updatedAt: '2014-05-21T08:51:20.286Z'
-    FileLinkCollectionReadModel:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedCollectionModel'
-      - type: object
-        properties:
-          _links:
-            type: object
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'This file links collection
-
-
-                    **Resource**: FileLinkCollectionReadModel'
-          _embedded:
-            type: object
-            properties:
-              elements:
-                type: array
-                items:
-                  $ref: '#/components/schemas/FileLinkReadModel'
-      example:
-        _type: Collection
-        total: 2
-        count: 2
-        pageSize: 30
-        offset: 1
-        _links:
-          self:
-            href: /api/v3/work_packages/42/file_links
-          jumpTo:
-            href: /api/v3/work_packages/42/file_links?offset=%7Boffset%7D&pageSize=30
-            templated: true
-          changeSize:
-            href: /api/v3/work_packages/42/file_links?offset=1&pageSize=%7Bsize%7D
-            templated: true
-        _embedded:
-          elements:
-          - id: 1337
-            _type: FileLink
-            createdAt: '2021-12-20T13:37:00.211Z'
-            updatedAt: '2021-12-20T13:37:00.211Z'
-            originData:
-              id: '5503'
-              name: logo.png
-              mimeType: image/png
-              size: 16042
-              createdAt: '2021-12-19T09:42:10.170Z'
-              lastModifiedAt: '2021-12-20T14:00:13.987Z'
-              createdByName: Luke Skywalker
-              lastModifiedByName: Anakin Skywalker
-            _links:
-              self:
-                href: /api/v3/work_package/17/file_links/1337
-                title: file link
-              storage:
-                href: /api/v3/storage/42
-                title: storage
-              container:
-                href: /api/v3/work_package/17
-                title: work package
-              creator:
-                href: /api/v3/users/33
-                title: Obi-Wan Kenobi
-              delete:
-                href: /api/v3/work_package/17/file_links/1337
-                method: delete
-              originOpen:
-                href: https://nextcloud.deathstar.rocks/index.php/f?fileid=5503
-              staticOriginOpen:
-                href: /api/v3/work_package/17/file_links/1337/open
-          - _hint: File Link resource shortened for brevity
-            id: 1338
-    StorageReadModel:
-      type: object
-      required:
-      - id
-      - _type
-      - name
-      - _links
-      properties:
-        id:
-          type: integer
-          description: Storage id
-        _type:
-          type: string
-          enum:
-          - Storage
-        name:
-          type: string
-          description: Storage name
-        storageAudience:
-          type: string
-          description: 'The audience that the storage expects in tokens for requests to it,
-
-            usually the storage''s client ID at the identity provider.
-
-
-            This is only required for authentication through single-sign-on and so far
-
-            only supported for provider type Nextcloud.'
-        tokenExchangeScope:
-          type: string
-          description: 'The scope that will be requested when requesting a token for the storage through token exchange. Has no effect if no
-
-            token exchange is performed.
-
-
-            This is only required for authentication through single-sign-on and so far only supported for provider type Nextcloud.'
-        tenantId:
-          type:
-          - string
-          - 'null'
-          description: 'The tenant id of a file storage of type OneDrive.
-
-
-            Ignored if the provider type is not OneDrive. May be null if the storage is not configured completely.'
-        driveId:
-          type:
-          - string
-          - 'null'
-          description: 'The drive id of a file storage of type OneDrive.
-
-
-            Ignored if the provider type is not OneDrive. May be null if the storage is not configured completely.'
-        hasApplicationPassword:
-          type: boolean
-          description: 'Whether the storage has the application password to use for the Nextcloud storage.
-
-
-            Ignored if the provider type is not Nextcloud.'
-        forbiddenFileNameCharacters:
-          type: string
-          description: 'A string with all the characters forbidden to be used for file and folder names in the storage. Used by OpenProject to avoid
-
-            creating files with unsupported names (e.g. when creating project folders).
-
-
-            Only supported for provider type Nextcloud so far.'
-        createdAt:
-          type: string
-          format: date-time
-          description: Time of creation
-        updatedAt:
-          type: string
-          format: date-time
-          description: Time of the most recent change to the storage
-        configured:
-          type: boolean
-          description: Indication, if the storage is fully configured
-        _embedded:
-          type: object
-          properties:
-            oauthApplication:
-              $ref: '#/components/schemas/OAuthApplicationReadModel'
-            oauthClientCredentials:
-              $ref: '#/components/schemas/OAuthClientCredentialsReadModel'
-        _links:
-          type: object
-          required:
-          - self
-          - type
-          - open
-          - authorizationState
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This storage resource. Contains the user defined storage name as title.
-
-
-                  **Resource**: Storage'
-            type:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The urn of the storage type. Currently Nextcloud and OneDrive storages are supported.
-
-
-                  - urn:openproject-org:api:v3:storages:Nextcloud
-
-                  - urn:openproject-org:api:v3:storages:OneDrive
-
-
-                  **Resource**: N/A'
-            authenticationMethod:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The urn of the authentication method. Currently only Nextcloud storages support this setting.
-
-
-                  - urn:openproject-org:api:v3:storages:authenticationMethod:TwoWayOAuth2 (default)
-
-                  - urn:openproject-org:api:v3:storages:authenticationMethod:OAuth2SSO
-
-
-                  **Resource**: N/A'
-            origin:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'Web URI of the storage instance. This link is ignored, if the storage is hosted in a cloud and has no own
-
-                  URL, like file storages of type OneDrive.
-
-
-                  **Resource**: N/A'
-            open:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'URI of the file storage location, from where the user usually starts browsing files.
-
-
-                  **Resource**: N/A'
-            authorizationState:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The urn of the storage connection state. Can be one of:
-
-
-                  - urn:openproject-org:api:v3:storages:authorization:Connected
-
-                  - urn:openproject-org:api:v3:storages:authorization:FailedAuthorization
-
-                  - urn:openproject-org:api:v3:storages:authorization:Error
-
-
-                  **Resource**: N/A'
-            authorize:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The link to the starting point of the authorization cycle for a configured storage provider.
-
-
-                  # Conditions
-
-
-                  `authorizationState` is:
-
-
-                  - urn:openproject-org:api:v3:storages:authorization:FailedAuthorization
-
-
-                  **Resource**: N/A'
-            oauthApplication:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The OAuth 2 provider application linked to the storage.
-
-
-                  # Conditions
-
-
-                  - User has role `admin`
-
-
-                  **Resource**: OAuthApplication'
-            oauthClientCredentials:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The OAuth 2 credentials resource linked to the storage.
-
-
-                  # Conditions
-
-
-                  - User has role `admin`
-
-
-                  **Resource**: OAuthClientCredentials'
     Work_Package_activitiesModel:
       type: object
       example:
@@ -4374,446 +5454,6 @@ components:
             createdAt: '2014-05-21T09:51:22.769Z'
             updatedAt: '2014-05-21T10:14:02.927Z'
             version: 2
-    OAuthClientCredentialsReadModel:
-      type: object
-      required:
-      - id
-      - _type
-      - clientId
-      - confidential
-      - _links
-      properties:
-        id:
-          type: integer
-          minimum: 1
-        _type:
-          type: string
-          enum:
-          - OAuthClientCredentials
-        clientId:
-          type: string
-          description: OAuth 2 client id
-        confidential:
-          type: boolean
-          description: true, if OAuth 2 credentials are confidential, false, if no secret is stored
-        createdAt:
-          type: string
-          format: date-time
-          description: The time the OAuth client credentials were created at
-        updatedAt:
-          type: string
-          format: date-time
-          description: The time the OAuth client credentials were last updated
-        _links:
-          type: object
-          required:
-          - self
-          - integration
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This OAuth Client Credentials object
-
-
-                  **Resource**: OAuthClientCredentials'
-            integration:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The resource that integrates this OAuth client credentials. Currently, only `Storage` resources are
-
-                  able to contain OAuth client credentials.
-
-
-                  **Resource**: Storage'
-      example:
-        id: 1337
-        _type: OAuthClientCredentials
-        clientId: O5h6WObhMg1Z8IcLHRE3_LMh4jJYmmca2V6OTFSv8DA
-        confidential: true
-        createdAt: '2022-12-07T12:56:42.836Z'
-        updatedAt: '2022-12-07T12:56:42.836Z'
-        _links:
-          self:
-            href: /api/v3/oauth_client_credentials/1337
-          integration:
-            href: /api/v3/storages/42
-            title: Death Star Cloud
-    WorkPackageWriteModel:
-      type: object
-      description: 'This model is used for creating and updating work packages. It can also be used for validation against the work
-
-        package form endpoints.'
-      properties:
-        subject:
-          type: string
-          description: Work package subject
-        description:
-          allOf:
-          - $ref: '#/components/schemas/Formattable'
-          - description: The work package description
-        scheduleManually:
-          type: boolean
-          description: 'Uses manual scheduling mode when true (default). Uses automatic scheduling
-
-            mode when false. Can be automatic only when predecessors or children are
-
-            present.'
-        startDate:
-          type:
-          - string
-          - 'null'
-          format: date
-          description: Scheduled beginning of a work package
-        dueDate:
-          type:
-          - string
-          - 'null'
-          format: date
-          description: Scheduled end of a work package
-        estimatedTime:
-          type:
-          - string
-          - 'null'
-          format: duration
-          description: Time a work package likely needs to be completed excluding its descendants
-        duration:
-          type:
-          - string
-          - 'null'
-          format: duration
-          description: 'The amount of time in hours the work package needs to be completed. This value must be bigger or equal to `P1D`,
-
-            and any the value will get floored to the nearest day.
-
-
-            The duration has no effect, unless either a start date or a due date is set.
-
-
-            Not available for milestone type of work packages.'
-        ignoreNonWorkingDays:
-          type: boolean
-          description: 'When scheduling, whether or not to ignore the non working days being defined.
-
-            A work package with the flag set to true will be allowed to be scheduled to a non working day.'
-        _links:
-          type: object
-          properties:
-            category:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The category of the work package
-
-
-                  **Resource**: Category'
-            type:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The type of the work package
-
-
-                  **Resource**: Type'
-            priority:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The priority of the work package
-
-
-                  **Resource**: Priority'
-            project:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The project to which the work package belongs
-
-
-                  **Resource**: Project'
-            status:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The current status of the work package
-
-
-                  **Resource**: Status'
-            responsible:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The person that is responsible for the overall outcome
-
-
-                  **Resource**: User'
-            assignee:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The person that is intended to work on the work package
-
-
-                  **Resource**: User'
-            version:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The version associated to the work package
-
-
-                  **Resource**: Version'
-            parent:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'Parent work package
-
-
-                  **Resource**: WorkPackage'
-        _meta:
-          type: object
-          description: Meta information for the work package request
-          properties:
-            validateCustomFields:
-              type: boolean
-              description: 'When set to true, explicitly validates all required custom fields on the work package, regardless of whether
-
-                they are provided in the request body. This overrides the default behavior where only custom fields included
-
-                in the request are validated. Use this parameter when you need to ensure all required custom fields have
-
-                valid values before allowing the update to proceed.'
-              default: false
-    OAuthApplicationReadModel:
-      type: object
-      required:
-      - id
-      - _type
-      - name
-      - clientId
-      - confidential
-      - _links
-      properties:
-        id:
-          type: integer
-          minimum: 1
-        _type:
-          type: string
-          enum:
-          - OAuthApplication
-        name:
-          type: string
-          description: The name of the OAuth 2 application
-        clientId:
-          type: string
-          description: OAuth 2 client id
-        clientSecret:
-          type: string
-          description: OAuth 2 client secret. This is only returned when creating a new OAuth application.
-        confidential:
-          type: boolean
-          description: true, if OAuth 2 credentials are confidential, false, if no secret is stored
-        createdAt:
-          type: string
-          format: date-time
-          description: The time the OAuth 2 Application was created at
-        updatedAt:
-          type: string
-          format: date-time
-          description: The time the OAuth 2 Application was last updated
-        scopes:
-          type: array
-          description: An array of the scopes of the OAuth 2 Application
-          items:
-            type: string
-        _links:
-          type: object
-          required:
-          - self
-          - owner
-          - redirectUri
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This OAuth application
-
-
-                  **Resource**: OAuthApplication'
-            owner:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The user that created the OAuth application.
-
-
-                  **Resource**: User'
-            integration:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The resource that integrates this OAuth application into itself. Currently, only `Storage` resources are
-
-                  able to create and maintain own OAuth application.
-
-
-                  **Resource**: Storage'
-            redirectUri:
-              type: array
-              items:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'A redirect URI of the OAuth application
-
-
-                    **Resource**: N/A'
-      example:
-        id: 1337
-        _type: OAuthApplication
-        name: Vader's secure OAuth app
-        clientId: O5h6WObhMg1Z8IcLHRE3_LMh4jJYmmca2V6OTFSv8DA
-        confidential: true
-        createdAt: '2022-12-07T12:56:42.626Z'
-        updatedAt: '2022-12-07T12:56:42.626Z'
-        scopes:
-        - api_v3
-        _links:
-          self:
-            href: /api/v3/oauth_applications/1337
-          owner:
-            href: /api/v3/users/13
-            title: Darth Vader
-          integration:
-            href: /api/v3/storages/42
-            title: Death Star Cloud
-          redirectUri:
-          - href: https://death-star.cloud.tools/index.php/apps/integration_openproject/oauth-redirect
-    PrincipalModel:
-      type: object
-      required:
-      - _type
-      - id
-      - name
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - User
-          - Group
-          - PlaceholderUser
-        id:
-          type: integer
-          description: The principal's unique identifier.
-          minimum: 1
-        name:
-          type: string
-          description: The principal's display name, layout depends on instance settings.
-        createdAt:
-          type: string
-          format: date-time
-          description: Time of creation
-        updatedAt:
-          type: string
-          format: date-time
-          description: Time of the most recent change to the principal
-        _links:
-          type: object
-          required:
-          - self
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This principal resource.
-
-
-                  **Resource**: User|Group|PlaceholderUser'
-            memberships:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'An href to the collection of the principal''s memberships.
-
-
-                  # Conditions:
-
-
-                  - user has permission `view_members` or `manage_members` in any project
-
-
-                  **Resource**: Collection'
-    FileLinkCollectionWriteModel:
-      type: object
-      required:
-      - _embedded
-      properties:
-        _embedded:
-          type: object
-          required:
-          - elements
-          properties:
-            elements:
-              type: array
-              items:
-                $ref: '#/components/schemas/FileLinkWriteModel'
-      example:
-        _embedded:
-          elements:
-          - originData:
-              id: '5503'
-              name: logo.png
-              mimeType: image/png
-              size: 16042
-              createdAt: '2021-12-19T09:42:10.170Z'
-              lastModifiedAt: '2021-12-20T14:00:13.987Z'
-              createdByName: Luke Skywalker
-              lastModifiedByName: Anakin Skywalker
-            _links:
-              storage:
-                href: /api/v3/storage/42
-    CollectionModel:
-      type: object
-      required:
-      - _type
-      - total
-      - count
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - Collection
-        total:
-          type: integer
-          description: The total amount of elements available in the collection.
-          minimum: 0
-        count:
-          type: integer
-          description: Actual amount of elements in this response.
-          minimum: 0
-        _links:
-          $ref: '#/components/schemas/CollectionLinks'
-    Available_AssigneesModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'The available assignees collection
-
-
-                    **Resource**: AvailableAssigneesCollection'
-                  readOnly: true
-          _embedded:
-            type: object
-            properties:
-              elements:
-                type: array
-                readOnly: true
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/UserModel'
-                  - description: Collection of Users
     FileLinkReadModel:
       type: object
       properties:
@@ -5000,675 +5640,35 @@ components:
             href: /api/v3/file_links/1337/open?location=true
           staticOriginDownload:
             href: /api/v3/file_links/1337/download
-    WorkPackageFormModel:
-      type: object
-      description: 'The work package creation form. This object is returned, whenever a work package form endpoint is called. It contains
-
-        an allowed payload definition, the full schema and any validation errors on the current request body.'
-      properties:
-        _type:
-          type: string
-          enum:
-          - Form
-        _embedded:
-          type: object
-          properties:
-            payload:
-              $ref: '#/components/schemas/WorkPackageWriteModel'
-            schema:
-              $ref: '#/components/schemas/WorkPackageSchemaModel'
-            validationErrors:
-              type: object
-              description: 'All validation errors, where the key is the faulty property. The object is empty, if the request body is
-
-                valid.'
-        _links:
-          type: object
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This form endpoint
-
-
-                  **Resource** : Form'
-            validate:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: The endpoint for validating the request bodies. Often referring to this very form endpoint.
-            previewMarkup:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: Renders a markup preview for the work package form.
-            customFields:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: Link to the HTML page for the custom field definitions.
-            configureForm:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: Link to the HTML page for the form configuration.
-    Formattable:
+    FileLinkCollectionWriteModel:
       type: object
       required:
-      - format
+      - _embedded
       properties:
-        format:
-          type: string
-          enum:
-          - plain
-          - markdown
-          - custom
-          readOnly: true
-          description: Indicates the formatting language of the raw text
-          example: markdown
-        raw:
-          type: string
-          description: The raw text, as entered by the user
-          example: I **am** formatted!
-        html:
-          type: string
-          readOnly: true
-          description: The text converted to HTML according to the format
-          example: I <strong>am</strong> formatted!
+        _embedded:
+          type: object
+          required:
+          - elements
+          properties:
+            elements:
+              type: array
+              items:
+                $ref: '#/components/schemas/FileLinkWriteModel'
       example:
-        format: markdown
-        raw: I am formatted!
-        html: I am formatted!
-    WorkPackagePatchModel:
-      allOf:
-      - $ref: '#/components/schemas/WorkPackageWriteModel'
-      - type: object
-        required:
-        - lockVersion
-        properties:
-          lockVersion:
-            type: integer
-            description: The version of the item as used for optimistic locking
-    RevisionsModel:
-      type: object
-      example:
-        _links:
-          self:
-            href: /api/v3/work_packages/42/revisions
-        total: 2
-        count: 2
-        _type: Collection
         _embedded:
           elements:
-          - _type: Revision
+          - originData:
+              id: '5503'
+              name: logo.png
+              mimeType: image/png
+              size: 16042
+              createdAt: '2021-12-19T09:42:10.170Z'
+              lastModifiedAt: '2021-12-20T14:00:13.987Z'
+              createdByName: Luke Skywalker
+              lastModifiedByName: Anakin Skywalker
             _links:
-              self:
-                href: /api/v3/revisions/13
-              project:
-                href: /api/v3/projects/1
-                title: A Test Project
-              author:
-                href: /api/v3/users/1
-                title: John Sheppard - j.sheppard
-              showRevision:
-                href: /projects/identifier/repository/revision/11f4b07
-            id: 13
-            identifier: 11f4b07dff4f4ce9548a52b7d002daca7cd63ec6
-            formattedIdentifier: 11f4b07
-            authorName: John Sheppard
-            message:
-              format: plain
-              raw: 'This revision provides new features
-
-
-                An elaborate description'
-              html: <p>This revision provides new features<br/><br/>An elaborate description</p>
-            createdAt: '2015-07-21T13:36:59.201Z'
-          - _type: Revision
-            _links:
-              self:
-                href: /api/v3/revisions/14
-              project:
-                href: /api/v3/projects/1
-                title: A Test Project
-              author:
-                href: /api/v3/users/2
-                title: Jim Sheppard - j.sheppard
-              showRevision:
-                href: /projects/identifier/repository/revision/029ed72a
-            id: 13
-            identifier: 029ed72a3b7b7c4ab332b1f6eaa6576e7c946059
-            formattedIdentifier: 029ed72a
-            authorName: j1msheppard
-            message:
-              format: plain
-              raw: 'This revision fixes some stuff
-
-
-                More information here'
-              html: <p>This revision fixes some stuff<br/><br/>More information here</p>
-            createdAt: '2015-06-30T08:47:00.548Z'
-    PaginatedCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - pageSize
-        - offset
-        properties:
-          pageSize:
-            type: integer
-            description: Amount of elements that a response will hold.
-            minimum: 0
-          offset:
-            type: integer
-            description: The page number that is requested from paginated collection.
-            minimum: 1
-          _links:
-            type: object
-            required:
-            - jumpTo
-            - changeSize
-            properties:
-              jumpTo:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Templated link to another page offset.
-
-
-                    **Resource**: Collection'
-              changeSize:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Templated link for another page size.
-
-
-                    **Resource**: Collection'
-    ErrorResponse:
-      type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
-    FileLinkWriteModel:
-      type: object
-      required:
-      - originData
-      - _links
-      properties:
-        originData:
-          $ref: '#/components/schemas/FileLinkOriginDataModel'
-        _links:
-          oneOf:
-          - type: object
-            required:
-            - storage
-            properties:
               storage:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'The storage resource of the linked file.
-
-
-                    **Resource**: Storage'
-          - type: object
-            required:
-            - storageUrl
-            properties:
-              storageUrl:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'The storage url the file link references to.
-
-
-                    **Resource**: N/A'
-      example:
-        originData:
-          id: '5503'
-          name: logo.png
-          mimeType: image/png
-          size: 16042
-          createdAt: '2021-12-19T09:42:10.170Z'
-          lastModifiedAt: '2021-12-20T14:00:13.987Z'
-          createdByName: Luke Skywalker
-          lastModifiedByName: Anakin Skywalker
-        _links:
-          storageUrl:
-            href: https://nextcloud.my-deathstar.org
-    WatchersModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'The watcher list
-
-
-                    **Resource**: WatchersModel'
-                  readOnly: true
-          _embedded:
-            type: object
-            properties:
-              elements:
-                type: array
-                readOnly: true
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/UserModel'
-                  - description: Collection of Users
-      example:
-        _links:
-          self:
-            href: /api/v3/work_packages/14/watchers
-        total: 2
-        count: 2
-        _type: Collection
-        _embedded:
-          elements:
-          - _type: User
-            _links:
-              self:
-                href: /api/v3/users/1
-                title: John Sheppard - j.sheppard
-              showUser:
-                href: /users/1
-                type: text/html
-              lock:
-                href: /api/v3/users/1/lock
-                title: Set lock on j.sheppard
-                method: POST
-              delete:
-                href: /api/v3/users/1
-                title: Delete j.sheppard
-                method: DELETE
-            id: 1
-            login: j.sheppard
-            firstName: John
-            lastName: Sheppard
-            name: John Sheppard
-            mail: shep@mail.com
-            avatar: https://example.org/users/1/avatar
-            status: active
-            createdAt: '2014-05-21T08:51:20.396Z'
-            updatedAt: '2014-05-21T08:51:20.396Z'
-          - _type: User
-            _links:
-              self:
-                href: /api/v3/users/2
-                title: Jim Sheppard - j.sheppard2
-              lock:
-                href: /api/v3/users/2/lock
-                title: Set lock on j.sheppard2
-                method: POST
-              delete:
-                href: /api/v3/users/2
-                title: Delete j.sheppard2
-                method: DELETE
-            id: 2
-            login: j.sheppard2
-            firstName: Jim
-            lastName: Sheppard
-            name: Jim Sheppard
-            mail: shep@mail.net
-            avatar: https://example.org/users/1/avatar
-            status: active
-            createdAt: '2014-05-21T08:51:20.396Z'
-            updatedAt: '2014-05-21T08:51:20.396Z'
-    CollectionLinks:
-      type: object
-      required:
-      - self
-      properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This collection resource.
-
-
-              **Resource**: Collection'
-    WorkPackageSchemaModel:
-      type: object
-      description: 'A schema for a work package. This schema defines the attributes of a work package.
-
-
-        TODO: Incomplete, needs to be updated with the real behaviour of schemas (when does which attribute appear?).'
-      properties:
-        _type:
-          type: string
-          enum:
-          - Schema
-        _dependencies:
-          type: array
-          items:
-            type: string
-          description: TBD
-        _attributeGroups:
-          type: array
-          items:
-            type: object
-          description: TBD (WorkPackageFormAttributeGroup)
-        lockVersion:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        id:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        subject:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        description:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        duration:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        scheduleManually:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        ignoreNonWorkingDays:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        startDate:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        dueDate:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        derivedStartDate:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        derivedDueDate:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        estimatedTime:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        derivedEstimatedTime:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        remainingTime:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        derivedRemainingTime:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        percentageDone:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        derivedPercentageDone:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        readonly:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        createdAt:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        updatedAt:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        author:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        position:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        project:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        projectPhase:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        projectPhaseDefinition:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        parent:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        sprint:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        storyPoints:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        assignee:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        responsible:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        type:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        status:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        category:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        version:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        priority:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        _links:
-          type: object
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This work package schema
-
-
-                  **Resource**: Schema'
-    UserModel:
-      allOf:
-      - $ref: '#/components/schemas/PrincipalModel'
-      - $ref: '#/components/schemas/CustomFieldProperties'
-      - type: object
-        required:
-        - _type
-        - avatar
-        properties:
-          _type:
-            type: string
-            enum:
-            - User
-          avatar:
-            type:
-            - string
-            - 'null'
-            format: uri
-            description: URL to user's avatar
-          login:
-            type: string
-            description: 'The user''s login name
-
-
-              # Conditions
-
-
-              - User is self, or `create_user` or `manage_user` permission globally'
-            maxLength: 256
-          firstName:
-            type: string
-            description: 'The user''s first name
-
-
-              # Conditions
-
-
-              - User is self, or `create_user` or `manage_user` permission globally'
-            maxLength: 30
-          lastName:
-            type: string
-            description: 'The user''s last name
-
-
-              # Conditions
-
-
-              - User is self, or `create_user` or `manage_user` permission globally'
-            maxLength: 30
-          email:
-            type: string
-            description: 'The user''s email address
-
-
-              # Conditions
-
-
-              - E-Mail address not hidden
-
-              - User is not a new record
-
-              - User is self, or `create_user` or `manage_user` permission globally'
-            maxLength: 60
-          admin:
-            type: boolean
-            description: 'Flag indicating whether or not the user is an admin
-
-
-              # Conditions
-
-
-              - `admin`'
-          status:
-            type: string
-            description: 'The current activation status of the user.
-
-
-              # Conditions
-
-
-              - User is self, or `create_user` or `manage_user` permission globally'
-          language:
-            type: string
-            description: 'User''s language | ISO 639-1 format
-
-
-              # Conditions
-
-
-              - User is self, or `create_user` or `manage_user` permission globally'
-          identityUrl:
-            type:
-            - string
-            - 'null'
-            description: 'User''s identity_url for OmniAuth authentication.
-
-              **Deprecated:** It will be removed in the near future.
-
-
-              # Conditions
-
-
-              - User is self, or `create_user` or `manage_user` permission globally'
-            deprecated: true
-          createdAt:
-            type: string
-            format: date-time
-            description: Time of creation
-          updatedAt:
-            type: string
-            format: date-time
-            description: Time of the most recent change to the user
-          _links:
-            type: object
-            properties:
-              showUser:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'A relative path to show the user in the web application.
-
-
-                    # Condition
-
-
-                    - User is not a new record
-
-                    - User is not `locked`'
-              updateImmediately:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'A link to update the user resource.
-
-
-                    # Conditions
-
-
-                    - `admin`'
-              lock:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Restrict the user from logging in and performing any actions.
-
-
-                    # Conditions
-
-
-                    - User is not locked
-
-                    - `admin`'
-              unlock:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Allow a locked user to login and act again.
-
-
-                    # Conditions
-
-
-                    - User is not locked
-
-                    - `admin`'
-              delete:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: "Permanently remove a user from the instance\n\n# Conditions\n\neither:\n  - `admin`\n  - Setting `users_deletable_by_admin` is set\nor:\n  - User is self\n  - Setting `users_deletable_by_self` is set"
-              authSource:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Permanently remove a user from the instance
-
-
-                    # Conditions
-
-
-                    - LDAP authentication configured
-
-                    - `admin`'
-    FileLinkOriginDataModel:
-      type: object
-      required:
-      - id
-      - name
-      properties:
-        id:
-          type: string
-          description: Linked file's id on the origin
-        name:
-          type: string
-          description: Linked file's name on the origin
-        mimeType:
-          type: string
-          minLength: 0
-          description: 'MIME type of the linked file.
-
-
-            To link a folder entity, the custom MIME type `application/x-op-directory` MUST be provided. Otherwise it defaults back to
-
-            an unknown MIME type.'
-        size:
-          type: integer
-          minimum: 0
-          description: file size on origin in bytes
-        createdAt:
-          type: string
-          format: date-time
-          description: Timestamp of the creation datetime of the file on the origin
-        lastModifiedAt:
-          type: string
-          format: date-time
-          description: Timestamp of the datetime of the last modification of the file on the origin
-        createdByName:
-          type: string
-          description: Display name of the author that created the file on the origin
-        lastModifiedByName:
-          type: string
-          description: Display name of the author that modified the file on the origin last
+                href: /api/v3/storage/42
     EmojiReactionModel:
       type: object
       properties:
@@ -5804,6 +5804,16 @@ components:
           self:
             href: /api/v3/activities/1/emoji_reactions
   examples:
+    WorkPackageCreateOnlySubject:
+      description: 'A request body to create a work package with only a subject. This can only be used, if the project context is already
+
+        given in the path. All other values will fall back to defaults.'
+      value:
+        subject: Replace GNK power droids
+    WorkPackageEditSubject:
+      description: A request body to edit a work package's subject.
+      value:
+        subject: Replace GNK power droids
     WorkPackageWithMetaValidation:
       description: A request body to edit a work package with custom field validation enabled via the _meta object.
       value:
@@ -5811,12 +5821,6 @@ components:
         lockVersion: 42
         _meta:
           validateCustomFields: true
-    WorkPackageCreateOnlySubject:
-      description: 'A request body to create a work package with only a subject. This can only be used, if the project context is already
-
-        given in the path. All other values will fall back to defaults.'
-      value:
-        subject: Replace GNK power droids
     WorkPackageCreateValid:
       description: A valid request body to create or edit a work package with a couple of properties.
       value:
@@ -5837,18 +5841,7 @@ components:
           href: /api/v3/types/13
         status:
           href: /api/v3/statuses/2
-    WorkPackageEditSubject:
-      description: A request body to edit a work package's subject.
-      value:
-        subject: Replace GNK power droids
   responses:
-    MissingContentType:
-      description: Occurs when the client did not send a Content-Type header
-      content:
-        text/plain:
-          schema:
-            type: string
-          example: Missing content-type header
     UnsupportedMediaType:
       description: Occurs when the client sends an unsupported Content-Type header.
       content:
@@ -5859,6 +5852,13 @@ components:
             _type: Error
             errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
             message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
     InvalidRequestBody:
       description: Occurs when the client did not send a valid JSON object in the request body.
       content:

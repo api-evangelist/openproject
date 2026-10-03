@@ -104,6 +104,31 @@ paths:
       summary: View project configuration
 components:
   schemas:
+    ConfigurationModel:
+      type: object
+      properties:
+        maximumAttachmentFileSize:
+          type: integer
+          description: The maximum allowed size of an attachment in Bytes
+          readOnly: true
+        hostName:
+          type: string
+          description: The host name configured for the system
+          readOnly: true
+        perPageOptions:
+          type: array
+          description: Page size steps to be offered in paginated list UI
+          items:
+            type: integer
+        durationFormat:
+          type: string
+          description: The format used to display Work, Remaining Work, and Spent time durations
+          readOnly: true
+        activeFeatureFlags:
+          type: array
+          description: The list of all feature flags that are active
+          items:
+            type: string
     ProjectConfigurationModel:
       allOf:
       - $ref: '#/components/schemas/ConfigurationModel'
@@ -139,31 +164,6 @@ components:
         message:
           type: string
           example: Project can't be blank.
-    ConfigurationModel:
-      type: object
-      properties:
-        maximumAttachmentFileSize:
-          type: integer
-          description: The maximum allowed size of an attachment in Bytes
-          readOnly: true
-        hostName:
-          type: string
-          description: The host name configured for the system
-          readOnly: true
-        perPageOptions:
-          type: array
-          description: Page size steps to be offered in paginated list UI
-          items:
-            type: integer
-        durationFormat:
-          type: string
-          description: The format used to display Work, Remaining Work, and Spent time durations
-          readOnly: true
-        activeFeatureFlags:
-          type: array
-          description: The list of all feature flags that are active
-          items:
-            type: string
   securitySchemes:
     BasicAuth:
       type: http

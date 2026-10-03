@@ -351,6 +351,1701 @@ paths:
             **Required permission** being recipient of the notification'
 components:
   schemas:
+    NotificationCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This notification collection
+
+
+                    **Resource**: NotificationCollectionModel'
+              jumpTo:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The notification collection at another offset
+
+
+                    **Resource**: NotificationCollectionModel'
+              changeSize:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The notification collection with another size
+
+
+                    **Resource**: NotificationCollectionModel'
+          _embedded:
+            type: object
+            required:
+            - elements
+            - detailsSchemas
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NotificationModel'
+              detailsSchemas:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SchemaModel'
+    NotificationModel:
+      type: object
+      properties:
+        _type:
+          type: string
+          enum:
+          - Notification
+        id:
+          type: integer
+          description: Notification id
+          minimum: 1
+        reason:
+          type: string
+          description: The reason for the notification
+          enum:
+          - assigned
+          - commented
+          - created
+          - dateAlert
+          - mentioned
+          - prioritized
+          - processed
+          - responsible
+          - subscribed
+          - scheduled
+          - watched
+        readIAN:
+          type: boolean
+          description: Whether the notification is marked as read
+        details:
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/ValuesPropertyModel'
+          description: A list of objects including detailed information about the notification.
+        createdAt:
+          type: string
+          format: date-time
+          description: The time the notification was created at
+        updatedAt:
+          type: string
+          format: date-time
+          description: The time the notification was last updated
+        _embedded:
+          type: object
+          required:
+          - project
+          - resource
+          properties:
+            actor:
+              $ref: '#/components/schemas/UserModel'
+            project:
+              oneOf:
+              - $ref: '#/components/schemas/ProjectModel'
+              - $ref: '#/components/schemas/ProgramModel'
+              - $ref: '#/components/schemas/PortfolioModel'
+            activity:
+              $ref: '#/components/schemas/ActivityModel'
+            resource:
+              oneOf:
+              - $ref: '#/components/schemas/WorkPackageModel'
+        _links:
+          type: object
+          required:
+          - self
+          - project
+          - actor
+          - activity
+          - resource
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This notification
+
+
+                  **Resource**: Notification'
+            readIAN:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: Request to mark the notification as read. Only available if the notification is currently unread.
+            unreadIAN:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: Request to mark the notification as unread. Only available if the notification is currently read.
+            project:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The workspace the notification originated in
+
+
+                  **Resource**: Workspace'
+            actor:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The user that caused the notification. This might be null in
+
+                  case no user triggered the notification.
+
+
+                  **Resource**: User'
+            resource:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The linked resource of the notification, if any.
+
+
+                  **Resource**: Polymorphic'
+            activity:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The journal activity, if the notification originated from a journal entry. This might be null in
+
+                  case no activity triggered the notification.
+
+
+                  **Resource**: Activity'
+    ActivityModel:
+      type: object
+      properties:
+        _type:
+          type: string
+          enum:
+          - Activity::Comment
+        id:
+          type: integer
+          description: Activity id
+          minimum: 1
+        version:
+          type: integer
+          description: Activity version
+          minimum: 1
+        comment:
+          $ref: '#/components/schemas/Formattable'
+        details:
+          type: array
+          items:
+            $ref: '#/components/schemas/Formattable'
+        internal:
+          type: boolean
+          description: Whether this activity is internal (only visible to users with view_internal_comments permission)
+        createdAt:
+          type: string
+          format: date-time
+          description: Time of creation
+        updatedAt:
+          type: string
+          format: date-time
+          description: Time of update
+        _embedded:
+          type: object
+          properties:
+            attachments:
+              allOf:
+              - $ref: '#/components/schemas/Attachments_Model'
+              - description: Collection of attachments for this activity
+            workPackage:
+              allOf:
+              - $ref: '#/components/schemas/WorkPackageModel'
+              - description: 'The work package this activity belongs to
+
+
+                  # Conditions
+
+
+                  Only embedded when the `journable` of the activity is a work package'
+            emojiReactions:
+              allOf:
+              - $ref: '#/components/schemas/EmojiReactions_Model'
+              - description: Collection of emoji reactions for this activity
+        _links:
+          type: object
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This activity
+
+
+                  **Resource**: Activity'
+            workPackage:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The work package this activity belongs to
+
+
+                  **Resource**: WorkPackage'
+            user:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The user who created this activity
+
+
+                  **Resource**: Principal'
+            update:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: Update this activity
+            attachments:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The attachment collection of this activity
+
+
+                  **Resource**: Attachments'
+            addAttachment:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'Attach a file to the activity
+
+
+                  # Conditions
+
+
+                  **Permissions**:
+
+                  - `add_work_package_comments`
+
+                  - for internal comments: `add_internal_comments`'
+            emojiReactions:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The emoji reactions collection of this activity
+
+
+                  **Resource**: EmojiReactions'
+      example:
+        id: 1
+        _type: Activity::Comment
+        _embedded:
+          attachments:
+            _type: Collection
+            total: 1
+            count: 1
+            _embedded:
+              elements:
+              - _type: Attachment
+                id: 30388
+                fileName: Task_Ensure_financing___4___OpenProject_DEV.jpeg
+                fileSize: 540992
+                description:
+                  format: plain
+                  raw: ''
+                  html: ''
+                status: uploaded
+                contentType: image/jpeg
+                digest:
+                  algorithm: md5
+                  hash: d02d312b25383b595a9fa10f1a8999fe
+                createdAt: '2025-04-08T15:37:19.275Z'
+                _links:
+                  self:
+                    href: /api/v3/attachments/30388
+                    title: Task_Ensure_financing___4___OpenProject_DEV.jpeg
+                  author:
+                    href: /api/v3/users/435
+                    title: Firstname
+                  container:
+                    href: /api/v3/activities/79090
+                  staticDownloadLocation:
+                    href: /api/v3/attachments/30388/content
+                  downloadLocation:
+                    href: /api/v3/attachments/30388/content
+                  delete:
+                    href: /api/v3/attachments/30388
+                    method: delete
+            _links:
+              self:
+                href: /api/v3/activities/79090/attachments
+          emojiReactions:
+            _type: Collection
+            total: 2
+            count: 2
+            _embedded:
+              elements:
+              - _type: EmojiReaction
+                id: 1-thumbs_up
+                reaction: thumbs_up
+                emoji: 👍
+                reactionsCount: 3
+                firstReactionAt: '2024-04-08T15:37:19.275Z'
+                _links:
+                  self:
+                    href: /api/v3/emoji_reactions/1-thumbs_up
+                  reactable:
+                    href: /api/v3/activities/1
+                  reactingUsers:
+                  - href: /api/v3/users/435
+                    title: John Doe
+                  - href: /api/v3/users/436
+                    title: Jane Smith
+                  - href: /api/v3/users/437
+                    title: Bob Johnson
+              - _type: EmojiReaction
+                id: 1-heart
+                reaction: heart
+                emoji: ❤️
+                reactionsCount: 1
+                firstReactionAt: '2024-04-08T15:38:19.275Z'
+                _links:
+                  self:
+                    href: /api/v3/emoji_reactions/1-heart
+                  reactable:
+                    href: /api/v3/activities/1
+                  reactingUsers:
+                  - href: /api/v3/users/435
+                    title: John Doe
+            _links:
+              self:
+                href: /api/v3/activities/1/emoji_reactions
+          workPackage:
+            _type: WorkPackage
+            id: 10403
+            lockVersion: 2
+            subject: Ensure financing
+            description:
+              format: markdown
+              raw: Lorem ipsum dolor sit amet.
+              html: <p>Lorem ipsum dolor sit amet.</p>
+            scheduleManually: true
+            startDate: null
+            dueDate: null
+            derivedStartDate: null
+            derivedDueDate: null
+            estimatedTime: null
+            derivedEstimatedTime: null
+            derivedRemainingTime: null
+            duration: null
+            ignoreNonWorkingDays: false
+            percentageDone: null
+            derivedPercentageDone: null
+            createdAt: '2025-03-24T13:11:09.480Z'
+            updatedAt: '2025-04-14T11:00:02.411Z'
+            _links:
+              self:
+                href: /api/v3/work_packages/10403
+                title: Ensure financing
+              type:
+                href: /api/v3/types/1
+                title: Task
+              status:
+                href: /api/v3/statuses/1
+                title: New
+              project:
+                href: /api/v3/projects/918
+                title: RVC Test
+              schema:
+                href: /api/v3/work_packages/schemas/11-2
+              author:
+                href: /api/v3/users/1
+                title: OpenProject Admin - admin
+              priority:
+                href: /api/v3/priorities/2
+                title: Normal
+              ancestors: []
+        _links:
+          self:
+            href: /api/v3/activity/1
+            title: Priority changed from High to Low
+          workPackage:
+            href: /api/v3/work_packages/1
+            title: quis numquam qui voluptatum quia praesentium blanditiis nisi
+          user:
+            href: /api/v3/users/1
+            title: John Sheppard - admin
+          attachments:
+            href: /api/v3/activities/1/attachments
+          emojiReactions:
+            href: /api/v3/activities/1/emoji_reactions
+          addAttachment:
+            href: /api/v3/activities/1/attachments
+            method: post
+          update:
+            href: /api/v3/activities/1
+            method: patch
+        details:
+        - format: markdown
+          raw: Lorem ipsum dolor sit amet.
+          html: <p>Lorem ipsum dolor sit amet.</p>
+        comment:
+          format: markdown
+          raw: Lorem ipsum dolor sit amet.
+          html: <p>Lorem ipsum dolor sit amet.</p>
+        createdAt: '2014-05-21T08:51:20.721Z'
+        updatedAt: '2014-05-21T09:14:02.929Z'
+        version: 31
+    PrincipalModel:
+      type: object
+      required:
+      - _type
+      - id
+      - name
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - User
+          - Group
+          - PlaceholderUser
+        id:
+          type: integer
+          description: The principal's unique identifier.
+          minimum: 1
+        name:
+          type: string
+          description: The principal's display name, layout depends on instance settings.
+        createdAt:
+          type: string
+          format: date-time
+          description: Time of creation
+        updatedAt:
+          type: string
+          format: date-time
+          description: Time of the most recent change to the principal
+        _links:
+          type: object
+          required:
+          - self
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This principal resource.
+
+
+                  **Resource**: User|Group|PlaceholderUser'
+            memberships:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'An href to the collection of the principal''s memberships.
+
+
+                  # Conditions:
+
+
+                  - user has permission `view_members` or `manage_members` in any project
+
+
+                  **Resource**: Collection'
+    Formattable:
+      type: object
+      required:
+      - format
+      properties:
+        format:
+          type: string
+          enum:
+          - plain
+          - markdown
+          - custom
+          readOnly: true
+          description: Indicates the formatting language of the raw text
+          example: markdown
+        raw:
+          type: string
+          description: The raw text, as entered by the user
+          example: I **am** formatted!
+        html:
+          type: string
+          readOnly: true
+          description: The text converted to HTML according to the format
+          example: I <strong>am</strong> formatted!
+      example:
+        format: markdown
+        raw: I am formatted!
+        html: I am formatted!
+    PortfolioModel:
+      allOf:
+      - $ref: '#/components/schemas/CustomFieldProperties'
+      - $ref: '#/components/schemas/CustomCommentProperties'
+      - type: object
+        properties:
+          _type:
+            type: string
+            enum:
+            - Portfolio
+          id:
+            type: integer
+            description: Portfolios' id
+            minimum: 1
+          identifier:
+            type: string
+          name:
+            type: string
+          active:
+            type: boolean
+            description: Indicates whether the portfolio is currently active or already archived
+          favorited:
+            type: boolean
+            description: Indicates whether the portfolio is favorited by the current user
+          statusExplanation:
+            allOf:
+            - $ref: '#/components/schemas/Formattable'
+            - description: A text detailing and explaining why the portfolio has the reported status
+          public:
+            type: boolean
+            description: Indicates whether the portfolio is accessible for everybody
+          description:
+            $ref: '#/components/schemas/Formattable'
+          createdAt:
+            type: string
+            format: date-time
+            description: Time of creation. Can be writable by admins with the `apiv3_write_readonly_attributes` setting enabled.
+          updatedAt:
+            type: string
+            format: date-time
+            description: Time of the most recent change to the portfolio
+          _links:
+            type: object
+            required:
+            - self
+            - categories
+            properties:
+              update:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Form endpoint that aids in updating this portfolio
+
+
+                    # Conditions
+
+
+                    **Permission**: edit workspace'
+              updateImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Directly update this portfolio
+
+
+                    # Conditions
+
+
+                    **Permission**: edit workspace'
+              delete:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Delete this portfolio
+
+
+                    # Conditions
+
+
+                    **Permission**: admin'
+              favor:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Mark this portfolio as favorited by the current user
+
+
+                    # Conditions
+
+
+                    Only present if the portfolio is not yet favorited
+
+
+                    Permission**: none but login is required'
+              disfavor:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Mark this portfolio as not favorited by the current user
+
+
+                    # Conditions
+
+                    Only present if the portfolio is favorited by the current user
+
+
+                    Permission**: none but login is required'
+              createWorkPackage:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Form endpoint that aids in preparing and creating a work package
+
+
+                    # Conditions
+
+
+                    **Permission**: add work packages'
+              createWorkPackageImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Directly creates a work package in the portfolio
+
+
+                    # Conditions
+
+
+                    **Permission**: add work packages'
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This portfolio
+
+
+                    **Resource**: Portfolio'
+              categories:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Categories available in this portfolio
+
+
+                    **Resource**: Collection'
+              types:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Types available in this portfolio
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view work packages or manage types'
+              versions:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Versions available in this portfolio
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view work packages or manage versions'
+              memberships:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Memberships in the  portfolio
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view members'
+              workPackages:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Work Packages of this portfolio
+
+
+                    **Resource**: Collection'
+              parent:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Parent of the portfolio
+
+
+                    **Resource**: Portfolio
+
+
+                    # Conditions
+
+
+                    **Permission** edit workspace'
+              status:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Denotes the status of the portfolio, so whether the portfolio is on track, at risk or is having trouble.
+
+
+                    **Resource**: ProjectStatus
+
+
+                    # Conditions
+
+
+                    **Permission** edit workspace'
+              storages:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'The link to a storage that is active for this portfolio.
+
+
+                      **Resource**: Storage
+
+
+                      # Conditions
+
+
+                      **Permission**: view_file_links'
+              projectStorages:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The project storage collection of this portfolio.
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view_file_links'
+              ancestors:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'A collection of links to the ancestor portfolios.
+
+
+                      **Resource**: Portfolio'
+    SchemaModel:
+      type: object
+      required:
+      - _type
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Schema
+        _dependencies:
+          type: array
+          description: A list of dependencies between one property's value and another property
+          items:
+            type: string
+        _links:
+          type: object
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This schema
+
+
+                  **Resource**: Schema'
+    UserModel:
+      allOf:
+      - $ref: '#/components/schemas/PrincipalModel'
+      - $ref: '#/components/schemas/CustomFieldProperties'
+      - type: object
+        required:
+        - _type
+        - avatar
+        properties:
+          _type:
+            type: string
+            enum:
+            - User
+          avatar:
+            type:
+            - string
+            - 'null'
+            format: uri
+            description: URL to user's avatar
+          login:
+            type: string
+            description: 'The user''s login name
+
+
+              # Conditions
+
+
+              - User is self, or `create_user` or `manage_user` permission globally'
+            maxLength: 256
+          firstName:
+            type: string
+            description: 'The user''s first name
+
+
+              # Conditions
+
+
+              - User is self, or `create_user` or `manage_user` permission globally'
+            maxLength: 30
+          lastName:
+            type: string
+            description: 'The user''s last name
+
+
+              # Conditions
+
+
+              - User is self, or `create_user` or `manage_user` permission globally'
+            maxLength: 30
+          email:
+            type: string
+            description: 'The user''s email address
+
+
+              # Conditions
+
+
+              - E-Mail address not hidden
+
+              - User is not a new record
+
+              - User is self, or `create_user` or `manage_user` permission globally'
+            maxLength: 60
+          admin:
+            type: boolean
+            description: 'Flag indicating whether or not the user is an admin
+
+
+              # Conditions
+
+
+              - `admin`'
+          status:
+            type: string
+            description: 'The current activation status of the user.
+
+
+              # Conditions
+
+
+              - User is self, or `create_user` or `manage_user` permission globally'
+          language:
+            type: string
+            description: 'User''s language | ISO 639-1 format
+
+
+              # Conditions
+
+
+              - User is self, or `create_user` or `manage_user` permission globally'
+          identityUrl:
+            type:
+            - string
+            - 'null'
+            description: 'User''s identity_url for OmniAuth authentication.
+
+              **Deprecated:** It will be removed in the near future.
+
+
+              # Conditions
+
+
+              - User is self, or `create_user` or `manage_user` permission globally'
+            deprecated: true
+          createdAt:
+            type: string
+            format: date-time
+            description: Time of creation
+          updatedAt:
+            type: string
+            format: date-time
+            description: Time of the most recent change to the user
+          _links:
+            type: object
+            properties:
+              showUser:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'A relative path to show the user in the web application.
+
+
+                    # Condition
+
+
+                    - User is not a new record
+
+                    - User is not `locked`'
+              updateImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'A link to update the user resource.
+
+
+                    # Conditions
+
+
+                    - `admin`'
+              lock:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Restrict the user from logging in and performing any actions.
+
+
+                    # Conditions
+
+
+                    - User is not locked
+
+                    - `admin`'
+              unlock:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Allow a locked user to login and act again.
+
+
+                    # Conditions
+
+
+                    - User is not locked
+
+                    - `admin`'
+              delete:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: "Permanently remove a user from the instance\n\n# Conditions\n\neither:\n  - `admin`\n  - Setting `users_deletable_by_admin` is set\nor:\n  - User is self\n  - Setting `users_deletable_by_self` is set"
+              authSource:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Permanently remove a user from the instance
+
+
+                    # Conditions
+
+
+                    - LDAP authentication configured
+
+                    - `admin`'
+    ProjectModel:
+      allOf:
+      - $ref: '#/components/schemas/CustomFieldProperties'
+      - $ref: '#/components/schemas/CustomCommentProperties'
+      - type: object
+        properties:
+          _type:
+            type: string
+            enum:
+            - Project
+          id:
+            type: integer
+            description: Projects' id
+            minimum: 1
+          identifier:
+            type: string
+          name:
+            type: string
+          active:
+            type: boolean
+            description: Indicates whether the project is currently active or already archived
+          favorited:
+            type: boolean
+            description: Indicates whether the project is favorited by the current user
+          statusExplanation:
+            allOf:
+            - $ref: '#/components/schemas/Formattable'
+            - description: A text detailing and explaining why the project has the reported status
+          public:
+            type: boolean
+            description: Indicates whether the project is accessible for everybody
+          description:
+            $ref: '#/components/schemas/Formattable'
+          createdAt:
+            type: string
+            format: date-time
+            description: Time of creation. Can be writable by admins with the `apiv3_write_readonly_attributes` setting enabled.
+          updatedAt:
+            type: string
+            format: date-time
+            description: Time of the most recent change to the project
+          _links:
+            type: object
+            required:
+            - self
+            - categories
+            properties:
+              update:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Form endpoint that aids in updating this project
+
+
+                    # Conditions
+
+
+                    **Permission**: edit workspace'
+              updateImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Directly update this project
+
+
+                    # Conditions
+
+
+                    **Permission**: edit workspace'
+              delete:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Delete this project
+
+
+                    # Conditions
+
+
+                    **Permission**: admin'
+              favor:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Mark this project as favorited by the current user
+
+
+                    # Conditions
+
+
+                    Only present if the project is not yet favorited
+
+
+                    Permission**: none but login is required'
+              disfavor:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Mark this project as not favorited by the current user
+
+
+                    # Conditions
+
+                    Only present if the project is favorited by the current user
+
+
+                    Permission**: none but login is required'
+              createWorkPackage:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Form endpoint that aids in preparing and creating a work package
+
+
+                    # Conditions
+
+
+                    **Permission**: add work packages'
+              createWorkPackageImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Directly creates a work package in the project
+
+
+                    # Conditions
+
+
+                    **Permission**: add work packages'
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This project
+
+
+                    **Resource**: Project'
+              categories:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Categories available in this project
+
+
+                    **Resource**: Collection'
+              types:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Types available in this project
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view work packages or manage types'
+              versions:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Versions available in this project
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view work packages or manage versions'
+              memberships:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Memberships in the project
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view members'
+              workPackages:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Work Packages of this project
+
+
+                    **Resource**: Collection'
+              parent:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Parent of the project
+
+
+                    **Resource**: Workspace
+
+
+                    # Conditions
+
+
+                    **Permission** edit workspace'
+              status:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Denotes the status of the project, so whether the project is on track, at risk or is having trouble.
+
+
+                    **Resource**: ProjectStatus
+
+
+                    # Conditions
+
+
+                    **Permission** edit workspace'
+              storages:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'The link to a storage that is active for this project.
+
+
+                      **Resource**: Storage
+
+
+                      # Conditions
+
+
+                      **Permission**: view_file_links'
+              projectStorages:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The project storage collection of this project.
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view_file_links'
+              ancestors:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'A collection of links to the ancestor workspaces.
+
+
+                      **Resource**: Workspace'
+    ValuesPropertyModel:
+      type: object
+      required:
+      - _type
+      - property
+      - value
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Values::Property
+        property:
+          type: string
+          description: The key of the key - value pair represented by the Values::Property
+        value:
+          type: string
+          description: The value of the key - value pair represented by the Values::Property
+        _links:
+          type: object
+          required:
+          - self
+          - schema
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This key - value pair.
+
+
+                  **Resource**: Storage'
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The schema describing the key - value pair.
+
+
+                  **Resource**: Schema'
+    CustomCommentProperties:
+      type: object
+      patternProperties:
+        ^customComment\d+$:
+          type:
+          - 'null'
+          - string
+          description: 'A plain-text comment associated with a project custom field that has comments enabled.
+
+
+            The property is only present when the corresponding `customField{N}` has `has_comment` set to `true`.'
+    CollectionModel:
+      type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    ProgramModel:
+      allOf:
+      - $ref: '#/components/schemas/CustomFieldProperties'
+      - $ref: '#/components/schemas/CustomCommentProperties'
+      - type: object
+        properties:
+          _type:
+            type: string
+            enum:
+            - Program
+          id:
+            type: integer
+            description: Programs' id
+            minimum: 1
+          identifier:
+            type: string
+          name:
+            type: string
+          active:
+            type: boolean
+            description: Indicates whether the program is currently active or already archived
+          favorited:
+            type: boolean
+            description: Indicates whether the program is favorited by the current user
+          statusExplanation:
+            allOf:
+            - $ref: '#/components/schemas/Formattable'
+            - description: A text detailing and explaining why the program has the reported status
+          public:
+            type: boolean
+            description: Indicates whether the program is accessible for everybody
+          description:
+            $ref: '#/components/schemas/Formattable'
+          createdAt:
+            type: string
+            format: date-time
+            description: Time of creation. Can be writable by admins with the `apiv3_write_readonly_attributes` setting enabled.
+          updatedAt:
+            type: string
+            format: date-time
+            description: Time of the most recent change to the program
+          _links:
+            type: object
+            required:
+            - self
+            - categories
+            properties:
+              update:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Form endpoint that aids in updating this program
+
+
+                    # Conditions
+
+
+                    **Permission**: edit workspace'
+              updateImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Directly update this program
+
+
+                    # Conditions
+
+
+                    **Permission**: edit workspace'
+              delete:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Delete this program
+
+
+                    # Conditions
+
+
+                    **Permission**: admin'
+              favor:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Mark this program as favorited by the current user
+
+
+                    # Conditions
+
+
+                    Only present if the program is not yet favorited
+
+
+                    Permission**: none but login is required'
+              disfavor:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Mark this program as not favorited by the current user
+
+
+                    # Conditions
+
+                    Only present if the program is favorited by the current user
+
+
+                    Permission**: none but login is required'
+              createWorkPackage:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Form endpoint that aids in preparing and creating a work package
+
+
+                    # Conditions
+
+
+                    **Permission**: add work packages'
+              createWorkPackageImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Directly creates a work package in the program
+
+
+                    # Conditions
+
+
+                    **Permission**: add work packages'
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This program
+
+
+                    **Resource**: Program'
+              categories:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Categories available in this program
+
+
+                    **Resource**: Collection'
+              types:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Types available in this program
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view work packages or manage types'
+              versions:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Versions available in this program
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view work packages or manage versions'
+              memberships:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Memberships in the  program
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view members'
+              workPackages:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Work Packages of this program
+
+
+                    **Resource**: Collection'
+              parent:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Parent of the program
+
+
+                    **Resource**: Program
+
+
+                    # Conditions
+
+
+                    **Permission** edit workspace'
+              status:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Denotes the status of the program, so whether the program is on track, at risk or is having trouble.
+
+
+                    **Resource**: ProjectStatus
+
+
+                    # Conditions
+
+
+                    **Permission** edit workspace'
+              storages:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'The link to a storage that is active for this program.
+
+
+                      **Resource**: Storage
+
+
+                      # Conditions
+
+
+                      **Permission**: view_file_links'
+              projectStorages:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The project storage collection of this program.
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view_file_links'
+              ancestors:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'A collection of links to the ancestor workspace.
+
+
+                      **Resource**: Workspace'
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
+    Attachments_Model:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The attachments collection
+
+
+                    **Resource**: AttachmentsCollection'
+                  readOnly: true
+          _embedded:
+            type: object
+            properties:
+              elements:
+                type: array
+                readOnly: true
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/AttachmentModel'
+                  - description: Collection of Attachments
+    EmojiReactions_Model:
+      type: object
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: Total number of emoji reactions
+          minimum: 0
+        count:
+          type: integer
+          description: Number of emoji reactions in this response
+          minimum: 0
+        _embedded:
+          type: object
+          properties:
+            elements:
+              type: array
+              items:
+                $ref: '#/components/schemas/EmojiReactionModel'
+        _links:
+          type: object
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: This collection
+      example:
+        _type: Collection
+        total: 2
+        count: 2
+        _embedded:
+          elements:
+          - _type: EmojiReaction
+            id: 1-thumbs_up
+            reaction: thumbs_up
+            emoji: 👍
+            reactionsCount: 3
+            firstReactionAt: '2024-04-08T15:37:19.275Z'
+            _links:
+              self:
+                href: /api/v3/emoji_reactions/1-thumbs_up
+              reactable:
+                href: /api/v3/activities/1
+              reactingUsers:
+              - href: /api/v3/users/435
+                title: John Doe
+              - href: /api/v3/users/436
+                title: Jane Smith
+              - href: /api/v3/users/437
+                title: Bob Johnson
+          - _type: EmojiReaction
+            id: 1-heart
+            reaction: heart
+            emoji: ❤️
+            reactionsCount: 1
+            firstReactionAt: '2024-04-08T15:38:19.275Z'
+            _links:
+              self:
+                href: /api/v3/emoji_reactions/1-heart
+              reactable:
+                href: /api/v3/activities/1
+              reactingUsers:
+              - href: /api/v3/users/435
+                title: John Doe
+        _links:
+          self:
+            href: /api/v3/activities/1/emoji_reactions
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
     WorkPackageModel:
       allOf:
       - $ref: '#/components/schemas/CustomFieldProperties'
@@ -1121,1403 +2816,70 @@ components:
             - Text
 
             - Long text'
-    NotificationCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'This notification collection
-
-
-                    **Resource**: NotificationCollectionModel'
-              jumpTo:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'The notification collection at another offset
-
-
-                    **Resource**: NotificationCollectionModel'
-              changeSize:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'The notification collection with another size
-
-
-                    **Resource**: NotificationCollectionModel'
-          _embedded:
-            type: object
-            required:
-            - elements
-            - detailsSchemas
-            properties:
-              elements:
-                type: array
-                items:
-                  $ref: '#/components/schemas/NotificationModel'
-              detailsSchemas:
-                type: array
-                items:
-                  $ref: '#/components/schemas/SchemaModel'
-    ValuesPropertyModel:
-      type: object
-      required:
-      - _type
-      - property
-      - value
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - Values::Property
-        property:
-          type: string
-          description: The key of the key - value pair represented by the Values::Property
-        value:
-          type: string
-          description: The value of the key - value pair represented by the Values::Property
-        _links:
-          type: object
-          required:
-          - self
-          - schema
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This key - value pair.
-
-
-                  **Resource**: Storage'
-            schema:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The schema describing the key - value pair.
-
-
-                  **Resource**: Schema'
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
-          type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
-    NotificationModel:
+    EmojiReactionModel:
       type: object
       properties:
         _type:
           type: string
           enum:
-          - Notification
+          - EmojiReaction
         id:
+          type: string
+          description: 'Emoji reaction id (format: reactable_id-reaction)'
+          example: 1-thumbs_up
+        reaction:
+          type: string
+          description: The reaction identifier
+          example: thumbs_up
+        emoji:
+          type: string
+          description: The emoji character
+          example: 👍
+        reactionsCount:
           type: integer
-          description: Notification id
+          description: Number of users who reacted with this emoji
           minimum: 1
-        reason:
-          type: string
-          description: The reason for the notification
-          enum:
-          - assigned
-          - commented
-          - created
-          - dateAlert
-          - mentioned
-          - prioritized
-          - processed
-          - responsible
-          - subscribed
-          - scheduled
-          - watched
-        readIAN:
-          type: boolean
-          description: Whether the notification is marked as read
-        details:
-          type: array
-          items:
-            oneOf:
-            - $ref: '#/components/schemas/ValuesPropertyModel'
-          description: A list of objects including detailed information about the notification.
-        createdAt:
+          example: 3
+        firstReactionAt:
           type: string
           format: date-time
-          description: The time the notification was created at
-        updatedAt:
-          type: string
-          format: date-time
-          description: The time the notification was last updated
-        _embedded:
-          type: object
-          required:
-          - project
-          - resource
-          properties:
-            actor:
-              $ref: '#/components/schemas/UserModel'
-            project:
-              oneOf:
-              - $ref: '#/components/schemas/ProjectModel'
-              - $ref: '#/components/schemas/ProgramModel'
-              - $ref: '#/components/schemas/PortfolioModel'
-            activity:
-              $ref: '#/components/schemas/ActivityModel'
-            resource:
-              oneOf:
-              - $ref: '#/components/schemas/WorkPackageModel'
+          description: Time of the first reaction
         _links:
           type: object
-          required:
-          - self
-          - project
-          - actor
-          - activity
-          - resource
           properties:
             self:
               allOf:
               - $ref: '#/components/schemas/Link'
-              - description: 'This notification
-
-
-                  **Resource**: Notification'
-            readIAN:
+              - description: This emoji reaction
+            reactable:
               allOf:
               - $ref: '#/components/schemas/Link'
-              - description: Request to mark the notification as read. Only available if the notification is currently unread.
-            unreadIAN:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: Request to mark the notification as unread. Only available if the notification is currently read.
-            project:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The workspace the notification originated in
-
-
-                  **Resource**: Workspace'
-            actor:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The user that caused the notification. This might be null in
-
-                  case no user triggered the notification.
-
-
-                  **Resource**: User'
-            resource:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The linked resource of the notification, if any.
-
-
-                  **Resource**: Polymorphic'
-            activity:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The journal activity, if the notification originated from a journal entry. This might be null in
-
-                  case no activity triggered the notification.
-
-
-                  **Resource**: Activity'
-    CustomCommentProperties:
-      type: object
-      patternProperties:
-        ^customComment\d+$:
-          type:
-          - 'null'
-          - string
-          description: 'A plain-text comment associated with a project custom field that has comments enabled.
-
-
-            The property is only present when the corresponding `customField{N}` has `has_comment` set to `true`.'
-    ProgramModel:
-      allOf:
-      - $ref: '#/components/schemas/CustomFieldProperties'
-      - $ref: '#/components/schemas/CustomCommentProperties'
-      - type: object
-        properties:
-          _type:
-            type: string
-            enum:
-            - Program
-          id:
-            type: integer
-            description: Programs' id
-            minimum: 1
-          identifier:
-            type: string
-          name:
-            type: string
-          active:
-            type: boolean
-            description: Indicates whether the program is currently active or already archived
-          favorited:
-            type: boolean
-            description: Indicates whether the program is favorited by the current user
-          statusExplanation:
-            allOf:
-            - $ref: '#/components/schemas/Formattable'
-            - description: A text detailing and explaining why the program has the reported status
-          public:
-            type: boolean
-            description: Indicates whether the program is accessible for everybody
-          description:
-            $ref: '#/components/schemas/Formattable'
-          createdAt:
-            type: string
-            format: date-time
-            description: Time of creation. Can be writable by admins with the `apiv3_write_readonly_attributes` setting enabled.
-          updatedAt:
-            type: string
-            format: date-time
-            description: Time of the most recent change to the program
-          _links:
-            type: object
-            required:
-            - self
-            - categories
-            properties:
-              update:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Form endpoint that aids in updating this program
-
-
-                    # Conditions
-
-
-                    **Permission**: edit workspace'
-              updateImmediately:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Directly update this program
-
-
-                    # Conditions
-
-
-                    **Permission**: edit workspace'
-              delete:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Delete this program
-
-
-                    # Conditions
-
-
-                    **Permission**: admin'
-              favor:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Mark this program as favorited by the current user
-
-
-                    # Conditions
-
-
-                    Only present if the program is not yet favorited
-
-
-                    Permission**: none but login is required'
-              disfavor:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Mark this program as not favorited by the current user
-
-
-                    # Conditions
-
-                    Only present if the program is favorited by the current user
-
-
-                    Permission**: none but login is required'
-              createWorkPackage:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Form endpoint that aids in preparing and creating a work package
-
-
-                    # Conditions
-
-
-                    **Permission**: add work packages'
-              createWorkPackageImmediately:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Directly creates a work package in the program
-
-
-                    # Conditions
-
-
-                    **Permission**: add work packages'
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'This program
-
-
-                    **Resource**: Program'
-              categories:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Categories available in this program
-
-
-                    **Resource**: Collection'
-              types:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Types available in this program
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view work packages or manage types'
-              versions:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Versions available in this program
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view work packages or manage versions'
-              memberships:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Memberships in the  program
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view members'
-              workPackages:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Work Packages of this program
-
-
-                    **Resource**: Collection'
-              parent:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Parent of the program
-
-
-                    **Resource**: Program
-
-
-                    # Conditions
-
-
-                    **Permission** edit workspace'
-              status:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Denotes the status of the program, so whether the program is on track, at risk or is having trouble.
-
-
-                    **Resource**: ProjectStatus
-
-
-                    # Conditions
-
-
-                    **Permission** edit workspace'
-              storages:
-                type: array
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/Link'
-                  - description: 'The link to a storage that is active for this program.
-
-
-                      **Resource**: Storage
-
-
-                      # Conditions
-
-
-                      **Permission**: view_file_links'
-              projectStorages:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'The project storage collection of this program.
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view_file_links'
-              ancestors:
-                type: array
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/Link'
-                  - description: 'A collection of links to the ancestor workspace.
-
-
-                      **Resource**: Workspace'
-    ProjectModel:
-      allOf:
-      - $ref: '#/components/schemas/CustomFieldProperties'
-      - $ref: '#/components/schemas/CustomCommentProperties'
-      - type: object
-        properties:
-          _type:
-            type: string
-            enum:
-            - Project
-          id:
-            type: integer
-            description: Projects' id
-            minimum: 1
-          identifier:
-            type: string
-          name:
-            type: string
-          active:
-            type: boolean
-            description: Indicates whether the project is currently active or already archived
-          favorited:
-            type: boolean
-            description: Indicates whether the project is favorited by the current user
-          statusExplanation:
-            allOf:
-            - $ref: '#/components/schemas/Formattable'
-            - description: A text detailing and explaining why the project has the reported status
-          public:
-            type: boolean
-            description: Indicates whether the project is accessible for everybody
-          description:
-            $ref: '#/components/schemas/Formattable'
-          createdAt:
-            type: string
-            format: date-time
-            description: Time of creation. Can be writable by admins with the `apiv3_write_readonly_attributes` setting enabled.
-          updatedAt:
-            type: string
-            format: date-time
-            description: Time of the most recent change to the project
-          _links:
-            type: object
-            required:
-            - self
-            - categories
-            properties:
-              update:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Form endpoint that aids in updating this project
-
-
-                    # Conditions
-
-
-                    **Permission**: edit workspace'
-              updateImmediately:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Directly update this project
-
-
-                    # Conditions
-
-
-                    **Permission**: edit workspace'
-              delete:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Delete this project
-
-
-                    # Conditions
-
-
-                    **Permission**: admin'
-              favor:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Mark this project as favorited by the current user
-
-
-                    # Conditions
-
-
-                    Only present if the project is not yet favorited
-
-
-                    Permission**: none but login is required'
-              disfavor:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Mark this project as not favorited by the current user
-
-
-                    # Conditions
-
-                    Only present if the project is favorited by the current user
-
-
-                    Permission**: none but login is required'
-              createWorkPackage:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Form endpoint that aids in preparing and creating a work package
-
-
-                    # Conditions
-
-
-                    **Permission**: add work packages'
-              createWorkPackageImmediately:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Directly creates a work package in the project
-
-
-                    # Conditions
-
-
-                    **Permission**: add work packages'
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'This project
-
-
-                    **Resource**: Project'
-              categories:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Categories available in this project
-
-
-                    **Resource**: Collection'
-              types:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Types available in this project
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view work packages or manage types'
-              versions:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Versions available in this project
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view work packages or manage versions'
-              memberships:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Memberships in the project
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view members'
-              workPackages:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Work Packages of this project
-
-
-                    **Resource**: Collection'
-              parent:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Parent of the project
-
-
-                    **Resource**: Workspace
-
-
-                    # Conditions
-
-
-                    **Permission** edit workspace'
-              status:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Denotes the status of the project, so whether the project is on track, at risk or is having trouble.
-
-
-                    **Resource**: ProjectStatus
-
-
-                    # Conditions
-
-
-                    **Permission** edit workspace'
-              storages:
-                type: array
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/Link'
-                  - description: 'The link to a storage that is active for this project.
-
-
-                      **Resource**: Storage
-
-
-                      # Conditions
-
-
-                      **Permission**: view_file_links'
-              projectStorages:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'The project storage collection of this project.
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view_file_links'
-              ancestors:
-                type: array
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/Link'
-                  - description: 'A collection of links to the ancestor workspaces.
-
-
-                      **Resource**: Workspace'
-    EmojiReactions_Model:
-      type: object
-      properties:
-        _type:
-          type: string
-          enum:
-          - Collection
-        total:
-          type: integer
-          description: Total number of emoji reactions
-          minimum: 0
-        count:
-          type: integer
-          description: Number of emoji reactions in this response
-          minimum: 0
-        _embedded:
-          type: object
-          properties:
-            elements:
+              - description: The activity this emoji reaction belongs to
+            reactingUsers:
               type: array
               items:
-                $ref: '#/components/schemas/EmojiReactionModel'
-        _links:
-          type: object
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: This collection
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: The users who reacted with this emoji
       example:
-        _type: Collection
-        total: 2
-        count: 2
-        _embedded:
-          elements:
-          - _type: EmojiReaction
-            id: 1-thumbs_up
-            reaction: thumbs_up
-            emoji: 👍
-            reactionsCount: 3
-            firstReactionAt: '2024-04-08T15:37:19.275Z'
-            _links:
-              self:
-                href: /api/v3/emoji_reactions/1-thumbs_up
-              reactable:
-                href: /api/v3/activities/1
-              reactingUsers:
-              - href: /api/v3/users/435
-                title: John Doe
-              - href: /api/v3/users/436
-                title: Jane Smith
-              - href: /api/v3/users/437
-                title: Bob Johnson
-          - _type: EmojiReaction
-            id: 1-heart
-            reaction: heart
-            emoji: ❤️
-            reactionsCount: 1
-            firstReactionAt: '2024-04-08T15:38:19.275Z'
-            _links:
-              self:
-                href: /api/v3/emoji_reactions/1-heart
-              reactable:
-                href: /api/v3/activities/1
-              reactingUsers:
-              - href: /api/v3/users/435
-                title: John Doe
+        _type: EmojiReaction
+        id: 1-thumbs_up
+        reaction: thumbs_up
+        emoji: 👍
+        reactionsCount: 3
+        firstReactionAt: '2024-04-08T15:37:19.275Z'
         _links:
           self:
-            href: /api/v3/activities/1/emoji_reactions
-    ActivityModel:
-      type: object
-      properties:
-        _type:
-          type: string
-          enum:
-          - Activity::Comment
-        id:
-          type: integer
-          description: Activity id
-          minimum: 1
-        version:
-          type: integer
-          description: Activity version
-          minimum: 1
-        comment:
-          $ref: '#/components/schemas/Formattable'
-        details:
-          type: array
-          items:
-            $ref: '#/components/schemas/Formattable'
-        internal:
-          type: boolean
-          description: Whether this activity is internal (only visible to users with view_internal_comments permission)
-        createdAt:
-          type: string
-          format: date-time
-          description: Time of creation
-        updatedAt:
-          type: string
-          format: date-time
-          description: Time of update
-        _embedded:
-          type: object
-          properties:
-            attachments:
-              allOf:
-              - $ref: '#/components/schemas/Attachments_Model'
-              - description: Collection of attachments for this activity
-            workPackage:
-              allOf:
-              - $ref: '#/components/schemas/WorkPackageModel'
-              - description: 'The work package this activity belongs to
-
-
-                  # Conditions
-
-
-                  Only embedded when the `journable` of the activity is a work package'
-            emojiReactions:
-              allOf:
-              - $ref: '#/components/schemas/EmojiReactions_Model'
-              - description: Collection of emoji reactions for this activity
-        _links:
-          type: object
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This activity
-
-
-                  **Resource**: Activity'
-            workPackage:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The work package this activity belongs to
-
-
-                  **Resource**: WorkPackage'
-            user:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The user who created this activity
-
-
-                  **Resource**: Principal'
-            update:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: Update this activity
-            attachments:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The attachment collection of this activity
-
-
-                  **Resource**: Attachments'
-            addAttachment:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'Attach a file to the activity
-
-
-                  # Conditions
-
-
-                  **Permissions**:
-
-                  - `add_work_package_comments`
-
-                  - for internal comments: `add_internal_comments`'
-            emojiReactions:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The emoji reactions collection of this activity
-
-
-                  **Resource**: EmojiReactions'
-      example:
-        id: 1
-        _type: Activity::Comment
-        _embedded:
-          attachments:
-            _type: Collection
-            total: 1
-            count: 1
-            _embedded:
-              elements:
-              - _type: Attachment
-                id: 30388
-                fileName: Task_Ensure_financing___4___OpenProject_DEV.jpeg
-                fileSize: 540992
-                description:
-                  format: plain
-                  raw: ''
-                  html: ''
-                status: uploaded
-                contentType: image/jpeg
-                digest:
-                  algorithm: md5
-                  hash: d02d312b25383b595a9fa10f1a8999fe
-                createdAt: '2025-04-08T15:37:19.275Z'
-                _links:
-                  self:
-                    href: /api/v3/attachments/30388
-                    title: Task_Ensure_financing___4___OpenProject_DEV.jpeg
-                  author:
-                    href: /api/v3/users/435
-                    title: Firstname
-                  container:
-                    href: /api/v3/activities/79090
-                  staticDownloadLocation:
-                    href: /api/v3/attachments/30388/content
-                  downloadLocation:
-                    href: /api/v3/attachments/30388/content
-                  delete:
-                    href: /api/v3/attachments/30388
-                    method: delete
-            _links:
-              self:
-                href: /api/v3/activities/79090/attachments
-          emojiReactions:
-            _type: Collection
-            total: 2
-            count: 2
-            _embedded:
-              elements:
-              - _type: EmojiReaction
-                id: 1-thumbs_up
-                reaction: thumbs_up
-                emoji: 👍
-                reactionsCount: 3
-                firstReactionAt: '2024-04-08T15:37:19.275Z'
-                _links:
-                  self:
-                    href: /api/v3/emoji_reactions/1-thumbs_up
-                  reactable:
-                    href: /api/v3/activities/1
-                  reactingUsers:
-                  - href: /api/v3/users/435
-                    title: John Doe
-                  - href: /api/v3/users/436
-                    title: Jane Smith
-                  - href: /api/v3/users/437
-                    title: Bob Johnson
-              - _type: EmojiReaction
-                id: 1-heart
-                reaction: heart
-                emoji: ❤️
-                reactionsCount: 1
-                firstReactionAt: '2024-04-08T15:38:19.275Z'
-                _links:
-                  self:
-                    href: /api/v3/emoji_reactions/1-heart
-                  reactable:
-                    href: /api/v3/activities/1
-                  reactingUsers:
-                  - href: /api/v3/users/435
-                    title: John Doe
-            _links:
-              self:
-                href: /api/v3/activities/1/emoji_reactions
-          workPackage:
-            _type: WorkPackage
-            id: 10403
-            lockVersion: 2
-            subject: Ensure financing
-            description:
-              format: markdown
-              raw: Lorem ipsum dolor sit amet.
-              html: <p>Lorem ipsum dolor sit amet.</p>
-            scheduleManually: true
-            startDate: null
-            dueDate: null
-            derivedStartDate: null
-            derivedDueDate: null
-            estimatedTime: null
-            derivedEstimatedTime: null
-            derivedRemainingTime: null
-            duration: null
-            ignoreNonWorkingDays: false
-            percentageDone: null
-            derivedPercentageDone: null
-            createdAt: '2025-03-24T13:11:09.480Z'
-            updatedAt: '2025-04-14T11:00:02.411Z'
-            _links:
-              self:
-                href: /api/v3/work_packages/10403
-                title: Ensure financing
-              type:
-                href: /api/v3/types/1
-                title: Task
-              status:
-                href: /api/v3/statuses/1
-                title: New
-              project:
-                href: /api/v3/projects/918
-                title: RVC Test
-              schema:
-                href: /api/v3/work_packages/schemas/11-2
-              author:
-                href: /api/v3/users/1
-                title: OpenProject Admin - admin
-              priority:
-                href: /api/v3/priorities/2
-                title: Normal
-              ancestors: []
-        _links:
-          self:
-            href: /api/v3/activity/1
-            title: Priority changed from High to Low
-          workPackage:
-            href: /api/v3/work_packages/1
-            title: quis numquam qui voluptatum quia praesentium blanditiis nisi
-          user:
-            href: /api/v3/users/1
-            title: John Sheppard - admin
-          attachments:
-            href: /api/v3/activities/1/attachments
-          emojiReactions:
-            href: /api/v3/activities/1/emoji_reactions
-          addAttachment:
-            href: /api/v3/activities/1/attachments
-            method: post
-          update:
+            href: /api/v3/emoji_reactions/1-thumbs_up
+          reactable:
             href: /api/v3/activities/1
-            method: patch
-        details:
-        - format: markdown
-          raw: Lorem ipsum dolor sit amet.
-          html: <p>Lorem ipsum dolor sit amet.</p>
-        comment:
-          format: markdown
-          raw: Lorem ipsum dolor sit amet.
-          html: <p>Lorem ipsum dolor sit amet.</p>
-        createdAt: '2014-05-21T08:51:20.721Z'
-        updatedAt: '2014-05-21T09:14:02.929Z'
-        version: 31
-    PrincipalModel:
-      type: object
-      required:
-      - _type
-      - id
-      - name
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - User
-          - Group
-          - PlaceholderUser
-        id:
-          type: integer
-          description: The principal's unique identifier.
-          minimum: 1
-        name:
-          type: string
-          description: The principal's display name, layout depends on instance settings.
-        createdAt:
-          type: string
-          format: date-time
-          description: Time of creation
-        updatedAt:
-          type: string
-          format: date-time
-          description: Time of the most recent change to the principal
-        _links:
-          type: object
-          required:
-          - self
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This principal resource.
-
-
-                  **Resource**: User|Group|PlaceholderUser'
-            memberships:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'An href to the collection of the principal''s memberships.
-
-
-                  # Conditions:
-
-
-                  - user has permission `view_members` or `manage_members` in any project
-
-
-                  **Resource**: Collection'
-    CollectionModel:
-      type: object
-      required:
-      - _type
-      - total
-      - count
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - Collection
-        total:
-          type: integer
-          description: The total amount of elements available in the collection.
-          minimum: 0
-        count:
-          type: integer
-          description: Actual amount of elements in this response.
-          minimum: 0
-        _links:
-          $ref: '#/components/schemas/CollectionLinks'
-    PortfolioModel:
-      allOf:
-      - $ref: '#/components/schemas/CustomFieldProperties'
-      - $ref: '#/components/schemas/CustomCommentProperties'
-      - type: object
-        properties:
-          _type:
-            type: string
-            enum:
-            - Portfolio
-          id:
-            type: integer
-            description: Portfolios' id
-            minimum: 1
-          identifier:
-            type: string
-          name:
-            type: string
-          active:
-            type: boolean
-            description: Indicates whether the portfolio is currently active or already archived
-          favorited:
-            type: boolean
-            description: Indicates whether the portfolio is favorited by the current user
-          statusExplanation:
-            allOf:
-            - $ref: '#/components/schemas/Formattable'
-            - description: A text detailing and explaining why the portfolio has the reported status
-          public:
-            type: boolean
-            description: Indicates whether the portfolio is accessible for everybody
-          description:
-            $ref: '#/components/schemas/Formattable'
-          createdAt:
-            type: string
-            format: date-time
-            description: Time of creation. Can be writable by admins with the `apiv3_write_readonly_attributes` setting enabled.
-          updatedAt:
-            type: string
-            format: date-time
-            description: Time of the most recent change to the portfolio
-          _links:
-            type: object
-            required:
-            - self
-            - categories
-            properties:
-              update:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Form endpoint that aids in updating this portfolio
-
-
-                    # Conditions
-
-
-                    **Permission**: edit workspace'
-              updateImmediately:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Directly update this portfolio
-
-
-                    # Conditions
-
-
-                    **Permission**: edit workspace'
-              delete:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Delete this portfolio
-
-
-                    # Conditions
-
-
-                    **Permission**: admin'
-              favor:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Mark this portfolio as favorited by the current user
-
-
-                    # Conditions
-
-
-                    Only present if the portfolio is not yet favorited
-
-
-                    Permission**: none but login is required'
-              disfavor:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Mark this portfolio as not favorited by the current user
-
-
-                    # Conditions
-
-                    Only present if the portfolio is favorited by the current user
-
-
-                    Permission**: none but login is required'
-              createWorkPackage:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Form endpoint that aids in preparing and creating a work package
-
-
-                    # Conditions
-
-
-                    **Permission**: add work packages'
-              createWorkPackageImmediately:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Directly creates a work package in the portfolio
-
-
-                    # Conditions
-
-
-                    **Permission**: add work packages'
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'This portfolio
-
-
-                    **Resource**: Portfolio'
-              categories:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Categories available in this portfolio
-
-
-                    **Resource**: Collection'
-              types:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Types available in this portfolio
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view work packages or manage types'
-              versions:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Versions available in this portfolio
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view work packages or manage versions'
-              memberships:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Memberships in the  portfolio
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view members'
-              workPackages:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Work Packages of this portfolio
-
-
-                    **Resource**: Collection'
-              parent:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Parent of the portfolio
-
-
-                    **Resource**: Portfolio
-
-
-                    # Conditions
-
-
-                    **Permission** edit workspace'
-              status:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Denotes the status of the portfolio, so whether the portfolio is on track, at risk or is having trouble.
-
-
-                    **Resource**: ProjectStatus
-
-
-                    # Conditions
-
-
-                    **Permission** edit workspace'
-              storages:
-                type: array
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/Link'
-                  - description: 'The link to a storage that is active for this portfolio.
-
-
-                      **Resource**: Storage
-
-
-                      # Conditions
-
-
-                      **Permission**: view_file_links'
-              projectStorages:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'The project storage collection of this portfolio.
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view_file_links'
-              ancestors:
-                type: array
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/Link'
-                  - description: 'A collection of links to the ancestor portfolios.
-
-
-                      **Resource**: Portfolio'
+          reactingUsers:
+          - href: /api/v3/users/435
+            title: John Doe
+          - href: /api/v3/users/436
+            title: Jane Smith
+          - href: /api/v3/users/437
+            title: Bob Johnson
     AttachmentModel:
       type: object
       required:
@@ -2643,369 +3005,17 @@ components:
           algorithm: md5
           hash: 64c26a8403cd796ea4cf913cda2ee4a9
         createdAt: '2014-05-21T08:51:20.396Z'
-    SchemaModel:
-      type: object
-      required:
-      - _type
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - Schema
-        _dependencies:
-          type: array
-          description: A list of dependencies between one property's value and another property
-          items:
-            type: string
-        _links:
-          type: object
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This schema
-
-
-                  **Resource**: Schema'
-    Formattable:
-      type: object
-      required:
-      - format
-      properties:
-        format:
-          type: string
-          enum:
-          - plain
-          - markdown
-          - custom
-          readOnly: true
-          description: Indicates the formatting language of the raw text
-          example: markdown
-        raw:
-          type: string
-          description: The raw text, as entered by the user
-          example: I **am** formatted!
-        html:
-          type: string
-          readOnly: true
-          description: The text converted to HTML according to the format
-          example: I <strong>am</strong> formatted!
-      example:
-        format: markdown
-        raw: I am formatted!
-        html: I am formatted!
-    EmojiReactionModel:
-      type: object
-      properties:
-        _type:
-          type: string
-          enum:
-          - EmojiReaction
-        id:
-          type: string
-          description: 'Emoji reaction id (format: reactable_id-reaction)'
-          example: 1-thumbs_up
-        reaction:
-          type: string
-          description: The reaction identifier
-          example: thumbs_up
-        emoji:
-          type: string
-          description: The emoji character
-          example: 👍
-        reactionsCount:
-          type: integer
-          description: Number of users who reacted with this emoji
-          minimum: 1
-          example: 3
-        firstReactionAt:
-          type: string
-          format: date-time
-          description: Time of the first reaction
-        _links:
-          type: object
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: This emoji reaction
-            reactable:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: The activity this emoji reaction belongs to
-            reactingUsers:
-              type: array
-              items:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: The users who reacted with this emoji
-      example:
-        _type: EmojiReaction
-        id: 1-thumbs_up
-        reaction: thumbs_up
-        emoji: 👍
-        reactionsCount: 3
-        firstReactionAt: '2024-04-08T15:37:19.275Z'
+  examples:
+    ValuesPropertyDate:
+      value:
+        _type: Values::Property
+        property: date
+        value: '2021-01-01'
         _links:
           self:
-            href: /api/v3/emoji_reactions/1-thumbs_up
-          reactable:
-            href: /api/v3/activities/1
-          reactingUsers:
-          - href: /api/v3/users/435
-            title: John Doe
-          - href: /api/v3/users/436
-            title: Jane Smith
-          - href: /api/v3/users/437
-            title: Bob Johnson
-    ErrorResponse:
-      type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
-    CollectionLinks:
-      type: object
-      required:
-      - self
-      properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This collection resource.
-
-
-              **Resource**: Collection'
-    Attachments_Model:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'The attachments collection
-
-
-                    **Resource**: AttachmentsCollection'
-                  readOnly: true
-          _embedded:
-            type: object
-            properties:
-              elements:
-                type: array
-                readOnly: true
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/AttachmentModel'
-                  - description: Collection of Attachments
-    UserModel:
-      allOf:
-      - $ref: '#/components/schemas/PrincipalModel'
-      - $ref: '#/components/schemas/CustomFieldProperties'
-      - type: object
-        required:
-        - _type
-        - avatar
-        properties:
-          _type:
-            type: string
-            enum:
-            - User
-          avatar:
-            type:
-            - string
-            - 'null'
-            format: uri
-            description: URL to user's avatar
-          login:
-            type: string
-            description: 'The user''s login name
-
-
-              # Conditions
-
-
-              - User is self, or `create_user` or `manage_user` permission globally'
-            maxLength: 256
-          firstName:
-            type: string
-            description: 'The user''s first name
-
-
-              # Conditions
-
-
-              - User is self, or `create_user` or `manage_user` permission globally'
-            maxLength: 30
-          lastName:
-            type: string
-            description: 'The user''s last name
-
-
-              # Conditions
-
-
-              - User is self, or `create_user` or `manage_user` permission globally'
-            maxLength: 30
-          email:
-            type: string
-            description: 'The user''s email address
-
-
-              # Conditions
-
-
-              - E-Mail address not hidden
-
-              - User is not a new record
-
-              - User is self, or `create_user` or `manage_user` permission globally'
-            maxLength: 60
-          admin:
-            type: boolean
-            description: 'Flag indicating whether or not the user is an admin
-
-
-              # Conditions
-
-
-              - `admin`'
-          status:
-            type: string
-            description: 'The current activation status of the user.
-
-
-              # Conditions
-
-
-              - User is self, or `create_user` or `manage_user` permission globally'
-          language:
-            type: string
-            description: 'User''s language | ISO 639-1 format
-
-
-              # Conditions
-
-
-              - User is self, or `create_user` or `manage_user` permission globally'
-          identityUrl:
-            type:
-            - string
-            - 'null'
-            description: 'User''s identity_url for OmniAuth authentication.
-
-              **Deprecated:** It will be removed in the near future.
-
-
-              # Conditions
-
-
-              - User is self, or `create_user` or `manage_user` permission globally'
-            deprecated: true
-          createdAt:
-            type: string
-            format: date-time
-            description: Time of creation
-          updatedAt:
-            type: string
-            format: date-time
-            description: Time of the most recent change to the user
-          _links:
-            type: object
-            properties:
-              showUser:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'A relative path to show the user in the web application.
-
-
-                    # Condition
-
-
-                    - User is not a new record
-
-                    - User is not `locked`'
-              updateImmediately:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'A link to update the user resource.
-
-
-                    # Conditions
-
-
-                    - `admin`'
-              lock:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Restrict the user from logging in and performing any actions.
-
-
-                    # Conditions
-
-
-                    - User is not locked
-
-                    - `admin`'
-              unlock:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Allow a locked user to login and act again.
-
-
-                    # Conditions
-
-
-                    - User is not locked
-
-                    - `admin`'
-              delete:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: "Permanently remove a user from the instance\n\n# Conditions\n\neither:\n  - `admin`\n  - Setting `users_deletable_by_admin` is set\nor:\n  - User is self\n  - Setting `users_deletable_by_self` is set"
-              authSource:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Permanently remove a user from the instance
-
-
-                    # Conditions
-
-
-                    - LDAP authentication configured
-
-                    - `admin`'
-  examples:
+            href: api/v3/notifications/123/details/0
+          schema:
+            href: api/v3/values/schemas/date
     MentionedNotification:
       value:
         _type: Notification
@@ -3063,6 +3073,60 @@ components:
             href: api/v3/notifications/123/details/0
           schema:
             href: api/v3/values/schemas/dueDate
+    DateAlertNotification:
+      value:
+        _type: Notification
+        id: 1
+        readIAN: false
+        reason: dateAlert
+        createdAt: '2022-04-05T14:38:28.361Z'
+        updatedAt: '2022-04-06T09:03:24.347Z'
+        _embedded:
+          project:
+            _abbreviated: Project resource shortened for brevity
+            _type: Project
+            id: 11
+            name: Jedi Remnant Locator
+          resource:
+            _abbreviated: WorkPackage resource shortened for brevity
+            _type: WorkPackage
+            id: 77
+            subject: Educate Visas Marr
+          details:
+          - _type: Values::Property
+            property: startDate
+            value: '2021-01-01'
+            _links:
+              self:
+                href: api/v3/notifications/123/details/0
+              schema:
+                href: api/v3/values/schemas/startDate
+        _links:
+          self:
+            href: /api/v3/notifications/1
+          readIAN:
+            href: /api/v3/notifications/1/read_ian
+            method: post
+          actor:
+            href: null
+          project:
+            href: /api/v3/projects/11
+            title: Jedi Remnant Locator
+          activity:
+            href: null
+          resource:
+            href: /api/v3/work_packages/77
+            title: Educate Visas Marr
+    ValuesPropertyStartDate:
+      value:
+        _type: Values::Property
+        property: startDate
+        value: '2021-01-01'
+        _links:
+          self:
+            href: api/v3/notifications/123/details/0
+          schema:
+            href: api/v3/values/schemas/startDate
     NotificationCollection:
       value:
         _type: Collection
@@ -3110,78 +3174,7 @@ components:
           changeSize:
             href: /api/v3/notifications?filters=%5B%5D&offset=1&pageSize=%7Bsize%7D
             templated: true
-    ValuesPropertyDate:
-      value:
-        _type: Values::Property
-        property: date
-        value: '2021-01-01'
-        _links:
-          self:
-            href: api/v3/notifications/123/details/0
-          schema:
-            href: api/v3/values/schemas/date
-    ValuesPropertyStartDate:
-      value:
-        _type: Values::Property
-        property: startDate
-        value: '2021-01-01'
-        _links:
-          self:
-            href: api/v3/notifications/123/details/0
-          schema:
-            href: api/v3/values/schemas/startDate
-    DateAlertNotification:
-      value:
-        _type: Notification
-        id: 1
-        readIAN: false
-        reason: dateAlert
-        createdAt: '2022-04-05T14:38:28.361Z'
-        updatedAt: '2022-04-06T09:03:24.347Z'
-        _embedded:
-          project:
-            _abbreviated: Project resource shortened for brevity
-            _type: Project
-            id: 11
-            name: Jedi Remnant Locator
-          resource:
-            _abbreviated: WorkPackage resource shortened for brevity
-            _type: WorkPackage
-            id: 77
-            subject: Educate Visas Marr
-          details:
-          - _type: Values::Property
-            property: startDate
-            value: '2021-01-01'
-            _links:
-              self:
-                href: api/v3/notifications/123/details/0
-              schema:
-                href: api/v3/values/schemas/startDate
-        _links:
-          self:
-            href: /api/v3/notifications/1
-          readIAN:
-            href: /api/v3/notifications/1/read_ian
-            method: post
-          actor:
-            href: null
-          project:
-            href: /api/v3/projects/11
-            title: Jedi Remnant Locator
-          activity:
-            href: null
-          resource:
-            href: /api/v3/work_packages/77
-            title: Educate Visas Marr
   responses:
-    MissingContentType:
-      description: Occurs when the client did not send a Content-Type header
-      content:
-        text/plain:
-          schema:
-            type: string
-          example: Missing content-type header
     UnsupportedMediaType:
       description: Occurs when the client sends an unsupported Content-Type header.
       content:
@@ -3192,6 +3185,13 @@ components:
             _type: Error
             errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
             message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
     InvalidRequestBody:
       description: Occurs when the client did not send a valid JSON object in the request body.
       content:

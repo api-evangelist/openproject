@@ -419,7 +419,151 @@ paths:
       operationId: Portfolio_update_form
       summary: Portfolio update form
 components:
+  examples:
+    PortfolioCollection:
+      value:
+        _type: Collection
+        count: 2
+        total: 2
+        pageSize: 20
+        offset: 1
+        _embedded:
+          elements:
+          - _hint: Portfolio resource shortened for brevity
+            id: 1
+            identifier: connect2030
+            name: Digital Connect 2030
+            active: true
+            public: true
+          - _hint: Portfolio resource shortened for brevity
+            id: 2
+            identifier: future2050
+            name: Digital Future 2050
+            active: true
+            public: false
+        _links:
+          self:
+            href: /api/v3/portfolios?filters=%5B%5D&offset=1&pageSize=20
+          jumpTo:
+            href: /api/v3/portfolios?filters=%5B%5D&offset=%7Boffset%7D&pageSize=20
+            templated: true
+          changeSize:
+            href: /api/v3/portfolios?filters=%5B%5D&offset=1&pageSize=%7Bsize%7D
+            templated: true
+          representations:
+          - href: /portfolios.csv?filters=%5B%5D&offset=1&pageSize=20
+            identifier: csv
+            type: text/csv
+            title: CSV
+          - href: /portfolios.xls?filters=%5B%5D&offset=1&pageSize=20
+            identifier: xls
+            type: application/vnd.ms-excel
+            title: XLS
+    PortfolioBody:
+      value:
+        name: Portfolio example
+        statusExplanation:
+          raw: Everything **fine**
+        description:
+          raw: Lorem **ipsum** dolor sit amet
+        customField123: 123
+        customComment123: Because it is 123!
+        _links:
+          parent:
+            href: /api/v3/portfolios/123
+          customField456:
+            href: /api/v3/portfolios/315
+    Portfolio:
+      value:
+        _type: Portfolio
+        _links:
+          self:
+            href: /api/v3/portfolios/1
+            title: Lorem
+          createWorkPackage:
+            href: /api/v3/portfolios/1/work_packages/form
+            method: post
+          createWorkPackageImmediate:
+            href: /api/v3/portfolios/1/work_packages
+            method: post
+          categories:
+            href: /api/v3/portfolios/1/categories
+          types:
+            href: /api/v3/portfolios/1/types
+          versions:
+            href: /api/v3/portfolios/1/versions
+          workPackages:
+            href: /api/v3/portfolios/1/work_packages
+          memberships:
+            href: /api/v3/memberships?filters=[{"project":{"operator":"=","values":["1"]}}]
+          customField456:
+            href: /api/v3/users/315
+            title: A user
+          parent:
+            href: /api/v3/portfolios/123
+            title: Parent portfolio
+          ancestors:
+          - href: /api/v3/portfolios/2
+            title: Root portfolio
+          - href: /api/v3/portfolios/12
+            title: Grandparent portfolio
+          - href: /api/v3/portfolios/123
+            title: Parent portfolio
+          status:
+            href: /api/v3/project_statuses/on_track
+            title: On track
+        id: 1
+        identifier: connect2025
+        name: Digital Connect 2030
+        active: true
+        public: false
+        statusExplanation:
+          format: markdown
+          raw: Everything **fine**
+          html: <p>Everything <strong>fine</strong></p>
+        description:
+          format: markdown
+          raw: This collection showcases a diverse selection of projects that highlight our commitment to excellence and our passion for design. From innovative web applications to stunning graphic designs, each piece reflects our unique approach and dedication to delivering impactful solutions. Discover the journey of our work and see how we bring ideas to life.
+          html: <p>This collection showcases a diverse selection of projects that highlight our commitment to excellence and our passion for design. From innovative web applications to stunning graphic designs, each piece reflects our unique approach and dedication to delivering impactful solutions. Discover the journey of our work and see how we bring ideas to life.</p>
+        createdAt: '2014-05-21T08:51:20.396Z'
+        updatedAt: '2014-05-21T08:51:20.396Z'
+        customField123: 123
+        customComment123: Why is the value 123?
   schemas:
+    OffsetPaginatedCollectionLinks:
+      allOf:
+      - $ref: '#/components/schemas/CollectionLinks'
+      - type: object
+        required:
+        - jumpTo
+        - changeSize
+        properties:
+          jumpTo:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: A templated link to jump to a given offset.
+          changeSize:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: A templated link to change the current page size.
+          previousByOffset:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: 'A link to the previous page of the collection.
+
+
+                # Conditions
+
+                - The collection is not on the first page.'
+          nextByOffset:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: 'A link to the next page of the collection.
+
+
+                # Conditions
+
+                - The collection is not on the last page.'
     CollectionModel:
       type: object
       required:
@@ -468,6 +612,18 @@ components:
         message:
           type: string
           example: Project can't be blank.
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
     PortfolioModel:
       allOf:
       - $ref: '#/components/schemas/CustomFieldProperties'
@@ -713,40 +869,6 @@ components:
 
 
                       **Resource**: Portfolio'
-    OffsetPaginatedCollectionLinks:
-      allOf:
-      - $ref: '#/components/schemas/CollectionLinks'
-      - type: object
-        required:
-        - jumpTo
-        - changeSize
-        properties:
-          jumpTo:
-            allOf:
-            - $ref: '#/components/schemas/Link'
-            - description: A templated link to jump to a given offset.
-          changeSize:
-            allOf:
-            - $ref: '#/components/schemas/Link'
-            - description: A templated link to change the current page size.
-          previousByOffset:
-            allOf:
-            - $ref: '#/components/schemas/Link'
-            - description: 'A link to the previous page of the collection.
-
-
-                # Conditions
-
-                - The collection is not on the first page.'
-          nextByOffset:
-            allOf:
-            - $ref: '#/components/schemas/Link'
-            - description: 'A link to the next page of the collection.
-
-
-                # Conditions
-
-                - The collection is not on the last page.'
     PortfolioCollectionModel:
       allOf:
       - $ref: '#/components/schemas/OffsetPaginatedCollectionModel'
@@ -775,103 +897,6 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/PortfolioModel'
-    OffsetPaginatedCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - pageSize
-        - offset
-        - _links
-        properties:
-          pageSize:
-            type: integer
-            description: 'The amount of elements per page. If not set by the request this value defaults to the server''s system
-
-              settings.'
-            minimum: 0
-          offset:
-            type: integer
-            description: The page offset indicating on which page the element collection starts.
-            minimum: 0
-          _links:
-            $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
-    CollectionLinks:
-      type: object
-      required:
-      - self
-      properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This collection resource.
-
-
-              **Resource**: Collection'
-    CustomCommentProperties:
-      type: object
-      patternProperties:
-        ^customComment\d+$:
-          type:
-          - 'null'
-          - string
-          description: 'A plain-text comment associated with a project custom field that has comments enabled.
-
-
-            The property is only present when the corresponding `customField{N}` has `has_comment` set to `true`.'
-    CustomFieldProperties:
-      type: object
-      patternProperties:
-        ^customField\d+$:
-          type:
-          - 'null'
-          - number
-          - boolean
-          - string
-          - object
-          description: 'A custom field value, that belongs to a custom field of a simple type:
-
-
-            - Boolean
-
-            - Date
-
-            - Float
-
-            - Integer
-
-            - Link (URL)
-
-            - Text
-
-            - Long text'
-    Formattable:
-      type: object
-      required:
-      - format
-      properties:
-        format:
-          type: string
-          enum:
-          - plain
-          - markdown
-          - custom
-          readOnly: true
-          description: Indicates the formatting language of the raw text
-          example: markdown
-        raw:
-          type: string
-          description: The raw text, as entered by the user
-          example: I **am** formatted!
-        html:
-          type: string
-          readOnly: true
-          description: The text converted to HTML according to the format
-          example: I <strong>am</strong> formatted!
-      example:
-        format: markdown
-        raw: I am formatted!
-        html: I am formatted!
     Link:
       type: object
       required:
@@ -905,24 +930,92 @@ components:
       example:
         href: /api/v3/work_packages
         method: POST
+    OffsetPaginatedCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - pageSize
+        - offset
+        - _links
+        properties:
+          pageSize:
+            type: integer
+            description: 'The amount of elements per page. If not set by the request this value defaults to the server''s system
+
+              settings.'
+            minimum: 0
+          offset:
+            type: integer
+            description: The page offset indicating on which page the element collection starts.
+            minimum: 0
+          _links:
+            $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
+    CustomFieldProperties:
+      type: object
+      patternProperties:
+        ^customField\d+$:
+          type:
+          - 'null'
+          - number
+          - boolean
+          - string
+          - object
+          description: 'A custom field value, that belongs to a custom field of a simple type:
+
+
+            - Boolean
+
+            - Date
+
+            - Float
+
+            - Integer
+
+            - Link (URL)
+
+            - Text
+
+            - Long text'
+    CustomCommentProperties:
+      type: object
+      patternProperties:
+        ^customComment\d+$:
+          type:
+          - 'null'
+          - string
+          description: 'A plain-text comment associated with a project custom field that has comments enabled.
+
+
+            The property is only present when the corresponding `customField{N}` has `has_comment` set to `true`.'
+    Formattable:
+      type: object
+      required:
+      - format
+      properties:
+        format:
+          type: string
+          enum:
+          - plain
+          - markdown
+          - custom
+          readOnly: true
+          description: Indicates the formatting language of the raw text
+          example: markdown
+        raw:
+          type: string
+          description: The raw text, as entered by the user
+          example: I **am** formatted!
+        html:
+          type: string
+          readOnly: true
+          description: The text converted to HTML according to the format
+          example: I <strong>am</strong> formatted!
+      example:
+        format: markdown
+        raw: I am formatted!
+        html: I am formatted!
   responses:
-    MissingContentType:
-      description: Occurs when the client did not send a Content-Type header
-      content:
-        text/plain:
-          schema:
-            type: string
-          example: Missing content-type header
-    UnsupportedMediaType:
-      description: Occurs when the client sends an unsupported Content-Type header.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
-            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
     InvalidRequestBody:
       description: Occurs when the client did not send a valid JSON object in the request body.
       content:
@@ -933,116 +1026,23 @@ components:
             _type: Error
             errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
             message: The request body was not a single JSON object.
-  examples:
-    PortfolioCollection:
-      value:
-        _type: Collection
-        count: 2
-        total: 2
-        pageSize: 20
-        offset: 1
-        _embedded:
-          elements:
-          - _hint: Portfolio resource shortened for brevity
-            id: 1
-            identifier: connect2030
-            name: Digital Connect 2030
-            active: true
-            public: true
-          - _hint: Portfolio resource shortened for brevity
-            id: 2
-            identifier: future2050
-            name: Digital Future 2050
-            active: true
-            public: false
-        _links:
-          self:
-            href: /api/v3/portfolios?filters=%5B%5D&offset=1&pageSize=20
-          jumpTo:
-            href: /api/v3/portfolios?filters=%5B%5D&offset=%7Boffset%7D&pageSize=20
-            templated: true
-          changeSize:
-            href: /api/v3/portfolios?filters=%5B%5D&offset=1&pageSize=%7Bsize%7D
-            templated: true
-          representations:
-          - href: /portfolios.csv?filters=%5B%5D&offset=1&pageSize=20
-            identifier: csv
-            type: text/csv
-            title: CSV
-          - href: /portfolios.xls?filters=%5B%5D&offset=1&pageSize=20
-            identifier: xls
-            type: application/vnd.ms-excel
-            title: XLS
-    Portfolio:
-      value:
-        _type: Portfolio
-        _links:
-          self:
-            href: /api/v3/portfolios/1
-            title: Lorem
-          createWorkPackage:
-            href: /api/v3/portfolios/1/work_packages/form
-            method: post
-          createWorkPackageImmediate:
-            href: /api/v3/portfolios/1/work_packages
-            method: post
-          categories:
-            href: /api/v3/portfolios/1/categories
-          types:
-            href: /api/v3/portfolios/1/types
-          versions:
-            href: /api/v3/portfolios/1/versions
-          workPackages:
-            href: /api/v3/portfolios/1/work_packages
-          memberships:
-            href: /api/v3/memberships?filters=[{"project":{"operator":"=","values":["1"]}}]
-          customField456:
-            href: /api/v3/users/315
-            title: A user
-          parent:
-            href: /api/v3/portfolios/123
-            title: Parent portfolio
-          ancestors:
-          - href: /api/v3/portfolios/2
-            title: Root portfolio
-          - href: /api/v3/portfolios/12
-            title: Grandparent portfolio
-          - href: /api/v3/portfolios/123
-            title: Parent portfolio
-          status:
-            href: /api/v3/project_statuses/on_track
-            title: On track
-        id: 1
-        identifier: connect2025
-        name: Digital Connect 2030
-        active: true
-        public: false
-        statusExplanation:
-          format: markdown
-          raw: Everything **fine**
-          html: <p>Everything <strong>fine</strong></p>
-        description:
-          format: markdown
-          raw: This collection showcases a diverse selection of projects that highlight our commitment to excellence and our passion for design. From innovative web applications to stunning graphic designs, each piece reflects our unique approach and dedication to delivering impactful solutions. Discover the journey of our work and see how we bring ideas to life.
-          html: <p>This collection showcases a diverse selection of projects that highlight our commitment to excellence and our passion for design. From innovative web applications to stunning graphic designs, each piece reflects our unique approach and dedication to delivering impactful solutions. Discover the journey of our work and see how we bring ideas to life.</p>
-        createdAt: '2014-05-21T08:51:20.396Z'
-        updatedAt: '2014-05-21T08:51:20.396Z'
-        customField123: 123
-        customComment123: Why is the value 123?
-    PortfolioBody:
-      value:
-        name: Portfolio example
-        statusExplanation:
-          raw: Everything **fine**
-        description:
-          raw: Lorem **ipsum** dolor sit amet
-        customField123: 123
-        customComment123: Because it is 123!
-        _links:
-          parent:
-            href: /api/v3/portfolios/123
-          customField456:
-            href: /api/v3/portfolios/315
+    UnsupportedMediaType:
+      description: Occurs when the client sends an unsupported Content-Type header.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
+            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
   securitySchemes:
     BasicAuth:
       type: http

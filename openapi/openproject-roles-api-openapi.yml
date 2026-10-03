@@ -159,6 +159,44 @@ paths:
       summary: View role
 components:
   schemas:
+    RoleModel:
+      type: object
+      required:
+      - name
+      properties:
+        _type:
+          type: string
+          enum:
+          - Role
+        id:
+          type: integer
+          description: Role id
+          readOnly: true
+          minimum: 1
+        name:
+          type: string
+          description: Role name
+        _links:
+          type: object
+          required:
+          - self
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This role
+
+
+                  **Resource**: Role'
+                readOnly: true
+      example:
+        _type: Role
+        id: 3
+        name: Manager
+        _links:
+          self:
+            href: /api/v3/roles/3
+            title: Manager
     Link:
       type: object
       required:
@@ -192,32 +230,6 @@ components:
       example:
         href: /api/v3/work_packages
         method: POST
-    ErrorResponse:
-      type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
     RolesModel:
       type: object
       example:
@@ -264,44 +276,32 @@ components:
         _links:
           self:
             href: /api/v3/roles
-    RoleModel:
+    ErrorResponse:
       type: object
       required:
-      - name
+      - _type
+      - errorIdentifier
+      - message
       properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
         _type:
           type: string
           enum:
-          - Role
-        id:
-          type: integer
-          description: Role id
-          readOnly: true
-          minimum: 1
-        name:
+          - Error
+        errorIdentifier:
           type: string
-          description: Role name
-        _links:
-          type: object
-          required:
-          - self
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This role
-
-
-                  **Resource**: Role'
-                readOnly: true
-      example:
-        _type: Role
-        id: 3
-        name: Manager
-        _links:
-          self:
-            href: /api/v3/roles/3
-            title: Manager
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
   securitySchemes:
     BasicAuth:
       type: http
