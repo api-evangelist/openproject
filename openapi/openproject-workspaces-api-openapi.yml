@@ -353,85 +353,6 @@ paths:
       summary: View workspace schema
 components:
   schemas:
-    CollectionModel:
-      type: object
-      required:
-      - _type
-      - total
-      - count
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - Collection
-        total:
-          type: integer
-          description: The total amount of elements available in the collection.
-          minimum: 0
-        count:
-          type: integer
-          description: Actual amount of elements in this response.
-          minimum: 0
-        _links:
-          $ref: '#/components/schemas/CollectionLinks'
-    Types_by_WorkspaceModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'The types collection
-
-
-                    **Resource**: TypesCollection'
-                  readOnly: true
-          _embedded:
-            type: object
-            properties:
-              elements:
-                type: array
-                readOnly: true
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/TypeModel'
-                  - description: Collection of Types
-    ErrorResponse:
-      type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
     CollectionLinks:
       type: object
       required:
@@ -444,43 +365,6 @@ components:
 
 
               **Resource**: Collection'
-    SchemaPropertyModel:
-      type: object
-      required:
-      - type
-      - name
-      - required
-      - hasDefault
-      - writable
-      properties:
-        type:
-          type: string
-          description: The resource type for this property.
-        name:
-          type: string
-          description: The name of the property.
-        required:
-          type: boolean
-          description: Indicates, if the property is required for submitting a request of this schema.
-        hasDefault:
-          type: boolean
-          description: Indicates, if the property has a default.
-        writable:
-          type: boolean
-          description: Indicates, if the property is writable when sending a request of this schema.
-        options:
-          type: object
-          description: Additional options for the property.
-        location:
-          type: string
-          description: Defines the json path where the property is located in the payload.
-          default: ''
-        placeholder:
-          type: string
-          description: A placeholder for the property to display if the property has no value.
-        _links:
-          type: object
-          description: Useful links for this property (e.g. an endpoint to fetch allowed values)
     Link:
       type: object
       required:
@@ -514,6 +398,80 @@ components:
       example:
         href: /api/v3/work_packages
         method: POST
+    TypeModel:
+      type: object
+      required:
+      - id
+      - name
+      - color
+      - position
+      - isDefault
+      - isMilestone
+      - createdAt
+      - updatedAt
+      properties:
+        id:
+          type: integer
+          description: Type id
+          readOnly: true
+          exclusiveMinimum: 0
+        name:
+          type: string
+          description: Type name
+          readOnly: true
+        color:
+          type:
+          - string
+          - 'null'
+          description: The color used to represent this type
+          readOnly: true
+        position:
+          type: integer
+          description: Sort index of the type
+          readOnly: true
+        isDefault:
+          type: boolean
+          description: Is this type active by default in new projects?
+          readOnly: true
+        isMilestone:
+          type: boolean
+          description: Do work packages of this type represent a milestone?
+          readOnly: true
+        createdAt:
+          type: string
+          format: date-time
+          description: Time of creation
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          description: Time of the most recent change to the user
+        _links:
+          type: object
+          required:
+          - self
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This type
+
+
+                  **Resource**: Type'
+                readOnly: true
+      example:
+        _links:
+          self:
+            href: /api/v3/types/1
+        _type: Type
+        id: 1
+        name: Bug
+        color: '#ff0000'
+        position: 1
+        isDefault: true
+        isMilestone: false
+        createdAt: '2014-05-21T08:51:20.624Z'
+        updatedAt: '2014-05-21T08:51:20.624Z'
     Workspaces_schemaModel:
       type: object
       description: A schema for a workspace. This schema defines the attributes of a workspace.
@@ -731,80 +689,122 @@ components:
         _links:
           self:
             href: /api/v3/workspaces/schema
-    TypeModel:
+    SchemaPropertyModel:
       type: object
       required:
-      - id
+      - type
       - name
-      - color
-      - position
-      - isDefault
-      - isMilestone
-      - createdAt
-      - updatedAt
+      - required
+      - hasDefault
+      - writable
       properties:
-        id:
-          type: integer
-          description: Type id
-          readOnly: true
-          exclusiveMinimum: 0
+        type:
+          type: string
+          description: The resource type for this property.
         name:
           type: string
-          description: Type name
-          readOnly: true
-        color:
-          type:
-          - string
-          - 'null'
-          description: The color used to represent this type
-          readOnly: true
-        position:
-          type: integer
-          description: Sort index of the type
-          readOnly: true
-        isDefault:
+          description: The name of the property.
+        required:
           type: boolean
-          description: Is this type active by default in new projects?
-          readOnly: true
-        isMilestone:
+          description: Indicates, if the property is required for submitting a request of this schema.
+        hasDefault:
           type: boolean
-          description: Do work packages of this type represent a milestone?
-          readOnly: true
-        createdAt:
+          description: Indicates, if the property has a default.
+        writable:
+          type: boolean
+          description: Indicates, if the property is writable when sending a request of this schema.
+        options:
+          type: object
+          description: Additional options for the property.
+        location:
           type: string
-          format: date-time
-          description: Time of creation
-          readOnly: true
-        updatedAt:
+          description: Defines the json path where the property is located in the payload.
+          default: ''
+        placeholder:
           type: string
-          format: date-time
-          description: Time of the most recent change to the user
+          description: A placeholder for the property to display if the property has no value.
         _links:
           type: object
-          required:
-          - self
+          description: Useful links for this property (e.g. an endpoint to fetch allowed values)
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
           properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This type
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    Types_by_WorkspaceModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The types collection
 
 
-                  **Resource**: Type'
+                    **Resource**: TypesCollection'
+                  readOnly: true
+          _embedded:
+            type: object
+            properties:
+              elements:
+                type: array
                 readOnly: true
-      example:
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/TypeModel'
+                  - description: Collection of Types
+    CollectionModel:
+      type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
         _links:
-          self:
-            href: /api/v3/types/1
-        _type: Type
-        id: 1
-        name: Bug
-        color: '#ff0000'
-        position: 1
-        isDefault: true
-        isMilestone: false
-        createdAt: '2014-05-21T08:51:20.624Z'
-        updatedAt: '2014-05-21T08:51:20.624Z'
+          $ref: '#/components/schemas/CollectionLinks'
   securitySchemes:
     BasicAuth:
       type: http

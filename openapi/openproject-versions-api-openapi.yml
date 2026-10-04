@@ -821,62 +821,40 @@ paths:
       operationId: List_versions_available_in_a_workspace
       summary: List versions available in a workspace
 components:
-  responses:
-    UnsupportedMediaType:
-      description: Occurs when the client sends an unsupported Content-Type header.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
-            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
-    MissingContentType:
-      description: Occurs when the client did not send a Content-Type header
-      content:
-        text/plain:
-          schema:
-            type: string
-          example: Missing content-type header
-    InvalidRequestBody:
-      description: Occurs when the client did not send a valid JSON object in the request body.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
-            message: The request body was not a single JSON object.
   schemas:
-    Formattable:
+    Link:
       type: object
       required:
-      - format
+      - href
       properties:
-        format:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
           type: string
-          enum:
-          - plain
-          - markdown
-          - custom
-          readOnly: true
-          description: Indicates the formatting language of the raw text
-          example: markdown
-        raw:
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
           type: string
-          description: The raw text, as entered by the user
-          example: I **am** formatted!
-        html:
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
           type: string
-          readOnly: true
-          description: The text converted to HTML according to the format
-          example: I <strong>am</strong> formatted!
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
       example:
-        format: markdown
-        raw: I am formatted!
-        html: I am formatted!
+        href: /api/v3/work_packages
+        method: POST
     Versions_by_WorkspaceModel:
       allOf:
       - $ref: '#/components/schemas/CollectionModel'
@@ -908,65 +886,6 @@ components:
                   allOf:
                   - $ref: '#/components/schemas/VersionReadModel'
                   - description: Collection of Versions
-    Available_projects_for_versionsModel:
-      type: object
-      example:
-        _links:
-          self:
-            href: /api/v3/versions/available_projects
-        _type: Collection
-        total: 2
-        count: 2
-        _embedded:
-          elements:
-          - _type: Project
-            _links:
-              self:
-                href: /api/v3/projects/6
-                title: A project
-              editWorkPackage:
-                href: /api/v3/work_packages/{id}/form
-                templated: true
-                method: post
-              createWorkPackage:
-                href: /api/v3/projects/6/work_packages/form
-                method: post
-              createWorkPackageImmediate:
-                href: /api/v3/projects/6/work_packages
-                method: post
-              categories:
-                href: /api/v3/projects/6/categories
-              versions:
-                href: /api/v3/projects/6/versions
-            id: 6
-            identifier: a_project
-            name: A project
-            description: Eveniet molestias omnis quis aut qui eum adipisci. Atque aut aut in exercitationem adipisci amet. Nisi asperiores quia ratione veritatis enim exercitationem magnam. Aut fuga architecto adipisci nihil. Et repellat pariatur. Aliquam et sed perferendis nostrum quaerat. Fugit doloremque voluptatem.
-            createdAt: '2015-07-06T13:28:14+00:00'
-            updatedAt: '2015-10-01T09:55:02+00:00'
-            type: Customer Project
-          - _type: Project
-            _links:
-              self:
-                href: /api/v3/projects/14
-                title: Another project
-              createWorkPackage:
-                href: /api/v3/projects/14/work_packages/form
-                method: post
-              createWorkPackageImmediate:
-                href: /api/v3/projects/14/work_packages
-                method: post
-              categories:
-                href: /api/v3/projects/14/categories
-              versions:
-                href: /api/v3/projects/14/versions
-            id: 14
-            identifier: another_project
-            name: Another project
-            description: ''
-            createdAt: '2016-02-29T12:50:20+00:00'
-            updatedAt: '2016-02-29T12:50:20+00:00'
-            type: null
     VersionReadModel:
       allOf:
       - $ref: '#/components/schemas/CustomFieldProperties'
@@ -1116,87 +1035,124 @@ components:
 
 
                       **Resource**: Workspace'
-    CollectionModel:
+    CollectionLinks:
       type: object
       required:
-      - _type
-      - total
-      - count
-      - _links
+      - self
       properties:
-        _type:
-          type: string
-          enum:
-          - Collection
-        total:
-          type: integer
-          description: The total amount of elements available in the collection.
-          minimum: 0
-        count:
-          type: integer
-          description: Actual amount of elements in this response.
-          minimum: 0
-        _links:
-          $ref: '#/components/schemas/CollectionLinks'
-    ErrorResponse:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
+    VersionCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This version collection
+
+
+                    **Resource**: Collection'
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VersionReadModel'
+    Available_projects_for_versionsModel:
       type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
-          type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
       example:
-        href: /api/v3/work_packages
-        method: POST
+        _links:
+          self:
+            href: /api/v3/versions/available_projects
+        _type: Collection
+        total: 2
+        count: 2
+        _embedded:
+          elements:
+          - _type: Project
+            _links:
+              self:
+                href: /api/v3/projects/6
+                title: A project
+              editWorkPackage:
+                href: /api/v3/work_packages/{id}/form
+                templated: true
+                method: post
+              createWorkPackage:
+                href: /api/v3/projects/6/work_packages/form
+                method: post
+              createWorkPackageImmediate:
+                href: /api/v3/projects/6/work_packages
+                method: post
+              categories:
+                href: /api/v3/projects/6/categories
+              versions:
+                href: /api/v3/projects/6/versions
+            id: 6
+            identifier: a_project
+            name: A project
+            description: Eveniet molestias omnis quis aut qui eum adipisci. Atque aut aut in exercitationem adipisci amet. Nisi asperiores quia ratione veritatis enim exercitationem magnam. Aut fuga architecto adipisci nihil. Et repellat pariatur. Aliquam et sed perferendis nostrum quaerat. Fugit doloremque voluptatem.
+            createdAt: '2015-07-06T13:28:14+00:00'
+            updatedAt: '2015-10-01T09:55:02+00:00'
+            type: Customer Project
+          - _type: Project
+            _links:
+              self:
+                href: /api/v3/projects/14
+                title: Another project
+              createWorkPackage:
+                href: /api/v3/projects/14/work_packages/form
+                method: post
+              createWorkPackageImmediate:
+                href: /api/v3/projects/14/work_packages
+                method: post
+              categories:
+                href: /api/v3/projects/14/categories
+              versions:
+                href: /api/v3/projects/14/versions
+            id: 14
+            identifier: another_project
+            name: Another project
+            description: ''
+            createdAt: '2016-02-29T12:50:20+00:00'
+            updatedAt: '2016-02-29T12:50:20+00:00'
+            type: null
+    CustomFieldLinkedProperties:
+      type: object
+      patternProperties:
+        ^customField\d+$:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'A custom field value that belongs to a custom field of a reference type:
+
+
+              - Hierarchy
+
+              - List
+
+              - User
+
+              - Version
+
+              - Weighted item list'
     Version_schemaModel:
       type: object
       example:
@@ -1288,6 +1244,33 @@ components:
         _links:
           self:
             href: /api/v3/versions/schema
+    Formattable:
+      type: object
+      required:
+      - format
+      properties:
+        format:
+          type: string
+          enum:
+          - plain
+          - markdown
+          - custom
+          readOnly: true
+          description: Indicates the formatting language of the raw text
+          example: markdown
+        raw:
+          type: string
+          description: The raw text, as entered by the user
+          example: I **am** formatted!
+        html:
+          type: string
+          readOnly: true
+          description: The text converted to HTML according to the format
+          example: I <strong>am</strong> formatted!
+      example:
+        format: markdown
+        raw: I am formatted!
+        html: I am formatted!
     VersionWriteModel:
       allOf:
       - $ref: '#/components/schemas/CustomFieldProperties'
@@ -1354,65 +1337,28 @@ components:
 
 
                       **Resource**: Workspace'
-    CustomFieldLinkedProperties:
-      type: object
-      patternProperties:
-        ^customField\d+$:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'A custom field value that belongs to a custom field of a reference type:
-
-
-              - Hierarchy
-
-              - List
-
-              - User
-
-              - Version
-
-              - Weighted item list'
-    VersionCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'This version collection
-
-
-                    **Resource**: Collection'
-          _embedded:
-            type: object
-            required:
-            - elements
-            properties:
-              elements:
-                type: array
-                items:
-                  $ref: '#/components/schemas/VersionReadModel'
-    CollectionLinks:
+    CollectionModel:
       type: object
       required:
-      - self
+      - _type
+      - total
+      - count
+      - _links
       properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This collection resource.
-
-
-              **Resource**: Collection'
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
     CustomFieldProperties:
       type: object
       patternProperties:
@@ -1439,23 +1385,61 @@ components:
             - Text
 
             - Long text'
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+  responses:
+    InvalidRequestBody:
+      description: Occurs when the client did not send a valid JSON object in the request body.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+            message: The request body was not a single JSON object.
+    UnsupportedMediaType:
+      description: Occurs when the client sends an unsupported Content-Type header.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
+            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
   examples:
-    VersionCreateRequest:
-      description: Request to create a basic version with custom fields
-      value:
-        name: v0.9.1-alpha
-        startDate: '2026-02-02'
-        endDate: '2026-02-09'
-        status: open
-        sharing: tree
-        customField14: true
-        _links:
-          definingProject:
-            href: /api/v3/projects/10
-            title: Death Star
-          customField23:
-            href: /api/v3/users/18
-            title: Mara Jade
     VersionSimpleResponse:
       description: Simple response showing a single version
       value:
@@ -1490,6 +1474,22 @@ components:
             method: delete
           availableInProjects:
             href: /api/v3/versions/1/workspaces
+          definingProject:
+            href: /api/v3/projects/10
+            title: Death Star
+          customField23:
+            href: /api/v3/users/18
+            title: Mara Jade
+    VersionCreateRequest:
+      description: Request to create a basic version with custom fields
+      value:
+        name: v0.9.1-alpha
+        startDate: '2026-02-02'
+        endDate: '2026-02-09'
+        status: open
+        sharing: tree
+        customField14: true
+        _links:
           definingProject:
             href: /api/v3/projects/10
             title: Death Star

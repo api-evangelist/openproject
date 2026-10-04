@@ -1712,101 +1712,39 @@ paths:
       summary: View schema for workspace queries
 components:
   schemas:
-    Unstar_QueryModel:
+    Link:
       type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
       example:
-        _type: Query
-        id: 9
-        name: fdsfdsfdsf
-        createdAt: '2015-03-20T12:56:56.257Z'
-        updatedAt: '2015-05-20T18:16:53.953Z'
-        filters:
-        - _type: StatusQueryFilter
-          name: Status
-          _links:
-            filter:
-              href: /api/v3/queries/filters/status
-              title: Status
-            operator:
-              href: /api/v3/queries/operators/o
-              title: open
-            schema:
-              href: /api/v3/queries/filter_instance_schemas/status
-            values: []
-        - _type: DueDateQueryFilter
-          name: Finish date
-          values:
-          - '1'
-          _links:
-            filter:
-              href: /api/v3/queries/filters/dueDate
-              title: Finish date
-            operator:
-              href: /api/v3/queries/operators/<t+
-              title: in less than
-            schema:
-              href: /api/v3/queries/filter_instance_schemas/dueDate
-        public: false
-        sums: false
-        starred: false
-        _embedded:
-          results:
-            _type: WorkPackageCollection
-            total: 234
-            count: 30
-            pageSize: 2
-            offset: 1
-            _embedded:
-              elements:
-              - <--- shortened for brevity --->
-            _links:
-              self:
-                href: /api/v3/projects/3/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=1&pageSize=2&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
-              jumpTo:
-                href: /api/v3/projects/3/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=%7Boffset%7D&pageSize=2&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
-                templated: true
-              changeSize:
-                href: /api/v3/projects/3/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=1&pageSize=%7Bsize%7D&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
-                templated: true
-              createWorkPackage:
-                href: /api/v3/work_packages/form
-                method: post
-              createWorkPackageImmediate:
-                href: /api/v3/work_packages
-                method: post
-        _links:
-          self:
-            href: /api/v3/queries/9
-            title: fdsfdsfdsf
-          results:
-            href: /api/v3/projects/3/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=1&pageSize=2&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
-          columns:
-          - href: /api/v3/queries/columns/id
-            title: ID
-          - href: /api/v3/queries/columns/subject
-            title: Subject
-          - href: /api/v3/queries/columns/type
-            title: Type
-          - href: /api/v3/queries/columns/status
-            title: Status
-          - href: /api/v3/queries/columns/priority
-            title: Priority
-          - href: /api/v3/queries/columns/assignee
-            title: Assignee
-          - href: /api/v3/queries/columns/updated_at
-            title: Updated on
-          groupBy:
-            href: null
-            title: null
-          sortBy:
-          - href: /api/v3/queries/sort_bys/parent-desc
-            title: Parent (Descending)
-          user:
-            href: /api/v3/users/1
-            title: OpenProject Admin
-          project:
-            href: /api/v3/projects/3
-            title: copy
+        href: /api/v3/work_packages
+        method: POST
     Schema_For_Workspace_QueriesModel:
       type: object
       example:
@@ -2018,117 +1956,6 @@ components:
         _links:
           self:
             href: /api/v3/workspaces/42/queries/schema
-    QueriesModel:
-      type: object
-      example:
-        _links:
-          self:
-            href: /api/v3/queries
-        total: 1
-        count: 1
-        _type: Collection
-        _embedded:
-          elements:
-          - _type: Query
-            id: 9
-            name: fdsfdsfdsf
-            createdAt: '2015-03-20T12:56:56.858Z'
-            updatedAt: '2015-05-20T18:16:53.887Z'
-            filters:
-            - _type: StatusQueryFilter
-              name: Status
-              _links:
-                filter:
-                  href: /api/v3/queries/filters/status
-                  title: Status
-                operator:
-                  href: /api/v3/queries/operators/o
-                  title: open
-                schema:
-                  href: /api/v3/queries/filter_instance_schemas/status
-                values: []
-            - _type: DueDateQueryFilter
-              name: Finish date
-              values:
-              - '1'
-              _links:
-                filter:
-                  href: /api/v3/queries/filters/dueDate
-                  title: Finish date
-                operator:
-                  href: /api/v3/queries/operators/<t+
-                  title: in less than
-                schema:
-                  href: /api/v3/queries/filter_instance_schemas/dueDate
-            public: false
-            sums: false
-            starred: true
-            projections:
-            - _type: Query::TableProjection
-            - _type: Query::TeamPlannerProjection
-              _links:
-                rows:
-                - href: /api/v3/users/1
-                  title: Bob Bobbit
-            - _type: Query::CalendarProjection
-            _embedded:
-              results:
-                _type: WorkPackageCollection
-                total: 234
-                count: 30
-                pageSize: 30
-                offset: 1
-                _embedded:
-                  elements:
-                  - <--- shortened for brevity --->
-                _links:
-                  self:
-                    href: /api/v3/projects/3/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=1&pageSize=2&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
-                  jumpTo:
-                    href: /api/v3/projects/3/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=%7Boffset%7D&pageSize=2&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
-                    templated: true
-                  changeSize:
-                    href: /api/v3/projects/3/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=1&pageSize=%7Bsize%7D&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
-                    templated: true
-                  createWorkPackage:
-                    href: /api/v3/work_packages/form
-                    method: post
-                  createWorkPackageImmediate:
-                    href: /api/v3/work_packages
-                    method: post
-            _links:
-              self:
-                href: /api/v3/queries/9
-                title: fdsfdsfdsf
-              results:
-                href: /api/v3/projects/3/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=1&pageSize=2&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
-              columns:
-              - href: /api/v3/queries/columns/id
-                title: ID
-              - href: /api/v3/queries/columns/subject
-                title: Subject
-              - href: /api/v3/queries/columns/type
-                title: Type
-              - href: /api/v3/queries/columns/status
-                title: Status
-              - href: /api/v3/queries/columns/priority
-                title: Priority
-              - href: /api/v3/queries/columns/assignee
-                title: Assignee
-              - href: /api/v3/queries/columns/updated_at
-                title: Updated on
-              groupBy:
-                href: null
-                title: null
-              sortBy:
-              - href: /api/v3/queries/sort_bys/parent-desc
-                title: Parent (Descending)
-              user:
-                href: /api/v3/users/1
-                title: OpenProject Admin
-              project:
-                href: /api/v3/projects/3
-                title: copy
     Query_Update_Form:
       type: object
       properties:
@@ -2137,11 +1964,14 @@ components:
           description: Query name.
       example:
         name: Updated query name
-    Default_Query_for_WorkspaceModel:
+    Star_QueryModel:
       type: object
       example:
         _type: Query
-        name: default
+        id: 9
+        name: fdsfdsfdsf
+        createdAt: '2015-03-20T12:56:56.085Z'
+        updatedAt: '2015-05-20T18:16:53.619Z'
         filters:
         - _type: StatusQueryFilter
           name: Status
@@ -2155,12 +1985,22 @@ components:
             schema:
               href: /api/v3/queries/filter_instance_schemas/status
             values: []
+        - _type: DueDateQueryFilter
+          name: Finish date
+          values:
+          - '1'
+          _links:
+            filter:
+              href: /api/v3/queries/filters/dueDate
+              title: Finish date
+            operator:
+              href: /api/v3/queries/operators/<t+
+              title: in less than
+            schema:
+              href: /api/v3/queries/filter_instance_schemas/dueDate
         public: false
         sums: false
-        timelineVisible: false
-        timelineZoomLevel: days
-        showHierarchies: true
-        starred: false
+        starred: true
         _embedded:
           results:
             _type: WorkPackageCollection
@@ -2173,12 +2013,12 @@ components:
               - <--- shortened for brevity --->
             _links:
               self:
-                href: /api/v3/workspaces/42/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=1&pageSize=2&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
+                href: /api/v3/projects/3/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=1&pageSize=2&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
               jumpTo:
-                href: /api/v3/workspaces/42/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=%7Boffset%7D&pageSize=2&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
+                href: /api/v3/projects/3/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=%7Boffset%7D&pageSize=2&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
                 templated: true
               changeSize:
-                href: /api/v3/workspaces/42/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=1&pageSize=%7Bsize%7D&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
+                href: /api/v3/projects/3/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=1&pageSize=%7Bsize%7D&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
                 templated: true
               createWorkPackage:
                 href: /api/v3/work_packages/form
@@ -2188,10 +2028,10 @@ components:
                 method: post
         _links:
           self:
-            href: /api/v3/workspaces/42/queries/default
-            title: Default
+            href: /api/v3/queries/9
+            title: fdsfdsfdsf
           results:
-            href: /api/v3/workspaces/42/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=1&pageSize=2&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
+            href: /api/v3/projects/3/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=1&pageSize=2&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
           columns:
           - href: /api/v3/queries/columns/id
             title: ID
@@ -2217,8 +2057,8 @@ components:
             href: /api/v3/users/1
             title: OpenProject Admin
           project:
-            href: /api/v3/projects/42
-            title: Lorem ipsum project
+            href: /api/v3/projects/3
+            title: copy
     Schema_For_Global_QueriesModel:
       type: object
       example:
@@ -2464,32 +2304,253 @@ components:
         _links:
           self:
             href: /api/v3/queries/schema
-    ErrorResponse:
+    Available_projects_for_queryModel:
+      type: object
+      example:
+        _links:
+          self:
+            href: /api/v3/queries/available_projects
+        _type: Collection
+        total: 2
+        count: 2
+        _embedded:
+          elements:
+          - _type: Project
+            _links:
+              self:
+                href: /api/v3/projects/6
+                title: A project
+              createWorkPackage:
+                href: /api/v3/projects/6/work_packages/form
+                method: post
+              createWorkPackageImmediate:
+                href: /api/v3/projects/6/work_packages
+                method: post
+              categories:
+                href: /api/v3/projects/6/categories
+              versions:
+                href: /api/v3/projects/6/versions
+            id: 6
+            identifier: a_project
+            name: A project
+            description: Eveniet molestias omnis quis aut qui eum adipisci.
+            createdAt: '2015-07-06T13:28:14+00:00'
+            updatedAt: '2015-10-01T09:55:02+00:00'
+            type: Customer Project
+          - _type: Project
+            _links:
+              self:
+                href: /api/v3/projects/14
+                title: Another project
+              createWorkPackage:
+                href: /api/v3/projects/14/work_packages/form
+                method: post
+              createWorkPackageImmediate:
+                href: /api/v3/projects/14/work_packages
+                method: post
+              categories:
+                href: /api/v3/projects/14/categories
+              versions:
+                href: /api/v3/projects/14/versions
+            id: 14
+            identifier: another_project
+            name: Another project
+            description: ''
+            createdAt: '2016-02-29T12:50:20+00:00'
+            updatedAt: '2016-02-29T12:50:20+00:00'
+            type: null
+    Default_Query_for_WorkspaceModel:
+      type: object
+      example:
+        _type: Query
+        name: default
+        filters:
+        - _type: StatusQueryFilter
+          name: Status
+          _links:
+            filter:
+              href: /api/v3/queries/filters/status
+              title: Status
+            operator:
+              href: /api/v3/queries/operators/o
+              title: open
+            schema:
+              href: /api/v3/queries/filter_instance_schemas/status
+            values: []
+        public: false
+        sums: false
+        timelineVisible: false
+        timelineZoomLevel: days
+        showHierarchies: true
+        starred: false
+        _embedded:
+          results:
+            _type: WorkPackageCollection
+            total: 234
+            count: 30
+            pageSize: 2
+            offset: 1
+            _embedded:
+              elements:
+              - <--- shortened for brevity --->
+            _links:
+              self:
+                href: /api/v3/workspaces/42/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=1&pageSize=2&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
+              jumpTo:
+                href: /api/v3/workspaces/42/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=%7Boffset%7D&pageSize=2&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
+                templated: true
+              changeSize:
+                href: /api/v3/workspaces/42/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=1&pageSize=%7Bsize%7D&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
+                templated: true
+              createWorkPackage:
+                href: /api/v3/work_packages/form
+                method: post
+              createWorkPackageImmediate:
+                href: /api/v3/work_packages
+                method: post
+        _links:
+          self:
+            href: /api/v3/workspaces/42/queries/default
+            title: Default
+          results:
+            href: /api/v3/workspaces/42/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=1&pageSize=2&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
+          columns:
+          - href: /api/v3/queries/columns/id
+            title: ID
+          - href: /api/v3/queries/columns/subject
+            title: Subject
+          - href: /api/v3/queries/columns/type
+            title: Type
+          - href: /api/v3/queries/columns/status
+            title: Status
+          - href: /api/v3/queries/columns/priority
+            title: Priority
+          - href: /api/v3/queries/columns/assignee
+            title: Assignee
+          - href: /api/v3/queries/columns/updated_at
+            title: Updated on
+          groupBy:
+            href: null
+            title: null
+          sortBy:
+          - href: /api/v3/queries/sort_bys/parent-desc
+            title: Parent (Descending)
+          user:
+            href: /api/v3/users/1
+            title: OpenProject Admin
+          project:
+            href: /api/v3/projects/42
+            title: Lorem ipsum project
+    Query_Filter_Instance_Model:
       type: object
       required:
+      - _links
       - _type
-      - errorIdentifier
-      - message
+      - name
       properties:
-        _embedded:
+        _links:
           type: object
+          required:
+          - filter
+          - schema
           properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
+            filter:
+              $ref: '#/components/schemas/Link'
+            schema:
+              $ref: '#/components/schemas/Link'
+            operator:
+              $ref: '#/components/schemas/Link'
         _type:
           type: string
-          enum:
-          - Error
-        errorIdentifier:
+        name:
           type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
+    Default_QueryModel:
+      type: object
+      example:
+        _type: Query
+        name: default
+        filters:
+        - _type: StatusQueryFilter
+          name: Status
+          _links:
+            filter:
+              href: /api/v3/queries/filters/status
+              title: Status
+            operator:
+              href: /api/v3/queries/operators/o
+              title: open
+            schema:
+              href: /api/v3/queries/filter_instance_schemas/status
+            values: []
+        public: false
+        sums: false
+        timelineVisible: false
+        timelineZoomLevel: days
+        timelineLabels: {}
+        highlightingMode: inline
+        timestamps:
+        - P0D
+        showHierarchies: true
+        starred: false
+        _embedded:
+          results:
+            _type: WorkPackageCollection
+            total: 234
+            count: 30
+            pageSize: 2
+            offset: 1
+            _embedded:
+              elements:
+              - <--- shortened for brevity --->
+            _links:
+              self:
+                href: /api/v3/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=1&pageSize=2&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
+              jumpTo:
+                href: /api/v3/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=%7Boffset%7D&pageSize=2&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
+                templated: true
+              changeSize:
+                href: /api/v3/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=1&pageSize=%7Bsize%7D&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
+                templated: true
+              createWorkPackage:
+                href: /api/v3/work_packages/form
+                method: post
+              createWorkPackageImmediate:
+                href: /api/v3/work_packages
+                method: post
+            highlightedAttributes: []
+        _links:
+          self:
+            href: /api/v3/queries/default
+            title: Default
+          results:
+            href: /api/v3/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=1&pageSize=2&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
+          columns:
+          - href: /api/v3/queries/columns/id
+            title: ID
+          - href: /api/v3/queries/columns/subject
+            title: Subject
+          - href: /api/v3/queries/columns/type
+            title: Type
+          - href: /api/v3/queries/columns/status
+            title: Status
+          - href: /api/v3/queries/columns/priority
+            title: Priority
+          - href: /api/v3/queries/columns/assignee
+            title: Assignee
+          - href: /api/v3/queries/columns/updated_at
+            title: Updated on
+          highlightedAttributes: []
+          groupBy:
+            href: null
+            title: null
+          sortBy:
+          - href: /api/v3/queries/sort_bys/parent-desc
+            title: Parent (Descending)
+          user:
+            href: /api/v3/users/1
+            title: OpenProject Admin
+          project:
+            href: null
     QueryModel:
       type: object
       required:
@@ -2616,134 +2677,14 @@ components:
 
                   **Permission**: save queries for own queries, manage public queries for public queries;'
                 readOnly: true
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
-          type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
-    Default_QueryModel:
-      type: object
-      example:
-        _type: Query
-        name: default
-        filters:
-        - _type: StatusQueryFilter
-          name: Status
-          _links:
-            filter:
-              href: /api/v3/queries/filters/status
-              title: Status
-            operator:
-              href: /api/v3/queries/operators/o
-              title: open
-            schema:
-              href: /api/v3/queries/filter_instance_schemas/status
-            values: []
-        public: false
-        sums: false
-        timelineVisible: false
-        timelineZoomLevel: days
-        timelineLabels: {}
-        highlightingMode: inline
-        timestamps:
-        - P0D
-        showHierarchies: true
-        starred: false
-        _embedded:
-          results:
-            _type: WorkPackageCollection
-            total: 234
-            count: 30
-            pageSize: 2
-            offset: 1
-            _embedded:
-              elements:
-              - <--- shortened for brevity --->
-            _links:
-              self:
-                href: /api/v3/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=1&pageSize=2&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
-              jumpTo:
-                href: /api/v3/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=%7Boffset%7D&pageSize=2&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
-                templated: true
-              changeSize:
-                href: /api/v3/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=1&pageSize=%7Bsize%7D&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
-                templated: true
-              createWorkPackage:
-                href: /api/v3/work_packages/form
-                method: post
-              createWorkPackageImmediate:
-                href: /api/v3/work_packages
-                method: post
-            highlightedAttributes: []
-        _links:
-          self:
-            href: /api/v3/queries/default
-            title: Default
-          results:
-            href: /api/v3/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=1&pageSize=2&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
-          columns:
-          - href: /api/v3/queries/columns/id
-            title: ID
-          - href: /api/v3/queries/columns/subject
-            title: Subject
-          - href: /api/v3/queries/columns/type
-            title: Type
-          - href: /api/v3/queries/columns/status
-            title: Status
-          - href: /api/v3/queries/columns/priority
-            title: Priority
-          - href: /api/v3/queries/columns/assignee
-            title: Assignee
-          - href: /api/v3/queries/columns/updated_at
-            title: Updated on
-          highlightedAttributes: []
-          groupBy:
-            href: null
-            title: null
-          sortBy:
-          - href: /api/v3/queries/sort_bys/parent-desc
-            title: Parent (Descending)
-          user:
-            href: /api/v3/users/1
-            title: OpenProject Admin
-          project:
-            href: null
-    Star_QueryModel:
+    Unstar_QueryModel:
       type: object
       example:
         _type: Query
         id: 9
         name: fdsfdsfdsf
-        createdAt: '2015-03-20T12:56:56.085Z'
-        updatedAt: '2015-05-20T18:16:53.619Z'
+        createdAt: '2015-03-20T12:56:56.257Z'
+        updatedAt: '2015-05-20T18:16:53.953Z'
         filters:
         - _type: StatusQueryFilter
           name: Status
@@ -2772,7 +2713,7 @@ components:
               href: /api/v3/queries/filter_instance_schemas/dueDate
         public: false
         sums: false
-        starred: true
+        starred: false
         _embedded:
           results:
             _type: WorkPackageCollection
@@ -2831,6 +2772,143 @@ components:
           project:
             href: /api/v3/projects/3
             title: copy
+    QueriesModel:
+      type: object
+      example:
+        _links:
+          self:
+            href: /api/v3/queries
+        total: 1
+        count: 1
+        _type: Collection
+        _embedded:
+          elements:
+          - _type: Query
+            id: 9
+            name: fdsfdsfdsf
+            createdAt: '2015-03-20T12:56:56.858Z'
+            updatedAt: '2015-05-20T18:16:53.887Z'
+            filters:
+            - _type: StatusQueryFilter
+              name: Status
+              _links:
+                filter:
+                  href: /api/v3/queries/filters/status
+                  title: Status
+                operator:
+                  href: /api/v3/queries/operators/o
+                  title: open
+                schema:
+                  href: /api/v3/queries/filter_instance_schemas/status
+                values: []
+            - _type: DueDateQueryFilter
+              name: Finish date
+              values:
+              - '1'
+              _links:
+                filter:
+                  href: /api/v3/queries/filters/dueDate
+                  title: Finish date
+                operator:
+                  href: /api/v3/queries/operators/<t+
+                  title: in less than
+                schema:
+                  href: /api/v3/queries/filter_instance_schemas/dueDate
+            public: false
+            sums: false
+            starred: true
+            projections:
+            - _type: Query::TableProjection
+            - _type: Query::TeamPlannerProjection
+              _links:
+                rows:
+                - href: /api/v3/users/1
+                  title: Bob Bobbit
+            - _type: Query::CalendarProjection
+            _embedded:
+              results:
+                _type: WorkPackageCollection
+                total: 234
+                count: 30
+                pageSize: 30
+                offset: 1
+                _embedded:
+                  elements:
+                  - <--- shortened for brevity --->
+                _links:
+                  self:
+                    href: /api/v3/projects/3/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=1&pageSize=2&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
+                  jumpTo:
+                    href: /api/v3/projects/3/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=%7Boffset%7D&pageSize=2&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
+                    templated: true
+                  changeSize:
+                    href: /api/v3/projects/3/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=1&pageSize=%7Bsize%7D&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
+                    templated: true
+                  createWorkPackage:
+                    href: /api/v3/work_packages/form
+                    method: post
+                  createWorkPackageImmediate:
+                    href: /api/v3/work_packages
+                    method: post
+            _links:
+              self:
+                href: /api/v3/queries/9
+                title: fdsfdsfdsf
+              results:
+                href: /api/v3/projects/3/work_packages?filters=%5B%7B%22status%22%3A%7B%22operator%22%3A%22o%22%2C%22values%22%3A%5B%5D%7D%7D%2C%7B%22dueDate%22%3A%7B%22operator%22%3A%22%3Ct%2B%22%2C%22values%22%3A%5B%221%22%5D%7D%7D%5D&offset=1&pageSize=2&sortBy=%5B%5B%22parent%22%2C%22desc%22%5D%5D
+              columns:
+              - href: /api/v3/queries/columns/id
+                title: ID
+              - href: /api/v3/queries/columns/subject
+                title: Subject
+              - href: /api/v3/queries/columns/type
+                title: Type
+              - href: /api/v3/queries/columns/status
+                title: Status
+              - href: /api/v3/queries/columns/priority
+                title: Priority
+              - href: /api/v3/queries/columns/assignee
+                title: Assignee
+              - href: /api/v3/queries/columns/updated_at
+                title: Updated on
+              groupBy:
+                href: null
+                title: null
+              sortBy:
+              - href: /api/v3/queries/sort_bys/parent-desc
+                title: Parent (Descending)
+              user:
+                href: /api/v3/users/1
+                title: OpenProject Admin
+              project:
+                href: /api/v3/projects/3
+                title: copy
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
     Query_Create_Form:
       type: object
       properties:
@@ -2839,85 +2917,17 @@ components:
           description: Query name.
       example:
         name: New query name
-    Available_projects_for_queryModel:
-      type: object
-      example:
-        _links:
-          self:
-            href: /api/v3/queries/available_projects
-        _type: Collection
-        total: 2
-        count: 2
-        _embedded:
-          elements:
-          - _type: Project
-            _links:
-              self:
-                href: /api/v3/projects/6
-                title: A project
-              createWorkPackage:
-                href: /api/v3/projects/6/work_packages/form
-                method: post
-              createWorkPackageImmediate:
-                href: /api/v3/projects/6/work_packages
-                method: post
-              categories:
-                href: /api/v3/projects/6/categories
-              versions:
-                href: /api/v3/projects/6/versions
-            id: 6
-            identifier: a_project
-            name: A project
-            description: Eveniet molestias omnis quis aut qui eum adipisci.
-            createdAt: '2015-07-06T13:28:14+00:00'
-            updatedAt: '2015-10-01T09:55:02+00:00'
-            type: Customer Project
-          - _type: Project
-            _links:
-              self:
-                href: /api/v3/projects/14
-                title: Another project
-              createWorkPackage:
-                href: /api/v3/projects/14/work_packages/form
-                method: post
-              createWorkPackageImmediate:
-                href: /api/v3/projects/14/work_packages
-                method: post
-              categories:
-                href: /api/v3/projects/14/categories
-              versions:
-                href: /api/v3/projects/14/versions
-            id: 14
-            identifier: another_project
-            name: Another project
-            description: ''
-            createdAt: '2016-02-29T12:50:20+00:00'
-            updatedAt: '2016-02-29T12:50:20+00:00'
-            type: null
-    Query_Filter_Instance_Model:
-      type: object
-      required:
-      - _links
-      - _type
-      - name
-      properties:
-        _links:
-          type: object
-          required:
-          - filter
-          - schema
-          properties:
-            filter:
-              $ref: '#/components/schemas/Link'
-            schema:
-              $ref: '#/components/schemas/Link'
-            operator:
-              $ref: '#/components/schemas/Link'
-        _type:
-          type: string
-        name:
-          type: string
   responses:
+    InvalidRequestBody:
+      description: Occurs when the client did not send a valid JSON object in the request body.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+            message: The request body was not a single JSON object.
     UnsupportedMediaType:
       description: Occurs when the client sends an unsupported Content-Type header.
       content:
@@ -2935,16 +2945,6 @@ components:
           schema:
             type: string
           example: Missing content-type header
-    InvalidRequestBody:
-      description: Occurs when the client did not send a valid JSON object in the request body.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
-            message: The request body was not a single JSON object.
   examples:
     QueryModel:
       value:

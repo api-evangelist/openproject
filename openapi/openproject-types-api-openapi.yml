@@ -302,85 +302,41 @@ paths:
       summary: List types available in a workspace
 components:
   schemas:
-    CollectionModel:
+    TypesModel:
       type: object
-      required:
-      - _type
-      - total
-      - count
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - Collection
-        total:
-          type: integer
-          description: The total amount of elements available in the collection.
-          minimum: 0
-        count:
-          type: integer
-          description: Actual amount of elements in this response.
-          minimum: 0
+      example:
         _links:
-          $ref: '#/components/schemas/CollectionLinks'
-    Types_by_WorkspaceModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'The types collection
-
-
-                    **Resource**: TypesCollection'
-                  readOnly: true
-          _embedded:
-            type: object
-            properties:
-              elements:
-                type: array
-                readOnly: true
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/TypeModel'
-                  - description: Collection of Types
-    ErrorResponse:
-      type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
+          self:
+            href: /api/v3/types
+        total: 2
+        count: 2
+        _type: Collection
         _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
+          elements:
+          - _links:
+              self:
+                href: /api/v3/types/1
+            _type: Type
+            id: 1
+            name: Bug
+            color: '#ff0000'
+            position: 1
+            isDefault: true
+            isMilestone: false
+            createdAt: '2014-05-21T08:51:20.429Z'
+            updatedAt: '2014-05-21T08:51:20.429Z'
+          - _links:
+              self:
+                href: /api/v3/types/2
+            _type: Type
+            id: 2
+            name: Feature
+            color: '#888'
+            position: 2
+            isDefault: false
+            isMilestone: false
+            createdAt: '2014-05-21T08:51:20.429Z'
+            updatedAt: '2014-05-21T08:51:20.429Z'
     CollectionLinks:
       type: object
       required:
@@ -426,41 +382,6 @@ components:
       example:
         href: /api/v3/work_packages
         method: POST
-    TypesModel:
-      type: object
-      example:
-        _links:
-          self:
-            href: /api/v3/types
-        total: 2
-        count: 2
-        _type: Collection
-        _embedded:
-          elements:
-          - _links:
-              self:
-                href: /api/v3/types/1
-            _type: Type
-            id: 1
-            name: Bug
-            color: '#ff0000'
-            position: 1
-            isDefault: true
-            isMilestone: false
-            createdAt: '2014-05-21T08:51:20.429Z'
-            updatedAt: '2014-05-21T08:51:20.429Z'
-          - _links:
-              self:
-                href: /api/v3/types/2
-            _type: Type
-            id: 2
-            name: Feature
-            color: '#888'
-            position: 2
-            isDefault: false
-            isMilestone: false
-            createdAt: '2014-05-21T08:51:20.429Z'
-            updatedAt: '2014-05-21T08:51:20.429Z'
     TypeModel:
       type: object
       required:
@@ -535,6 +456,85 @@ components:
         isMilestone: false
         createdAt: '2014-05-21T08:51:20.624Z'
         updatedAt: '2014-05-21T08:51:20.624Z'
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    Types_by_WorkspaceModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The types collection
+
+
+                    **Resource**: TypesCollection'
+                  readOnly: true
+          _embedded:
+            type: object
+            properties:
+              elements:
+                type: array
+                readOnly: true
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/TypeModel'
+                  - description: Collection of Types
+    CollectionModel:
+      type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
   securitySchemes:
     BasicAuth:
       type: http

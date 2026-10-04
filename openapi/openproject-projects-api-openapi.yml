@@ -1551,42 +1551,336 @@ paths:
       summary: List workspaces having version
 components:
   schemas:
-    ProjectConfigurationModel:
-      allOf:
-      - $ref: '#/components/schemas/ConfigurationModel'
-      - type: object
-        properties:
-          enabledInternalComments:
-            type: boolean
-            description: Whether internal comments are enabled for this project
-            readOnly: true
-    Formattable:
+    View_project_statusModel:
+      type: object
+      example:
+        _type: ProjectStatus
+        id: on_track
+        name: On track
+        _links:
+          self:
+            href: /api/v3/project_statuses/on_track
+    Link:
       type: object
       required:
-      - format
+      - href
       properties:
-        format:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
+    Workspaces_schemaModel:
+      type: object
+      description: A schema for a workspace. This schema defines the attributes of a workspace.
+      properties:
+        _type:
           type: string
           enum:
-          - plain
-          - markdown
-          - custom
-          readOnly: true
-          description: Indicates the formatting language of the raw text
-          example: markdown
-        raw:
-          type: string
-          description: The raw text, as entered by the user
-          example: I **am** formatted!
-        html:
-          type: string
-          readOnly: true
-          description: The text converted to HTML according to the format
-          example: I <strong>am</strong> formatted!
+          - Schema
+          description: The type identifier for this resource
+        _dependencies:
+          type: array
+          description: Schema dependencies (currently empty for workspaces)
+        _attributeGroups:
+          type: array
+          items:
+            type: object
+            properties:
+              _type:
+                type: string
+                enum:
+                - ProjectFormCustomFieldSection
+                description: The type identifier for this resource
+              id:
+                type: integer
+                description: The unique identifier of the custom field section
+              name:
+                type: string
+                description: The human-readable name of the custom field section
+              attributes:
+                type: array
+                items:
+                  type: string
+                description: 'Array of camelCase custom field attribute names belonging to this section.
+
+                  Only includes custom fields visible to the current user.'
+          description: "Defines the organizational structure of project custom fields into sections for UI rendering.\n\nEach attribute group represents a project attribute section containing related project attributes.\nThe sections determine how project attributes are visually organized and grouped in forms.\n\n**Key behaviors:**\n- Admin-only project attributes appear only for users with admin privileges\n- Empty sections (with no accessible project attributes) are omitted from the response\n- The order reflects the configured section positioning in admin settings\n- Each section contains only project attributes assigned to that specific section\n\n**Example structure:**\n```json\n[\n  {\n    \"_type\": \"ProjectFormCustomFieldSection\",\n    \"name\": \"Project Details\",\n    \"attributes\": [\"customField1\", \"customField3\"]\n  },\n  {\n    \"_type\": \"ProjectFormCustomFieldSection\",\n    \"name\": \"Budget Information\",\n    \"attributes\": [\"customField2\", \"customField4\"]\n  }\n]\n```"
+        id:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        name:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        identifier:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        description:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        public:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        active:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        status:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        statusExplanation:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        parent:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        createdAt:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        updatedAt:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        _links:
+          type: object
+          description: Links related to this resource
+          properties:
+            self:
+              type: object
+              properties:
+                href:
+                  type: string
+                  example: /api/v3/workspaces/schema
+      patternProperties:
+        ^customField\d+$:
+          $ref: '#/components/schemas/SchemaPropertyModel'
+        ^customComment\d+$:
+          $ref: '#/components/schemas/SchemaPropertyModel'
       example:
-        format: markdown
-        raw: I am formatted!
-        html: I am formatted!
+        _type: Schema
+        _dependencies: []
+        _attributeGroups:
+        - _type: ProjectFormCustomFieldSection
+          name: Project Details
+          attributes:
+          - customField30
+          - customField34
+        - _type: ProjectFormCustomFieldSection
+          name: Budget Information
+          attributes:
+          - customField31
+          - customField32
+          - customField35
+        id:
+          type: Integer
+          name: ID
+          required: true
+          hasDefault: false
+          writable: false
+        name:
+          type: String
+          name: Name
+          required: true
+          hasDefault: false
+          writable: true
+          minLength: 1
+          maxLength: 255
+        identifier:
+          type: String
+          name: Identifier
+          required: true
+          hasDefault: false
+          writable: true
+          minLength: 1
+          maxLength: 100
+        description:
+          type: Formattable
+          name: Description
+          required: false
+          hasDefault: false
+          writable: true
+        public:
+          type: Boolean
+          name: Public
+          required: true
+          hasDefault: false
+          writable: true
+        active:
+          type: Boolean
+          name: Active
+          required: true
+          hasDefault: true
+          writable: true
+        status:
+          type: ProjectStatus
+          name: Status
+          required: false
+          hasDefault: true
+          writable: true
+          _links:
+            allowedValues:
+            - href: /api/v3/project_statuses/on_track
+              title: On track
+            - href: /api/v3/project_statuses/at_risk
+              title: At risk
+            - href: /api/v3/project_statuses/off_track
+              title: Off track
+        statusExplanation:
+          type: Formattable
+          name: Status explanation
+          required: false
+          hasDefault: false
+          writable: true
+        parent:
+          type: Workspace
+          name: Subproject of
+          required: false
+          hasDefault: false
+          writable: true
+          location: _links
+          visibility: default
+          _links: {}
+        createdAt:
+          type: DateTime
+          name: Created on
+          required: true
+          hasDefault: false
+          writable: false
+        updatedAt:
+          type: DateTime
+          name: Updated on
+          required: true
+          hasDefault: false
+          writable: false
+        customField30:
+          type: Integer
+          name: Integer project custom field
+          required: false
+          hasDefault: false
+          writable: true
+          visibility: default
+        customField31:
+          type: CustomOption
+          name: List project custom field
+          required: false
+          hasDefault: false
+          writable: true
+          location: _links
+          visibility: default
+          _links: {}
+        customField32:
+          type: Version
+          name: Version project custom field
+          required: false
+          hasDefault: false
+          writable: true
+          location: _links
+          visibility: default
+          _links: {}
+        customField34:
+          type: Boolean
+          name: Boolean project custom field
+          required: false
+          hasDefault: false
+          writable: true
+          visibility: default
+        customField35:
+          type: String
+          name: Text project custom field
+          required: true
+          hasDefault: false
+          writable: true
+          visibility: default
+        customComment35:
+          type: String
+          name: Text project custom field comment
+          required: false
+          hasDefault: false
+          writable: true
+        _links:
+          self:
+            href: /api/v3/workspaces/schema
+    OffsetPaginatedCollectionLinks:
+      allOf:
+      - $ref: '#/components/schemas/CollectionLinks'
+      - type: object
+        required:
+        - jumpTo
+        - changeSize
+        properties:
+          jumpTo:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: A templated link to jump to a given offset.
+          changeSize:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: A templated link to change the current page size.
+          previousByOffset:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: 'A link to the previous page of the collection.
+
+
+                # Conditions
+
+                - The collection is not on the first page.'
+          nextByOffset:
+            allOf:
+            - $ref: '#/components/schemas/Link'
+            - description: 'A link to the next page of the collection.
+
+
+                # Conditions
+
+                - The collection is not on the last page.'
+    SchemaPropertyModel:
+      type: object
+      required:
+      - type
+      - name
+      - required
+      - hasDefault
+      - writable
+      properties:
+        type:
+          type: string
+          description: The resource type for this property.
+        name:
+          type: string
+          description: The name of the property.
+        required:
+          type: boolean
+          description: Indicates, if the property is required for submitting a request of this schema.
+        hasDefault:
+          type: boolean
+          description: Indicates, if the property has a default.
+        writable:
+          type: boolean
+          description: Indicates, if the property is writable when sending a request of this schema.
+        options:
+          type: object
+          description: Additional options for the property.
+        location:
+          type: string
+          description: Defines the json path where the property is located in the payload.
+          default: ''
+        placeholder:
+          type: string
+          description: A placeholder for the property to display if the property has no value.
+        _links:
+          type: object
+          description: Useful links for this property (e.g. an endpoint to fetch allowed values)
     PortfolioModel:
       allOf:
       - $ref: '#/components/schemas/CustomFieldProperties'
@@ -1832,39 +2126,6 @@ components:
 
 
                       **Resource**: Portfolio'
-    List_available_parent_project_candidatesModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'The project collection
-
-
-                    **Resource**: ProjectCollection'
-                  readOnly: true
-          _embedded:
-            type: object
-            properties:
-              elements:
-                type: array
-                readOnly: true
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/ProjectModel'
-                  - $ref: '#/components/schemas/ProgramModel'
-                  - $ref: '#/components/schemas/PortfolioModel'
-                description: Collection of projects
     ProjectCollectionModel:
       allOf:
       - $ref: '#/components/schemas/OffsetPaginatedCollectionModel'
@@ -1893,223 +2154,18 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/ProjectModel'
-    Workspaces_schemaModel:
+    CollectionLinks:
       type: object
-      description: A schema for a workspace. This schema defines the attributes of a workspace.
+      required:
+      - self
       properties:
-        _type:
-          type: string
-          enum:
-          - Schema
-          description: The type identifier for this resource
-        _dependencies:
-          type: array
-          description: Schema dependencies (currently empty for workspaces)
-        _attributeGroups:
-          type: array
-          items:
-            type: object
-            properties:
-              _type:
-                type: string
-                enum:
-                - ProjectFormCustomFieldSection
-                description: The type identifier for this resource
-              id:
-                type: integer
-                description: The unique identifier of the custom field section
-              name:
-                type: string
-                description: The human-readable name of the custom field section
-              attributes:
-                type: array
-                items:
-                  type: string
-                description: 'Array of camelCase custom field attribute names belonging to this section.
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
 
-                  Only includes custom fields visible to the current user.'
-          description: "Defines the organizational structure of project custom fields into sections for UI rendering.\n\nEach attribute group represents a project attribute section containing related project attributes.\nThe sections determine how project attributes are visually organized and grouped in forms.\n\n**Key behaviors:**\n- Admin-only project attributes appear only for users with admin privileges\n- Empty sections (with no accessible project attributes) are omitted from the response\n- The order reflects the configured section positioning in admin settings\n- Each section contains only project attributes assigned to that specific section\n\n**Example structure:**\n```json\n[\n  {\n    \"_type\": \"ProjectFormCustomFieldSection\",\n    \"name\": \"Project Details\",\n    \"attributes\": [\"customField1\", \"customField3\"]\n  },\n  {\n    \"_type\": \"ProjectFormCustomFieldSection\",\n    \"name\": \"Budget Information\",\n    \"attributes\": [\"customField2\", \"customField4\"]\n  }\n]\n```"
-        id:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        name:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        identifier:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        description:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        public:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        active:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        status:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        statusExplanation:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        parent:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        createdAt:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        updatedAt:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        _links:
-          type: object
-          description: Links related to this resource
-          properties:
-            self:
-              type: object
-              properties:
-                href:
-                  type: string
-                  example: /api/v3/workspaces/schema
-      patternProperties:
-        ^customField\d+$:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-        ^customComment\d+$:
-          $ref: '#/components/schemas/SchemaPropertyModel'
-      example:
-        _type: Schema
-        _dependencies: []
-        _attributeGroups:
-        - _type: ProjectFormCustomFieldSection
-          name: Project Details
-          attributes:
-          - customField30
-          - customField34
-        - _type: ProjectFormCustomFieldSection
-          name: Budget Information
-          attributes:
-          - customField31
-          - customField32
-          - customField35
-        id:
-          type: Integer
-          name: ID
-          required: true
-          hasDefault: false
-          writable: false
-        name:
-          type: String
-          name: Name
-          required: true
-          hasDefault: false
-          writable: true
-          minLength: 1
-          maxLength: 255
-        identifier:
-          type: String
-          name: Identifier
-          required: true
-          hasDefault: false
-          writable: true
-          minLength: 1
-          maxLength: 100
-        description:
-          type: Formattable
-          name: Description
-          required: false
-          hasDefault: false
-          writable: true
-        public:
-          type: Boolean
-          name: Public
-          required: true
-          hasDefault: false
-          writable: true
-        active:
-          type: Boolean
-          name: Active
-          required: true
-          hasDefault: true
-          writable: true
-        status:
-          type: ProjectStatus
-          name: Status
-          required: false
-          hasDefault: true
-          writable: true
-          _links:
-            allowedValues:
-            - href: /api/v3/project_statuses/on_track
-              title: On track
-            - href: /api/v3/project_statuses/at_risk
-              title: At risk
-            - href: /api/v3/project_statuses/off_track
-              title: Off track
-        statusExplanation:
-          type: Formattable
-          name: Status explanation
-          required: false
-          hasDefault: false
-          writable: true
-        parent:
-          type: Workspace
-          name: Subproject of
-          required: false
-          hasDefault: false
-          writable: true
-          location: _links
-          visibility: default
-          _links: {}
-        createdAt:
-          type: DateTime
-          name: Created on
-          required: true
-          hasDefault: false
-          writable: false
-        updatedAt:
-          type: DateTime
-          name: Updated on
-          required: true
-          hasDefault: false
-          writable: false
-        customField30:
-          type: Integer
-          name: Integer project custom field
-          required: false
-          hasDefault: false
-          writable: true
-          visibility: default
-        customField31:
-          type: CustomOption
-          name: List project custom field
-          required: false
-          hasDefault: false
-          writable: true
-          location: _links
-          visibility: default
-          _links: {}
-        customField32:
-          type: Version
-          name: Version project custom field
-          required: false
-          hasDefault: false
-          writable: true
-          location: _links
-          visibility: default
-          _links: {}
-        customField34:
-          type: Boolean
-          name: Boolean project custom field
-          required: false
-          hasDefault: false
-          writable: true
-          visibility: default
-        customField35:
-          type: String
-          name: Text project custom field
-          required: true
-          hasDefault: false
-          writable: true
-          visibility: default
-        customComment35:
-          type: String
-          name: Text project custom field comment
-          required: false
-          hasDefault: false
-          writable: true
-        _links:
-          self:
-            href: /api/v3/workspaces/schema
+
+              **Resource**: Collection'
     List_workspaces_by_versionModel:
       type: object
       example:
@@ -2147,6 +2203,31 @@ components:
               html: <p>Everything <strong>fine</strong></p>
             createdAt: '2014-05-21T08:51:20.142Z'
             updatedAt: '2014-05-21T08:51:20.142Z'
+    ConfigurationModel:
+      type: object
+      properties:
+        maximumAttachmentFileSize:
+          type: integer
+          description: The maximum allowed size of an attachment in Bytes
+          readOnly: true
+        hostName:
+          type: string
+          description: The host name configured for the system
+          readOnly: true
+        perPageOptions:
+          type: array
+          description: Page size steps to be offered in paginated list UI
+          items:
+            type: integer
+        durationFormat:
+          type: string
+          description: The format used to display Work, Remaining Work, and Spent time durations
+          readOnly: true
+        activeFeatureFlags:
+          type: array
+          description: The list of all feature flags that are active
+          items:
+            type: string
     ProjectModel:
       allOf:
       - $ref: '#/components/schemas/CustomFieldProperties'
@@ -2392,17 +2473,33 @@ components:
 
 
                       **Resource**: Workspace'
-    CustomCommentProperties:
+    Formattable:
       type: object
-      patternProperties:
-        ^customComment\d+$:
-          type:
-          - 'null'
-          - string
-          description: 'A plain-text comment associated with a project custom field that has comments enabled.
-
-
-            The property is only present when the corresponding `customField{N}` has `has_comment` set to `true`.'
+      required:
+      - format
+      properties:
+        format:
+          type: string
+          enum:
+          - plain
+          - markdown
+          - custom
+          readOnly: true
+          description: Indicates the formatting language of the raw text
+          example: markdown
+        raw:
+          type: string
+          description: The raw text, as entered by the user
+          example: I **am** formatted!
+        html:
+          type: string
+          readOnly: true
+          description: The text converted to HTML according to the format
+          example: I <strong>am</strong> formatted!
+      example:
+        format: markdown
+        raw: I am formatted!
+        html: I am formatted!
     CollectionModel:
       type: object
       required:
@@ -2425,32 +2522,6 @@ components:
           minimum: 0
         _links:
           $ref: '#/components/schemas/CollectionLinks'
-    ErrorResponse:
-      type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
     ProgramModel:
       allOf:
       - $ref: '#/components/schemas/CustomFieldProperties'
@@ -2696,168 +2767,39 @@ components:
 
 
                       **Resource**: Workspace'
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
-          type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
-    SchemaPropertyModel:
-      type: object
-      required:
-      - type
-      - name
-      - required
-      - hasDefault
-      - writable
-      properties:
-        type:
-          type: string
-          description: The resource type for this property.
-        name:
-          type: string
-          description: The name of the property.
-        required:
-          type: boolean
-          description: Indicates, if the property is required for submitting a request of this schema.
-        hasDefault:
-          type: boolean
-          description: Indicates, if the property has a default.
-        writable:
-          type: boolean
-          description: Indicates, if the property is writable when sending a request of this schema.
-        options:
-          type: object
-          description: Additional options for the property.
-        location:
-          type: string
-          description: Defines the json path where the property is located in the payload.
-          default: ''
-        placeholder:
-          type: string
-          description: A placeholder for the property to display if the property has no value.
-        _links:
-          type: object
-          description: Useful links for this property (e.g. an endpoint to fetch allowed values)
-    OffsetPaginatedCollectionModel:
+    List_available_parent_project_candidatesModel:
       allOf:
       - $ref: '#/components/schemas/CollectionModel'
       - type: object
         required:
-        - pageSize
-        - offset
         - _links
+        - _embedded
         properties:
-          pageSize:
-            type: integer
-            description: 'The amount of elements per page. If not set by the request this value defaults to the server''s system
-
-              settings.'
-            minimum: 0
-          offset:
-            type: integer
-            description: The page offset indicating on which page the element collection starts.
-            minimum: 0
           _links:
-            $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
-    ConfigurationModel:
-      type: object
-      properties:
-        maximumAttachmentFileSize:
-          type: integer
-          description: The maximum allowed size of an attachment in Bytes
-          readOnly: true
-        hostName:
-          type: string
-          description: The host name configured for the system
-          readOnly: true
-        perPageOptions:
-          type: array
-          description: Page size steps to be offered in paginated list UI
-          items:
-            type: integer
-        durationFormat:
-          type: string
-          description: The format used to display Work, Remaining Work, and Spent time durations
-          readOnly: true
-        activeFeatureFlags:
-          type: array
-          description: The list of all feature flags that are active
-          items:
-            type: string
-    OffsetPaginatedCollectionLinks:
-      allOf:
-      - $ref: '#/components/schemas/CollectionLinks'
-      - type: object
-        required:
-        - jumpTo
-        - changeSize
-        properties:
-          jumpTo:
-            allOf:
-            - $ref: '#/components/schemas/Link'
-            - description: A templated link to jump to a given offset.
-          changeSize:
-            allOf:
-            - $ref: '#/components/schemas/Link'
-            - description: A templated link to change the current page size.
-          previousByOffset:
-            allOf:
-            - $ref: '#/components/schemas/Link'
-            - description: 'A link to the previous page of the collection.
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The project collection
 
 
-                # Conditions
-
-                - The collection is not on the first page.'
-          nextByOffset:
-            allOf:
-            - $ref: '#/components/schemas/Link'
-            - description: 'A link to the next page of the collection.
-
-
-                # Conditions
-
-                - The collection is not on the last page.'
-    CollectionLinks:
-      type: object
-      required:
-      - self
-      properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This collection resource.
-
-
-              **Resource**: Collection'
+                    **Resource**: ProjectCollection'
+                  readOnly: true
+          _embedded:
+            type: object
+            properties:
+              elements:
+                type: array
+                readOnly: true
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/ProjectModel'
+                  - $ref: '#/components/schemas/ProgramModel'
+                  - $ref: '#/components/schemas/PortfolioModel'
+                description: Collection of projects
     CustomFieldProperties:
       type: object
       patternProperties:
@@ -2884,16 +2826,116 @@ components:
             - Text
 
             - Long text'
-    View_project_statusModel:
+    ProjectConfigurationModel:
+      allOf:
+      - $ref: '#/components/schemas/ConfigurationModel'
+      - type: object
+        properties:
+          enabledInternalComments:
+            type: boolean
+            description: Whether internal comments are enabled for this project
+            readOnly: true
+    ErrorResponse:
       type: object
-      example:
-        _type: ProjectStatus
-        id: on_track
-        name: On track
-        _links:
-          self:
-            href: /api/v3/project_statuses/on_track
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    CustomCommentProperties:
+      type: object
+      patternProperties:
+        ^customComment\d+$:
+          type:
+          - 'null'
+          - string
+          description: 'A plain-text comment associated with a project custom field that has comments enabled.
+
+
+            The property is only present when the corresponding `customField{N}` has `has_comment` set to `true`.'
+    OffsetPaginatedCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - pageSize
+        - offset
+        - _links
+        properties:
+          pageSize:
+            type: integer
+            description: 'The amount of elements per page. If not set by the request this value defaults to the server''s system
+
+              settings.'
+            minimum: 0
+          offset:
+            type: integer
+            description: The page offset indicating on which page the element collection starts.
+            minimum: 0
+          _links:
+            $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
+  responses:
+    InvalidRequestBody:
+      description: Occurs when the client did not send a valid JSON object in the request body.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+            message: The request body was not a single JSON object.
+    UnsupportedMediaType:
+      description: Occurs when the client sends an unsupported Content-Type header.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
+            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
   examples:
+    ProjectBody:
+      value:
+        name: Project example
+        statusExplanation:
+          raw: Everything **fine**
+        description:
+          raw: Lorem **ipsum** dolor sit amet
+        customField123: 123
+        customComment123: Because it is 123!
+        _links:
+          parent:
+            href: /api/v3/projects/123
+          customField456:
+            href: /api/v3/users/315
     ProjectCollection:
       value:
         _type: Collection
@@ -2989,48 +3031,6 @@ components:
         updatedAt: '2014-05-21T08:51:20.396Z'
         customField123: 123
         customComment123: Why is the value 123?
-    ProjectBody:
-      value:
-        name: Project example
-        statusExplanation:
-          raw: Everything **fine**
-        description:
-          raw: Lorem **ipsum** dolor sit amet
-        customField123: 123
-        customComment123: Because it is 123!
-        _links:
-          parent:
-            href: /api/v3/projects/123
-          customField456:
-            href: /api/v3/users/315
-  responses:
-    UnsupportedMediaType:
-      description: Occurs when the client sends an unsupported Content-Type header.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
-            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
-    MissingContentType:
-      description: Occurs when the client did not send a Content-Type header
-      content:
-        text/plain:
-          schema:
-            type: string
-          example: Missing content-type header
-    InvalidRequestBody:
-      description: Occurs when the client did not send a valid JSON object in the request body.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
-            message: The request body was not a single JSON object.
   securitySchemes:
     BasicAuth:
       type: http

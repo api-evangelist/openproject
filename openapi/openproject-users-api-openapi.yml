@@ -661,98 +661,6 @@ paths:
           $ref: '#/components/responses/UnsupportedMediaType'
 components:
   schemas:
-    UserCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'This user collection
-
-
-                    **Resource**: Collection'
-          _embedded:
-            type: object
-            required:
-            - elements
-            properties:
-              elements:
-                type: array
-                items:
-                  $ref: '#/components/schemas/UserModel'
-      example:
-        _type: Collection
-        total: 2
-        count: 2
-        _links:
-          self:
-            href: /api/v3/users
-        _embedded:
-          elements:
-          - _abbreviated: User resource shortened for brevity
-            _type: User
-            id: 1337
-          - _abbreviated: User resource shortened for brevity
-            _type: User
-            id: 1338
-    CollectionModel:
-      type: object
-      required:
-      - _type
-      - total
-      - count
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - Collection
-        total:
-          type: integer
-          description: The total amount of elements available in the collection.
-          minimum: 0
-        count:
-          type: integer
-          description: Actual amount of elements in this response.
-          minimum: 0
-        _links:
-          $ref: '#/components/schemas/CollectionLinks'
-    ErrorResponse:
-      type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
     CollectionLinks:
       type: object
       required:
@@ -765,133 +673,32 @@ components:
 
 
               **Resource**: Collection'
-    PrincipalModel:
+    CustomFieldProperties:
       type: object
-      required:
-      - _type
-      - id
-      - name
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - User
-          - Group
-          - PlaceholderUser
-        id:
-          type: integer
-          description: The principal's unique identifier.
-          minimum: 1
-        name:
-          type: string
-          description: The principal's display name, layout depends on instance settings.
-        createdAt:
-          type: string
-          format: date-time
-          description: Time of creation
-        updatedAt:
-          type: string
-          format: date-time
-          description: Time of the most recent change to the principal
-        _links:
-          type: object
-          required:
-          - self
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This principal resource.
+      patternProperties:
+        ^customField\d+$:
+          type:
+          - 'null'
+          - number
+          - boolean
+          - string
+          - object
+          description: 'A custom field value, that belongs to a custom field of a simple type:
 
 
-                  **Resource**: User|Group|PlaceholderUser'
-            memberships:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'An href to the collection of the principal''s memberships.
+            - Boolean
 
+            - Date
 
-                  # Conditions:
+            - Float
 
+            - Integer
 
-                  - user has permission `view_members` or `manage_members` in any project
+            - Link (URL)
 
+            - Text
 
-                  **Resource**: Collection'
-    UserCreateModel:
-      type: object
-      required:
-      - admin
-      - email
-      - login
-      - firstName
-      - lastName
-      - language
-      properties:
-        admin:
-          type: boolean
-        email:
-          type: string
-          maxLength: 60
-        login:
-          type: string
-          maxLength: 256
-        password:
-          type: string
-          description: 'The user''s password.
-
-
-            *Conditions:*
-
-
-            Writable on create.
-
-
-            Writable on update only when:
-
-            - the caller updates their own account
-
-            - `currentPassword` is provided and valid'
-        currentPassword:
-          type: string
-          description: 'The user''s current password.
-
-
-            *Conditions:*
-
-
-            Required when changing `password` for a self update (`PATCH /api/v3/users/me` or `PATCH /api/v3/users/{id}` where `id` is the caller).
-
-
-            Ignored for non-self updates (for example, administrators updating other users).'
-        firstName:
-          type: string
-          maxLength: 30
-        lastName:
-          type: string
-          maxLength: 30
-        status:
-          type: string
-          description: 'The current activation status of the user.
-
-
-            *Conditions:*
-
-
-            Only writable on creation, not on update.'
-        language:
-          type: string
-      example:
-        login: j.sheppard
-        password: idestroyedsouvereign
-        currentPassword: iusedtobuildstarships
-        firstName: John
-        lastName: Sheppard
-        email: shep@mail.com
-        admin: true
-        status: active
-        language: en
+            - Long text'
     Link:
       type: object
       required:
@@ -1102,6 +909,225 @@ components:
                     - LDAP authentication configured
 
                     - `admin`'
+    UserCreateModel:
+      type: object
+      required:
+      - admin
+      - email
+      - login
+      - firstName
+      - lastName
+      - language
+      properties:
+        admin:
+          type: boolean
+        email:
+          type: string
+          maxLength: 60
+        login:
+          type: string
+          maxLength: 256
+        password:
+          type: string
+          description: 'The user''s password.
+
+
+            *Conditions:*
+
+
+            Writable on create.
+
+
+            Writable on update only when:
+
+            - the caller updates their own account
+
+            - `currentPassword` is provided and valid'
+        currentPassword:
+          type: string
+          description: 'The user''s current password.
+
+
+            *Conditions:*
+
+
+            Required when changing `password` for a self update (`PATCH /api/v3/users/me` or `PATCH /api/v3/users/{id}` where `id` is the caller).
+
+
+            Ignored for non-self updates (for example, administrators updating other users).'
+        firstName:
+          type: string
+          maxLength: 30
+        lastName:
+          type: string
+          maxLength: 30
+        status:
+          type: string
+          description: 'The current activation status of the user.
+
+
+            *Conditions:*
+
+
+            Only writable on creation, not on update.'
+        language:
+          type: string
+      example:
+        login: j.sheppard
+        password: idestroyedsouvereign
+        currentPassword: iusedtobuildstarships
+        firstName: John
+        lastName: Sheppard
+        email: shep@mail.com
+        admin: true
+        status: active
+        language: en
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    PrincipalModel:
+      type: object
+      required:
+      - _type
+      - id
+      - name
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - User
+          - Group
+          - PlaceholderUser
+        id:
+          type: integer
+          description: The principal's unique identifier.
+          minimum: 1
+        name:
+          type: string
+          description: The principal's display name, layout depends on instance settings.
+        createdAt:
+          type: string
+          format: date-time
+          description: Time of creation
+        updatedAt:
+          type: string
+          format: date-time
+          description: Time of the most recent change to the principal
+        _links:
+          type: object
+          required:
+          - self
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This principal resource.
+
+
+                  **Resource**: User|Group|PlaceholderUser'
+            memberships:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'An href to the collection of the principal''s memberships.
+
+
+                  # Conditions:
+
+
+                  - user has permission `view_members` or `manage_members` in any project
+
+
+                  **Resource**: Collection'
+    UserCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This user collection
+
+
+                    **Resource**: Collection'
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserModel'
+      example:
+        _type: Collection
+        total: 2
+        count: 2
+        _links:
+          self:
+            href: /api/v3/users
+        _embedded:
+          elements:
+          - _abbreviated: User resource shortened for brevity
+            _type: User
+            id: 1337
+          - _abbreviated: User resource shortened for brevity
+            _type: User
+            id: 1338
+    CollectionModel:
+      type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
     View_user_schemaModel:
       type: object
       example:
@@ -1222,32 +1248,34 @@ components:
         _links:
           self:
             href: /api/v3/users/schema
-    CustomFieldProperties:
-      type: object
-      patternProperties:
-        ^customField\d+$:
-          type:
-          - 'null'
-          - number
-          - boolean
-          - string
-          - object
-          description: 'A custom field value, that belongs to a custom field of a simple type:
-
-
-            - Boolean
-
-            - Date
-
-            - Float
-
-            - Integer
-
-            - Link (URL)
-
-            - Text
-
-            - Long text'
+  responses:
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
+    UnsupportedMediaType:
+      description: Occurs when the client sends an unsupported Content-Type header.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
+            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+    InvalidRequestBody:
+      description: Occurs when the client did not send a valid JSON object in the request body.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+            message: The request body was not a single JSON object.
   examples:
     UserResponse:
       value:
@@ -1287,34 +1315,6 @@ components:
             href: /api/v3/users/14
             title: Delete member
             method: delete
-  responses:
-    InvalidRequestBody:
-      description: Occurs when the client did not send a valid JSON object in the request body.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
-            message: The request body was not a single JSON object.
-    UnsupportedMediaType:
-      description: Occurs when the client sends an unsupported Content-Type header.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
-            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
-    MissingContentType:
-      description: Occurs when the client did not send a Content-Type header
-      content:
-        text/plain:
-          schema:
-            type: string
-          example: Missing content-type header
   securitySchemes:
     BasicAuth:
       type: http

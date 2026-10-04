@@ -73,366 +73,7 @@ paths:
 
             **Required permission:** view meetings in the page''s project'
 components:
-  examples:
-    MeetingCollectionSimpleResponse:
-      description: A simple response of a meeting collection.
-      value:
-        _type: Collection
-        total: 2
-        count: 2
-        pageSize: 20
-        offset: 1
-        _embedded:
-          _abbreviated: Embedded resources shortened for brevity
-          elements:
-          - _type: Meeting
-            id: 6
-            title: Weekly
-            startTime: '2026-02-17T20:54:35.523Z'
-            endTime: '2026-02-17T21:54:35.523Z'
-          - _type: Meeting
-            id: 5
-            title: Weekly
-            startTime: '2026-02-10T20:54:35.523Z'
-            endTime: '2026-02-10T21:54:35.523Z'
-        _links:
-          self:
-            href: /api/v3/meetings?filters=%5B%5D&offset=1&pageSize=20
-          jumpTo:
-            href: /api/v3/meetings?filters=%5B%5D&offset=%7Boffset%7D&pageSize=20
-            templated: true
-          changeSize:
-            href: /api/v3/meetings?filters=%5B%5D&offset=1&pageSize=%7Bsize%7D
-            templated: true
-    MeetingSimpleResponse:
-      description: A simple meeting response.
-      value:
-        _type: Meeting
-        id: 1
-        title: Meeting No 42
-        location: Death Star - Level 1337 L13/42
-        lockVersion: 13
-        startTime: '2026-02-16T10:00:00.000Z'
-        endTime: '2026-02-16T11:00:00.000Z'
-        duration: 1.0
-        createdAt: '2026-02-13T14:47:12.315Z'
-        updatedAt: '2026-02-13T14:47:12.315Z'
-        _links:
-          attachments:
-            href: /api/v3/meetings/1/attachments
-          addAttachment:
-            href: /api/v3/meetings/1/attachments
-            method: post
-          self:
-            href: /api/v3/meetings/1
-            title: Meeting No 42
-          author:
-            href: /api/v3/users/4
-            title: Darth Vader
-          project:
-            href: /api/v3/projects/10
-            title: Death Star
-        _embedded:
-          _abbreviated: Embedded resources shortened for brevity
-          attachments:
-            _type: Collection
-            total: 2
-            count: 2
-          author:
-            _type: User
-            name: Darth Vader
-            id: 4
-          project:
-            _type: Project
-            name: Death Star
-            id: 10
   schemas:
-    CollectionModel:
-      type: object
-      required:
-      - _type
-      - total
-      - count
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - Collection
-        total:
-          type: integer
-          description: The total amount of elements available in the collection.
-          minimum: 0
-        count:
-          type: integer
-          description: Actual amount of elements in this response.
-          minimum: 0
-        _links:
-          $ref: '#/components/schemas/CollectionLinks'
-    ErrorResponse:
-      type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
-    CollectionLinks:
-      type: object
-      required:
-      - self
-      properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This collection resource.
-
-
-              **Resource**: Collection'
-    MeetingModel:
-      type: object
-      required:
-      - _type
-      - id
-      - lockVersion
-      - title
-      - startTime
-      - endTime
-      - duration
-      - createdAt
-      - updatedAt
-      properties:
-        _type:
-          type: string
-          enum:
-          - Meeting
-        id:
-          type: integer
-          description: Identifier of this meeting
-          minimum: 1
-        title:
-          type: string
-          description: The meeting's title
-        location:
-          type: string
-          description: The meeting's location
-        lockVersion:
-          type: integer
-          description: The version of the item as used for optimistic locking
-        startTime:
-          type: string
-          format: date-time
-          description: The scheduled meeting start time.
-        endTime:
-          type: string
-          format: date-time
-          description: The scheduled meeting start time.
-        duration:
-          type: number
-          description: The meeting duration in hours.
-        createdAt:
-          type: string
-          format: date-time
-          description: Time of creation. Can be writable by admins with the `apiv3_write_readonly_attributes` setting enabled.
-        updatedAt:
-          type: string
-          format: date-time
-          description: Time of the most recent change to the meeting.
-        _embedded:
-          type: object
-          required:
-          - attachments
-          - author
-          properties:
-            attachments:
-              $ref: '#/components/schemas/Attachments_Model'
-            author:
-              $ref: '#/components/schemas/UserModel'
-            project:
-              $ref: '#/components/schemas/ProjectModel'
-        _links:
-          type: object
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This meeting
-
-
-                  **Resource**: Meeting'
-            author:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The user having created the meeting
-
-
-                  **Resource**: User'
-            project:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The project the meeting is in
-
-
-                  **Resource**: Project'
-            attachments:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The attachment collection of this grid.
-
-
-                  **Resource**: AttachmentCollection'
-            addAttachment:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'Attach a file to the meeting
-
-
-                  # Conditions
-
-
-                  **Permission**: edit meeting'
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
-          type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
-    PaginatedCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - pageSize
-        - offset
-        properties:
-          pageSize:
-            type: integer
-            description: Amount of elements that a response will hold.
-            minimum: 0
-          offset:
-            type: integer
-            description: The page number that is requested from paginated collection.
-            minimum: 1
-          _links:
-            type: object
-            required:
-            - jumpTo
-            - changeSize
-            properties:
-              jumpTo:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Templated link to another page offset.
-
-
-                    **Resource**: Collection'
-              changeSize:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Templated link for another page size.
-
-
-                    **Resource**: Collection'
-    MeetingCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedCollectionModel'
-      - type: object
-        required:
-        - _embedded
-        - _links
-        properties:
-          _embedded:
-            type: object
-            required:
-            - elements
-            properties:
-              elements:
-                type: array
-                items:
-                  $ref: '#/components/schemas/MeetingModel'
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'The link to this meeting collection resource
-
-
-                    **Resource**: MeetingCollection'
-    CustomFieldProperties:
-      type: object
-      patternProperties:
-        ^customField\d+$:
-          type:
-          - 'null'
-          - number
-          - boolean
-          - string
-          - object
-          description: 'A custom field value, that belongs to a custom field of a simple type:
-
-
-            - Boolean
-
-            - Date
-
-            - Float
-
-            - Integer
-
-            - Link (URL)
-
-            - Text
-
-            - Long text'
     Attachments_Model:
       allOf:
       - $ref: '#/components/schemas/CollectionModel'
@@ -464,183 +105,47 @@ components:
                   allOf:
                   - $ref: '#/components/schemas/AttachmentModel'
                   - description: Collection of Attachments
-    UserModel:
+    MeetingCollectionModel:
       allOf:
-      - $ref: '#/components/schemas/PrincipalModel'
-      - $ref: '#/components/schemas/CustomFieldProperties'
+      - $ref: '#/components/schemas/PaginatedCollectionModel'
       - type: object
         required:
-        - _type
-        - avatar
+        - _embedded
+        - _links
         properties:
-          _type:
-            type: string
-            enum:
-            - User
-          avatar:
-            type:
-            - string
-            - 'null'
-            format: uri
-            description: URL to user's avatar
-          login:
-            type: string
-            description: 'The user''s login name
-
-
-              # Conditions
-
-
-              - User is self, or `create_user` or `manage_user` permission globally'
-            maxLength: 256
-          firstName:
-            type: string
-            description: 'The user''s first name
-
-
-              # Conditions
-
-
-              - User is self, or `create_user` or `manage_user` permission globally'
-            maxLength: 30
-          lastName:
-            type: string
-            description: 'The user''s last name
-
-
-              # Conditions
-
-
-              - User is self, or `create_user` or `manage_user` permission globally'
-            maxLength: 30
-          email:
-            type: string
-            description: 'The user''s email address
-
-
-              # Conditions
-
-
-              - E-Mail address not hidden
-
-              - User is not a new record
-
-              - User is self, or `create_user` or `manage_user` permission globally'
-            maxLength: 60
-          admin:
-            type: boolean
-            description: 'Flag indicating whether or not the user is an admin
-
-
-              # Conditions
-
-
-              - `admin`'
-          status:
-            type: string
-            description: 'The current activation status of the user.
-
-
-              # Conditions
-
-
-              - User is self, or `create_user` or `manage_user` permission globally'
-          language:
-            type: string
-            description: 'User''s language | ISO 639-1 format
-
-
-              # Conditions
-
-
-              - User is self, or `create_user` or `manage_user` permission globally'
-          identityUrl:
-            type:
-            - string
-            - 'null'
-            description: 'User''s identity_url for OmniAuth authentication.
-
-              **Deprecated:** It will be removed in the near future.
-
-
-              # Conditions
-
-
-              - User is self, or `create_user` or `manage_user` permission globally'
-            deprecated: true
-          createdAt:
-            type: string
-            format: date-time
-            description: Time of creation
-          updatedAt:
-            type: string
-            format: date-time
-            description: Time of the most recent change to the user
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MeetingModel'
           _links:
             type: object
+            required:
+            - self
             properties:
-              showUser:
+              self:
                 allOf:
                 - $ref: '#/components/schemas/Link'
-                - description: 'A relative path to show the user in the web application.
+                - description: 'The link to this meeting collection resource
 
 
-                    # Condition
+                    **Resource**: MeetingCollection'
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
 
 
-                    - User is not a new record
-
-                    - User is not `locked`'
-              updateImmediately:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'A link to update the user resource.
-
-
-                    # Conditions
-
-
-                    - `admin`'
-              lock:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Restrict the user from logging in and performing any actions.
-
-
-                    # Conditions
-
-
-                    - User is not locked
-
-                    - `admin`'
-              unlock:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Allow a locked user to login and act again.
-
-
-                    # Conditions
-
-
-                    - User is not locked
-
-                    - `admin`'
-              delete:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: "Permanently remove a user from the instance\n\n# Conditions\n\neither:\n  - `admin`\n  - Setting `users_deletable_by_admin` is set\nor:\n  - User is self\n  - Setting `users_deletable_by_self` is set"
-              authSource:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Permanently remove a user from the instance
-
-
-                    # Conditions
-
-
-                    - LDAP authentication configured
-
-                    - `admin`'
+              **Resource**: Collection'
     AttachmentModel:
       type: object
       required:
@@ -766,6 +271,92 @@ components:
           algorithm: md5
           hash: 64c26a8403cd796ea4cf913cda2ee4a9
         createdAt: '2014-05-21T08:51:20.396Z'
+    CustomFieldProperties:
+      type: object
+      patternProperties:
+        ^customField\d+$:
+          type:
+          - 'null'
+          - number
+          - boolean
+          - string
+          - object
+          description: 'A custom field value, that belongs to a custom field of a simple type:
+
+
+            - Boolean
+
+            - Date
+
+            - Float
+
+            - Integer
+
+            - Link (URL)
+
+            - Text
+
+            - Long text'
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
+    Formattable:
+      type: object
+      required:
+      - format
+      properties:
+        format:
+          type: string
+          enum:
+          - plain
+          - markdown
+          - custom
+          readOnly: true
+          description: Indicates the formatting language of the raw text
+          example: markdown
+        raw:
+          type: string
+          description: The raw text, as entered by the user
+          example: I **am** formatted!
+        html:
+          type: string
+          readOnly: true
+          description: The text converted to HTML according to the format
+          example: I <strong>am</strong> formatted!
+      example:
+        format: markdown
+        raw: I am formatted!
+        html: I am formatted!
     ProjectModel:
       allOf:
       - $ref: '#/components/schemas/CustomFieldProperties'
@@ -1011,6 +602,245 @@ components:
 
 
                       **Resource**: Workspace'
+    PaginatedCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - pageSize
+        - offset
+        properties:
+          pageSize:
+            type: integer
+            description: Amount of elements that a response will hold.
+            minimum: 0
+          offset:
+            type: integer
+            description: The page number that is requested from paginated collection.
+            minimum: 1
+          _links:
+            type: object
+            required:
+            - jumpTo
+            - changeSize
+            properties:
+              jumpTo:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Templated link to another page offset.
+
+
+                    **Resource**: Collection'
+              changeSize:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Templated link for another page size.
+
+
+                    **Resource**: Collection'
+    UserModel:
+      allOf:
+      - $ref: '#/components/schemas/PrincipalModel'
+      - $ref: '#/components/schemas/CustomFieldProperties'
+      - type: object
+        required:
+        - _type
+        - avatar
+        properties:
+          _type:
+            type: string
+            enum:
+            - User
+          avatar:
+            type:
+            - string
+            - 'null'
+            format: uri
+            description: URL to user's avatar
+          login:
+            type: string
+            description: 'The user''s login name
+
+
+              # Conditions
+
+
+              - User is self, or `create_user` or `manage_user` permission globally'
+            maxLength: 256
+          firstName:
+            type: string
+            description: 'The user''s first name
+
+
+              # Conditions
+
+
+              - User is self, or `create_user` or `manage_user` permission globally'
+            maxLength: 30
+          lastName:
+            type: string
+            description: 'The user''s last name
+
+
+              # Conditions
+
+
+              - User is self, or `create_user` or `manage_user` permission globally'
+            maxLength: 30
+          email:
+            type: string
+            description: 'The user''s email address
+
+
+              # Conditions
+
+
+              - E-Mail address not hidden
+
+              - User is not a new record
+
+              - User is self, or `create_user` or `manage_user` permission globally'
+            maxLength: 60
+          admin:
+            type: boolean
+            description: 'Flag indicating whether or not the user is an admin
+
+
+              # Conditions
+
+
+              - `admin`'
+          status:
+            type: string
+            description: 'The current activation status of the user.
+
+
+              # Conditions
+
+
+              - User is self, or `create_user` or `manage_user` permission globally'
+          language:
+            type: string
+            description: 'User''s language | ISO 639-1 format
+
+
+              # Conditions
+
+
+              - User is self, or `create_user` or `manage_user` permission globally'
+          identityUrl:
+            type:
+            - string
+            - 'null'
+            description: 'User''s identity_url for OmniAuth authentication.
+
+              **Deprecated:** It will be removed in the near future.
+
+
+              # Conditions
+
+
+              - User is self, or `create_user` or `manage_user` permission globally'
+            deprecated: true
+          createdAt:
+            type: string
+            format: date-time
+            description: Time of creation
+          updatedAt:
+            type: string
+            format: date-time
+            description: Time of the most recent change to the user
+          _links:
+            type: object
+            properties:
+              showUser:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'A relative path to show the user in the web application.
+
+
+                    # Condition
+
+
+                    - User is not a new record
+
+                    - User is not `locked`'
+              updateImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'A link to update the user resource.
+
+
+                    # Conditions
+
+
+                    - `admin`'
+              lock:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Restrict the user from logging in and performing any actions.
+
+
+                    # Conditions
+
+
+                    - User is not locked
+
+                    - `admin`'
+              unlock:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Allow a locked user to login and act again.
+
+
+                    # Conditions
+
+
+                    - User is not locked
+
+                    - `admin`'
+              delete:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: "Permanently remove a user from the instance\n\n# Conditions\n\neither:\n  - `admin`\n  - Setting `users_deletable_by_admin` is set\nor:\n  - User is self\n  - Setting `users_deletable_by_self` is set"
+              authSource:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Permanently remove a user from the instance
+
+
+                    # Conditions
+
+
+                    - LDAP authentication configured
+
+                    - `admin`'
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
     PrincipalModel:
       type: object
       required:
@@ -1076,33 +906,203 @@ components:
 
 
             The property is only present when the corresponding `customField{N}` has `has_comment` set to `true`.'
-    Formattable:
+    CollectionModel:
       type: object
       required:
-      - format
+      - _type
+      - total
+      - count
+      - _links
       properties:
-        format:
+        _type:
           type: string
           enum:
-          - plain
-          - markdown
-          - custom
-          readOnly: true
-          description: Indicates the formatting language of the raw text
-          example: markdown
-        raw:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
+    MeetingModel:
+      type: object
+      required:
+      - _type
+      - id
+      - lockVersion
+      - title
+      - startTime
+      - endTime
+      - duration
+      - createdAt
+      - updatedAt
+      properties:
+        _type:
           type: string
-          description: The raw text, as entered by the user
-          example: I **am** formatted!
-        html:
+          enum:
+          - Meeting
+        id:
+          type: integer
+          description: Identifier of this meeting
+          minimum: 1
+        title:
           type: string
-          readOnly: true
-          description: The text converted to HTML according to the format
-          example: I <strong>am</strong> formatted!
-      example:
-        format: markdown
-        raw: I am formatted!
-        html: I am formatted!
+          description: The meeting's title
+        location:
+          type: string
+          description: The meeting's location
+        lockVersion:
+          type: integer
+          description: The version of the item as used for optimistic locking
+        startTime:
+          type: string
+          format: date-time
+          description: The scheduled meeting start time.
+        endTime:
+          type: string
+          format: date-time
+          description: The scheduled meeting start time.
+        duration:
+          type: number
+          description: The meeting duration in hours.
+        createdAt:
+          type: string
+          format: date-time
+          description: Time of creation. Can be writable by admins with the `apiv3_write_readonly_attributes` setting enabled.
+        updatedAt:
+          type: string
+          format: date-time
+          description: Time of the most recent change to the meeting.
+        _embedded:
+          type: object
+          required:
+          - attachments
+          - author
+          properties:
+            attachments:
+              $ref: '#/components/schemas/Attachments_Model'
+            author:
+              $ref: '#/components/schemas/UserModel'
+            project:
+              $ref: '#/components/schemas/ProjectModel'
+        _links:
+          type: object
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This meeting
+
+
+                  **Resource**: Meeting'
+            author:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The user having created the meeting
+
+
+                  **Resource**: User'
+            project:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The project the meeting is in
+
+
+                  **Resource**: Project'
+            attachments:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The attachment collection of this grid.
+
+
+                  **Resource**: AttachmentCollection'
+            addAttachment:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'Attach a file to the meeting
+
+
+                  # Conditions
+
+
+                  **Permission**: edit meeting'
+  examples:
+    MeetingSimpleResponse:
+      description: A simple meeting response.
+      value:
+        _type: Meeting
+        id: 1
+        title: Meeting No 42
+        location: Death Star - Level 1337 L13/42
+        lockVersion: 13
+        startTime: '2026-02-16T10:00:00.000Z'
+        endTime: '2026-02-16T11:00:00.000Z'
+        duration: 1.0
+        createdAt: '2026-02-13T14:47:12.315Z'
+        updatedAt: '2026-02-13T14:47:12.315Z'
+        _links:
+          attachments:
+            href: /api/v3/meetings/1/attachments
+          addAttachment:
+            href: /api/v3/meetings/1/attachments
+            method: post
+          self:
+            href: /api/v3/meetings/1
+            title: Meeting No 42
+          author:
+            href: /api/v3/users/4
+            title: Darth Vader
+          project:
+            href: /api/v3/projects/10
+            title: Death Star
+        _embedded:
+          _abbreviated: Embedded resources shortened for brevity
+          attachments:
+            _type: Collection
+            total: 2
+            count: 2
+          author:
+            _type: User
+            name: Darth Vader
+            id: 4
+          project:
+            _type: Project
+            name: Death Star
+            id: 10
+    MeetingCollectionSimpleResponse:
+      description: A simple response of a meeting collection.
+      value:
+        _type: Collection
+        total: 2
+        count: 2
+        pageSize: 20
+        offset: 1
+        _embedded:
+          _abbreviated: Embedded resources shortened for brevity
+          elements:
+          - _type: Meeting
+            id: 6
+            title: Weekly
+            startTime: '2026-02-17T20:54:35.523Z'
+            endTime: '2026-02-17T21:54:35.523Z'
+          - _type: Meeting
+            id: 5
+            title: Weekly
+            startTime: '2026-02-10T20:54:35.523Z'
+            endTime: '2026-02-10T21:54:35.523Z'
+        _links:
+          self:
+            href: /api/v3/meetings?filters=%5B%5D&offset=1&pageSize=20
+          jumpTo:
+            href: /api/v3/meetings?filters=%5B%5D&offset=%7Boffset%7D&pageSize=20
+            templated: true
+          changeSize:
+            href: /api/v3/meetings?filters=%5B%5D&offset=1&pageSize=%7Bsize%7D
+            templated: true
   securitySchemes:
     BasicAuth:
       type: http

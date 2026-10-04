@@ -322,54 +322,6 @@ paths:
                 message: Member is already taken.
 components:
   schemas:
-    CollectionModel:
-      type: object
-      required:
-      - _type
-      - total
-      - count
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - Collection
-        total:
-          type: integer
-          description: The total amount of elements available in the collection.
-          minimum: 0
-        count:
-          type: integer
-          description: Actual amount of elements in this response.
-          minimum: 0
-        _links:
-          $ref: '#/components/schemas/CollectionLinks'
-    ErrorResponse:
-      type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
     CollectionLinks:
       type: object
       required:
@@ -382,6 +334,32 @@ components:
 
 
               **Resource**: Collection'
+    CustomFieldProperties:
+      type: object
+      patternProperties:
+        ^customField\d+$:
+          type:
+          - 'null'
+          - number
+          - boolean
+          - string
+          - object
+          description: 'A custom field value, that belongs to a custom field of a simple type:
+
+
+            - Boolean
+
+            - Date
+
+            - Float
+
+            - Integer
+
+            - Link (URL)
+
+            - Text
+
+            - Long text'
     Link:
       type: object
       required:
@@ -415,6 +393,161 @@ components:
       example:
         href: /api/v3/work_packages
         method: POST
+    GroupModel:
+      allOf:
+      - $ref: '#/components/schemas/PrincipalModel'
+      - $ref: '#/components/schemas/CustomFieldProperties'
+      - type: object
+        required:
+        - _type
+        - _embedded
+        properties:
+          _type:
+            type: string
+            enum:
+            - Group
+          _embedded:
+            type: object
+            properties:
+              members:
+                type: array
+                description: Embedded list of members.
+                items:
+                  $ref: '#/components/schemas/UserModel'
+          _links:
+            type: object
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This group resource
+
+
+                    **Resource**: Group'
+              members:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'A member of the group
+
+
+                      # Conditions:
+
+
+                      - user has permission `manage_members` in any project
+
+
+                      **Resource**: User'
+              memberships:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'An collection of all memberships of the group.
+
+
+                    **Resource**: MembershipCollection'
+              delete:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'An href to delete the group.
+
+
+                    # Conditions:
+
+
+                    - `admin`'
+              updateImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'An href to update the group.
+
+
+                    # Conditions:
+
+
+                    - `admin`
+
+
+                    **Resource**: Group'
+    PrincipalModel:
+      type: object
+      required:
+      - _type
+      - id
+      - name
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - User
+          - Group
+          - PlaceholderUser
+        id:
+          type: integer
+          description: The principal's unique identifier.
+          minimum: 1
+        name:
+          type: string
+          description: The principal's display name, layout depends on instance settings.
+        createdAt:
+          type: string
+          format: date-time
+          description: Time of creation
+        updatedAt:
+          type: string
+          format: date-time
+          description: Time of the most recent change to the principal
+        _links:
+          type: object
+          required:
+          - self
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This principal resource.
+
+
+                  **Resource**: User|Group|PlaceholderUser'
+            memberships:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'An href to the collection of the principal''s memberships.
+
+
+                  # Conditions:
+
+
+                  - user has permission `view_members` or `manage_members` in any project
+
+
+                  **Resource**: Collection'
+    GroupWriteModel:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The new group name.
+        _links:
+          type: object
+          properties:
+            members:
+              type: array
+              items:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'A new member for the group.
+
+
+                    **Resource**: User'
+      example:
+        name: Emperor's guard
+        _links:
+          members:
+          - href: /api/v3/users/42
+          - href: /api/v3/users/43
+          - href: /api/v3/users/44
     UserModel:
       allOf:
       - $ref: '#/components/schemas/PrincipalModel'
@@ -592,111 +725,6 @@ components:
                     - LDAP authentication configured
 
                     - `admin`'
-    CustomFieldProperties:
-      type: object
-      patternProperties:
-        ^customField\d+$:
-          type:
-          - 'null'
-          - number
-          - boolean
-          - string
-          - object
-          description: 'A custom field value, that belongs to a custom field of a simple type:
-
-
-            - Boolean
-
-            - Date
-
-            - Float
-
-            - Integer
-
-            - Link (URL)
-
-            - Text
-
-            - Long text'
-    GroupWriteModel:
-      type: object
-      properties:
-        name:
-          type: string
-          description: The new group name.
-        _links:
-          type: object
-          properties:
-            members:
-              type: array
-              items:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'A new member for the group.
-
-
-                    **Resource**: User'
-      example:
-        name: Emperor's guard
-        _links:
-          members:
-          - href: /api/v3/users/42
-          - href: /api/v3/users/43
-          - href: /api/v3/users/44
-    PrincipalModel:
-      type: object
-      required:
-      - _type
-      - id
-      - name
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - User
-          - Group
-          - PlaceholderUser
-        id:
-          type: integer
-          description: The principal's unique identifier.
-          minimum: 1
-        name:
-          type: string
-          description: The principal's display name, layout depends on instance settings.
-        createdAt:
-          type: string
-          format: date-time
-          description: Time of creation
-        updatedAt:
-          type: string
-          format: date-time
-          description: Time of the most recent change to the principal
-        _links:
-          type: object
-          required:
-          - self
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This principal resource.
-
-
-                  **Resource**: User|Group|PlaceholderUser'
-            memberships:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'An href to the collection of the principal''s memberships.
-
-
-                  # Conditions:
-
-
-                  - user has permission `view_members` or `manage_members` in any project
-
-
-                  **Resource**: Collection'
     GroupCollectionModel:
       allOf:
       - $ref: '#/components/schemas/CollectionModel'
@@ -760,110 +788,54 @@ components:
                 title: ST-C-334
           - _abbreviated: Group resource shortened for brevity
             id: 1338
-    GroupModel:
-      allOf:
-      - $ref: '#/components/schemas/PrincipalModel'
-      - $ref: '#/components/schemas/CustomFieldProperties'
-      - type: object
-        required:
-        - _type
-        - _embedded
-        properties:
-          _type:
-            type: string
-            enum:
-            - Group
-          _embedded:
-            type: object
-            properties:
-              members:
-                type: array
-                description: Embedded list of members.
-                items:
-                  $ref: '#/components/schemas/UserModel'
-          _links:
-            type: object
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'This group resource
-
-
-                    **Resource**: Group'
-              members:
-                type: array
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/Link'
-                  - description: 'A member of the group
-
-
-                      # Conditions:
-
-
-                      - user has permission `manage_members` in any project
-
-
-                      **Resource**: User'
-              memberships:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'An collection of all memberships of the group.
-
-
-                    **Resource**: MembershipCollection'
-              delete:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'An href to delete the group.
-
-
-                    # Conditions:
-
-
-                    - `admin`'
-              updateImmediately:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'An href to update the group.
-
-
-                    # Conditions:
-
-
-                    - `admin`
-
-
-                    **Resource**: Group'
-  responses:
-    MissingContentType:
-      description: Occurs when the client did not send a Content-Type header
-      content:
-        text/plain:
-          schema:
-            type: string
-          example: Missing content-type header
-    InvalidRequestBody:
-      description: Occurs when the client did not send a valid JSON object in the request body.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
-            message: The request body was not a single JSON object.
-    UnsupportedMediaType:
-      description: Occurs when the client sends an unsupported Content-Type header.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
-            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    CollectionModel:
+      type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
   examples:
     GroupResponse:
       value:
@@ -906,6 +878,34 @@ components:
             title: Mara Jade
           - href: /api/v3/users/3
             title: Darth Vader
+  responses:
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
+    InvalidRequestBody:
+      description: Occurs when the client did not send a valid JSON object in the request body.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+            message: The request body was not a single JSON object.
+    UnsupportedMediaType:
+      description: Occurs when the client sends an unsupported Content-Type header.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
+            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
   securitySchemes:
     BasicAuth:
       type: http

@@ -506,32 +506,6 @@ paths:
       summary: List Query Filter Instance Schemas for Workspace
 components:
   schemas:
-    ErrorResponse:
-      type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
     Query_Filter_Instance_SchemaModel:
       type: object
       required:
@@ -626,99 +600,6 @@ components:
       example:
         href: /api/v3/work_packages
         method: POST
-    Query_Filter_Instance_Schemas_For_WorkspaceModel:
-      type: object
-      example:
-        _type: Collection
-        total: 2
-        count: 2
-        _embedded:
-          elements:
-          - _type: QueryFilterInstanceSchema
-            _dependencies:
-            - _type: SchemaDependency
-              'on': operator
-              dependencies:
-                /api/v3/queries/operators/=:
-                  values:
-                    type: '[]User'
-                    name: Values
-                    required: true
-                    hasDefault: false
-                    writable: true
-                    _links: {}
-                /api/v3/queries/operators/!:
-                  values:
-                    type: '[]User'
-                    name: Values
-                    required: true
-                    hasDefault: false
-                    writable: true
-                    _links: {}
-                /api/v3/queries/operators/!*: {}
-                /api/v3/queries/operators/*: {}
-            name:
-              type: String
-              name: Name
-              required: true
-              hasDefault: true
-              writable: false
-            filter:
-              type: QueryFilter
-              name: Filter
-              required: true
-              hasDefault: false
-              writable: true
-              _links: {}
-            _links:
-              self:
-                href: /api/v3/queries/filter_instance_schemas/assignee
-              filter:
-                href: /api/v3/queries/filters/assignee
-                title: Assignee
-          - _type: QueryFilterInstanceSchema
-            _dependencies:
-            - _type: SchemaDependency
-              'on': operator
-              dependencies:
-                /api/v3/queries/operators/=:
-                  values:
-                    type: '[]User'
-                    name: Values
-                    required: true
-                    hasDefault: false
-                    writable: true
-                    _links: {}
-                /api/v3/queries/operators/!:
-                  values:
-                    type: '[]User'
-                    name: Values
-                    required: true
-                    hasDefault: false
-                    writable: true
-                    _links: {}
-            name:
-              type: String
-              name: Name
-              required: true
-              hasDefault: true
-              writable: false
-            filter:
-              type: QueryFilter
-              name: Filter
-              required: true
-              hasDefault: false
-              writable: true
-              _links: {}
-            _links:
-              self:
-                href: /api/v3/queries/filter_instance_schemas/author
-              filter:
-                href: /api/v3/queries/filters/author
-                title: Author
-        _links:
-          self:
-            href: /api/v3/workspaces/42/queries/filter_instance_schemas
     Query_Filter_Instance_SchemasModel:
       type: object
       example:
@@ -812,6 +693,125 @@ components:
         _links:
           self:
             href: /api/v3/queries/filter_instance_schemas
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    Query_Filter_Instance_Schemas_For_WorkspaceModel:
+      type: object
+      example:
+        _type: Collection
+        total: 2
+        count: 2
+        _embedded:
+          elements:
+          - _type: QueryFilterInstanceSchema
+            _dependencies:
+            - _type: SchemaDependency
+              'on': operator
+              dependencies:
+                /api/v3/queries/operators/=:
+                  values:
+                    type: '[]User'
+                    name: Values
+                    required: true
+                    hasDefault: false
+                    writable: true
+                    _links: {}
+                /api/v3/queries/operators/!:
+                  values:
+                    type: '[]User'
+                    name: Values
+                    required: true
+                    hasDefault: false
+                    writable: true
+                    _links: {}
+                /api/v3/queries/operators/!*: {}
+                /api/v3/queries/operators/*: {}
+            name:
+              type: String
+              name: Name
+              required: true
+              hasDefault: true
+              writable: false
+            filter:
+              type: QueryFilter
+              name: Filter
+              required: true
+              hasDefault: false
+              writable: true
+              _links: {}
+            _links:
+              self:
+                href: /api/v3/queries/filter_instance_schemas/assignee
+              filter:
+                href: /api/v3/queries/filters/assignee
+                title: Assignee
+          - _type: QueryFilterInstanceSchema
+            _dependencies:
+            - _type: SchemaDependency
+              'on': operator
+              dependencies:
+                /api/v3/queries/operators/=:
+                  values:
+                    type: '[]User'
+                    name: Values
+                    required: true
+                    hasDefault: false
+                    writable: true
+                    _links: {}
+                /api/v3/queries/operators/!:
+                  values:
+                    type: '[]User'
+                    name: Values
+                    required: true
+                    hasDefault: false
+                    writable: true
+                    _links: {}
+            name:
+              type: String
+              name: Name
+              required: true
+              hasDefault: true
+              writable: false
+            filter:
+              type: QueryFilter
+              name: Filter
+              required: true
+              hasDefault: false
+              writable: true
+              _links: {}
+            _links:
+              self:
+                href: /api/v3/queries/filter_instance_schemas/author
+              filter:
+                href: /api/v3/queries/filters/author
+                title: Author
+        _links:
+          self:
+            href: /api/v3/workspaces/42/queries/filter_instance_schemas
   securitySchemes:
     BasicAuth:
       type: http

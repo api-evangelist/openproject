@@ -134,6 +134,10 @@ components:
       type: string
       format: html
       example: <p>Hello world! <a href="http://example.com">This</a> <strong>is</strong> markdown!</p>
+    Plain_TextModel:
+      type: string
+      format: html
+      example: <p>Hello world! This *is* plain text!</p>
     ErrorResponse:
       type: object
       required:
@@ -160,10 +164,6 @@ components:
         message:
           type: string
           example: Project can't be blank.
-    Plain_TextModel:
-      type: string
-      format: html
-      example: <p>Hello world! This *is* plain text!</p>
   securitySchemes:
     BasicAuth:
       type: http

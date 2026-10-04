@@ -421,7 +421,243 @@ paths:
       operationId: Program_update_form
       summary: Program update form
 components:
+  examples:
+    ProgramBody:
+      value:
+        name: Program example
+        statusExplanation:
+          raw: Everything **fine**
+        description:
+          raw: Lorem **ipsum** dolor sit amet
+        customField123: 123
+        customComment123: Because it is 123!
+        _links:
+          parent:
+            href: /api/v3/programs/123
+          customField456:
+            href: /api/v3/programs/315
+    Program:
+      value:
+        _type: Program
+        _links:
+          self:
+            href: /api/v3/programs/1
+            title: Lorem
+          createWorkPackage:
+            href: /api/v3/programs/1/work_packages/form
+            method: post
+          createWorkPackageImmediate:
+            href: /api/v3/programs/1/work_packages
+            method: post
+          categories:
+            href: /api/v3/programs/1/categories
+          types:
+            href: /api/v3/programs/1/types
+          versions:
+            href: /api/v3/programs/1/versions
+          workPackages:
+            href: /api/v3/programs/1/work_packages
+          memberships:
+            href: /api/v3/memberships?filters=[{"project":{"operator":"=","values":["1"]}}]
+          customField456:
+            href: /api/v3/users/315
+            title: A user
+          parent:
+            href: /api/v3/portfolio/123
+            title: Parent portfolio
+          ancestors:
+          - href: /api/v3/portfolios/2
+            title: Root portfolio
+          - href: /api/v3/portfolios/12
+            title: Grandparent portfolio
+          - href: /api/v3/portfolios/123
+            title: Parent portfolio
+          status:
+            href: /api/v3/project_statuses/on_track
+            title: On track
+        id: 1
+        identifier: program_example
+        name: Program example
+        active: true
+        public: false
+        statusExplanation:
+          format: markdown
+          raw: Everything **fine**
+          html: <p>Everything <strong>fine</strong></p>
+        description:
+          format: markdown
+          raw: Lorem **ipsum** dolor sit amet
+          html: <p>Lorem <strong>ipsum</strong> dolor sit amet</p>
+        createdAt: '2014-05-21T08:51:20.396Z'
+        updatedAt: '2014-05-21T08:51:20.396Z'
+        customField123: 123
+        customComment123: Why is the value 123?
+    ProgramCollection:
+      value:
+        _type: Collection
+        count: 2
+        total: 2
+        pageSize: 20
+        offset: 1
+        _embedded:
+          elements:
+          - _hint: Program resource shortened for brevity
+            id: 1
+            identifier: initialprogram
+            name: DeathStar construction
+            active: true
+            public: true
+          - _hint: Program resource shortened for brevity
+            id: 2
+            identifier: mysecret
+            name: Palpatine's secret plan
+            active: true
+            public: false
+        _links:
+          self:
+            href: /api/v3/programs?filters=%5B%5D&offset=1&pageSize=20
+          jumpTo:
+            href: /api/v3/programs?filters=%5B%5D&offset=%7Boffset%7D&pageSize=20
+            templated: true
+          changeSize:
+            href: /api/v3/programs?filters=%5B%5D&offset=1&pageSize=%7Bsize%7D
+            templated: true
+          representations:
+          - href: /programs.csv?filters=%5B%5D&offset=1&pageSize=20
+            identifier: csv
+            type: text/csv
+            title: CSV
+          - href: /programs.xls?filters=%5B%5D&offset=1&pageSize=20
+            identifier: xls
+            type: application/vnd.ms-excel
+            title: XLS
   schemas:
+    CustomFieldProperties:
+      type: object
+      patternProperties:
+        ^customField\d+$:
+          type:
+          - 'null'
+          - number
+          - boolean
+          - string
+          - object
+          description: 'A custom field value, that belongs to a custom field of a simple type:
+
+
+            - Boolean
+
+            - Date
+
+            - Float
+
+            - Integer
+
+            - Link (URL)
+
+            - Text
+
+            - Long text'
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
+    Formattable:
+      type: object
+      required:
+      - format
+      properties:
+        format:
+          type: string
+          enum:
+          - plain
+          - markdown
+          - custom
+          readOnly: true
+          description: Indicates the formatting language of the raw text
+          example: markdown
+        raw:
+          type: string
+          description: The raw text, as entered by the user
+          example: I **am** formatted!
+        html:
+          type: string
+          readOnly: true
+          description: The text converted to HTML according to the format
+          example: I <strong>am</strong> formatted!
+      example:
+        format: markdown
+        raw: I am formatted!
+        html: I am formatted!
+    ProgramCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/OffsetPaginatedCollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            allOf:
+            - $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
+            - type: object
+              properties:
+                representations:
+                  type: array
+                  items:
+                    allOf:
+                    - $ref: '#/components/schemas/Link'
+                    - description: A program collection representation in a specific file format.
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProgramModel'
     OffsetPaginatedCollectionLinks:
       allOf:
       - $ref: '#/components/schemas/CollectionLinks'
@@ -456,6 +692,27 @@ components:
                 # Conditions
 
                 - The collection is not on the last page.'
+    OffsetPaginatedCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - pageSize
+        - offset
+        - _links
+        properties:
+          pageSize:
+            type: integer
+            description: 'The amount of elements per page. If not set by the request this value defaults to the server''s system
+
+              settings.'
+            minimum: 0
+          offset:
+            type: integer
+            description: The page offset indicating on which page the element collection starts.
+            minimum: 0
+          _links:
+            $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
     CollectionModel:
       type: object
       required:
@@ -504,18 +761,17 @@ components:
         message:
           type: string
           example: Project can't be blank.
-    CollectionLinks:
+    CustomCommentProperties:
       type: object
-      required:
-      - self
-      properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This collection resource.
+      patternProperties:
+        ^customComment\d+$:
+          type:
+          - 'null'
+          - string
+          description: 'A plain-text comment associated with a project custom field that has comments enabled.
 
 
-              **Resource**: Collection'
+            The property is only present when the corresponding `customField{N}` has `has_comment` set to `true`.'
     ProgramModel:
       allOf:
       - $ref: '#/components/schemas/CustomFieldProperties'
@@ -761,153 +1017,14 @@ components:
 
 
                       **Resource**: Workspace'
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
-          type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
-    OffsetPaginatedCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - pageSize
-        - offset
-        - _links
-        properties:
-          pageSize:
-            type: integer
-            description: 'The amount of elements per page. If not set by the request this value defaults to the server''s system
-
-              settings.'
-            minimum: 0
-          offset:
-            type: integer
-            description: The page offset indicating on which page the element collection starts.
-            minimum: 0
-          _links:
-            $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
-    CustomFieldProperties:
-      type: object
-      patternProperties:
-        ^customField\d+$:
-          type:
-          - 'null'
-          - number
-          - boolean
-          - string
-          - object
-          description: 'A custom field value, that belongs to a custom field of a simple type:
-
-
-            - Boolean
-
-            - Date
-
-            - Float
-
-            - Integer
-
-            - Link (URL)
-
-            - Text
-
-            - Long text'
-    Formattable:
-      type: object
-      required:
-      - format
-      properties:
-        format:
-          type: string
-          enum:
-          - plain
-          - markdown
-          - custom
-          readOnly: true
-          description: Indicates the formatting language of the raw text
-          example: markdown
-        raw:
-          type: string
-          description: The raw text, as entered by the user
-          example: I **am** formatted!
-        html:
-          type: string
-          readOnly: true
-          description: The text converted to HTML according to the format
-          example: I <strong>am</strong> formatted!
-      example:
-        format: markdown
-        raw: I am formatted!
-        html: I am formatted!
-    CustomCommentProperties:
-      type: object
-      patternProperties:
-        ^customComment\d+$:
-          type:
-          - 'null'
-          - string
-          description: 'A plain-text comment associated with a project custom field that has comments enabled.
-
-
-            The property is only present when the corresponding `customField{N}` has `has_comment` set to `true`.'
-    ProgramCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/OffsetPaginatedCollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            allOf:
-            - $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
-            - type: object
-              properties:
-                representations:
-                  type: array
-                  items:
-                    allOf:
-                    - $ref: '#/components/schemas/Link'
-                    - description: A program collection representation in a specific file format.
-          _embedded:
-            type: object
-            required:
-            - elements
-            properties:
-              elements:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ProgramModel'
   responses:
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
     InvalidRequestBody:
       description: Occurs when the client did not send a valid JSON object in the request body.
       content:
@@ -928,123 +1045,6 @@ components:
             _type: Error
             errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
             message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
-    MissingContentType:
-      description: Occurs when the client did not send a Content-Type header
-      content:
-        text/plain:
-          schema:
-            type: string
-          example: Missing content-type header
-  examples:
-    ProgramCollection:
-      value:
-        _type: Collection
-        count: 2
-        total: 2
-        pageSize: 20
-        offset: 1
-        _embedded:
-          elements:
-          - _hint: Program resource shortened for brevity
-            id: 1
-            identifier: initialprogram
-            name: DeathStar construction
-            active: true
-            public: true
-          - _hint: Program resource shortened for brevity
-            id: 2
-            identifier: mysecret
-            name: Palpatine's secret plan
-            active: true
-            public: false
-        _links:
-          self:
-            href: /api/v3/programs?filters=%5B%5D&offset=1&pageSize=20
-          jumpTo:
-            href: /api/v3/programs?filters=%5B%5D&offset=%7Boffset%7D&pageSize=20
-            templated: true
-          changeSize:
-            href: /api/v3/programs?filters=%5B%5D&offset=1&pageSize=%7Bsize%7D
-            templated: true
-          representations:
-          - href: /programs.csv?filters=%5B%5D&offset=1&pageSize=20
-            identifier: csv
-            type: text/csv
-            title: CSV
-          - href: /programs.xls?filters=%5B%5D&offset=1&pageSize=20
-            identifier: xls
-            type: application/vnd.ms-excel
-            title: XLS
-    ProgramBody:
-      value:
-        name: Program example
-        statusExplanation:
-          raw: Everything **fine**
-        description:
-          raw: Lorem **ipsum** dolor sit amet
-        customField123: 123
-        customComment123: Because it is 123!
-        _links:
-          parent:
-            href: /api/v3/programs/123
-          customField456:
-            href: /api/v3/programs/315
-    Program:
-      value:
-        _type: Program
-        _links:
-          self:
-            href: /api/v3/programs/1
-            title: Lorem
-          createWorkPackage:
-            href: /api/v3/programs/1/work_packages/form
-            method: post
-          createWorkPackageImmediate:
-            href: /api/v3/programs/1/work_packages
-            method: post
-          categories:
-            href: /api/v3/programs/1/categories
-          types:
-            href: /api/v3/programs/1/types
-          versions:
-            href: /api/v3/programs/1/versions
-          workPackages:
-            href: /api/v3/programs/1/work_packages
-          memberships:
-            href: /api/v3/memberships?filters=[{"project":{"operator":"=","values":["1"]}}]
-          customField456:
-            href: /api/v3/users/315
-            title: A user
-          parent:
-            href: /api/v3/portfolio/123
-            title: Parent portfolio
-          ancestors:
-          - href: /api/v3/portfolios/2
-            title: Root portfolio
-          - href: /api/v3/portfolios/12
-            title: Grandparent portfolio
-          - href: /api/v3/portfolios/123
-            title: Parent portfolio
-          status:
-            href: /api/v3/project_statuses/on_track
-            title: On track
-        id: 1
-        identifier: program_example
-        name: Program example
-        active: true
-        public: false
-        statusExplanation:
-          format: markdown
-          raw: Everything **fine**
-          html: <p>Everything <strong>fine</strong></p>
-        description:
-          format: markdown
-          raw: Lorem **ipsum** dolor sit amet
-          html: <p>Lorem <strong>ipsum</strong> dolor sit amet</p>
-        createdAt: '2014-05-21T08:51:20.396Z'
-        updatedAt: '2014-05-21T08:51:20.396Z'
-        customField123: 123
-        customComment123: Why is the value 123?
   securitySchemes:
     BasicAuth:
       type: http

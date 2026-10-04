@@ -343,177 +343,6 @@ paths:
                     message: Lag must be a number greater than or equal to 0
 components:
   schemas:
-    CollectionModel:
-      type: object
-      required:
-      - _type
-      - total
-      - count
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - Collection
-        total:
-          type: integer
-          description: The total amount of elements available in the collection.
-          minimum: 0
-        count:
-          type: integer
-          description: Actual amount of elements in this response.
-          minimum: 0
-        _links:
-          $ref: '#/components/schemas/CollectionLinks'
-    RelationReadModel:
-      type: object
-      properties:
-        _type:
-          type: string
-          enum:
-          - Relation
-        id:
-          type: integer
-          description: Relation ID
-        name:
-          type: string
-          description: The internationalised name of this type of relation
-        type:
-          type: string
-          description: The relation type.
-          enum:
-          - relates
-          - duplicates
-          - duplicated
-          - blocks
-          - blocked
-          - precedes
-          - follows
-          - includes
-          - partof
-          - requires
-          - required
-        reverseType:
-          type: string
-          description: The type of relation from the perspective of the related work package.
-          enum:
-          - relates
-          - duplicates
-          - duplicated
-          - blocks
-          - blocked
-          - precedes
-          - follows
-          - includes
-          - partof
-          - requires
-          - required
-        description:
-          type:
-          - string
-          - 'null'
-          description: A descriptive text for the relation.
-        lag:
-          type:
-          - integer
-          - 'null'
-          description: The lag in days between closing of `from` and start of `to`
-          minimum: 0
-        _embedded:
-          type: object
-          properties:
-            from:
-              $ref: '#/components/schemas/WorkPackageModel'
-            to:
-              $ref: '#/components/schemas/WorkPackageModel'
-        _links:
-          type: object
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This relation
-
-
-                  **Resource**: Relation
-
-
-                  # Conditions
-
-
-                  **Permission**: view work packages'
-            updateImmediately:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'Updates the relation between two work packages
-
-
-                  # Conditions
-
-
-                  **Permission**: manage work package relations'
-            delete:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'Destroys the relation between the two work packages
-
-
-                  # Conditions
-
-
-                  **Permission**: manage work package relations'
-            from:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The emanating work package
-
-
-                  **Resource**: WorkPackage
-
-
-                  # Conditions
-
-
-                  **Permission**: view work packages'
-            to:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The work package the relation ends in
-
-
-                  **Resource**: WorkPackage
-
-
-                  # Conditions
-
-
-                  **Permission**: view work packages'
-    ErrorResponse:
-      type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
     CollectionLinks:
       type: object
       required:
@@ -526,54 +355,65 @@ components:
 
 
               **Resource**: Collection'
-    RelationWriteModel:
+    CustomFieldProperties:
+      type: object
+      patternProperties:
+        ^customField\d+$:
+          type:
+          - 'null'
+          - number
+          - boolean
+          - string
+          - object
+          description: 'A custom field value, that belongs to a custom field of a simple type:
+
+
+            - Boolean
+
+            - Date
+
+            - Float
+
+            - Integer
+
+            - Link (URL)
+
+            - Text
+
+            - Long text'
+    Link:
       type: object
       required:
-      - _links
-      - type
+      - href
       properties:
-        type:
-          type: string
-          description: The relation type.
-          enum:
-          - relates
-          - duplicates
-          - duplicated
-          - blocks
-          - blocked
-          - precedes
-          - follows
-          - includes
-          - partof
-          - requires
-          - required
-        description:
+        href:
           type:
           - string
           - 'null'
-          description: A descriptive text for the relation.
-        lag:
-          type:
-          - integer
-          - 'null'
-          description: The lag in days between closing of `from` and start of `to`
-          minimum: 0
-        _links:
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
           type: object
-          properties:
-            to:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The work package the relation ends in. Only available on relation creation, not on update.
-
-
-                  **Resource**: WorkPackage
-
-
-                  # Conditions
-
-
-                  **Permission**: view work packages'
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
     WorkPackageModel:
       allOf:
       - $ref: '#/components/schemas/CustomFieldProperties'
@@ -1318,65 +1158,252 @@ components:
         customField2: 42
         createdAt: '2014-08-29T12:40:53.373Z'
         updatedAt: '2014-08-29T12:44:41.981Z'
-    Link:
+    Formattable:
       type: object
       required:
-      - href
+      - format
       properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
+        format:
           type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
+          enum:
+          - plain
+          - markdown
+          - custom
+          readOnly: true
+          description: Indicates the formatting language of the raw text
+          example: markdown
+        raw:
           type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
+          description: The raw text, as entered by the user
+          example: I **am** formatted!
+        html:
           type: string
-          description: An optional unique identifier to the link object
+          readOnly: true
+          description: The text converted to HTML according to the format
+          example: I <strong>am</strong> formatted!
+      example:
+        format: markdown
+        raw: I am formatted!
+        html: I am formatted!
+    RelationWriteModel:
+      type: object
+      required:
+      - _links
+      - type
+      properties:
         type:
           type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
-    CustomFieldProperties:
-      type: object
-      patternProperties:
-        ^customField\d+$:
+          description: The relation type.
+          enum:
+          - relates
+          - duplicates
+          - duplicated
+          - blocks
+          - blocked
+          - precedes
+          - follows
+          - includes
+          - partof
+          - requires
+          - required
+        description:
           type:
-          - 'null'
-          - number
-          - boolean
           - string
-          - object
-          description: 'A custom field value, that belongs to a custom field of a simple type:
+          - 'null'
+          description: A descriptive text for the relation.
+        lag:
+          type:
+          - integer
+          - 'null'
+          description: The lag in days between closing of `from` and start of `to`
+          minimum: 0
+        _links:
+          type: object
+          properties:
+            to:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The work package the relation ends in. Only available on relation creation, not on update.
 
 
-            - Boolean
+                  **Resource**: WorkPackage
 
-            - Date
 
-            - Float
+                  # Conditions
 
-            - Integer
 
-            - Link (URL)
+                  **Permission**: view work packages'
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    RelationReadModel:
+      type: object
+      properties:
+        _type:
+          type: string
+          enum:
+          - Relation
+        id:
+          type: integer
+          description: Relation ID
+        name:
+          type: string
+          description: The internationalised name of this type of relation
+        type:
+          type: string
+          description: The relation type.
+          enum:
+          - relates
+          - duplicates
+          - duplicated
+          - blocks
+          - blocked
+          - precedes
+          - follows
+          - includes
+          - partof
+          - requires
+          - required
+        reverseType:
+          type: string
+          description: The type of relation from the perspective of the related work package.
+          enum:
+          - relates
+          - duplicates
+          - duplicated
+          - blocks
+          - blocked
+          - precedes
+          - follows
+          - includes
+          - partof
+          - requires
+          - required
+        description:
+          type:
+          - string
+          - 'null'
+          description: A descriptive text for the relation.
+        lag:
+          type:
+          - integer
+          - 'null'
+          description: The lag in days between closing of `from` and start of `to`
+          minimum: 0
+        _embedded:
+          type: object
+          properties:
+            from:
+              $ref: '#/components/schemas/WorkPackageModel'
+            to:
+              $ref: '#/components/schemas/WorkPackageModel'
+        _links:
+          type: object
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This relation
 
-            - Text
 
-            - Long text'
+                  **Resource**: Relation
+
+
+                  # Conditions
+
+
+                  **Permission**: view work packages'
+            updateImmediately:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'Updates the relation between two work packages
+
+
+                  # Conditions
+
+
+                  **Permission**: manage work package relations'
+            delete:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'Destroys the relation between the two work packages
+
+
+                  # Conditions
+
+
+                  **Permission**: manage work package relations'
+            from:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The emanating work package
+
+
+                  **Resource**: WorkPackage
+
+
+                  # Conditions
+
+
+                  **Permission**: view work packages'
+            to:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The work package the relation ends in
+
+
+                  **Resource**: WorkPackage
+
+
+                  # Conditions
+
+
+                  **Permission**: view work packages'
+    CollectionModel:
+      type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
     RelationCollectionModel:
       allOf:
       - $ref: '#/components/schemas/CollectionModel'
@@ -1406,43 +1433,11 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/RelationReadModel'
-    Formattable:
-      type: object
-      required:
-      - format
-      properties:
-        format:
-          type: string
-          enum:
-          - plain
-          - markdown
-          - custom
-          readOnly: true
-          description: Indicates the formatting language of the raw text
-          example: markdown
-        raw:
-          type: string
-          description: The raw text, as entered by the user
-          example: I **am** formatted!
-        html:
-          type: string
-          readOnly: true
-          description: The text converted to HTML according to the format
-          example: I <strong>am</strong> formatted!
-      example:
-        format: markdown
-        raw: I am formatted!
-        html: I am formatted!
   examples:
-    RelationCreateRequest:
-      description: Example request to create a relation between two work packages.
+    RelationUpdateRequest:
+      description: Example request to update the relation's description.
       value:
-        type: follows
-        lag: 2
-        description: Build hangar AFTER improving external skeleton of Death Star.
-        _links:
-          to:
-            href: /api/v3/work_packages/1337
+        description: This is the new description.
     RelationResponse:
       description: Simple response of a 'duplicated by' relation between two work packages.
       value:
@@ -1478,10 +1473,15 @@ components:
           to:
             href: /api/v3/work_packages/78
             title: Annihilate Yavin 4
-    RelationUpdateRequest:
-      description: Example request to update the relation's description.
+    RelationCreateRequest:
+      description: Example request to create a relation between two work packages.
       value:
-        description: This is the new description.
+        type: follows
+        lag: 2
+        description: Build hangar AFTER improving external skeleton of Death Star.
+        _links:
+          to:
+            href: /api/v3/work_packages/1337
     RelationCollectionResponse:
       description: Simple response of a relation collection.
       value:
@@ -1534,6 +1534,13 @@ components:
           nextByOffset:
             href: /api/v3/relations?filters=%5B%5D&offset=2&pageSize=20
   responses:
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
     InvalidRequestBody:
       description: Occurs when the client did not send a valid JSON object in the request body.
       content:
@@ -1554,13 +1561,6 @@ components:
             _type: Error
             errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
             message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
-    MissingContentType:
-      description: Occurs when the client did not send a Content-Type header
-      content:
-        text/plain:
-          schema:
-            type: string
-          example: Missing content-type header
   securitySchemes:
     BasicAuth:
       type: http

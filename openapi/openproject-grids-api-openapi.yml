@@ -399,55 +399,141 @@ paths:
       operationId: Grid_Update_Form
       summary: Grid Update Form
 components:
-  schemas:
-    CollectionModel:
-      type: object
-      required:
-      - _type
-      - total
-      - count
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - Collection
-        total:
-          type: integer
-          description: The total amount of elements available in the collection.
-          minimum: 0
-        count:
-          type: integer
-          description: Actual amount of elements in this response.
-          minimum: 0
+  examples:
+    GridSimplePatchModel:
+      value:
+        rowCount: 1
+        columnCount: 2
+        widgets:
+        - _type: GridWidget
+          identifier: tasks
+          startRow: 1
+          endRow: 2
+          startColumn: 1
+          endColumn: 2
+          options:
+            name: Tasks
+        - _type: GridWidget
+          identifier: news
+          startRow: 1
+          endRow: 2
+          startColumn: 2
+          endColumn: 3
+          options:
+            name: News
         _links:
-          $ref: '#/components/schemas/CollectionLinks'
-    ErrorResponse:
-      type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
+          scope:
+            href: /my/page
+            type: text/html
+    GridSimpleResponse:
+      value:
+        _type: Grid
+        id: 2
+        rowCount: 8
+        columnCount: 5
+        widgets:
+        - _type: GridWidget
+          id: 1
+          identifier: tasks
+          startRow: 1
+          endRow: 8
+          startColumn: 1
+          endColumn: 3
+        - _type: GridWidget
+          id: 2
+          identifier: news
+          startRow: 3
+          endRow: 8
+          startColumn: 4
+          endColumn: 5
+        - _type: GridWidget
+          id: 3
+          identifier: documents
+          startRow: 1
+          endRow: 3
+          startColumn: 3
+          endColumn: 6
+        createdAt: '2018-12-03T16:58:30.915Z'
+        updatedAt: '2018-12-13T19:36:40.588Z'
+        _links:
+          self:
+            href: /api/v3/grids/2
+          attachments:
+            href: /api/v3/grids/2/attachments
+          addAttachment:
+            href: /api/v3/grids/2/attachments
+            method: post
+          scope:
+            href: /my/page
+            type: text/html
+          updateImmediately:
+            href: /api/v3/grids/2
+            method: patch
+          update:
+            href: /api/v3/grids/2/form
+            method: post
+          delete:
+            href: /api/v3/grids/2
+            method: delete
+    GridSimpleCollectionResponse:
+      value:
+        _type: Collection
+        total: 1
+        count: 1
+        pageSize: 30
+        offset: 1
         _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
+          elements:
+          - _type: Grid
+            id: 2
+            rowCount: 8
+            columnCount: 5
+            widgets:
+            - _type: GridWidget
+              id: 1
+              identifier: time_entries_current_user
+              startRow: 1
+              endRow: 8
+              startColumn: 1
+              endColumn: 3
+            - _type: GridWidget
+              id: 2
+              identifier: news
+              startRow: 3
+              endRow: 8
+              startColumn: 4
+              endColumn: 5
+            - _type: GridWidget
+              id: 3
+              identifier: documents
+              startRow: 1
+              endRow: 3
+              startColumn: 3
+              endColumn: 6
+            createdAt: '2018-12-03T16:58:30.297Z'
+            updatedAt: '2018-12-13T19:36:40.352Z'
+            _links:
+              scope:
+                href: /my/page
+                type: text/html
+              updateImmediately:
+                href: /api/v3/grids/2
+                method: patch
+              update:
+                href: /api/v3/grids/2/form
+                method: post
+              self:
+                href: /api/v3/grids/2
+        _links:
+          self:
+            href: /api/v3/grids
+          jumpTo:
+            href: /api/v3/grids?filters=%5B%5D&offset=%7Boffset%7D&pageSize=20
+            templated: true
+          changeSize:
+            href: /api/v3/grids?filters=%5B%5D&offset=1&pageSize=%7Bsize%7D
+            templated: true
+  schemas:
     CollectionLinks:
       type: object
       required:
@@ -460,35 +546,6 @@ components:
 
 
               **Resource**: Collection'
-    GridWriteModel:
-      type: object
-      properties:
-        rowCount:
-          type: integer
-          description: The number of rows the grid has
-          minimum: 1
-        columnCount:
-          type: integer
-          description: The number of columns the grid has
-          minimum: 1
-        widgets:
-          type: array
-          description: 'The set of `GridWidget`s selected for the grid.
-
-
-            # Conditions
-
-
-            - The widgets must not overlap.'
-          items:
-            $ref: '#/components/schemas/GridWidgetModel'
-        _links:
-          type: object
-          properties:
-            scope:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: The location where this grid is used, usually represented as a relative URL.
     Link:
       type: object
       required:
@@ -558,22 +615,6 @@ components:
 
 
                     **Resource**: Collection'
-    GridCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedCollectionModel'
-      - type: object
-        required:
-        - _embedded
-        properties:
-          _embedded:
-            type: object
-            required:
-            - elements
-            properties:
-              elements:
-                type: array
-                items:
-                  $ref: '#/components/schemas/GridReadModel'
     GridReadModel:
       type: object
       required:
@@ -671,6 +712,99 @@ components:
               allOf:
               - $ref: '#/components/schemas/Link'
               - description: Deletes this grid resource.
+    GridCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedCollectionModel'
+      - type: object
+        required:
+        - _embedded
+        properties:
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GridReadModel'
+    GridWriteModel:
+      type: object
+      properties:
+        rowCount:
+          type: integer
+          description: The number of rows the grid has
+          minimum: 1
+        columnCount:
+          type: integer
+          description: The number of columns the grid has
+          minimum: 1
+        widgets:
+          type: array
+          description: 'The set of `GridWidget`s selected for the grid.
+
+
+            # Conditions
+
+
+            - The widgets must not overlap.'
+          items:
+            $ref: '#/components/schemas/GridWidgetModel'
+        _links:
+          type: object
+          properties:
+            scope:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: The location where this grid is used, usually represented as a relative URL.
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    CollectionModel:
+      type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
     GridWidgetModel:
       type: object
       required:
@@ -714,16 +848,13 @@ components:
         options:
           type: object
   responses:
-    InvalidRequestBody:
-      description: Occurs when the client did not send a valid JSON object in the request body.
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
       content:
-        application/hal+json:
+        text/plain:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
-            message: The request body was not a single JSON object.
+            type: string
+          example: Missing content-type header
     InvalidQuery:
       description: Returned if the client sends invalid request parameters e.g. filters
       content:
@@ -734,6 +865,16 @@ components:
             _type: Error
             errorIdentifier: urn:openproject-org:api:v3:errors:InvalidQuery
             message: Filters Invalid filter does not exist.
+    InvalidRequestBody:
+      description: Occurs when the client did not send a valid JSON object in the request body.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+            message: The request body was not a single JSON object.
     UnsupportedMediaType:
       description: Occurs when the client sends an unsupported Content-Type header.
       content:
@@ -744,147 +885,6 @@ components:
             _type: Error
             errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
             message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
-    MissingContentType:
-      description: Occurs when the client did not send a Content-Type header
-      content:
-        text/plain:
-          schema:
-            type: string
-          example: Missing content-type header
-  examples:
-    GridSimpleCollectionResponse:
-      value:
-        _type: Collection
-        total: 1
-        count: 1
-        pageSize: 30
-        offset: 1
-        _embedded:
-          elements:
-          - _type: Grid
-            id: 2
-            rowCount: 8
-            columnCount: 5
-            widgets:
-            - _type: GridWidget
-              id: 1
-              identifier: time_entries_current_user
-              startRow: 1
-              endRow: 8
-              startColumn: 1
-              endColumn: 3
-            - _type: GridWidget
-              id: 2
-              identifier: news
-              startRow: 3
-              endRow: 8
-              startColumn: 4
-              endColumn: 5
-            - _type: GridWidget
-              id: 3
-              identifier: documents
-              startRow: 1
-              endRow: 3
-              startColumn: 3
-              endColumn: 6
-            createdAt: '2018-12-03T16:58:30.297Z'
-            updatedAt: '2018-12-13T19:36:40.352Z'
-            _links:
-              scope:
-                href: /my/page
-                type: text/html
-              updateImmediately:
-                href: /api/v3/grids/2
-                method: patch
-              update:
-                href: /api/v3/grids/2/form
-                method: post
-              self:
-                href: /api/v3/grids/2
-        _links:
-          self:
-            href: /api/v3/grids
-          jumpTo:
-            href: /api/v3/grids?filters=%5B%5D&offset=%7Boffset%7D&pageSize=20
-            templated: true
-          changeSize:
-            href: /api/v3/grids?filters=%5B%5D&offset=1&pageSize=%7Bsize%7D
-            templated: true
-    GridSimplePatchModel:
-      value:
-        rowCount: 1
-        columnCount: 2
-        widgets:
-        - _type: GridWidget
-          identifier: tasks
-          startRow: 1
-          endRow: 2
-          startColumn: 1
-          endColumn: 2
-          options:
-            name: Tasks
-        - _type: GridWidget
-          identifier: news
-          startRow: 1
-          endRow: 2
-          startColumn: 2
-          endColumn: 3
-          options:
-            name: News
-        _links:
-          scope:
-            href: /my/page
-            type: text/html
-    GridSimpleResponse:
-      value:
-        _type: Grid
-        id: 2
-        rowCount: 8
-        columnCount: 5
-        widgets:
-        - _type: GridWidget
-          id: 1
-          identifier: tasks
-          startRow: 1
-          endRow: 8
-          startColumn: 1
-          endColumn: 3
-        - _type: GridWidget
-          id: 2
-          identifier: news
-          startRow: 3
-          endRow: 8
-          startColumn: 4
-          endColumn: 5
-        - _type: GridWidget
-          id: 3
-          identifier: documents
-          startRow: 1
-          endRow: 3
-          startColumn: 3
-          endColumn: 6
-        createdAt: '2018-12-03T16:58:30.915Z'
-        updatedAt: '2018-12-13T19:36:40.588Z'
-        _links:
-          self:
-            href: /api/v3/grids/2
-          attachments:
-            href: /api/v3/grids/2/attachments
-          addAttachment:
-            href: /api/v3/grids/2/attachments
-            method: post
-          scope:
-            href: /my/page
-            type: text/html
-          updateImmediately:
-            href: /api/v3/grids/2
-            method: patch
-          update:
-            href: /api/v3/grids/2/form
-            method: post
-          delete:
-            href: /api/v3/grids/2
-            method: delete
   securitySchemes:
     BasicAuth:
       type: http
