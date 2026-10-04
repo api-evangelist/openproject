@@ -4976,6 +4976,8 @@ apis:
   humanURL: https://www.openproject.org/docs/api/
   baseURL: https://community.openproject.org/api/v3
   tags:
+  - Authentication
+  tags_raw:
   - OAuth2
   properties:
   - type: OpenAPI
