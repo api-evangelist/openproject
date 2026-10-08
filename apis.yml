@@ -5008,6 +5008,8 @@ apis:
   - type: GitHub
     url: https://github.com/opf/openproject
 common:
+  - type: FinOps
+    url: finops/openproject-finops.yml
   - type: RateLimits
     url: rate-limits/openproject-rate-limits.yml
   - type: Plans
