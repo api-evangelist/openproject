@@ -118,99 +118,7 @@ paths:
       operationId: View_values_schema
       summary: View Values schema
 components:
-  examples:
-    ValuesPropertyStartDate:
-      value:
-        _type: Values::Property
-        property: startDate
-        value: '2021-01-01'
-        _links:
-          self:
-            href: api/v3/notifications/123/details/0
-          schema:
-            href: api/v3/values/schemas/startDate
-    ValuesPropertyDueDateSchema:
-      value:
-        _type: Schema
-        property:
-          name: Property
-          type: String
-        value:
-          name: Due date
-          type: Date
-        _links:
-          self:
-            href: api/v3/values/schemas/dueDate
-    ValuesPropertyStartDateSchema:
-      value:
-        _type: Schema
-        property:
-          name: Property
-          type: String
-        value:
-          name: Start date
-          type: Date
-        _links:
-          self:
-            href: api/v3/values/schemas/startDate
-    ValuesPropertyDate:
-      value:
-        _type: Values::Property
-        property: date
-        value: '2021-01-01'
-        _links:
-          self:
-            href: api/v3/notifications/123/details/0
-          schema:
-            href: api/v3/values/schemas/date
-    ValuesPropertyDateSchema:
-      value:
-        _type: Schema
-        property:
-          name: Property
-          type: String
-        value:
-          name: Date
-          type: Date
-        _links:
-          self:
-            href: api/v3/values/schemas/date
-    ValuesPropertyDueDate:
-      value:
-        _type: Values::Property
-        property: dueDate
-        value: '2021-01-01'
-        _links:
-          self:
-            href: api/v3/notifications/123/details/0
-          schema:
-            href: api/v3/values/schemas/dueDate
   schemas:
-    SchemaModel:
-      type: object
-      required:
-      - _type
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - Schema
-        _dependencies:
-          type: array
-          description: A list of dependencies between one property's value and another property
-          items:
-            type: string
-        _links:
-          type: object
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This schema
-
-
-                  **Resource**: Schema'
     Link:
       type: object
       required:
@@ -282,6 +190,31 @@ components:
 
 
                   **Resource**: Schema'
+    SchemaModel:
+      type: object
+      required:
+      - _type
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Schema
+        _dependencies:
+          type: array
+          description: A list of dependencies between one property's value and another property
+          items:
+            type: string
+        _links:
+          type: object
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This schema
+
+
+                  **Resource**: Schema'
     ErrorResponse:
       type: object
       required:
@@ -308,6 +241,73 @@ components:
         message:
           type: string
           example: Project can't be blank.
+  examples:
+    ValuesPropertyDueDateSchema:
+      value:
+        _type: Schema
+        property:
+          name: Property
+          type: String
+        value:
+          name: Due date
+          type: Date
+        _links:
+          self:
+            href: api/v3/values/schemas/dueDate
+    ValuesPropertyStartDateSchema:
+      value:
+        _type: Schema
+        property:
+          name: Property
+          type: String
+        value:
+          name: Start date
+          type: Date
+        _links:
+          self:
+            href: api/v3/values/schemas/startDate
+    ValuesPropertyDate:
+      value:
+        _type: Values::Property
+        property: date
+        value: '2021-01-01'
+        _links:
+          self:
+            href: api/v3/notifications/123/details/0
+          schema:
+            href: api/v3/values/schemas/date
+    ValuesPropertyDueDate:
+      value:
+        _type: Values::Property
+        property: dueDate
+        value: '2021-01-01'
+        _links:
+          self:
+            href: api/v3/notifications/123/details/0
+          schema:
+            href: api/v3/values/schemas/dueDate
+    ValuesPropertyDateSchema:
+      value:
+        _type: Schema
+        property:
+          name: Property
+          type: String
+        value:
+          name: Date
+          type: Date
+        _links:
+          self:
+            href: api/v3/values/schemas/date
+    ValuesPropertyStartDate:
+      value:
+        _type: Values::Property
+        property: startDate
+        value: '2021-01-01'
+        _links:
+          self:
+            href: api/v3/notifications/123/details/0
+          schema:
+            href: api/v3/values/schemas/startDate
   securitySchemes:
     BasicAuth:
       type: http

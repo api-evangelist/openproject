@@ -138,75 +138,6 @@ paths:
                 message: Filters Invalid filter does not exist.
 components:
   schemas:
-    WorkspaceCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/OffsetPaginatedCollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            allOf:
-            - $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
-            - type: object
-              properties:
-                representations:
-                  type: array
-                  items:
-                    allOf:
-                    - $ref: '#/components/schemas/Link'
-                    - description: A workspace collection representation in a specific file format.
-          _embedded:
-            type: object
-            required:
-            - elements
-            properties:
-              elements:
-                type: array
-                items:
-                  oneOf:
-                  - $ref: '#/components/schemas/PortfolioModel'
-                  - $ref: '#/components/schemas/ProgramModel'
-                  - $ref: '#/components/schemas/ProjectModel'
-    CollectionLinks:
-      type: object
-      required:
-      - self
-      properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This collection resource.
-
-
-              **Resource**: Collection'
-    CustomFieldProperties:
-      type: object
-      patternProperties:
-        ^customField\d+$:
-          type:
-          - 'null'
-          - number
-          - boolean
-          - string
-          - object
-          description: 'A custom field value, that belongs to a custom field of a simple type:
-
-
-            - Boolean
-
-            - Date
-
-            - Float
-
-            - Integer
-
-            - Link (URL)
-
-            - Text
-
-            - Long text'
     ProjectModel:
       allOf:
       - $ref: '#/components/schemas/CustomFieldProperties'
@@ -452,6 +383,32 @@ components:
 
 
                       **Resource**: Workspace'
+    CustomFieldProperties:
+      type: object
+      patternProperties:
+        ^customField\d+$:
+          type:
+          - 'null'
+          - number
+          - boolean
+          - string
+          - object
+          description: 'A custom field value, that belongs to a custom field of a simple type:
+
+
+            - Boolean
+
+            - Date
+
+            - Float
+
+            - Integer
+
+            - Link (URL)
+
+            - Text
+
+            - Long text'
     Link:
       type: object
       required:
@@ -485,33 +442,70 @@ components:
       example:
         href: /api/v3/work_packages
         method: POST
-    Formattable:
+    CollectionLinks:
       type: object
       required:
-      - format
+      - self
       properties:
-        format:
-          type: string
-          enum:
-          - plain
-          - markdown
-          - custom
-          readOnly: true
-          description: Indicates the formatting language of the raw text
-          example: markdown
-        raw:
-          type: string
-          description: The raw text, as entered by the user
-          example: I **am** formatted!
-        html:
-          type: string
-          readOnly: true
-          description: The text converted to HTML according to the format
-          example: I <strong>am</strong> formatted!
-      example:
-        format: markdown
-        raw: I am formatted!
-        html: I am formatted!
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
+    OffsetPaginatedCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - pageSize
+        - offset
+        - _links
+        properties:
+          pageSize:
+            type: integer
+            description: 'The amount of elements per page. If not set by the request this value defaults to the server''s system
+
+              settings.'
+            minimum: 0
+          offset:
+            type: integer
+            description: The page offset indicating on which page the element collection starts.
+            minimum: 0
+          _links:
+            $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
+    WorkspaceCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/OffsetPaginatedCollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            allOf:
+            - $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
+            - type: object
+              properties:
+                representations:
+                  type: array
+                  items:
+                    allOf:
+                    - $ref: '#/components/schemas/Link'
+                    - description: A workspace collection representation in a specific file format.
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                items:
+                  oneOf:
+                  - $ref: '#/components/schemas/PortfolioModel'
+                  - $ref: '#/components/schemas/ProgramModel'
+                  - $ref: '#/components/schemas/ProjectModel'
     OffsetPaginatedCollectionLinks:
       allOf:
       - $ref: '#/components/schemas/CollectionLinks'
@@ -546,277 +540,6 @@ components:
                 # Conditions
 
                 - The collection is not on the last page.'
-    ProgramModel:
-      allOf:
-      - $ref: '#/components/schemas/CustomFieldProperties'
-      - $ref: '#/components/schemas/CustomCommentProperties'
-      - type: object
-        properties:
-          _type:
-            type: string
-            enum:
-            - Program
-          id:
-            type: integer
-            description: Programs' id
-            minimum: 1
-          identifier:
-            type: string
-          name:
-            type: string
-          active:
-            type: boolean
-            description: Indicates whether the program is currently active or already archived
-          favorited:
-            type: boolean
-            description: Indicates whether the program is favorited by the current user
-          statusExplanation:
-            allOf:
-            - $ref: '#/components/schemas/Formattable'
-            - description: A text detailing and explaining why the program has the reported status
-          public:
-            type: boolean
-            description: Indicates whether the program is accessible for everybody
-          description:
-            $ref: '#/components/schemas/Formattable'
-          createdAt:
-            type: string
-            format: date-time
-            description: Time of creation. Can be writable by admins with the `apiv3_write_readonly_attributes` setting enabled.
-          updatedAt:
-            type: string
-            format: date-time
-            description: Time of the most recent change to the program
-          _links:
-            type: object
-            required:
-            - self
-            - categories
-            properties:
-              update:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Form endpoint that aids in updating this program
-
-
-                    # Conditions
-
-
-                    **Permission**: edit workspace'
-              updateImmediately:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Directly update this program
-
-
-                    # Conditions
-
-
-                    **Permission**: edit workspace'
-              delete:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Delete this program
-
-
-                    # Conditions
-
-
-                    **Permission**: admin'
-              favor:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Mark this program as favorited by the current user
-
-
-                    # Conditions
-
-
-                    Only present if the program is not yet favorited
-
-
-                    Permission**: none but login is required'
-              disfavor:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Mark this program as not favorited by the current user
-
-
-                    # Conditions
-
-                    Only present if the program is favorited by the current user
-
-
-                    Permission**: none but login is required'
-              createWorkPackage:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Form endpoint that aids in preparing and creating a work package
-
-
-                    # Conditions
-
-
-                    **Permission**: add work packages'
-              createWorkPackageImmediately:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Directly creates a work package in the program
-
-
-                    # Conditions
-
-
-                    **Permission**: add work packages'
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'This program
-
-
-                    **Resource**: Program'
-              categories:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Categories available in this program
-
-
-                    **Resource**: Collection'
-              types:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Types available in this program
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view work packages or manage types'
-              versions:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Versions available in this program
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view work packages or manage versions'
-              memberships:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Memberships in the  program
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view members'
-              workPackages:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Work Packages of this program
-
-
-                    **Resource**: Collection'
-              parent:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Parent of the program
-
-
-                    **Resource**: Program
-
-
-                    # Conditions
-
-
-                    **Permission** edit workspace'
-              status:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Denotes the status of the program, so whether the program is on track, at risk or is having trouble.
-
-
-                    **Resource**: ProjectStatus
-
-
-                    # Conditions
-
-
-                    **Permission** edit workspace'
-              storages:
-                type: array
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/Link'
-                  - description: 'The link to a storage that is active for this program.
-
-
-                      **Resource**: Storage
-
-
-                      # Conditions
-
-
-                      **Permission**: view_file_links'
-              projectStorages:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'The project storage collection of this program.
-
-
-                    **Resource**: Collection
-
-
-                    # Conditions
-
-
-                    **Permission**: view_file_links'
-              ancestors:
-                type: array
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/Link'
-                  - description: 'A collection of links to the ancestor workspace.
-
-
-                      **Resource**: Workspace'
-    ErrorResponse:
-      type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
     PortfolioModel:
       allOf:
       - $ref: '#/components/schemas/CustomFieldProperties'
@@ -1062,17 +785,33 @@ components:
 
 
                       **Resource**: Portfolio'
-    CustomCommentProperties:
+    Formattable:
       type: object
-      patternProperties:
-        ^customComment\d+$:
-          type:
-          - 'null'
-          - string
-          description: 'A plain-text comment associated with a project custom field that has comments enabled.
-
-
-            The property is only present when the corresponding `customField{N}` has `has_comment` set to `true`.'
+      required:
+      - format
+      properties:
+        format:
+          type: string
+          enum:
+          - plain
+          - markdown
+          - custom
+          readOnly: true
+          description: Indicates the formatting language of the raw text
+          example: markdown
+        raw:
+          type: string
+          description: The raw text, as entered by the user
+          example: I **am** formatted!
+        html:
+          type: string
+          readOnly: true
+          description: The text converted to HTML according to the format
+          example: I <strong>am</strong> formatted!
+      example:
+        format: markdown
+        raw: I am formatted!
+        html: I am formatted!
     CollectionModel:
       type: object
       required:
@@ -1095,27 +834,288 @@ components:
           minimum: 0
         _links:
           $ref: '#/components/schemas/CollectionLinks'
-    OffsetPaginatedCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - pageSize
-        - offset
-        - _links
-        properties:
-          pageSize:
-            type: integer
-            description: 'The amount of elements per page. If not set by the request this value defaults to the server''s system
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    CustomCommentProperties:
+      type: object
+      patternProperties:
+        ^customComment\d+$:
+          type:
+          - 'null'
+          - string
+          description: 'A plain-text comment associated with a project custom field that has comments enabled.
 
-              settings.'
-            minimum: 0
-          offset:
+
+            The property is only present when the corresponding `customField{N}` has `has_comment` set to `true`.'
+    ProgramModel:
+      allOf:
+      - $ref: '#/components/schemas/CustomFieldProperties'
+      - $ref: '#/components/schemas/CustomCommentProperties'
+      - type: object
+        properties:
+          _type:
+            type: string
+            enum:
+            - Program
+          id:
             type: integer
-            description: The page offset indicating on which page the element collection starts.
-            minimum: 0
+            description: Programs' id
+            minimum: 1
+          identifier:
+            type: string
+          name:
+            type: string
+          active:
+            type: boolean
+            description: Indicates whether the program is currently active or already archived
+          favorited:
+            type: boolean
+            description: Indicates whether the program is favorited by the current user
+          statusExplanation:
+            allOf:
+            - $ref: '#/components/schemas/Formattable'
+            - description: A text detailing and explaining why the program has the reported status
+          public:
+            type: boolean
+            description: Indicates whether the program is accessible for everybody
+          description:
+            $ref: '#/components/schemas/Formattable'
+          createdAt:
+            type: string
+            format: date-time
+            description: Time of creation. Can be writable by admins with the `apiv3_write_readonly_attributes` setting enabled.
+          updatedAt:
+            type: string
+            format: date-time
+            description: Time of the most recent change to the program
           _links:
-            $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
+            type: object
+            required:
+            - self
+            - categories
+            properties:
+              update:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Form endpoint that aids in updating this program
+
+
+                    # Conditions
+
+
+                    **Permission**: edit workspace'
+              updateImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Directly update this program
+
+
+                    # Conditions
+
+
+                    **Permission**: edit workspace'
+              delete:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Delete this program
+
+
+                    # Conditions
+
+
+                    **Permission**: admin'
+              favor:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Mark this program as favorited by the current user
+
+
+                    # Conditions
+
+
+                    Only present if the program is not yet favorited
+
+
+                    Permission**: none but login is required'
+              disfavor:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Mark this program as not favorited by the current user
+
+
+                    # Conditions
+
+                    Only present if the program is favorited by the current user
+
+
+                    Permission**: none but login is required'
+              createWorkPackage:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Form endpoint that aids in preparing and creating a work package
+
+
+                    # Conditions
+
+
+                    **Permission**: add work packages'
+              createWorkPackageImmediately:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Directly creates a work package in the program
+
+
+                    # Conditions
+
+
+                    **Permission**: add work packages'
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This program
+
+
+                    **Resource**: Program'
+              categories:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Categories available in this program
+
+
+                    **Resource**: Collection'
+              types:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Types available in this program
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view work packages or manage types'
+              versions:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Versions available in this program
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view work packages or manage versions'
+              memberships:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Memberships in the  program
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view members'
+              workPackages:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Work Packages of this program
+
+
+                    **Resource**: Collection'
+              parent:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Parent of the program
+
+
+                    **Resource**: Program
+
+
+                    # Conditions
+
+
+                    **Permission** edit workspace'
+              status:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Denotes the status of the program, so whether the program is on track, at risk or is having trouble.
+
+
+                    **Resource**: ProjectStatus
+
+
+                    # Conditions
+
+
+                    **Permission** edit workspace'
+              storages:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'The link to a storage that is active for this program.
+
+
+                      **Resource**: Storage
+
+
+                      # Conditions
+
+
+                      **Permission**: view_file_links'
+              projectStorages:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The project storage collection of this program.
+
+
+                    **Resource**: Collection
+
+
+                    # Conditions
+
+
+                    **Permission**: view_file_links'
+              ancestors:
+                type: array
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'A collection of links to the ancestor workspace.
+
+
+                      **Resource**: Workspace'
   securitySchemes:
     BasicAuth:
       type: http

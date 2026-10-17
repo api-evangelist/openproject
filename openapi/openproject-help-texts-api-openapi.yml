@@ -109,111 +109,6 @@ components:
       example:
         href: /api/v3/work_packages
         method: POST
-    Formattable:
-      type: object
-      required:
-      - format
-      properties:
-        format:
-          type: string
-          enum:
-          - plain
-          - markdown
-          - custom
-          readOnly: true
-          description: Indicates the formatting language of the raw text
-          example: markdown
-        raw:
-          type: string
-          description: The raw text, as entered by the user
-          example: I **am** formatted!
-        html:
-          type: string
-          readOnly: true
-          description: The text converted to HTML according to the format
-          example: I <strong>am</strong> formatted!
-      example:
-        format: markdown
-        raw: I am formatted!
-        html: I am formatted!
-    HelpTextCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'This help text collection
-
-
-                    **Resource**: HelpTextCollectionModel'
-          _embedded:
-            type: object
-            required:
-            - elements
-            properties:
-              elements:
-                type: array
-                items:
-                  $ref: '#/components/schemas/HelpTextModel'
-      example:
-        total: 2
-        count: 2
-        _type: Collection
-        _embedded:
-          elements:
-          - _type: HelpText
-            _links:
-              self:
-                href: /api/v3/help_texts/1
-              editText:
-                href: /admin/attribute_help_texts/1/edit
-                type: text/html
-              attachments:
-                href: /api/v3/help_texts/1/attachments
-              addAttachment:
-                href: /api/v3/help_texts/1/attachments
-                method: post
-            id: 1
-            attribute: id
-            attributeCaption: ID
-            scope: WorkPackage
-            helpText:
-              format: markdown
-              raw: Help text for id attribute.
-              html: <p>Help text for id attribute.</p>
-          - _type: HelpText
-            _links:
-              self:
-                href: /api/v3/help_texts/2
-              editText:
-                href: /admin/attribute_help_texts/2/edit
-                type: text/html
-              attachments:
-                href: /api/v3/help_texts/2/attachments
-              addAttachment:
-                href: /api/v3/help_texts/2/attachments
-                method: post
-            id: 2
-            attribute: status
-            attributeCaption: Status
-            scope: WorkPackage
-            helpText:
-              format: markdown
-              raw: Help text for status attribute.
-              html: <p>Help text for status attribute.</p>
-        _links:
-          self:
-            href: /api/v3/help_texts
     HelpTextModel:
       type: object
       required:
@@ -296,6 +191,133 @@ components:
           addAttachment:
             href: /api/v3/help_texts/1/attachments
             method: post
+    HelpTextCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This help text collection
+
+
+                    **Resource**: HelpTextCollectionModel'
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HelpTextModel'
+      example:
+        total: 2
+        count: 2
+        _type: Collection
+        _embedded:
+          elements:
+          - _type: HelpText
+            _links:
+              self:
+                href: /api/v3/help_texts/1
+              editText:
+                href: /admin/attribute_help_texts/1/edit
+                type: text/html
+              attachments:
+                href: /api/v3/help_texts/1/attachments
+              addAttachment:
+                href: /api/v3/help_texts/1/attachments
+                method: post
+            id: 1
+            attribute: id
+            attributeCaption: ID
+            scope: WorkPackage
+            helpText:
+              format: markdown
+              raw: Help text for id attribute.
+              html: <p>Help text for id attribute.</p>
+          - _type: HelpText
+            _links:
+              self:
+                href: /api/v3/help_texts/2
+              editText:
+                href: /admin/attribute_help_texts/2/edit
+                type: text/html
+              attachments:
+                href: /api/v3/help_texts/2/attachments
+              addAttachment:
+                href: /api/v3/help_texts/2/attachments
+                method: post
+            id: 2
+            attribute: status
+            attributeCaption: Status
+            scope: WorkPackage
+            helpText:
+              format: markdown
+              raw: Help text for status attribute.
+              html: <p>Help text for status attribute.</p>
+        _links:
+          self:
+            href: /api/v3/help_texts
+    CollectionModel:
+      type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
+    Formattable:
+      type: object
+      required:
+      - format
+      properties:
+        format:
+          type: string
+          enum:
+          - plain
+          - markdown
+          - custom
+          readOnly: true
+          description: Indicates the formatting language of the raw text
+          example: markdown
+        raw:
+          type: string
+          description: The raw text, as entered by the user
+          example: I **am** formatted!
+        html:
+          type: string
+          readOnly: true
+          description: The text converted to HTML according to the format
+          example: I <strong>am</strong> formatted!
+      example:
+        format: markdown
+        raw: I am formatted!
+        html: I am formatted!
     ErrorResponse:
       type: object
       required:
@@ -322,28 +344,6 @@ components:
         message:
           type: string
           example: Project can't be blank.
-    CollectionModel:
-      type: object
-      required:
-      - _type
-      - total
-      - count
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - Collection
-        total:
-          type: integer
-          description: The total amount of elements available in the collection.
-          minimum: 0
-        count:
-          type: integer
-          description: Actual amount of elements in this response.
-          minimum: 0
-        _links:
-          $ref: '#/components/schemas/CollectionLinks'
   securitySchemes:
     BasicAuth:
       type: http

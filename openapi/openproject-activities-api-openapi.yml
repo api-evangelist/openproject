@@ -487,6 +487,65 @@ components:
                   allOf:
                   - $ref: '#/components/schemas/AttachmentModel'
                   - description: Collection of Attachments
+    CustomFieldProperties:
+      type: object
+      patternProperties:
+        ^customField\d+$:
+          type:
+          - 'null'
+          - number
+          - boolean
+          - string
+          - object
+          description: 'A custom field value, that belongs to a custom field of a simple type:
+
+
+            - Boolean
+
+            - Date
+
+            - Float
+
+            - Integer
+
+            - Link (URL)
+
+            - Text
+
+            - Long text'
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
     CollectionLinks:
       type: object
       required:
@@ -499,6 +558,233 @@ components:
 
 
               **Resource**: Collection'
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    EmojiReactions_Model:
+      type: object
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: Total number of emoji reactions
+          minimum: 0
+        count:
+          type: integer
+          description: Number of emoji reactions in this response
+          minimum: 0
+        _embedded:
+          type: object
+          properties:
+            elements:
+              type: array
+              items:
+                $ref: '#/components/schemas/EmojiReactionModel'
+        _links:
+          type: object
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: This collection
+      example:
+        _type: Collection
+        total: 2
+        count: 2
+        _embedded:
+          elements:
+          - _type: EmojiReaction
+            id: 1-thumbs_up
+            reaction: thumbs_up
+            emoji: 👍
+            reactionsCount: 3
+            firstReactionAt: '2024-04-08T15:37:19.275Z'
+            _links:
+              self:
+                href: /api/v3/emoji_reactions/1-thumbs_up
+              reactable:
+                href: /api/v3/activities/1
+              reactingUsers:
+              - href: /api/v3/users/435
+                title: John Doe
+              - href: /api/v3/users/436
+                title: Jane Smith
+              - href: /api/v3/users/437
+                title: Bob Johnson
+          - _type: EmojiReaction
+            id: 1-heart
+            reaction: heart
+            emoji: ❤️
+            reactionsCount: 1
+            firstReactionAt: '2024-04-08T15:38:19.275Z'
+            _links:
+              self:
+                href: /api/v3/emoji_reactions/1-heart
+              reactable:
+                href: /api/v3/activities/1
+              reactingUsers:
+              - href: /api/v3/users/435
+                title: John Doe
+        _links:
+          self:
+            href: /api/v3/activities/1/emoji_reactions
+    ActivityCommentWriteModel:
+      type: object
+      properties:
+        comment:
+          type: object
+          properties:
+            raw:
+              type: string
+              description: The raw content of the comment
+        internal:
+          type: boolean
+          description: 'Determines whether this comment is internal. This is only available to users
+
+            with `add_internal_comments` permission. It defaults to `false`, if unset.'
+          default: false
+      example:
+        comment:
+          raw: I think this is awesome!
+    Formattable:
+      type: object
+      required:
+      - format
+      properties:
+        format:
+          type: string
+          enum:
+          - plain
+          - markdown
+          - custom
+          readOnly: true
+          description: Indicates the formatting language of the raw text
+          example: markdown
+        raw:
+          type: string
+          description: The raw text, as entered by the user
+          example: I **am** formatted!
+        html:
+          type: string
+          readOnly: true
+          description: The text converted to HTML according to the format
+          example: I <strong>am</strong> formatted!
+      example:
+        format: markdown
+        raw: I am formatted!
+        html: I am formatted!
+    CollectionModel:
+      type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
+    EmojiReactionModel:
+      type: object
+      properties:
+        _type:
+          type: string
+          enum:
+          - EmojiReaction
+        id:
+          type: string
+          description: 'Emoji reaction id (format: reactable_id-reaction)'
+          example: 1-thumbs_up
+        reaction:
+          type: string
+          description: The reaction identifier
+          example: thumbs_up
+        emoji:
+          type: string
+          description: The emoji character
+          example: 👍
+        reactionsCount:
+          type: integer
+          description: Number of users who reacted with this emoji
+          minimum: 1
+          example: 3
+        firstReactionAt:
+          type: string
+          format: date-time
+          description: Time of the first reaction
+        _links:
+          type: object
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: This emoji reaction
+            reactable:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: The activity this emoji reaction belongs to
+            reactingUsers:
+              type: array
+              items:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: The users who reacted with this emoji
+      example:
+        _type: EmojiReaction
+        id: 1-thumbs_up
+        reaction: thumbs_up
+        emoji: 👍
+        reactionsCount: 3
+        firstReactionAt: '2024-04-08T15:37:19.275Z'
+        _links:
+          self:
+            href: /api/v3/emoji_reactions/1-thumbs_up
+          reactable:
+            href: /api/v3/activities/1
+          reactingUsers:
+          - href: /api/v3/users/435
+            title: John Doe
+          - href: /api/v3/users/436
+            title: Jane Smith
+          - href: /api/v3/users/437
+            title: Bob Johnson
     AttachmentModel:
       type: object
       required:
@@ -624,92 +910,275 @@ components:
           algorithm: md5
           hash: 64c26a8403cd796ea4cf913cda2ee4a9
         createdAt: '2014-05-21T08:51:20.396Z'
-    CustomFieldProperties:
+    ActivityModel:
       type: object
-      patternProperties:
-        ^customField\d+$:
-          type:
-          - 'null'
-          - number
-          - boolean
-          - string
-          - object
-          description: 'A custom field value, that belongs to a custom field of a simple type:
-
-
-            - Boolean
-
-            - Date
-
-            - Float
-
-            - Integer
-
-            - Link (URL)
-
-            - Text
-
-            - Long text'
-    Link:
-      type: object
-      required:
-      - href
       properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
-          type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
-    Formattable:
-      type: object
-      required:
-      - format
-      properties:
-        format:
+        _type:
           type: string
           enum:
-          - plain
-          - markdown
-          - custom
-          readOnly: true
-          description: Indicates the formatting language of the raw text
-          example: markdown
-        raw:
+          - Activity::Comment
+        id:
+          type: integer
+          description: Activity id
+          minimum: 1
+        version:
+          type: integer
+          description: Activity version
+          minimum: 1
+        comment:
+          $ref: '#/components/schemas/Formattable'
+        details:
+          type: array
+          items:
+            $ref: '#/components/schemas/Formattable'
+        internal:
+          type: boolean
+          description: Whether this activity is internal (only visible to users with view_internal_comments permission)
+        createdAt:
           type: string
-          description: The raw text, as entered by the user
-          example: I **am** formatted!
-        html:
+          format: date-time
+          description: Time of creation
+        updatedAt:
           type: string
-          readOnly: true
-          description: The text converted to HTML according to the format
-          example: I <strong>am</strong> formatted!
+          format: date-time
+          description: Time of update
+        _embedded:
+          type: object
+          properties:
+            attachments:
+              allOf:
+              - $ref: '#/components/schemas/Attachments_Model'
+              - description: Collection of attachments for this activity
+            workPackage:
+              allOf:
+              - $ref: '#/components/schemas/WorkPackageModel'
+              - description: 'The work package this activity belongs to
+
+
+                  # Conditions
+
+
+                  Only embedded when the `journable` of the activity is a work package'
+            emojiReactions:
+              allOf:
+              - $ref: '#/components/schemas/EmojiReactions_Model'
+              - description: Collection of emoji reactions for this activity
+        _links:
+          type: object
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This activity
+
+
+                  **Resource**: Activity'
+            workPackage:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The work package this activity belongs to
+
+
+                  **Resource**: WorkPackage'
+            user:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The user who created this activity
+
+
+                  **Resource**: Principal'
+            update:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: Update this activity
+            attachments:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The attachment collection of this activity
+
+
+                  **Resource**: Attachments'
+            addAttachment:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'Attach a file to the activity
+
+
+                  # Conditions
+
+
+                  **Permissions**:
+
+                  - `add_work_package_comments`
+
+                  - for internal comments: `add_internal_comments`'
+            emojiReactions:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The emoji reactions collection of this activity
+
+
+                  **Resource**: EmojiReactions'
       example:
-        format: markdown
-        raw: I am formatted!
-        html: I am formatted!
+        id: 1
+        _type: Activity::Comment
+        _embedded:
+          attachments:
+            _type: Collection
+            total: 1
+            count: 1
+            _embedded:
+              elements:
+              - _type: Attachment
+                id: 30388
+                fileName: Task_Ensure_financing___4___OpenProject_DEV.jpeg
+                fileSize: 540992
+                description:
+                  format: plain
+                  raw: ''
+                  html: ''
+                status: uploaded
+                contentType: image/jpeg
+                digest:
+                  algorithm: md5
+                  hash: d02d312b25383b595a9fa10f1a8999fe
+                createdAt: '2025-04-08T15:37:19.275Z'
+                _links:
+                  self:
+                    href: /api/v3/attachments/30388
+                    title: Task_Ensure_financing___4___OpenProject_DEV.jpeg
+                  author:
+                    href: /api/v3/users/435
+                    title: Firstname
+                  container:
+                    href: /api/v3/activities/79090
+                  staticDownloadLocation:
+                    href: /api/v3/attachments/30388/content
+                  downloadLocation:
+                    href: /api/v3/attachments/30388/content
+                  delete:
+                    href: /api/v3/attachments/30388
+                    method: delete
+            _links:
+              self:
+                href: /api/v3/activities/79090/attachments
+          emojiReactions:
+            _type: Collection
+            total: 2
+            count: 2
+            _embedded:
+              elements:
+              - _type: EmojiReaction
+                id: 1-thumbs_up
+                reaction: thumbs_up
+                emoji: 👍
+                reactionsCount: 3
+                firstReactionAt: '2024-04-08T15:37:19.275Z'
+                _links:
+                  self:
+                    href: /api/v3/emoji_reactions/1-thumbs_up
+                  reactable:
+                    href: /api/v3/activities/1
+                  reactingUsers:
+                  - href: /api/v3/users/435
+                    title: John Doe
+                  - href: /api/v3/users/436
+                    title: Jane Smith
+                  - href: /api/v3/users/437
+                    title: Bob Johnson
+              - _type: EmojiReaction
+                id: 1-heart
+                reaction: heart
+                emoji: ❤️
+                reactionsCount: 1
+                firstReactionAt: '2024-04-08T15:38:19.275Z'
+                _links:
+                  self:
+                    href: /api/v3/emoji_reactions/1-heart
+                  reactable:
+                    href: /api/v3/activities/1
+                  reactingUsers:
+                  - href: /api/v3/users/435
+                    title: John Doe
+            _links:
+              self:
+                href: /api/v3/activities/1/emoji_reactions
+          workPackage:
+            _type: WorkPackage
+            id: 10403
+            lockVersion: 2
+            subject: Ensure financing
+            description:
+              format: markdown
+              raw: Lorem ipsum dolor sit amet.
+              html: <p>Lorem ipsum dolor sit amet.</p>
+            scheduleManually: true
+            startDate: null
+            dueDate: null
+            derivedStartDate: null
+            derivedDueDate: null
+            estimatedTime: null
+            derivedEstimatedTime: null
+            derivedRemainingTime: null
+            duration: null
+            ignoreNonWorkingDays: false
+            percentageDone: null
+            derivedPercentageDone: null
+            createdAt: '2025-03-24T13:11:09.480Z'
+            updatedAt: '2025-04-14T11:00:02.411Z'
+            _links:
+              self:
+                href: /api/v3/work_packages/10403
+                title: Ensure financing
+              type:
+                href: /api/v3/types/1
+                title: Task
+              status:
+                href: /api/v3/statuses/1
+                title: New
+              project:
+                href: /api/v3/projects/918
+                title: RVC Test
+              schema:
+                href: /api/v3/work_packages/schemas/11-2
+              author:
+                href: /api/v3/users/1
+                title: OpenProject Admin - admin
+              priority:
+                href: /api/v3/priorities/2
+                title: Normal
+              ancestors: []
+        _links:
+          self:
+            href: /api/v3/activity/1
+            title: Priority changed from High to Low
+          workPackage:
+            href: /api/v3/work_packages/1
+            title: quis numquam qui voluptatum quia praesentium blanditiis nisi
+          user:
+            href: /api/v3/users/1
+            title: John Sheppard - admin
+          attachments:
+            href: /api/v3/activities/1/attachments
+          emojiReactions:
+            href: /api/v3/activities/1/emoji_reactions
+          addAttachment:
+            href: /api/v3/activities/1/attachments
+            method: post
+          update:
+            href: /api/v3/activities/1
+            method: patch
+        details:
+        - format: markdown
+          raw: Lorem ipsum dolor sit amet.
+          html: <p>Lorem ipsum dolor sit amet.</p>
+        comment:
+          format: markdown
+          raw: Lorem ipsum dolor sit amet.
+          html: <p>Lorem ipsum dolor sit amet.</p>
+        createdAt: '2014-05-21T08:51:20.721Z'
+        updatedAt: '2014-05-21T09:14:02.929Z'
+        version: 31
     WorkPackageModel:
       allOf:
       - $ref: '#/components/schemas/CustomFieldProperties'
@@ -1465,475 +1934,6 @@ components:
         file:
           type: string
           format: binary
-    ActivityModel:
-      type: object
-      properties:
-        _type:
-          type: string
-          enum:
-          - Activity::Comment
-        id:
-          type: integer
-          description: Activity id
-          minimum: 1
-        version:
-          type: integer
-          description: Activity version
-          minimum: 1
-        comment:
-          $ref: '#/components/schemas/Formattable'
-        details:
-          type: array
-          items:
-            $ref: '#/components/schemas/Formattable'
-        internal:
-          type: boolean
-          description: Whether this activity is internal (only visible to users with view_internal_comments permission)
-        createdAt:
-          type: string
-          format: date-time
-          description: Time of creation
-        updatedAt:
-          type: string
-          format: date-time
-          description: Time of update
-        _embedded:
-          type: object
-          properties:
-            attachments:
-              allOf:
-              - $ref: '#/components/schemas/Attachments_Model'
-              - description: Collection of attachments for this activity
-            workPackage:
-              allOf:
-              - $ref: '#/components/schemas/WorkPackageModel'
-              - description: 'The work package this activity belongs to
-
-
-                  # Conditions
-
-
-                  Only embedded when the `journable` of the activity is a work package'
-            emojiReactions:
-              allOf:
-              - $ref: '#/components/schemas/EmojiReactions_Model'
-              - description: Collection of emoji reactions for this activity
-        _links:
-          type: object
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This activity
-
-
-                  **Resource**: Activity'
-            workPackage:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The work package this activity belongs to
-
-
-                  **Resource**: WorkPackage'
-            user:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The user who created this activity
-
-
-                  **Resource**: Principal'
-            update:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: Update this activity
-            attachments:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The attachment collection of this activity
-
-
-                  **Resource**: Attachments'
-            addAttachment:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'Attach a file to the activity
-
-
-                  # Conditions
-
-
-                  **Permissions**:
-
-                  - `add_work_package_comments`
-
-                  - for internal comments: `add_internal_comments`'
-            emojiReactions:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The emoji reactions collection of this activity
-
-
-                  **Resource**: EmojiReactions'
-      example:
-        id: 1
-        _type: Activity::Comment
-        _embedded:
-          attachments:
-            _type: Collection
-            total: 1
-            count: 1
-            _embedded:
-              elements:
-              - _type: Attachment
-                id: 30388
-                fileName: Task_Ensure_financing___4___OpenProject_DEV.jpeg
-                fileSize: 540992
-                description:
-                  format: plain
-                  raw: ''
-                  html: ''
-                status: uploaded
-                contentType: image/jpeg
-                digest:
-                  algorithm: md5
-                  hash: d02d312b25383b595a9fa10f1a8999fe
-                createdAt: '2025-04-08T15:37:19.275Z'
-                _links:
-                  self:
-                    href: /api/v3/attachments/30388
-                    title: Task_Ensure_financing___4___OpenProject_DEV.jpeg
-                  author:
-                    href: /api/v3/users/435
-                    title: Firstname
-                  container:
-                    href: /api/v3/activities/79090
-                  staticDownloadLocation:
-                    href: /api/v3/attachments/30388/content
-                  downloadLocation:
-                    href: /api/v3/attachments/30388/content
-                  delete:
-                    href: /api/v3/attachments/30388
-                    method: delete
-            _links:
-              self:
-                href: /api/v3/activities/79090/attachments
-          emojiReactions:
-            _type: Collection
-            total: 2
-            count: 2
-            _embedded:
-              elements:
-              - _type: EmojiReaction
-                id: 1-thumbs_up
-                reaction: thumbs_up
-                emoji: 👍
-                reactionsCount: 3
-                firstReactionAt: '2024-04-08T15:37:19.275Z'
-                _links:
-                  self:
-                    href: /api/v3/emoji_reactions/1-thumbs_up
-                  reactable:
-                    href: /api/v3/activities/1
-                  reactingUsers:
-                  - href: /api/v3/users/435
-                    title: John Doe
-                  - href: /api/v3/users/436
-                    title: Jane Smith
-                  - href: /api/v3/users/437
-                    title: Bob Johnson
-              - _type: EmojiReaction
-                id: 1-heart
-                reaction: heart
-                emoji: ❤️
-                reactionsCount: 1
-                firstReactionAt: '2024-04-08T15:38:19.275Z'
-                _links:
-                  self:
-                    href: /api/v3/emoji_reactions/1-heart
-                  reactable:
-                    href: /api/v3/activities/1
-                  reactingUsers:
-                  - href: /api/v3/users/435
-                    title: John Doe
-            _links:
-              self:
-                href: /api/v3/activities/1/emoji_reactions
-          workPackage:
-            _type: WorkPackage
-            id: 10403
-            lockVersion: 2
-            subject: Ensure financing
-            description:
-              format: markdown
-              raw: Lorem ipsum dolor sit amet.
-              html: <p>Lorem ipsum dolor sit amet.</p>
-            scheduleManually: true
-            startDate: null
-            dueDate: null
-            derivedStartDate: null
-            derivedDueDate: null
-            estimatedTime: null
-            derivedEstimatedTime: null
-            derivedRemainingTime: null
-            duration: null
-            ignoreNonWorkingDays: false
-            percentageDone: null
-            derivedPercentageDone: null
-            createdAt: '2025-03-24T13:11:09.480Z'
-            updatedAt: '2025-04-14T11:00:02.411Z'
-            _links:
-              self:
-                href: /api/v3/work_packages/10403
-                title: Ensure financing
-              type:
-                href: /api/v3/types/1
-                title: Task
-              status:
-                href: /api/v3/statuses/1
-                title: New
-              project:
-                href: /api/v3/projects/918
-                title: RVC Test
-              schema:
-                href: /api/v3/work_packages/schemas/11-2
-              author:
-                href: /api/v3/users/1
-                title: OpenProject Admin - admin
-              priority:
-                href: /api/v3/priorities/2
-                title: Normal
-              ancestors: []
-        _links:
-          self:
-            href: /api/v3/activity/1
-            title: Priority changed from High to Low
-          workPackage:
-            href: /api/v3/work_packages/1
-            title: quis numquam qui voluptatum quia praesentium blanditiis nisi
-          user:
-            href: /api/v3/users/1
-            title: John Sheppard - admin
-          attachments:
-            href: /api/v3/activities/1/attachments
-          emojiReactions:
-            href: /api/v3/activities/1/emoji_reactions
-          addAttachment:
-            href: /api/v3/activities/1/attachments
-            method: post
-          update:
-            href: /api/v3/activities/1
-            method: patch
-        details:
-        - format: markdown
-          raw: Lorem ipsum dolor sit amet.
-          html: <p>Lorem ipsum dolor sit amet.</p>
-        comment:
-          format: markdown
-          raw: Lorem ipsum dolor sit amet.
-          html: <p>Lorem ipsum dolor sit amet.</p>
-        createdAt: '2014-05-21T08:51:20.721Z'
-        updatedAt: '2014-05-21T09:14:02.929Z'
-        version: 31
-    EmojiReactions_Model:
-      type: object
-      properties:
-        _type:
-          type: string
-          enum:
-          - Collection
-        total:
-          type: integer
-          description: Total number of emoji reactions
-          minimum: 0
-        count:
-          type: integer
-          description: Number of emoji reactions in this response
-          minimum: 0
-        _embedded:
-          type: object
-          properties:
-            elements:
-              type: array
-              items:
-                $ref: '#/components/schemas/EmojiReactionModel'
-        _links:
-          type: object
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: This collection
-      example:
-        _type: Collection
-        total: 2
-        count: 2
-        _embedded:
-          elements:
-          - _type: EmojiReaction
-            id: 1-thumbs_up
-            reaction: thumbs_up
-            emoji: 👍
-            reactionsCount: 3
-            firstReactionAt: '2024-04-08T15:37:19.275Z'
-            _links:
-              self:
-                href: /api/v3/emoji_reactions/1-thumbs_up
-              reactable:
-                href: /api/v3/activities/1
-              reactingUsers:
-              - href: /api/v3/users/435
-                title: John Doe
-              - href: /api/v3/users/436
-                title: Jane Smith
-              - href: /api/v3/users/437
-                title: Bob Johnson
-          - _type: EmojiReaction
-            id: 1-heart
-            reaction: heart
-            emoji: ❤️
-            reactionsCount: 1
-            firstReactionAt: '2024-04-08T15:38:19.275Z'
-            _links:
-              self:
-                href: /api/v3/emoji_reactions/1-heart
-              reactable:
-                href: /api/v3/activities/1
-              reactingUsers:
-              - href: /api/v3/users/435
-                title: John Doe
-        _links:
-          self:
-            href: /api/v3/activities/1/emoji_reactions
-    ActivityCommentWriteModel:
-      type: object
-      properties:
-        comment:
-          type: object
-          properties:
-            raw:
-              type: string
-              description: The raw content of the comment
-        internal:
-          type: boolean
-          description: 'Determines whether this comment is internal. This is only available to users
-
-            with `add_internal_comments` permission. It defaults to `false`, if unset.'
-          default: false
-      example:
-        comment:
-          raw: I think this is awesome!
-    ErrorResponse:
-      type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
-    EmojiReactionModel:
-      type: object
-      properties:
-        _type:
-          type: string
-          enum:
-          - EmojiReaction
-        id:
-          type: string
-          description: 'Emoji reaction id (format: reactable_id-reaction)'
-          example: 1-thumbs_up
-        reaction:
-          type: string
-          description: The reaction identifier
-          example: thumbs_up
-        emoji:
-          type: string
-          description: The emoji character
-          example: 👍
-        reactionsCount:
-          type: integer
-          description: Number of users who reacted with this emoji
-          minimum: 1
-          example: 3
-        firstReactionAt:
-          type: string
-          format: date-time
-          description: Time of the first reaction
-        _links:
-          type: object
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: This emoji reaction
-            reactable:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: The activity this emoji reaction belongs to
-            reactingUsers:
-              type: array
-              items:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: The users who reacted with this emoji
-      example:
-        _type: EmojiReaction
-        id: 1-thumbs_up
-        reaction: thumbs_up
-        emoji: 👍
-        reactionsCount: 3
-        firstReactionAt: '2024-04-08T15:37:19.275Z'
-        _links:
-          self:
-            href: /api/v3/emoji_reactions/1-thumbs_up
-          reactable:
-            href: /api/v3/activities/1
-          reactingUsers:
-          - href: /api/v3/users/435
-            title: John Doe
-          - href: /api/v3/users/436
-            title: Jane Smith
-          - href: /api/v3/users/437
-            title: Bob Johnson
-    CollectionModel:
-      type: object
-      required:
-      - _type
-      - total
-      - count
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - Collection
-        total:
-          type: integer
-          description: The total amount of elements available in the collection.
-          minimum: 0
-        count:
-          type: integer
-          description: Actual amount of elements in this response.
-          minimum: 0
-        _links:
-          $ref: '#/components/schemas/CollectionLinks'
   responses:
     MissingContentType:
       description: Occurs when the client did not send a Content-Type header

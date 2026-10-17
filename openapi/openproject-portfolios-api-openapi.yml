@@ -446,18 +446,6 @@ components:
             - Text
 
             - Long text'
-    CollectionLinks:
-      type: object
-      required:
-      - self
-      properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This collection resource.
-
-
-              **Resource**: Collection'
     Link:
       type: object
       required:
@@ -491,33 +479,67 @@ components:
       example:
         href: /api/v3/work_packages
         method: POST
-    Formattable:
+    CollectionLinks:
       type: object
       required:
-      - format
+      - self
       properties:
-        format:
-          type: string
-          enum:
-          - plain
-          - markdown
-          - custom
-          readOnly: true
-          description: Indicates the formatting language of the raw text
-          example: markdown
-        raw:
-          type: string
-          description: The raw text, as entered by the user
-          example: I **am** formatted!
-        html:
-          type: string
-          readOnly: true
-          description: The text converted to HTML according to the format
-          example: I <strong>am</strong> formatted!
-      example:
-        format: markdown
-        raw: I am formatted!
-        html: I am formatted!
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
+    OffsetPaginatedCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - pageSize
+        - offset
+        - _links
+        properties:
+          pageSize:
+            type: integer
+            description: 'The amount of elements per page. If not set by the request this value defaults to the server''s system
+
+              settings.'
+            minimum: 0
+          offset:
+            type: integer
+            description: The page offset indicating on which page the element collection starts.
+            minimum: 0
+          _links:
+            $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
+    PortfolioCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/OffsetPaginatedCollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            allOf:
+            - $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
+            - type: object
+              properties:
+                representations:
+                  type: array
+                  items:
+                    allOf:
+                    - $ref: '#/components/schemas/Link'
+                    - description: A portfolio collection representation in a specific file format.
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PortfolioModel'
     OffsetPaginatedCollectionLinks:
       allOf:
       - $ref: '#/components/schemas/CollectionLinks'
@@ -552,75 +574,6 @@ components:
                 # Conditions
 
                 - The collection is not on the last page.'
-    OffsetPaginatedCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - pageSize
-        - offset
-        - _links
-        properties:
-          pageSize:
-            type: integer
-            description: 'The amount of elements per page. If not set by the request this value defaults to the server''s system
-
-              settings.'
-            minimum: 0
-          offset:
-            type: integer
-            description: The page offset indicating on which page the element collection starts.
-            minimum: 0
-          _links:
-            $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
-    CollectionModel:
-      type: object
-      required:
-      - _type
-      - total
-      - count
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - Collection
-        total:
-          type: integer
-          description: The total amount of elements available in the collection.
-          minimum: 0
-        count:
-          type: integer
-          description: Actual amount of elements in this response.
-          minimum: 0
-        _links:
-          $ref: '#/components/schemas/CollectionLinks'
-    ErrorResponse:
-      type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
     PortfolioModel:
       allOf:
       - $ref: '#/components/schemas/CustomFieldProperties'
@@ -866,6 +819,59 @@ components:
 
 
                       **Resource**: Portfolio'
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
+    Formattable:
+      type: object
+      required:
+      - format
+      properties:
+        format:
+          type: string
+          enum:
+          - plain
+          - markdown
+          - custom
+          readOnly: true
+          description: Indicates the formatting language of the raw text
+          example: markdown
+        raw:
+          type: string
+          description: The raw text, as entered by the user
+          example: I **am** formatted!
+        html:
+          type: string
+          readOnly: true
+          description: The text converted to HTML according to the format
+          example: I <strong>am</strong> formatted!
+      example:
+        format: markdown
+        raw: I am formatted!
+        html: I am formatted!
     CustomCommentProperties:
       type: object
       patternProperties:
@@ -877,62 +883,28 @@ components:
 
 
             The property is only present when the corresponding `customField{N}` has `has_comment` set to `true`.'
-    PortfolioCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/OffsetPaginatedCollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            allOf:
-            - $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
-            - type: object
-              properties:
-                representations:
-                  type: array
-                  items:
-                    allOf:
-                    - $ref: '#/components/schemas/Link'
-                    - description: A portfolio collection representation in a specific file format.
-          _embedded:
-            type: object
-            required:
-            - elements
-            properties:
-              elements:
-                type: array
-                items:
-                  $ref: '#/components/schemas/PortfolioModel'
-  responses:
-    MissingContentType:
-      description: Occurs when the client did not send a Content-Type header
-      content:
-        text/plain:
-          schema:
-            type: string
-          example: Missing content-type header
-    InvalidRequestBody:
-      description: Occurs when the client did not send a valid JSON object in the request body.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
-            message: The request body was not a single JSON object.
-    UnsupportedMediaType:
-      description: Occurs when the client sends an unsupported Content-Type header.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
-            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+    CollectionModel:
+      type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
   examples:
     PortfolioCollection:
       value:
@@ -973,20 +945,6 @@ components:
             identifier: xls
             type: application/vnd.ms-excel
             title: XLS
-    PortfolioBody:
-      value:
-        name: Portfolio example
-        statusExplanation:
-          raw: Everything **fine**
-        description:
-          raw: Lorem **ipsum** dolor sit amet
-        customField123: 123
-        customComment123: Because it is 123!
-        _links:
-          parent:
-            href: /api/v3/portfolios/123
-          customField456:
-            href: /api/v3/portfolios/315
     Portfolio:
       value:
         _type: Portfolio
@@ -1043,6 +1001,48 @@ components:
         updatedAt: '2014-05-21T08:51:20.396Z'
         customField123: 123
         customComment123: Why is the value 123?
+    PortfolioBody:
+      value:
+        name: Portfolio example
+        statusExplanation:
+          raw: Everything **fine**
+        description:
+          raw: Lorem **ipsum** dolor sit amet
+        customField123: 123
+        customComment123: Because it is 123!
+        _links:
+          parent:
+            href: /api/v3/portfolios/123
+          customField456:
+            href: /api/v3/portfolios/315
+  responses:
+    InvalidRequestBody:
+      description: Occurs when the client did not send a valid JSON object in the request body.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+            message: The request body was not a single JSON object.
+    UnsupportedMediaType:
+      description: Occurs when the client sends an unsupported Content-Type header.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
+            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
   securitySchemes:
     BasicAuth:
       type: http

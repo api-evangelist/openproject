@@ -130,6 +130,15 @@ components:
         message:
           type: string
           example: Project can't be blank.
+    ProjectConfigurationModel:
+      allOf:
+      - $ref: '#/components/schemas/ConfigurationModel'
+      - type: object
+        properties:
+          enabledInternalComments:
+            type: boolean
+            description: Whether internal comments are enabled for this project
+            readOnly: true
     ConfigurationModel:
       type: object
       properties:
@@ -155,15 +164,6 @@ components:
           description: The list of all feature flags that are active
           items:
             type: string
-    ProjectConfigurationModel:
-      allOf:
-      - $ref: '#/components/schemas/ConfigurationModel'
-      - type: object
-        properties:
-          enabledInternalComments:
-            type: boolean
-            description: Whether internal comments are enabled for this project
-            readOnly: true
   securitySchemes:
     BasicAuth:
       type: http

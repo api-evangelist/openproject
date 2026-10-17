@@ -110,143 +110,6 @@ paths:
       tags:
       - Custom Fields
 components:
-  examples:
-    HierarchyItemCollectionFilteredResponse:
-      description: Filtered response of a hierarchy structure starting at a specific parent and restricting the depth.
-      value:
-        _type: Collection
-        total: 3
-        count: 3
-        _embedded:
-          elements:
-          - _type: HierarchyItem
-            id: 1338
-            label: Stormtroopers
-            short: ST
-            weight: null
-            formattedWeight: null
-            depth: 1
-            _links:
-              self:
-                href: /api/v3/custom_field_items/1338
-                name: Stormtroopers
-              parent:
-                href: /api/v3/custom_field_items/1337
-                name: null
-              branch:
-                href: /api/v3/custom_field_items/1338/branch
-              children:
-              - href: /api/v3/custom_field_items/1340
-                name: ST-377
-              - href: /api/v3/custom_field_items/1341
-                name: ST-422
-          - _type: HierarchyItem
-            id: 1340
-            label: ST-377
-            short: null
-            weight: null
-            formattedWeight: null
-            depth: 2
-            _links:
-              self:
-                href: /api/v3/custom_field_items/1340
-                name: ST-377
-              parent:
-                href: /api/v3/custom_field_items/1338
-                name: Stormtroopers
-              branch:
-                href: /api/v3/custom_field_items/1340/branch
-              children:
-              - href: /api/v3/custom_field_items/1480
-                name: ST-377-200
-              - href: /api/v3/custom_field_items/1481
-                name: ST-377-201
-          - _type: HierarchyItem
-            id: 1341
-            label: ST-422
-            short: null
-            weight: null
-            formattedWeight: null
-            depth: 2
-            _links:
-              self:
-                href: /api/v3/custom_field_items/1341
-                name: ST-422
-              parent:
-                href: /api/v3/custom_field_items/1338
-                name: Stormtroopers
-              branch:
-                href: /api/v3/custom_field_items/1341/branch
-              children:
-              - href: /api/v3/custom_field_items/1580
-                name: ST-422-137
-              - href: /api/v3/custom_field_items/1581
-                name: ST-422-138
-        _links:
-          self:
-            href: /api/v3/custom_field/42/items?parent=1338&depth=1
-    HierarchyItemCollectionResponse:
-      description: Simple response of a hierarchy structure starting at root.
-      value:
-        _type: Collection
-        total: 37
-        count: 37
-        _embedded:
-          elements:
-          - _type: HierarchyItem
-            id: 1337
-            label: null
-            short: null
-            weight: null
-            formattedWeight: null
-            depth: 0
-            _links:
-              self:
-                href: /api/v3/custom_field_items/1337
-              branch:
-                href: /api/v3/custom_field_items/1337/branch
-              children:
-              - href: /api/v3/custom_field_items/1338
-                name: Stormtroopers
-              - href: /api/v3/custom_field_items/1339
-                name: Dark Troopers
-          - _type: HierarchyItem
-            id: 1338
-            label: Stormtroopers
-            short: ST
-            weight: null
-            formattedWeight: null
-            depth: 1
-            _links:
-              self:
-                href: /api/v3/custom_field_items/1338
-                name: Stormtroopers
-              parent:
-                href: /api/v3/custom_field_items/1337
-                name: Imperial Troopers
-              branch:
-                href: /api/v3/custom_field_items/1338/branch
-              children:
-              - href: /api/v3/custom_field_items/1340
-                name: ST-377
-              - href: /api/v3/custom_field_items/1341
-                name: ST-422
-          - _type: HierarchyItem
-            id: 1340
-            label: ST-377
-            short: null
-            weight: null
-            formattedWeight: null
-            depth: 2
-            _links:
-              self:
-                href: /api/v3/custom_field_items/1340
-              branch:
-                href: /api/v3/custom_field_items/1340/branch
-              children: []
-        _links:
-          self:
-            href: /api/v3/custom_field/42/items
   schemas:
     CollectionLinks:
       type: object
@@ -260,6 +123,68 @@ components:
 
 
               **Resource**: Collection'
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
+    HierarchyItemCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This hierarchy item collection
+
+
+                    **Resource**: HierarchyItemCollectionModel'
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HierarchyItemReadModel'
     HierarchyItemReadModel:
       type: object
       required:
@@ -351,68 +276,28 @@ components:
 
 
                   **Resource**: HierarchyItemCollection'
-    Link:
+    CollectionModel:
       type: object
       required:
-      - href
+      - _type
+      - total
+      - count
+      - _links
       properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
+        _type:
           type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
-    HierarchyItemCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'This hierarchy item collection
-
-
-                    **Resource**: HierarchyItemCollectionModel'
-          _embedded:
-            type: object
-            required:
-            - elements
-            properties:
-              elements:
-                type: array
-                items:
-                  $ref: '#/components/schemas/HierarchyItemReadModel'
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
     ErrorResponse:
       type: object
       required:
@@ -439,28 +324,143 @@ components:
         message:
           type: string
           example: Project can't be blank.
-    CollectionModel:
-      type: object
-      required:
-      - _type
-      - total
-      - count
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - Collection
-        total:
-          type: integer
-          description: The total amount of elements available in the collection.
-          minimum: 0
-        count:
-          type: integer
-          description: Actual amount of elements in this response.
-          minimum: 0
+  examples:
+    HierarchyItemCollectionResponse:
+      description: Simple response of a hierarchy structure starting at root.
+      value:
+        _type: Collection
+        total: 37
+        count: 37
+        _embedded:
+          elements:
+          - _type: HierarchyItem
+            id: 1337
+            label: null
+            short: null
+            weight: null
+            formattedWeight: null
+            depth: 0
+            _links:
+              self:
+                href: /api/v3/custom_field_items/1337
+              branch:
+                href: /api/v3/custom_field_items/1337/branch
+              children:
+              - href: /api/v3/custom_field_items/1338
+                name: Stormtroopers
+              - href: /api/v3/custom_field_items/1339
+                name: Dark Troopers
+          - _type: HierarchyItem
+            id: 1338
+            label: Stormtroopers
+            short: ST
+            weight: null
+            formattedWeight: null
+            depth: 1
+            _links:
+              self:
+                href: /api/v3/custom_field_items/1338
+                name: Stormtroopers
+              parent:
+                href: /api/v3/custom_field_items/1337
+                name: Imperial Troopers
+              branch:
+                href: /api/v3/custom_field_items/1338/branch
+              children:
+              - href: /api/v3/custom_field_items/1340
+                name: ST-377
+              - href: /api/v3/custom_field_items/1341
+                name: ST-422
+          - _type: HierarchyItem
+            id: 1340
+            label: ST-377
+            short: null
+            weight: null
+            formattedWeight: null
+            depth: 2
+            _links:
+              self:
+                href: /api/v3/custom_field_items/1340
+              branch:
+                href: /api/v3/custom_field_items/1340/branch
+              children: []
         _links:
-          $ref: '#/components/schemas/CollectionLinks'
+          self:
+            href: /api/v3/custom_field/42/items
+    HierarchyItemCollectionFilteredResponse:
+      description: Filtered response of a hierarchy structure starting at a specific parent and restricting the depth.
+      value:
+        _type: Collection
+        total: 3
+        count: 3
+        _embedded:
+          elements:
+          - _type: HierarchyItem
+            id: 1338
+            label: Stormtroopers
+            short: ST
+            weight: null
+            formattedWeight: null
+            depth: 1
+            _links:
+              self:
+                href: /api/v3/custom_field_items/1338
+                name: Stormtroopers
+              parent:
+                href: /api/v3/custom_field_items/1337
+                name: null
+              branch:
+                href: /api/v3/custom_field_items/1338/branch
+              children:
+              - href: /api/v3/custom_field_items/1340
+                name: ST-377
+              - href: /api/v3/custom_field_items/1341
+                name: ST-422
+          - _type: HierarchyItem
+            id: 1340
+            label: ST-377
+            short: null
+            weight: null
+            formattedWeight: null
+            depth: 2
+            _links:
+              self:
+                href: /api/v3/custom_field_items/1340
+                name: ST-377
+              parent:
+                href: /api/v3/custom_field_items/1338
+                name: Stormtroopers
+              branch:
+                href: /api/v3/custom_field_items/1340/branch
+              children:
+              - href: /api/v3/custom_field_items/1480
+                name: ST-377-200
+              - href: /api/v3/custom_field_items/1481
+                name: ST-377-201
+          - _type: HierarchyItem
+            id: 1341
+            label: ST-422
+            short: null
+            weight: null
+            formattedWeight: null
+            depth: 2
+            _links:
+              self:
+                href: /api/v3/custom_field_items/1341
+                name: ST-422
+              parent:
+                href: /api/v3/custom_field_items/1338
+                name: Stormtroopers
+              branch:
+                href: /api/v3/custom_field_items/1341/branch
+              children:
+              - href: /api/v3/custom_field_items/1580
+                name: ST-422-137
+              - href: /api/v3/custom_field_items/1581
+                name: ST-422-138
+        _links:
+          self:
+            href: /api/v3/custom_field/42/items?parent=1338&depth=1
   securitySchemes:
     BasicAuth:
       type: http

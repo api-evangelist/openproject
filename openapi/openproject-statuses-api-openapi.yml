@@ -102,23 +102,6 @@ paths:
                     message: The requested resource could not be found.
 components:
   examples:
-    StatusResponse:
-      description: A standard status resource response.
-      value:
-        _type: Status
-        id: 13
-        name: Waiting for Darth-approval
-        isClosed: false
-        color: '#FE005D'
-        isDefault: false
-        isReadonly: false
-        excludedFromTotals: false
-        defaultDoneRatio: 66
-        position: 4
-        _links:
-          self:
-            href: /api/v3/statuses/13
-            title: Waiting for Darth-approval
     StatusCollection:
       description: A standard, unpaginated collection of statuses.
       value:
@@ -208,6 +191,23 @@ components:
         _links:
           self:
             href: /api/v3/statuses
+    StatusResponse:
+      description: A standard status resource response.
+      value:
+        _type: Status
+        id: 13
+        name: Waiting for Darth-approval
+        isClosed: false
+        color: '#FE005D'
+        isDefault: false
+        isReadonly: false
+        excludedFromTotals: false
+        defaultDoneRatio: 66
+        position: 4
+        _links:
+          self:
+            href: /api/v3/statuses/13
+            title: Waiting for Darth-approval
   schemas:
     CollectionLinks:
       type: object
@@ -324,6 +324,28 @@ components:
 
 
                   **Resource**: Status'
+    CollectionModel:
+      type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
     ErrorResponse:
       type: object
       required:
@@ -350,28 +372,6 @@ components:
         message:
           type: string
           example: Project can't be blank.
-    CollectionModel:
-      type: object
-      required:
-      - _type
-      - total
-      - count
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - Collection
-        total:
-          type: integer
-          description: The total amount of elements available in the collection.
-          minimum: 0
-        count:
-          type: integer
-          description: Actual amount of elements in this response.
-          minimum: 0
-        _links:
-          $ref: '#/components/schemas/CollectionLinks'
   securitySchemes:
     BasicAuth:
       type: http

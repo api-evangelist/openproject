@@ -166,64 +166,6 @@ paths:
       summary: view Budgets of a Project
 components:
   schemas:
-    Budgets_by_ProjectModel:
-      type: object
-      example:
-        _links:
-          self:
-            href: /api/v3/projects/1/budgets
-        _type: Collection
-        total: 2
-        count: 2
-        _embedded:
-          elements:
-          - _type: Budget
-            _links:
-              self:
-                href: /api/v3/budgets/1
-                title: Q3 2015
-            id: 1
-            subject: Q3 2015
-          - _type: Budget
-            _links:
-              self:
-                href: /api/v3/budgets/2
-                title: Q4 2015
-            id: 2
-            subject: Q4 2015
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
-          type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
     ErrorResponse:
       type: object
       required:
@@ -274,6 +216,64 @@ components:
             title: Q3 2015
         id: 1
         subject: Q3 2015
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
+    Budgets_by_ProjectModel:
+      type: object
+      example:
+        _links:
+          self:
+            href: /api/v3/projects/1/budgets
+        _type: Collection
+        total: 2
+        count: 2
+        _embedded:
+          elements:
+          - _type: Budget
+            _links:
+              self:
+                href: /api/v3/budgets/1
+                title: Q3 2015
+            id: 1
+            subject: Q3 2015
+          - _type: Budget
+            _links:
+              self:
+                href: /api/v3/budgets/2
+                title: Q4 2015
+            id: 2
+            subject: Q4 2015
   securitySchemes:
     BasicAuth:
       type: http

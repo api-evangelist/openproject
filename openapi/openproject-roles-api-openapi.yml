@@ -159,77 +159,32 @@ paths:
       summary: View role
 components:
   schemas:
-    RoleModel:
+    ErrorResponse:
       type: object
       required:
-      - name
+      - _type
+      - errorIdentifier
+      - message
       properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
         _type:
           type: string
           enum:
-          - Role
-        id:
-          type: integer
-          description: Role id
-          readOnly: true
-          minimum: 1
-        name:
+          - Error
+        errorIdentifier:
           type: string
-          description: Role name
-        _links:
-          type: object
-          required:
-          - self
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This role
-
-
-                  **Resource**: Role'
-                readOnly: true
-      example:
-        _type: Role
-        id: 3
-        name: Manager
-        _links:
-          self:
-            href: /api/v3/roles/3
-            title: Manager
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
           type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
+          example: Project can't be blank.
     RolesModel:
       type: object
       example:
@@ -276,32 +231,77 @@ components:
         _links:
           self:
             href: /api/v3/roles
-    ErrorResponse:
+    Link:
       type: object
       required:
-      - _type
-      - errorIdentifier
-      - message
+      - href
       properties:
-        _embedded:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
           type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
+    RoleModel:
+      type: object
+      required:
+      - name
+      properties:
         _type:
           type: string
           enum:
-          - Error
-        errorIdentifier:
+          - Role
+        id:
+          type: integer
+          description: Role id
+          readOnly: true
+          minimum: 1
+        name:
           type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
+          description: Role name
+        _links:
+          type: object
+          required:
+          - self
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This role
+
+
+                  **Resource**: Role'
+                readOnly: true
+      example:
+        _type: Role
+        id: 3
+        name: Manager
+        _links:
+          self:
+            href: /api/v3/roles/3
+            title: Manager
   securitySchemes:
     BasicAuth:
       type: http

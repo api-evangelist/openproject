@@ -81,6 +81,118 @@ paths:
             **Required permission:** view project phase OR select project phase'
 components:
   schemas:
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
+    OffsetPaginatedCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - pageSize
+        - offset
+        - _links
+        properties:
+          pageSize:
+            type: integer
+            description: 'The amount of elements per page. If not set by the request this value defaults to the server''s system
+
+              settings.'
+            minimum: 0
+          offset:
+            type: integer
+            description: The page offset indicating on which page the element collection starts.
+            minimum: 0
+          _links:
+            $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
+    ProjectPhaseDefinitionCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/OffsetPaginatedCollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This file links collection
+
+
+                    **Resource**: ProjectPhaseDefinitionCollectionModel'
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectPhaseDefinitionModel'
+      example:
+        _type: Collection
+        total: 2
+        count: 2
+        _links:
+          self:
+            href: /api/v3/project_phase_definitions
+        _embedded:
+          elements:
+          - id: 14
+            name: Initiating
+            _type: ProjectPhaseDefinition
+            _abbreviated: project phase definition resource shortened for brevity
+          - id: 15
+            name: Executing
+            _type: ProjectPhaseDefinition
+            _abbreviated: project phase definition resource shortened for brevity
     ProjectPhaseDefinitionModel:
       type: object
       required:
@@ -149,51 +261,6 @@ components:
         _links:
           self:
             href: /api/v3/project_phase_definitions/23
-    CollectionLinks:
-      type: object
-      required:
-      - self
-      properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This collection resource.
-
-
-              **Resource**: Collection'
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
-          type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
     OffsetPaginatedCollectionLinks:
       allOf:
       - $ref: '#/components/schemas/CollectionLinks'
@@ -228,52 +295,28 @@ components:
                 # Conditions
 
                 - The collection is not on the last page.'
-    ProjectPhaseDefinitionCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/OffsetPaginatedCollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'This file links collection
-
-
-                    **Resource**: ProjectPhaseDefinitionCollectionModel'
-          _embedded:
-            type: object
-            required:
-            - elements
-            properties:
-              elements:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ProjectPhaseDefinitionModel'
-      example:
-        _type: Collection
-        total: 2
-        count: 2
+    CollectionModel:
+      type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
         _links:
-          self:
-            href: /api/v3/project_phase_definitions
-        _embedded:
-          elements:
-          - id: 14
-            name: Initiating
-            _type: ProjectPhaseDefinition
-            _abbreviated: project phase definition resource shortened for brevity
-          - id: 15
-            name: Executing
-            _type: ProjectPhaseDefinition
-            _abbreviated: project phase definition resource shortened for brevity
+          $ref: '#/components/schemas/CollectionLinks'
     ErrorResponse:
       type: object
       required:
@@ -300,49 +343,6 @@ components:
         message:
           type: string
           example: Project can't be blank.
-    CollectionModel:
-      type: object
-      required:
-      - _type
-      - total
-      - count
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - Collection
-        total:
-          type: integer
-          description: The total amount of elements available in the collection.
-          minimum: 0
-        count:
-          type: integer
-          description: Actual amount of elements in this response.
-          minimum: 0
-        _links:
-          $ref: '#/components/schemas/CollectionLinks'
-    OffsetPaginatedCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - pageSize
-        - offset
-        - _links
-        properties:
-          pageSize:
-            type: integer
-            description: 'The amount of elements per page. If not set by the request this value defaults to the server''s system
-
-              settings.'
-            minimum: 0
-          offset:
-            type: integer
-            description: The page offset indicating on which page the element collection starts.
-            minimum: 0
-          _links:
-            $ref: '#/components/schemas/OffsetPaginatedCollectionLinks'
   securitySchemes:
     BasicAuth:
       type: http

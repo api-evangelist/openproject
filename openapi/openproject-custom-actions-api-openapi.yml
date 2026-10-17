@@ -271,13 +271,6 @@ components:
           type: string
           example: Project can't be blank.
   responses:
-    MissingContentType:
-      description: Occurs when the client did not send a Content-Type header
-      content:
-        text/plain:
-          schema:
-            type: string
-          example: Missing content-type header
     InvalidRequestBody:
       description: Occurs when the client did not send a valid JSON object in the request body.
       content:
@@ -298,6 +291,13 @@ components:
             _type: Error
             errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
             message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
   securitySchemes:
     BasicAuth:
       type: http

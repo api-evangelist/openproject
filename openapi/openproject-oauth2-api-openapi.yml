@@ -116,71 +116,32 @@ paths:
           description: Returned if the object does not exist.
 components:
   schemas:
-    OAuthClientCredentialsReadModel:
+    ErrorResponse:
       type: object
       required:
-      - id
       - _type
-      - clientId
-      - confidential
-      - _links
+      - errorIdentifier
+      - message
       properties:
-        id:
-          type: integer
-          minimum: 1
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
         _type:
           type: string
           enum:
-          - OAuthClientCredentials
-        clientId:
+          - Error
+        errorIdentifier:
           type: string
-          description: OAuth 2 client id
-        confidential:
-          type: boolean
-          description: true, if OAuth 2 credentials are confidential, false, if no secret is stored
-        createdAt:
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
           type: string
-          format: date-time
-          description: The time the OAuth client credentials were created at
-        updatedAt:
-          type: string
-          format: date-time
-          description: The time the OAuth client credentials were last updated
-        _links:
-          type: object
-          required:
-          - self
-          - integration
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This OAuth Client Credentials object
-
-
-                  **Resource**: OAuthClientCredentials'
-            integration:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The resource that integrates this OAuth client credentials. Currently, only `Storage` resources are
-
-                  able to contain OAuth client credentials.
-
-
-                  **Resource**: Storage'
-      example:
-        id: 1337
-        _type: OAuthClientCredentials
-        clientId: O5h6WObhMg1Z8IcLHRE3_LMh4jJYmmca2V6OTFSv8DA
-        confidential: true
-        createdAt: '2022-12-07T12:56:42.836Z'
-        updatedAt: '2022-12-07T12:56:42.836Z'
-        _links:
-          self:
-            href: /api/v3/oauth_client_credentials/1337
-          integration:
-            href: /api/v3/storages/42
-            title: Death Star Cloud
+          example: Project can't be blank.
     Link:
       type: object
       required:
@@ -316,32 +277,71 @@ components:
             title: Death Star Cloud
           redirectUri:
           - href: https://death-star.cloud.tools/index.php/apps/integration_openproject/oauth-redirect
-    ErrorResponse:
+    OAuthClientCredentialsReadModel:
       type: object
       required:
+      - id
       - _type
-      - errorIdentifier
-      - message
+      - clientId
+      - confidential
+      - _links
       properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
+        id:
+          type: integer
+          minimum: 1
         _type:
           type: string
           enum:
-          - Error
-        errorIdentifier:
+          - OAuthClientCredentials
+        clientId:
           type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
+          description: OAuth 2 client id
+        confidential:
+          type: boolean
+          description: true, if OAuth 2 credentials are confidential, false, if no secret is stored
+        createdAt:
           type: string
-          example: Project can't be blank.
+          format: date-time
+          description: The time the OAuth client credentials were created at
+        updatedAt:
+          type: string
+          format: date-time
+          description: The time the OAuth client credentials were last updated
+        _links:
+          type: object
+          required:
+          - self
+          - integration
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This OAuth Client Credentials object
+
+
+                  **Resource**: OAuthClientCredentials'
+            integration:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The resource that integrates this OAuth client credentials. Currently, only `Storage` resources are
+
+                  able to contain OAuth client credentials.
+
+
+                  **Resource**: Storage'
+      example:
+        id: 1337
+        _type: OAuthClientCredentials
+        clientId: O5h6WObhMg1Z8IcLHRE3_LMh4jJYmmca2V6OTFSv8DA
+        confidential: true
+        createdAt: '2022-12-07T12:56:42.836Z'
+        updatedAt: '2022-12-07T12:56:42.836Z'
+        _links:
+          self:
+            href: /api/v3/oauth_client_credentials/1337
+          integration:
+            href: /api/v3/storages/42
+            title: Death Star Cloud
   securitySchemes:
     BasicAuth:
       type: http

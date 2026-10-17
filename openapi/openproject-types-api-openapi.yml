@@ -302,41 +302,6 @@ paths:
       summary: List types available in a workspace
 components:
   schemas:
-    TypesModel:
-      type: object
-      example:
-        _links:
-          self:
-            href: /api/v3/types
-        total: 2
-        count: 2
-        _type: Collection
-        _embedded:
-          elements:
-          - _links:
-              self:
-                href: /api/v3/types/1
-            _type: Type
-            id: 1
-            name: Bug
-            color: '#ff0000'
-            position: 1
-            isDefault: true
-            isMilestone: false
-            createdAt: '2014-05-21T08:51:20.429Z'
-            updatedAt: '2014-05-21T08:51:20.429Z'
-          - _links:
-              self:
-                href: /api/v3/types/2
-            _type: Type
-            id: 2
-            name: Feature
-            color: '#888'
-            position: 2
-            isDefault: false
-            isMilestone: false
-            createdAt: '2014-05-21T08:51:20.429Z'
-            updatedAt: '2014-05-21T08:51:20.429Z'
     CollectionLinks:
       type: object
       required:
@@ -456,32 +421,41 @@ components:
         isMilestone: false
         createdAt: '2014-05-21T08:51:20.624Z'
         updatedAt: '2014-05-21T08:51:20.624Z'
-    ErrorResponse:
+    TypesModel:
       type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
+      example:
+        _links:
+          self:
+            href: /api/v3/types
+        total: 2
+        count: 2
+        _type: Collection
         _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
+          elements:
+          - _links:
+              self:
+                href: /api/v3/types/1
+            _type: Type
+            id: 1
+            name: Bug
+            color: '#ff0000'
+            position: 1
+            isDefault: true
+            isMilestone: false
+            createdAt: '2014-05-21T08:51:20.429Z'
+            updatedAt: '2014-05-21T08:51:20.429Z'
+          - _links:
+              self:
+                href: /api/v3/types/2
+            _type: Type
+            id: 2
+            name: Feature
+            color: '#888'
+            position: 2
+            isDefault: false
+            isMilestone: false
+            createdAt: '2014-05-21T08:51:20.429Z'
+            updatedAt: '2014-05-21T08:51:20.429Z'
     Types_by_WorkspaceModel:
       allOf:
       - $ref: '#/components/schemas/CollectionModel'
@@ -535,6 +509,32 @@ components:
           minimum: 0
         _links:
           $ref: '#/components/schemas/CollectionLinks'
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
   securitySchemes:
     BasicAuth:
       type: http

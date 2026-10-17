@@ -821,7 +821,317 @@ paths:
       operationId: List_versions_available_in_a_workspace
       summary: List versions available in a workspace
 components:
+  examples:
+    VersionCreateRequest:
+      description: Request to create a basic version with custom fields
+      value:
+        name: v0.9.1-alpha
+        startDate: '2026-02-02'
+        endDate: '2026-02-09'
+        status: open
+        sharing: tree
+        customField14: true
+        _links:
+          definingProject:
+            href: /api/v3/projects/10
+            title: Death Star
+          customField23:
+            href: /api/v3/users/18
+            title: Mara Jade
+    VersionSimpleResponse:
+      description: Simple response showing a single version
+      value:
+        _type: Version
+        id: 3
+        name: v0.9.1-alpha
+        description:
+          format: plain
+          raw: First draft of the energy weapon ... (behold, Alderaan *evil_laughter*)
+          html: <p>First draft of the energy weapon ... (behold, Alderaan *evil_laughter*)</p>
+        startDate: '2026-02-02'
+        endDate: '2026-02-09'
+        status: closed
+        sharing: none
+        createdAt: '2026-02-06T09:30:49.157Z'
+        updatedAt: '2026-02-10T09:53:21.620Z'
+        customField14: true
+        _links:
+          self:
+            href: /api/v3/versions/1
+            title: v0.1.0-alpha
+          schema:
+            href: /api/v3/versions/schema
+          update:
+            href: /api/v3/versions/1/form
+            method: post
+          updateImmediately:
+            href: /api/v3/versions/1
+            method: patch
+          delete:
+            href: /api/v3/versions/1
+            method: delete
+          availableInProjects:
+            href: /api/v3/versions/1/workspaces
+          definingProject:
+            href: /api/v3/projects/10
+            title: Death Star
+          customField23:
+            href: /api/v3/users/18
+            title: Mara Jade
+    VersionUpdateNameRequest:
+      description: Example request body to update the name of a version.
+      value:
+        name: v0.9.1-alpha
+  responses:
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
+    UnsupportedMediaType:
+      description: Occurs when the client sends an unsupported Content-Type header.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
+            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+    InvalidRequestBody:
+      description: Occurs when the client did not send a valid JSON object in the request body.
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+            message: The request body was not a single JSON object.
   schemas:
+    CustomFieldProperties:
+      type: object
+      patternProperties:
+        ^customField\d+$:
+          type:
+          - 'null'
+          - number
+          - boolean
+          - string
+          - object
+          description: 'A custom field value, that belongs to a custom field of a simple type:
+
+
+            - Boolean
+
+            - Date
+
+            - Float
+
+            - Integer
+
+            - Link (URL)
+
+            - Text
+
+            - Long text'
+    Available_projects_for_versionsModel:
+      type: object
+      example:
+        _links:
+          self:
+            href: /api/v3/versions/available_projects
+        _type: Collection
+        total: 2
+        count: 2
+        _embedded:
+          elements:
+          - _type: Project
+            _links:
+              self:
+                href: /api/v3/projects/6
+                title: A project
+              editWorkPackage:
+                href: /api/v3/work_packages/{id}/form
+                templated: true
+                method: post
+              createWorkPackage:
+                href: /api/v3/projects/6/work_packages/form
+                method: post
+              createWorkPackageImmediate:
+                href: /api/v3/projects/6/work_packages
+                method: post
+              categories:
+                href: /api/v3/projects/6/categories
+              versions:
+                href: /api/v3/projects/6/versions
+            id: 6
+            identifier: a_project
+            name: A project
+            description: Eveniet molestias omnis quis aut qui eum adipisci. Atque aut aut in exercitationem adipisci amet. Nisi asperiores quia ratione veritatis enim exercitationem magnam. Aut fuga architecto adipisci nihil. Et repellat pariatur. Aliquam et sed perferendis nostrum quaerat. Fugit doloremque voluptatem.
+            createdAt: '2015-07-06T13:28:14+00:00'
+            updatedAt: '2015-10-01T09:55:02+00:00'
+            type: Customer Project
+          - _type: Project
+            _links:
+              self:
+                href: /api/v3/projects/14
+                title: Another project
+              createWorkPackage:
+                href: /api/v3/projects/14/work_packages/form
+                method: post
+              createWorkPackageImmediate:
+                href: /api/v3/projects/14/work_packages
+                method: post
+              categories:
+                href: /api/v3/projects/14/categories
+              versions:
+                href: /api/v3/projects/14/versions
+            id: 14
+            identifier: another_project
+            name: Another project
+            description: ''
+            createdAt: '2016-02-29T12:50:20+00:00'
+            updatedAt: '2016-02-29T12:50:20+00:00'
+            type: null
+    VersionWriteModel:
+      allOf:
+      - $ref: '#/components/schemas/CustomFieldProperties'
+      - type: object
+        properties:
+          name:
+            type: string
+            description: Version name
+          description:
+            $ref: '#/components/schemas/Formattable'
+          startDate:
+            type:
+            - string
+            - 'null'
+            format: date
+          endDate:
+            type:
+            - string
+            - 'null'
+            format: date
+          status:
+            type: string
+            description: 'The current status of the version. This could be:
+
+
+              - *open*: if the version is available to be assigned to work packages in all shared projects
+
+              - *locked*: if the version is not finished, but locked for further assignments to work packages
+
+              - *closed*: if the version is finished'
+            enum:
+            - open
+            - locked
+            - closed
+          sharing:
+            type: string
+            description: 'The indicator of how the version is shared between projects. This could be:
+
+
+              - *none*: if the version is only available in the defining project
+
+              - *descendants*: if the version is shared with the descendants of the defining project
+
+              - *hierarchy*: if the version is shared with the descendants and the ancestors of the defining project
+
+              - *tree*: if the version is shared with the root project of the defining project and all descendants of the root project
+
+              - *system*: if the version is shared globally'
+            enum:
+            - none
+            - descendants
+            - hierarchy
+            - tree
+            - system
+          _links:
+            allOf:
+            - $ref: '#/components/schemas/CustomFieldLinkedProperties'
+            - type: object
+              properties:
+                definingProject:
+                  allOf:
+                  - $ref: '#/components/schemas/Link'
+                  - description: 'The workspace to which the version belongs
+
+
+                      **Resource**: Workspace'
+    Formattable:
+      type: object
+      required:
+      - format
+      properties:
+        format:
+          type: string
+          enum:
+          - plain
+          - markdown
+          - custom
+          readOnly: true
+          description: Indicates the formatting language of the raw text
+          example: markdown
+        raw:
+          type: string
+          description: The raw text, as entered by the user
+          example: I **am** formatted!
+        html:
+          type: string
+          readOnly: true
+          description: The text converted to HTML according to the format
+          example: I <strong>am</strong> formatted!
+      example:
+        format: markdown
+        raw: I am formatted!
+        html: I am formatted!
+    Versions_by_WorkspaceModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The versions collection
+
+
+                    **Resource**: VersionsCollection'
+                  readOnly: true
+          _embedded:
+            type: object
+            properties:
+              elements:
+                type: array
+                readOnly: true
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/VersionReadModel'
+                  - description: Collection of Versions
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
     Link:
       type: object
       required:
@@ -855,7 +1165,7 @@ components:
       example:
         href: /api/v3/work_packages
         method: POST
-    Versions_by_WorkspaceModel:
+    VersionCollectionModel:
       allOf:
       - $ref: '#/components/schemas/CollectionModel'
       - type: object
@@ -871,21 +1181,128 @@ components:
               self:
                 allOf:
                 - $ref: '#/components/schemas/Link'
-                - description: 'The versions collection
+                - description: 'This version collection
 
 
-                    **Resource**: VersionsCollection'
-                  readOnly: true
+                    **Resource**: Collection'
           _embedded:
             type: object
+            required:
+            - elements
             properties:
               elements:
                 type: array
-                readOnly: true
                 items:
-                  allOf:
-                  - $ref: '#/components/schemas/VersionReadModel'
-                  - description: Collection of Versions
+                  $ref: '#/components/schemas/VersionReadModel'
+    CustomFieldLinkedProperties:
+      type: object
+      patternProperties:
+        ^customField\d+$:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'A custom field value that belongs to a custom field of a reference type:
+
+
+              - Hierarchy
+
+              - List
+
+              - User
+
+              - Version
+
+              - Weighted item list'
+    Version_schemaModel:
+      type: object
+      example:
+        _type: Schema
+        _dependencies: []
+        id:
+          type: Integer
+          name: ID
+          required: true
+          hasDefault: false
+          writable: false
+        name:
+          type: String
+          name: Name
+          required: true
+          hasDefault: false
+          writable: true
+          minLength: 1
+          maxLength: 60
+        description:
+          type: Formattable
+          name: Description
+          required: false
+          hasDefault: false
+          writable: true
+        startDate:
+          type: Date
+          name: Start date
+          required: false
+          hasDefault: false
+          writable: true
+        endDate:
+          type: Date
+          name: Finish date
+          required: false
+          hasDefault: false
+          writable: false
+        status:
+          type: String
+          name: Status
+          required: true
+          hasDefault: false
+          writable: true
+          visibility: default
+          _links: {}
+        sharing:
+          type: String
+          name: Sharing
+          required: true
+          hasDefault: false
+          writable: true
+          visibility: default
+          _links: {}
+        createdAt:
+          type: DateTime
+          name: Created on
+          required: true
+          hasDefault: false
+          writable: false
+        updatedAt:
+          type: DateTime
+          name: Updated on
+          required: true
+          hasDefault: false
+          writable: false
+        definingProject:
+          type: Project
+          name: Project
+          required: true
+          hasDefault: false
+          writable: true
+          _links: {}
+        customField14:
+          type: String
+          name: text CF
+          required: false
+          hasDefault: false
+          writable: true
+          visibility: default
+        customField40:
+          type: CustomOption
+          name: List CF
+          required: false
+          hasDefault: false
+          writable: true
+          location: _links
+          visibility: default
+          _links: {}
+        _links:
+          self:
+            href: /api/v3/versions/schema
     VersionReadModel:
       allOf:
       - $ref: '#/components/schemas/CustomFieldProperties'
@@ -1035,308 +1452,6 @@ components:
 
 
                       **Resource**: Workspace'
-    CollectionLinks:
-      type: object
-      required:
-      - self
-      properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This collection resource.
-
-
-              **Resource**: Collection'
-    VersionCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'This version collection
-
-
-                    **Resource**: Collection'
-          _embedded:
-            type: object
-            required:
-            - elements
-            properties:
-              elements:
-                type: array
-                items:
-                  $ref: '#/components/schemas/VersionReadModel'
-    Available_projects_for_versionsModel:
-      type: object
-      example:
-        _links:
-          self:
-            href: /api/v3/versions/available_projects
-        _type: Collection
-        total: 2
-        count: 2
-        _embedded:
-          elements:
-          - _type: Project
-            _links:
-              self:
-                href: /api/v3/projects/6
-                title: A project
-              editWorkPackage:
-                href: /api/v3/work_packages/{id}/form
-                templated: true
-                method: post
-              createWorkPackage:
-                href: /api/v3/projects/6/work_packages/form
-                method: post
-              createWorkPackageImmediate:
-                href: /api/v3/projects/6/work_packages
-                method: post
-              categories:
-                href: /api/v3/projects/6/categories
-              versions:
-                href: /api/v3/projects/6/versions
-            id: 6
-            identifier: a_project
-            name: A project
-            description: Eveniet molestias omnis quis aut qui eum adipisci. Atque aut aut in exercitationem adipisci amet. Nisi asperiores quia ratione veritatis enim exercitationem magnam. Aut fuga architecto adipisci nihil. Et repellat pariatur. Aliquam et sed perferendis nostrum quaerat. Fugit doloremque voluptatem.
-            createdAt: '2015-07-06T13:28:14+00:00'
-            updatedAt: '2015-10-01T09:55:02+00:00'
-            type: Customer Project
-          - _type: Project
-            _links:
-              self:
-                href: /api/v3/projects/14
-                title: Another project
-              createWorkPackage:
-                href: /api/v3/projects/14/work_packages/form
-                method: post
-              createWorkPackageImmediate:
-                href: /api/v3/projects/14/work_packages
-                method: post
-              categories:
-                href: /api/v3/projects/14/categories
-              versions:
-                href: /api/v3/projects/14/versions
-            id: 14
-            identifier: another_project
-            name: Another project
-            description: ''
-            createdAt: '2016-02-29T12:50:20+00:00'
-            updatedAt: '2016-02-29T12:50:20+00:00'
-            type: null
-    CustomFieldLinkedProperties:
-      type: object
-      patternProperties:
-        ^customField\d+$:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'A custom field value that belongs to a custom field of a reference type:
-
-
-              - Hierarchy
-
-              - List
-
-              - User
-
-              - Version
-
-              - Weighted item list'
-    Version_schemaModel:
-      type: object
-      example:
-        _type: Schema
-        _dependencies: []
-        id:
-          type: Integer
-          name: ID
-          required: true
-          hasDefault: false
-          writable: false
-        name:
-          type: String
-          name: Name
-          required: true
-          hasDefault: false
-          writable: true
-          minLength: 1
-          maxLength: 60
-        description:
-          type: Formattable
-          name: Description
-          required: false
-          hasDefault: false
-          writable: true
-        startDate:
-          type: Date
-          name: Start date
-          required: false
-          hasDefault: false
-          writable: true
-        endDate:
-          type: Date
-          name: Finish date
-          required: false
-          hasDefault: false
-          writable: false
-        status:
-          type: String
-          name: Status
-          required: true
-          hasDefault: false
-          writable: true
-          visibility: default
-          _links: {}
-        sharing:
-          type: String
-          name: Sharing
-          required: true
-          hasDefault: false
-          writable: true
-          visibility: default
-          _links: {}
-        createdAt:
-          type: DateTime
-          name: Created on
-          required: true
-          hasDefault: false
-          writable: false
-        updatedAt:
-          type: DateTime
-          name: Updated on
-          required: true
-          hasDefault: false
-          writable: false
-        definingProject:
-          type: Project
-          name: Project
-          required: true
-          hasDefault: false
-          writable: true
-          _links: {}
-        customField14:
-          type: String
-          name: text CF
-          required: false
-          hasDefault: false
-          writable: true
-          visibility: default
-        customField40:
-          type: CustomOption
-          name: List CF
-          required: false
-          hasDefault: false
-          writable: true
-          location: _links
-          visibility: default
-          _links: {}
-        _links:
-          self:
-            href: /api/v3/versions/schema
-    Formattable:
-      type: object
-      required:
-      - format
-      properties:
-        format:
-          type: string
-          enum:
-          - plain
-          - markdown
-          - custom
-          readOnly: true
-          description: Indicates the formatting language of the raw text
-          example: markdown
-        raw:
-          type: string
-          description: The raw text, as entered by the user
-          example: I **am** formatted!
-        html:
-          type: string
-          readOnly: true
-          description: The text converted to HTML according to the format
-          example: I <strong>am</strong> formatted!
-      example:
-        format: markdown
-        raw: I am formatted!
-        html: I am formatted!
-    VersionWriteModel:
-      allOf:
-      - $ref: '#/components/schemas/CustomFieldProperties'
-      - type: object
-        properties:
-          name:
-            type: string
-            description: Version name
-          description:
-            $ref: '#/components/schemas/Formattable'
-          startDate:
-            type:
-            - string
-            - 'null'
-            format: date
-          endDate:
-            type:
-            - string
-            - 'null'
-            format: date
-          status:
-            type: string
-            description: 'The current status of the version. This could be:
-
-
-              - *open*: if the version is available to be assigned to work packages in all shared projects
-
-              - *locked*: if the version is not finished, but locked for further assignments to work packages
-
-              - *closed*: if the version is finished'
-            enum:
-            - open
-            - locked
-            - closed
-          sharing:
-            type: string
-            description: 'The indicator of how the version is shared between projects. This could be:
-
-
-              - *none*: if the version is only available in the defining project
-
-              - *descendants*: if the version is shared with the descendants of the defining project
-
-              - *hierarchy*: if the version is shared with the descendants and the ancestors of the defining project
-
-              - *tree*: if the version is shared with the root project of the defining project and all descendants of the root project
-
-              - *system*: if the version is shared globally'
-            enum:
-            - none
-            - descendants
-            - hierarchy
-            - tree
-            - system
-          _links:
-            allOf:
-            - $ref: '#/components/schemas/CustomFieldLinkedProperties'
-            - type: object
-              properties:
-                definingProject:
-                  allOf:
-                  - $ref: '#/components/schemas/Link'
-                  - description: 'The workspace to which the version belongs
-
-
-                      **Resource**: Workspace'
     CollectionModel:
       type: object
       required:
@@ -1359,32 +1474,6 @@ components:
           minimum: 0
         _links:
           $ref: '#/components/schemas/CollectionLinks'
-    CustomFieldProperties:
-      type: object
-      patternProperties:
-        ^customField\d+$:
-          type:
-          - 'null'
-          - number
-          - boolean
-          - string
-          - object
-          description: 'A custom field value, that belongs to a custom field of a simple type:
-
-
-            - Boolean
-
-            - Date
-
-            - Float
-
-            - Integer
-
-            - Link (URL)
-
-            - Text
-
-            - Long text'
     ErrorResponse:
       type: object
       required:
@@ -1411,95 +1500,6 @@ components:
         message:
           type: string
           example: Project can't be blank.
-  responses:
-    InvalidRequestBody:
-      description: Occurs when the client did not send a valid JSON object in the request body.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
-            message: The request body was not a single JSON object.
-    UnsupportedMediaType:
-      description: Occurs when the client sends an unsupported Content-Type header.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
-            message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
-    MissingContentType:
-      description: Occurs when the client did not send a Content-Type header
-      content:
-        text/plain:
-          schema:
-            type: string
-          example: Missing content-type header
-  examples:
-    VersionSimpleResponse:
-      description: Simple response showing a single version
-      value:
-        _type: Version
-        id: 3
-        name: v0.9.1-alpha
-        description:
-          format: plain
-          raw: First draft of the energy weapon ... (behold, Alderaan *evil_laughter*)
-          html: <p>First draft of the energy weapon ... (behold, Alderaan *evil_laughter*)</p>
-        startDate: '2026-02-02'
-        endDate: '2026-02-09'
-        status: closed
-        sharing: none
-        createdAt: '2026-02-06T09:30:49.157Z'
-        updatedAt: '2026-02-10T09:53:21.620Z'
-        customField14: true
-        _links:
-          self:
-            href: /api/v3/versions/1
-            title: v0.1.0-alpha
-          schema:
-            href: /api/v3/versions/schema
-          update:
-            href: /api/v3/versions/1/form
-            method: post
-          updateImmediately:
-            href: /api/v3/versions/1
-            method: patch
-          delete:
-            href: /api/v3/versions/1
-            method: delete
-          availableInProjects:
-            href: /api/v3/versions/1/workspaces
-          definingProject:
-            href: /api/v3/projects/10
-            title: Death Star
-          customField23:
-            href: /api/v3/users/18
-            title: Mara Jade
-    VersionCreateRequest:
-      description: Request to create a basic version with custom fields
-      value:
-        name: v0.9.1-alpha
-        startDate: '2026-02-02'
-        endDate: '2026-02-09'
-        status: open
-        sharing: tree
-        customField14: true
-        _links:
-          definingProject:
-            href: /api/v3/projects/10
-            title: Death Star
-          customField23:
-            href: /api/v3/users/18
-            title: Mara Jade
-    VersionUpdateNameRequest:
-      description: Example request body to update the name of a version.
-      value:
-        name: v0.9.1-alpha
   securitySchemes:
     BasicAuth:
       type: http

@@ -647,6 +647,101 @@ components:
       example:
         href: /api/v3/work_packages
         method: POST
+    View_time_entry_schemaModel:
+      type: object
+      example:
+        _type: Schema
+        _dependencies: []
+        id:
+          type: Integer
+          name: ID
+          required: true
+          hasDefault: false
+          writable: false
+          options: {}
+        createdAt:
+          type: DateTime
+          name: Created on
+          required: true
+          hasDefault: false
+          writable: false
+          options: {}
+        updatedAt:
+          type: DateTime
+          name: Updated on
+          required: true
+          hasDefault: false
+          writable: false
+          options: {}
+        spentOn:
+          type: Date
+          name: Date
+          required: true
+          hasDefault: false
+          writable: true
+          options: {}
+        hours:
+          type: Duration
+          name: Hours
+          required: true
+          hasDefault: false
+          writable: true
+          options: {}
+        user:
+          type: User
+          name: User
+          required: true
+          hasDefault: false
+          writable: false
+          options: {}
+        workPackage:
+          type: WorkPackage
+          name: Work package
+          required: false
+          hasDefault: false
+          writable: true
+          location: _links
+          _links: {}
+        project:
+          type: Project
+          name: Project
+          required: false
+          hasDefault: false
+          writable: true
+          location: _links
+          _links: {}
+        activity:
+          type: TimeEntriesActivity
+          name: Activity
+          required: true
+          hasDefault: true
+          writable: true
+          location: _links
+          _links: {}
+        customField29:
+          type: String
+          name: sfsdfsdfsdfsdfdsf
+          required: false
+          hasDefault: false
+          writable: true
+          options:
+            rtl: null
+        _links:
+          self:
+            href: /api/v3/time_entries/schema
+    Available_projects_for_time_entriesModel:
+      type: object
+      example:
+        _links:
+          self:
+            href: /api/v3/time_entries/available_projects
+        _type: Collection
+        total: 2
+        count: 2
+        _embedded:
+          elements:
+          - _type: Project...
+          - _type: Project...
     Formattable:
       type: object
       required:
@@ -674,6 +769,32 @@ components:
         format: markdown
         raw: I am formatted!
         html: I am formatted!
+    ErrorResponse:
+      type: object
+      required:
+      - _type
+      - errorIdentifier
+      - message
+      properties:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
+          type: string
+          enum:
+          - Error
+        errorIdentifier:
+          type: string
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
+          type: string
+          example: Project can't be blank.
     TimeEntryModel:
       allOf:
       - $ref: '#/components/schemas/CustomFieldProperties'
@@ -850,127 +971,6 @@ components:
             activity:
               href: /api/v3/time_entries/activities/1
               title: Management
-    View_time_entry_schemaModel:
-      type: object
-      example:
-        _type: Schema
-        _dependencies: []
-        id:
-          type: Integer
-          name: ID
-          required: true
-          hasDefault: false
-          writable: false
-          options: {}
-        createdAt:
-          type: DateTime
-          name: Created on
-          required: true
-          hasDefault: false
-          writable: false
-          options: {}
-        updatedAt:
-          type: DateTime
-          name: Updated on
-          required: true
-          hasDefault: false
-          writable: false
-          options: {}
-        spentOn:
-          type: Date
-          name: Date
-          required: true
-          hasDefault: false
-          writable: true
-          options: {}
-        hours:
-          type: Duration
-          name: Hours
-          required: true
-          hasDefault: false
-          writable: true
-          options: {}
-        user:
-          type: User
-          name: User
-          required: true
-          hasDefault: false
-          writable: false
-          options: {}
-        workPackage:
-          type: WorkPackage
-          name: Work package
-          required: false
-          hasDefault: false
-          writable: true
-          location: _links
-          _links: {}
-        project:
-          type: Project
-          name: Project
-          required: false
-          hasDefault: false
-          writable: true
-          location: _links
-          _links: {}
-        activity:
-          type: TimeEntriesActivity
-          name: Activity
-          required: true
-          hasDefault: true
-          writable: true
-          location: _links
-          _links: {}
-        customField29:
-          type: String
-          name: sfsdfsdfsdfsdfdsf
-          required: false
-          hasDefault: false
-          writable: true
-          options:
-            rtl: null
-        _links:
-          self:
-            href: /api/v3/time_entries/schema
-    ErrorResponse:
-      type: object
-      required:
-      - _type
-      - errorIdentifier
-      - message
-      properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
-          type: string
-          enum:
-          - Error
-        errorIdentifier:
-          type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
-          type: string
-          example: Project can't be blank.
-    Available_projects_for_time_entriesModel:
-      type: object
-      example:
-        _links:
-          self:
-            href: /api/v3/time_entries/available_projects
-        _type: Collection
-        total: 2
-        count: 2
-        _embedded:
-          elements:
-          - _type: Project...
-          - _type: Project...
     CollectionLinks:
       type: object
       required:
@@ -1121,13 +1121,6 @@ components:
         _links:
           $ref: '#/components/schemas/CollectionLinks'
   responses:
-    MissingContentType:
-      description: Occurs when the client did not send a Content-Type header
-      content:
-        text/plain:
-          schema:
-            type: string
-          example: Missing content-type header
     InvalidRequestBody:
       description: Occurs when the client did not send a valid JSON object in the request body.
       content:
@@ -1148,6 +1141,13 @@ components:
             _type: Error
             errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
             message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: Missing content-type header
   securitySchemes:
     BasicAuth:
       type: http

@@ -74,289 +74,6 @@ paths:
             **Required permission:** view meetings in the page''s project'
 components:
   schemas:
-    Attachments_Model:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - _links
-        - _embedded
-        properties:
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'The attachments collection
-
-
-                    **Resource**: AttachmentsCollection'
-                  readOnly: true
-          _embedded:
-            type: object
-            properties:
-              elements:
-                type: array
-                readOnly: true
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/AttachmentModel'
-                  - description: Collection of Attachments
-    MeetingCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedCollectionModel'
-      - type: object
-        required:
-        - _embedded
-        - _links
-        properties:
-          _embedded:
-            type: object
-            required:
-            - elements
-            properties:
-              elements:
-                type: array
-                items:
-                  $ref: '#/components/schemas/MeetingModel'
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'The link to this meeting collection resource
-
-
-                    **Resource**: MeetingCollection'
-    CollectionLinks:
-      type: object
-      required:
-      - self
-      properties:
-        self:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          - description: 'This collection resource.
-
-
-              **Resource**: Collection'
-    AttachmentModel:
-      type: object
-      required:
-      - fileName
-      - description
-      - status
-      - contentType
-      - digest
-      - createdAt
-      properties:
-        id:
-          type: integer
-          description: Attachment's id
-          minimum: 1
-        fileName:
-          type: string
-          description: The name of the uploaded file
-        fileSize:
-          type: integer
-          description: The size of the uploaded file in Bytes
-          minimum: 0
-        description:
-          allOf:
-          - $ref: '#/components/schemas/Formattable'
-          - description: A user provided description of the file
-        status:
-          type: string
-          enum:
-          - uploaded
-          - prepared
-          - scanned
-          - quarantined
-          - rescan
-        contentType:
-          type: string
-          description: The files MIME-Type as determined by the server
-        digest:
-          type: object
-          description: A checksum for the files content
-          required:
-          - algorithm
-          - hash
-          properties:
-            algorithm:
-              type: string
-              description: The algorithm used to generate the digest.
-            hash:
-              type: string
-              description: The hexadecimal representation of the digested hash value.
-        createdAt:
-          type: string
-          format: date-time
-          description: Time of creation
-        _links:
-          type: object
-          required:
-          - self
-          - container
-          - author
-          - downloadLocation
-          properties:
-            delete:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'Deletes this attachment
-
-
-                  # Conditions
-
-
-                  **Permission**: edit on attachment container or being the author for attachments without container'
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This attachment
-
-
-                  **Resource**: Attachment'
-            container:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The object (e.g. WorkPackage) housing the attachment
-
-
-                  **Resource**: Anything'
-            author:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The user who uploaded the attachment
-
-
-                  **Resource**: User'
-            downloadLocation:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'Direct download link to the attachment
-
-
-                  **Resource**: -'
-      example:
-        _type: Attachment
-        _links:
-          self:
-            href: /api/v3/attachments/1
-          container:
-            href: /api/v3/work_packages/1
-          author:
-            href: /api/v3/users/1
-          staticDownloadLocation:
-            href: /api/v3/attachments/1/content
-          downloadLocation:
-            href: /some/remote/aws/url/image.png
-        id: 1
-        fileName: cat.png
-        filesize: 24
-        status: uploaded
-        description:
-          format: plain
-          raw: A picture of a cute cat
-          html: <p>A picture of a cute cat</p>
-        contentType: image/png
-        digest:
-          algorithm: md5
-          hash: 64c26a8403cd796ea4cf913cda2ee4a9
-        createdAt: '2014-05-21T08:51:20.396Z'
-    CustomFieldProperties:
-      type: object
-      patternProperties:
-        ^customField\d+$:
-          type:
-          - 'null'
-          - number
-          - boolean
-          - string
-          - object
-          description: 'A custom field value, that belongs to a custom field of a simple type:
-
-
-            - Boolean
-
-            - Date
-
-            - Float
-
-            - Integer
-
-            - Link (URL)
-
-            - Text
-
-            - Long text'
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
-          type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
-    Formattable:
-      type: object
-      required:
-      - format
-      properties:
-        format:
-          type: string
-          enum:
-          - plain
-          - markdown
-          - custom
-          readOnly: true
-          description: Indicates the formatting language of the raw text
-          example: markdown
-        raw:
-          type: string
-          description: The raw text, as entered by the user
-          example: I **am** formatted!
-        html:
-          type: string
-          readOnly: true
-          description: The text converted to HTML according to the format
-          example: I <strong>am</strong> formatted!
-      example:
-        format: markdown
-        raw: I am formatted!
-        html: I am formatted!
     ProjectModel:
       allOf:
       - $ref: '#/components/schemas/CustomFieldProperties'
@@ -602,6 +319,162 @@ components:
 
 
                       **Resource**: Workspace'
+    Attachments_Model:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The attachments collection
+
+
+                    **Resource**: AttachmentsCollection'
+                  readOnly: true
+          _embedded:
+            type: object
+            properties:
+              elements:
+                type: array
+                readOnly: true
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/AttachmentModel'
+                  - description: Collection of Attachments
+    CustomFieldProperties:
+      type: object
+      patternProperties:
+        ^customField\d+$:
+          type:
+          - 'null'
+          - number
+          - boolean
+          - string
+          - object
+          description: 'A custom field value, that belongs to a custom field of a simple type:
+
+
+            - Boolean
+
+            - Date
+
+            - Float
+
+            - Integer
+
+            - Link (URL)
+
+            - Text
+
+            - Long text'
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
+    PrincipalModel:
+      type: object
+      required:
+      - _type
+      - id
+      - name
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - User
+          - Group
+          - PlaceholderUser
+        id:
+          type: integer
+          description: The principal's unique identifier.
+          minimum: 1
+        name:
+          type: string
+          description: The principal's display name, layout depends on instance settings.
+        createdAt:
+          type: string
+          format: date-time
+          description: Time of creation
+        updatedAt:
+          type: string
+          format: date-time
+          description: Time of the most recent change to the principal
+        _links:
+          type: object
+          required:
+          - self
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This principal resource.
+
+
+                  **Resource**: User|Group|PlaceholderUser'
+            memberships:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'An href to the collection of the principal''s memberships.
+
+
+                  # Conditions:
+
+
+                  - user has permission `view_members` or `manage_members` in any project
+
+
+                  **Resource**: Collection'
+    CollectionLinks:
+      type: object
+      required:
+      - self
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          - description: 'This collection resource.
+
+
+              **Resource**: Collection'
     PaginatedCollectionModel:
       allOf:
       - $ref: '#/components/schemas/CollectionModel'
@@ -638,6 +511,160 @@ components:
 
 
                     **Resource**: Collection'
+    AttachmentModel:
+      type: object
+      required:
+      - fileName
+      - description
+      - status
+      - contentType
+      - digest
+      - createdAt
+      properties:
+        id:
+          type: integer
+          description: Attachment's id
+          minimum: 1
+        fileName:
+          type: string
+          description: The name of the uploaded file
+        fileSize:
+          type: integer
+          description: The size of the uploaded file in Bytes
+          minimum: 0
+        description:
+          allOf:
+          - $ref: '#/components/schemas/Formattable'
+          - description: A user provided description of the file
+        status:
+          type: string
+          enum:
+          - uploaded
+          - prepared
+          - scanned
+          - quarantined
+          - rescan
+        contentType:
+          type: string
+          description: The files MIME-Type as determined by the server
+        digest:
+          type: object
+          description: A checksum for the files content
+          required:
+          - algorithm
+          - hash
+          properties:
+            algorithm:
+              type: string
+              description: The algorithm used to generate the digest.
+            hash:
+              type: string
+              description: The hexadecimal representation of the digested hash value.
+        createdAt:
+          type: string
+          format: date-time
+          description: Time of creation
+        _links:
+          type: object
+          required:
+          - self
+          - container
+          - author
+          - downloadLocation
+          properties:
+            delete:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'Deletes this attachment
+
+
+                  # Conditions
+
+
+                  **Permission**: edit on attachment container or being the author for attachments without container'
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This attachment
+
+
+                  **Resource**: Attachment'
+            container:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The object (e.g. WorkPackage) housing the attachment
+
+
+                  **Resource**: Anything'
+            author:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The user who uploaded the attachment
+
+
+                  **Resource**: User'
+            downloadLocation:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'Direct download link to the attachment
+
+
+                  **Resource**: -'
+      example:
+        _type: Attachment
+        _links:
+          self:
+            href: /api/v3/attachments/1
+          container:
+            href: /api/v3/work_packages/1
+          author:
+            href: /api/v3/users/1
+          staticDownloadLocation:
+            href: /api/v3/attachments/1/content
+          downloadLocation:
+            href: /some/remote/aws/url/image.png
+        id: 1
+        fileName: cat.png
+        filesize: 24
+        status: uploaded
+        description:
+          format: plain
+          raw: A picture of a cute cat
+          html: <p>A picture of a cute cat</p>
+        contentType: image/png
+        digest:
+          algorithm: md5
+          hash: 64c26a8403cd796ea4cf913cda2ee4a9
+        createdAt: '2014-05-21T08:51:20.396Z'
+    MeetingCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedCollectionModel'
+      - type: object
+        required:
+        - _embedded
+        - _links
+        properties:
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MeetingModel'
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The link to this meeting collection resource
+
+
+                    **Resource**: MeetingCollection'
     UserModel:
       allOf:
       - $ref: '#/components/schemas/PrincipalModel'
@@ -815,6 +842,55 @@ components:
                     - LDAP authentication configured
 
                     - `admin`'
+    Formattable:
+      type: object
+      required:
+      - format
+      properties:
+        format:
+          type: string
+          enum:
+          - plain
+          - markdown
+          - custom
+          readOnly: true
+          description: Indicates the formatting language of the raw text
+          example: markdown
+        raw:
+          type: string
+          description: The raw text, as entered by the user
+          example: I **am** formatted!
+        html:
+          type: string
+          readOnly: true
+          description: The text converted to HTML according to the format
+          example: I <strong>am</strong> formatted!
+      example:
+        format: markdown
+        raw: I am formatted!
+        html: I am formatted!
+    CollectionModel:
+      type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
     ErrorResponse:
       type: object
       required:
@@ -841,60 +917,6 @@ components:
         message:
           type: string
           example: Project can't be blank.
-    PrincipalModel:
-      type: object
-      required:
-      - _type
-      - id
-      - name
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - User
-          - Group
-          - PlaceholderUser
-        id:
-          type: integer
-          description: The principal's unique identifier.
-          minimum: 1
-        name:
-          type: string
-          description: The principal's display name, layout depends on instance settings.
-        createdAt:
-          type: string
-          format: date-time
-          description: Time of creation
-        updatedAt:
-          type: string
-          format: date-time
-          description: Time of the most recent change to the principal
-        _links:
-          type: object
-          required:
-          - self
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This principal resource.
-
-
-                  **Resource**: User|Group|PlaceholderUser'
-            memberships:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'An href to the collection of the principal''s memberships.
-
-
-                  # Conditions:
-
-
-                  - user has permission `view_members` or `manage_members` in any project
-
-
-                  **Resource**: Collection'
     CustomCommentProperties:
       type: object
       patternProperties:
@@ -906,28 +928,6 @@ components:
 
 
             The property is only present when the corresponding `customField{N}` has `has_comment` set to `true`.'
-    CollectionModel:
-      type: object
-      required:
-      - _type
-      - total
-      - count
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - Collection
-        total:
-          type: integer
-          description: The total amount of elements available in the collection.
-          minimum: 0
-        count:
-          type: integer
-          description: Actual amount of elements in this response.
-          minimum: 0
-        _links:
-          $ref: '#/components/schemas/CollectionLinks'
     MeetingModel:
       type: object
       required:
@@ -1031,6 +1031,36 @@ components:
 
                   **Permission**: edit meeting'
   examples:
+    MeetingCollectionSimpleResponse:
+      description: A simple response of a meeting collection.
+      value:
+        _type: Collection
+        total: 2
+        count: 2
+        pageSize: 20
+        offset: 1
+        _embedded:
+          _abbreviated: Embedded resources shortened for brevity
+          elements:
+          - _type: Meeting
+            id: 6
+            title: Weekly
+            startTime: '2026-02-17T20:54:35.523Z'
+            endTime: '2026-02-17T21:54:35.523Z'
+          - _type: Meeting
+            id: 5
+            title: Weekly
+            startTime: '2026-02-10T20:54:35.523Z'
+            endTime: '2026-02-10T21:54:35.523Z'
+        _links:
+          self:
+            href: /api/v3/meetings?filters=%5B%5D&offset=1&pageSize=20
+          jumpTo:
+            href: /api/v3/meetings?filters=%5B%5D&offset=%7Boffset%7D&pageSize=20
+            templated: true
+          changeSize:
+            href: /api/v3/meetings?filters=%5B%5D&offset=1&pageSize=%7Bsize%7D
+            templated: true
     MeetingSimpleResponse:
       description: A simple meeting response.
       value:
@@ -1073,36 +1103,6 @@ components:
             _type: Project
             name: Death Star
             id: 10
-    MeetingCollectionSimpleResponse:
-      description: A simple response of a meeting collection.
-      value:
-        _type: Collection
-        total: 2
-        count: 2
-        pageSize: 20
-        offset: 1
-        _embedded:
-          _abbreviated: Embedded resources shortened for brevity
-          elements:
-          - _type: Meeting
-            id: 6
-            title: Weekly
-            startTime: '2026-02-17T20:54:35.523Z'
-            endTime: '2026-02-17T21:54:35.523Z'
-          - _type: Meeting
-            id: 5
-            title: Weekly
-            startTime: '2026-02-10T20:54:35.523Z'
-            endTime: '2026-02-10T21:54:35.523Z'
-        _links:
-          self:
-            href: /api/v3/meetings?filters=%5B%5D&offset=1&pageSize=20
-          jumpTo:
-            href: /api/v3/meetings?filters=%5B%5D&offset=%7Boffset%7D&pageSize=20
-            templated: true
-          changeSize:
-            href: /api/v3/meetings?filters=%5B%5D&offset=1&pageSize=%7Bsize%7D
-            templated: true
   securitySchemes:
     BasicAuth:
       type: http

@@ -396,33 +396,32 @@ components:
       example:
         href: /api/v3/work_packages
         method: POST
-    Formattable:
+    ErrorResponse:
       type: object
       required:
-      - format
+      - _type
+      - errorIdentifier
+      - message
       properties:
-        format:
+        _embedded:
+          type: object
+          properties:
+            details:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                  example: project
+        _type:
           type: string
           enum:
-          - plain
-          - markdown
-          - custom
-          readOnly: true
-          description: Indicates the formatting language of the raw text
-          example: markdown
-        raw:
+          - Error
+        errorIdentifier:
           type: string
-          description: The raw text, as entered by the user
-          example: I **am** formatted!
-        html:
+          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
+        message:
           type: string
-          readOnly: true
-          description: The text converted to HTML according to the format
-          example: I <strong>am</strong> formatted!
-      example:
-        format: markdown
-        raw: I am formatted!
-        html: I am formatted!
+          example: Project can't be blank.
     DocumentsModel:
       type: object
       example:
@@ -482,32 +481,33 @@ components:
           changeSize:
             href: /api/v3/documents?offset=1&pageSize=%7Bsize%7D
             templated: true
-    ErrorResponse:
+    Formattable:
       type: object
       required:
-      - _type
-      - errorIdentifier
-      - message
+      - format
       properties:
-        _embedded:
-          type: object
-          properties:
-            details:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                  example: project
-        _type:
+        format:
           type: string
           enum:
-          - Error
-        errorIdentifier:
+          - plain
+          - markdown
+          - custom
+          readOnly: true
+          description: Indicates the formatting language of the raw text
+          example: markdown
+        raw:
           type: string
-          example: urn:openproject-org:api:v3:errors:PropertyConstraintViolation
-        message:
+          description: The raw text, as entered by the user
+          example: I **am** formatted!
+        html:
           type: string
-          example: Project can't be blank.
+          readOnly: true
+          description: The text converted to HTML according to the format
+          example: I <strong>am</strong> formatted!
+      example:
+        format: markdown
+        raw: I am formatted!
+        html: I am formatted!
     DocumentModel:
       type: object
       properties:

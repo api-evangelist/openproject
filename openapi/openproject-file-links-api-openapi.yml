@@ -1056,6 +1056,39 @@ components:
 
 
               **Resource**: Collection'
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type:
+          - string
+          - 'null'
+          description: URL to the referenced resource (might be relative)
+        title:
+          type: string
+          description: Representative label for the resource
+        templated:
+          type: boolean
+          default: false
+          description: If true the href contains parts that need to be replaced by the client
+        method:
+          type: string
+          default: GET
+          description: The HTTP verb to use when requesting the resource
+        payload:
+          type: object
+          description: The payload to send in the request to achieve the desired result
+        identifier:
+          type: string
+          description: An optional unique identifier to the link object
+        type:
+          type: string
+          description: The MIME-Type of the returned resource.
+      example:
+        href: /api/v3/work_packages
+        method: POST
     ProjectStorageModel:
       type: object
       required:
@@ -1178,39 +1211,6 @@ components:
             href: /api/v3/storages/81/open
           openWithConnectionEnsured:
             href: /api/v3/storages/81/open
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type:
-          - string
-          - 'null'
-          description: URL to the referenced resource (might be relative)
-        title:
-          type: string
-          description: Representative label for the resource
-        templated:
-          type: boolean
-          default: false
-          description: If true the href contains parts that need to be replaced by the client
-        method:
-          type: string
-          default: GET
-          description: The HTTP verb to use when requesting the resource
-        payload:
-          type: object
-          description: The payload to send in the request to achieve the desired result
-        identifier:
-          type: string
-          description: An optional unique identifier to the link object
-        type:
-          type: string
-          description: The MIME-Type of the returned resource.
-      example:
-        href: /api/v3/work_packages
-        method: POST
     ProjectStorageCollectionModel:
       allOf:
       - $ref: '#/components/schemas/CollectionModel'
@@ -1255,6 +1255,28 @@ components:
           - id: 1338
             _type: ProjectStorage
             _abbreviated: File Link resource shortened for brevity
+    CollectionModel:
+      type: object
+      required:
+      - _type
+      - total
+      - count
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - Collection
+        total:
+          type: integer
+          description: The total amount of elements available in the collection.
+          minimum: 0
+        count:
+          type: integer
+          description: Actual amount of elements in this response.
+          minimum: 0
+        _links:
+          $ref: '#/components/schemas/CollectionLinks'
     ErrorResponse:
       type: object
       required:
@@ -1281,43 +1303,71 @@ components:
         message:
           type: string
           example: Project can't be blank.
-    CollectionModel:
+    OAuthClientCredentialsReadModel:
       type: object
       required:
+      - id
       - _type
-      - total
-      - count
+      - clientId
+      - confidential
       - _links
       properties:
+        id:
+          type: integer
+          minimum: 1
         _type:
           type: string
           enum:
-          - Collection
-        total:
-          type: integer
-          description: The total amount of elements available in the collection.
-          minimum: 0
-        count:
-          type: integer
-          description: Actual amount of elements in this response.
-          minimum: 0
-        _links:
-          $ref: '#/components/schemas/CollectionLinks'
-    OAuthClientCredentialsWriteModel:
-      type: object
-      required:
-      - clientId
-      - clientSecret
-      properties:
+          - OAuthClientCredentials
         clientId:
           type: string
           description: OAuth 2 client id
-        clientSecret:
+        confidential:
+          type: boolean
+          description: true, if OAuth 2 credentials are confidential, false, if no secret is stored
+        createdAt:
           type: string
-          description: OAuth 2 client secret
+          format: date-time
+          description: The time the OAuth client credentials were created at
+        updatedAt:
+          type: string
+          format: date-time
+          description: The time the OAuth client credentials were last updated
+        _links:
+          type: object
+          required:
+          - self
+          - integration
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This OAuth Client Credentials object
+
+
+                  **Resource**: OAuthClientCredentials'
+            integration:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The resource that integrates this OAuth client credentials. Currently, only `Storage` resources are
+
+                  able to contain OAuth client credentials.
+
+
+                  **Resource**: Storage'
       example:
+        id: 1337
+        _type: OAuthClientCredentials
         clientId: O5h6WObhMg1Z8IcLHRE3_LMh4jJYmmca2V6OTFSv8DA
-        clientSecret: LSk52mn4jmtSYTgH0NzDj-u2z5LMpT8bsS0BouwJQQw
+        confidential: true
+        createdAt: '2022-12-07T12:56:42.836Z'
+        updatedAt: '2022-12-07T12:56:42.836Z'
+        _links:
+          self:
+            href: /api/v3/oauth_client_credentials/1337
+          integration:
+            href: /api/v3/storages/42
+            title: Death Star Cloud
     FileLinkCollectionReadModel:
       allOf:
       - $ref: '#/components/schemas/PaginatedCollectionModel'
@@ -1392,6 +1442,116 @@ components:
                 href: /api/v3/work_package/17/file_links/1337/open
           - _hint: File Link resource shortened for brevity
             id: 1338
+    FileLinkWriteModel:
+      type: object
+      required:
+      - originData
+      - _links
+      properties:
+        originData:
+          $ref: '#/components/schemas/FileLinkOriginDataModel'
+        _links:
+          oneOf:
+          - type: object
+            required:
+            - storage
+            properties:
+              storage:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The storage resource of the linked file.
+
+
+                    **Resource**: Storage'
+          - type: object
+            required:
+            - storageUrl
+            properties:
+              storageUrl:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'The storage url the file link references to.
+
+
+                    **Resource**: N/A'
+      example:
+        originData:
+          id: '5503'
+          name: logo.png
+          mimeType: image/png
+          size: 16042
+          createdAt: '2021-12-19T09:42:10.170Z'
+          lastModifiedAt: '2021-12-20T14:00:13.987Z'
+          createdByName: Luke Skywalker
+          lastModifiedByName: Anakin Skywalker
+        _links:
+          storageUrl:
+            href: https://nextcloud.my-deathstar.org
+    StorageCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - _links
+        - _embedded
+        properties:
+          _links:
+            type: object
+            required:
+            - self
+            properties:
+              self:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'This storage collection
+
+
+                    **Resource**: StorageCollectionReadModel'
+          _embedded:
+            type: object
+            required:
+            - elements
+            properties:
+              elements:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StorageReadModel'
+    PaginatedCollectionModel:
+      allOf:
+      - $ref: '#/components/schemas/CollectionModel'
+      - type: object
+        required:
+        - pageSize
+        - offset
+        properties:
+          pageSize:
+            type: integer
+            description: Amount of elements that a response will hold.
+            minimum: 0
+          offset:
+            type: integer
+            description: The page number that is requested from paginated collection.
+            minimum: 1
+          _links:
+            type: object
+            required:
+            - jumpTo
+            - changeSize
+            properties:
+              jumpTo:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Templated link to another page offset.
+
+
+                    **Resource**: Collection'
+              changeSize:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'Templated link for another page size.
+
+
+                    **Resource**: Collection'
     FileLinkOriginDataModel:
       type: object
       required:
@@ -1431,104 +1591,158 @@ components:
         lastModifiedByName:
           type: string
           description: Display name of the author that modified the file on the origin last
-    StorageFilesModel:
+    StorageFileUploadLinkModel:
       type: object
       required:
       - _type
-      - files
-      - parent
-      - ancestors
       - _links
       properties:
         _type:
           type: string
           enum:
-          - StorageFiles
-        files:
-          type: array
-          items:
-            $ref: '#/components/schemas/StorageFileModel'
-          description: List of files provided by the selected storage.
-        parent:
-          allOf:
-          - $ref: '#/components/schemas/StorageFileModel'
-          - description: File of the currently selected parent directory.
-        ancestors:
-          type: array
-          items:
-            $ref: '#/components/schemas/StorageFileModel'
-          description: List of ancestors of the parent directory. Can be empty, if parent directory was root directory.
+          - UploadLink
         _links:
           type: object
           required:
           - self
+          - destination
           properties:
             self:
               allOf:
               - $ref: '#/components/schemas/Link'
-              - description: 'Not provided
+              - description: 'The resource link of the upload link resource.
 
 
-                  **Resource**: urn:openproject-org:api:v3:storages:storage_file:no_link_provided'
-      example:
-        _type: StorageFiles
-        files:
-        - id: '42'
-          name: readme.md
-          _type: StorageFile
-          location: /readme.md
-          mimeType: text/markdown
-          size: 4096
-          createdAt: '2021-12-19T09:42:10.170Z'
-          lastModifiedAt: '2021-12-20T14:00:13.987Z'
-          createdByName: Luke Skywalker
-          lastModifiedByName: Anakin Skywalker
-          _links:
-            self:
-              href: urn:openproject-org:api:v3:storages:storage_file:no_link_provided
-        - id: '43'
-          name: readme.pdf
-          _type: StorageFile
-          location: /readme.pdf
-          mimeType: application/pdf
-          size: 2048
-          createdAt: '2021-12-19T09:42:10.170Z'
-          lastModifiedAt: '2021-12-20T14:00:13.987Z'
-          createdByName: Luke Skywalker
-          lastModifiedByName: Anakin Skywalker
-          _links:
-            self:
-              href: urn:openproject-org:api:v3:storages:storage_file:no_link_provided
-        parent:
-          id: '41'
-          name: /
-          _type: StorageFile
-          location: /
-          mimeType: application/x-op-directory
-          size: 6144
-          createdAt: '2021-12-20T09:42:10.170Z'
-          lastModifiedAt: '2021-12-21T14:00:13.987Z'
-          createdByName: Luke Skywalker
-          lastModifiedByName: Anakin Skywalker
-          _links:
-            self:
-              href: urn:openproject-org:api:v3:storages:storage_file:no_link_provided
-        ancestors: []
-        _links:
-          self:
-            href: urn:openproject-org:api:v3:storages:storage_file:no_link_provided
-    StorageFolderWriteModel:
+                  As the upload link is a temporal object, and cannot be retrieved again, the
+
+                  self link usually is `urn:openproject-org:api:v3:storages:upload_link:no_link_provided`.
+
+
+                  **Resource**: UploadLink'
+            destination:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The direct upload link.
+
+
+                  **Resource**: N/A'
+    OAuthClientCredentialsWriteModel:
       type: object
       required:
-      - name
-      - parentId
+      - clientId
+      - clientSecret
       properties:
+        clientId:
+          type: string
+          description: OAuth 2 client id
+        clientSecret:
+          type: string
+          description: OAuth 2 client secret
+      example:
+        clientId: O5h6WObhMg1Z8IcLHRE3_LMh4jJYmmca2V6OTFSv8DA
+        clientSecret: LSk52mn4jmtSYTgH0NzDj-u2z5LMpT8bsS0BouwJQQw
+    OAuthApplicationReadModel:
+      type: object
+      required:
+      - id
+      - _type
+      - name
+      - clientId
+      - confidential
+      - _links
+      properties:
+        id:
+          type: integer
+          minimum: 1
+        _type:
+          type: string
+          enum:
+          - OAuthApplication
         name:
           type: string
-          description: Name of the folder to be created
-        parentId:
+          description: The name of the OAuth 2 application
+        clientId:
           type: string
-          description: Unique identifier of the parent folder in which the new folder should be created in
+          description: OAuth 2 client id
+        clientSecret:
+          type: string
+          description: OAuth 2 client secret. This is only returned when creating a new OAuth application.
+        confidential:
+          type: boolean
+          description: true, if OAuth 2 credentials are confidential, false, if no secret is stored
+        createdAt:
+          type: string
+          format: date-time
+          description: The time the OAuth 2 Application was created at
+        updatedAt:
+          type: string
+          format: date-time
+          description: The time the OAuth 2 Application was last updated
+        scopes:
+          type: array
+          description: An array of the scopes of the OAuth 2 Application
+          items:
+            type: string
+        _links:
+          type: object
+          required:
+          - self
+          - owner
+          - redirectUri
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'This OAuth application
+
+
+                  **Resource**: OAuthApplication'
+            owner:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The user that created the OAuth application.
+
+
+                  **Resource**: User'
+            integration:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'The resource that integrates this OAuth application into itself. Currently, only `Storage` resources are
+
+                  able to create and maintain own OAuth application.
+
+
+                  **Resource**: Storage'
+            redirectUri:
+              type: array
+              items:
+                allOf:
+                - $ref: '#/components/schemas/Link'
+                - description: 'A redirect URI of the OAuth application
+
+
+                    **Resource**: N/A'
+      example:
+        id: 1337
+        _type: OAuthApplication
+        name: Vader's secure OAuth app
+        clientId: O5h6WObhMg1Z8IcLHRE3_LMh4jJYmmca2V6OTFSv8DA
+        confidential: true
+        createdAt: '2022-12-07T12:56:42.626Z'
+        updatedAt: '2022-12-07T12:56:42.626Z'
+        scopes:
+        - api_v3
+        _links:
+          self:
+            href: /api/v3/oauth_applications/1337
+          owner:
+            href: /api/v3/users/13
+            title: Darth Vader
+          integration:
+            href: /api/v3/storages/42
+            title: Death Star Cloud
+          redirectUri:
+          - href: https://death-star.cloud.tools/index.php/apps/integration_openproject/oauth-redirect
     FileLinkReadModel:
       type: object
       properties:
@@ -1715,14 +1929,120 @@ components:
             href: /api/v3/file_links/1337/open?location=true
           staticOriginDownload:
             href: /api/v3/file_links/1337/download
-    StorageCollectionModel:
+    StorageFolderWriteModel:
+      type: object
+      required:
+      - name
+      - parentId
+      properties:
+        name:
+          type: string
+          description: Name of the folder to be created
+        parentId:
+          type: string
+          description: Unique identifier of the parent folder in which the new folder should be created in
+    StorageFilesModel:
+      type: object
+      required:
+      - _type
+      - files
+      - parent
+      - ancestors
+      - _links
+      properties:
+        _type:
+          type: string
+          enum:
+          - StorageFiles
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/StorageFileModel'
+          description: List of files provided by the selected storage.
+        parent:
+          allOf:
+          - $ref: '#/components/schemas/StorageFileModel'
+          - description: File of the currently selected parent directory.
+        ancestors:
+          type: array
+          items:
+            $ref: '#/components/schemas/StorageFileModel'
+          description: List of ancestors of the parent directory. Can be empty, if parent directory was root directory.
+        _links:
+          type: object
+          required:
+          - self
+          properties:
+            self:
+              allOf:
+              - $ref: '#/components/schemas/Link'
+              - description: 'Not provided
+
+
+                  **Resource**: urn:openproject-org:api:v3:storages:storage_file:no_link_provided'
+      example:
+        _type: StorageFiles
+        files:
+        - id: '42'
+          name: readme.md
+          _type: StorageFile
+          location: /readme.md
+          mimeType: text/markdown
+          size: 4096
+          createdAt: '2021-12-19T09:42:10.170Z'
+          lastModifiedAt: '2021-12-20T14:00:13.987Z'
+          createdByName: Luke Skywalker
+          lastModifiedByName: Anakin Skywalker
+          _links:
+            self:
+              href: urn:openproject-org:api:v3:storages:storage_file:no_link_provided
+        - id: '43'
+          name: readme.pdf
+          _type: StorageFile
+          location: /readme.pdf
+          mimeType: application/pdf
+          size: 2048
+          createdAt: '2021-12-19T09:42:10.170Z'
+          lastModifiedAt: '2021-12-20T14:00:13.987Z'
+          createdByName: Luke Skywalker
+          lastModifiedByName: Anakin Skywalker
+          _links:
+            self:
+              href: urn:openproject-org:api:v3:storages:storage_file:no_link_provided
+        parent:
+          id: '41'
+          name: /
+          _type: StorageFile
+          location: /
+          mimeType: application/x-op-directory
+          size: 6144
+          createdAt: '2021-12-20T09:42:10.170Z'
+          lastModifiedAt: '2021-12-21T14:00:13.987Z'
+          createdByName: Luke Skywalker
+          lastModifiedByName: Anakin Skywalker
+          _links:
+            self:
+              href: urn:openproject-org:api:v3:storages:storage_file:no_link_provided
+        ancestors: []
+        _links:
+          self:
+            href: urn:openproject-org:api:v3:storages:storage_file:no_link_provided
+    StorageFileModel:
       allOf:
-      - $ref: '#/components/schemas/CollectionModel'
+      - $ref: '#/components/schemas/FileLinkOriginDataModel'
       - type: object
         required:
+        - _type
+        - location
         - _links
-        - _embedded
         properties:
+          _type:
+            type: string
+            enum:
+            - StorageFile
+          location:
+            type: string
+            description: Location identification for file in storage
           _links:
             type: object
             required:
@@ -1731,19 +2051,18 @@ components:
               self:
                 allOf:
                 - $ref: '#/components/schemas/Link'
-                - description: 'This storage collection
+                - description: 'Not provided
 
 
-                    **Resource**: StorageCollectionReadModel'
-          _embedded:
-            type: object
-            required:
-            - elements
-            properties:
-              elements:
-                type: array
-                items:
-                  $ref: '#/components/schemas/StorageReadModel'
+                    **Resource**: urn:openproject-org:api:v3:storages:storage_file:no_link_provided'
+      example:
+        id: '42'
+        name: readme.md
+        _type: StorageFile
+        location: /readme.md
+        _links:
+          self:
+            href: urn:openproject-org:api:v3:storages:storage_file:no_link_provided
     FileLinkCollectionWriteModel:
       type: object
       required:
@@ -1773,144 +2092,6 @@ components:
             _links:
               storage:
                 href: /api/v3/storage/42
-    PaginatedCollectionModel:
-      allOf:
-      - $ref: '#/components/schemas/CollectionModel'
-      - type: object
-        required:
-        - pageSize
-        - offset
-        properties:
-          pageSize:
-            type: integer
-            description: Amount of elements that a response will hold.
-            minimum: 0
-          offset:
-            type: integer
-            description: The page number that is requested from paginated collection.
-            minimum: 1
-          _links:
-            type: object
-            required:
-            - jumpTo
-            - changeSize
-            properties:
-              jumpTo:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Templated link to another page offset.
-
-
-                    **Resource**: Collection'
-              changeSize:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Templated link for another page size.
-
-
-                    **Resource**: Collection'
-    OAuthApplicationReadModel:
-      type: object
-      required:
-      - id
-      - _type
-      - name
-      - clientId
-      - confidential
-      - _links
-      properties:
-        id:
-          type: integer
-          minimum: 1
-        _type:
-          type: string
-          enum:
-          - OAuthApplication
-        name:
-          type: string
-          description: The name of the OAuth 2 application
-        clientId:
-          type: string
-          description: OAuth 2 client id
-        clientSecret:
-          type: string
-          description: OAuth 2 client secret. This is only returned when creating a new OAuth application.
-        confidential:
-          type: boolean
-          description: true, if OAuth 2 credentials are confidential, false, if no secret is stored
-        createdAt:
-          type: string
-          format: date-time
-          description: The time the OAuth 2 Application was created at
-        updatedAt:
-          type: string
-          format: date-time
-          description: The time the OAuth 2 Application was last updated
-        scopes:
-          type: array
-          description: An array of the scopes of the OAuth 2 Application
-          items:
-            type: string
-        _links:
-          type: object
-          required:
-          - self
-          - owner
-          - redirectUri
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This OAuth application
-
-
-                  **Resource**: OAuthApplication'
-            owner:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The user that created the OAuth application.
-
-
-                  **Resource**: User'
-            integration:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The resource that integrates this OAuth application into itself. Currently, only `Storage` resources are
-
-                  able to create and maintain own OAuth application.
-
-
-                  **Resource**: Storage'
-            redirectUri:
-              type: array
-              items:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'A redirect URI of the OAuth application
-
-
-                    **Resource**: N/A'
-      example:
-        id: 1337
-        _type: OAuthApplication
-        name: Vader's secure OAuth app
-        clientId: O5h6WObhMg1Z8IcLHRE3_LMh4jJYmmca2V6OTFSv8DA
-        confidential: true
-        createdAt: '2022-12-07T12:56:42.626Z'
-        updatedAt: '2022-12-07T12:56:42.626Z'
-        scopes:
-        - api_v3
-        _links:
-          self:
-            href: /api/v3/oauth_applications/1337
-          owner:
-            href: /api/v3/users/13
-            title: Darth Vader
-          integration:
-            href: /api/v3/storages/42
-            title: Death Star Cloud
-          redirectUri:
-          - href: https://death-star.cloud.tools/index.php/apps/integration_openproject/oauth-redirect
     StorageReadModel:
       type: object
       required:
@@ -2106,170 +2287,6 @@ components:
 
 
                   **Resource**: OAuthClientCredentials'
-    OAuthClientCredentialsReadModel:
-      type: object
-      required:
-      - id
-      - _type
-      - clientId
-      - confidential
-      - _links
-      properties:
-        id:
-          type: integer
-          minimum: 1
-        _type:
-          type: string
-          enum:
-          - OAuthClientCredentials
-        clientId:
-          type: string
-          description: OAuth 2 client id
-        confidential:
-          type: boolean
-          description: true, if OAuth 2 credentials are confidential, false, if no secret is stored
-        createdAt:
-          type: string
-          format: date-time
-          description: The time the OAuth client credentials were created at
-        updatedAt:
-          type: string
-          format: date-time
-          description: The time the OAuth client credentials were last updated
-        _links:
-          type: object
-          required:
-          - self
-          - integration
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'This OAuth Client Credentials object
-
-
-                  **Resource**: OAuthClientCredentials'
-            integration:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The resource that integrates this OAuth client credentials. Currently, only `Storage` resources are
-
-                  able to contain OAuth client credentials.
-
-
-                  **Resource**: Storage'
-      example:
-        id: 1337
-        _type: OAuthClientCredentials
-        clientId: O5h6WObhMg1Z8IcLHRE3_LMh4jJYmmca2V6OTFSv8DA
-        confidential: true
-        createdAt: '2022-12-07T12:56:42.836Z'
-        updatedAt: '2022-12-07T12:56:42.836Z'
-        _links:
-          self:
-            href: /api/v3/oauth_client_credentials/1337
-          integration:
-            href: /api/v3/storages/42
-            title: Death Star Cloud
-    StorageFileUploadPreparationModel:
-      type: object
-      required:
-      - projectId
-      - fileName
-      - parent
-      properties:
-        projectId:
-          type: integer
-          description: The project identifier, from where a user starts uploading a file.
-          minimum: 1
-        fileName:
-          type: string
-          description: The file name.
-        parent:
-          type: string
-          description: 'The directory to which the file is to be uploaded. For root directories, the value `/` must
-
-            be provided.'
-    FileLinkWriteModel:
-      type: object
-      required:
-      - originData
-      - _links
-      properties:
-        originData:
-          $ref: '#/components/schemas/FileLinkOriginDataModel'
-        _links:
-          oneOf:
-          - type: object
-            required:
-            - storage
-            properties:
-              storage:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'The storage resource of the linked file.
-
-
-                    **Resource**: Storage'
-          - type: object
-            required:
-            - storageUrl
-            properties:
-              storageUrl:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'The storage url the file link references to.
-
-
-                    **Resource**: N/A'
-      example:
-        originData:
-          id: '5503'
-          name: logo.png
-          mimeType: image/png
-          size: 16042
-          createdAt: '2021-12-19T09:42:10.170Z'
-          lastModifiedAt: '2021-12-20T14:00:13.987Z'
-          createdByName: Luke Skywalker
-          lastModifiedByName: Anakin Skywalker
-        _links:
-          storageUrl:
-            href: https://nextcloud.my-deathstar.org
-    StorageFileUploadLinkModel:
-      type: object
-      required:
-      - _type
-      - _links
-      properties:
-        _type:
-          type: string
-          enum:
-          - UploadLink
-        _links:
-          type: object
-          required:
-          - self
-          - destination
-          properties:
-            self:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The resource link of the upload link resource.
-
-
-                  As the upload link is a temporal object, and cannot be retrieved again, the
-
-                  self link usually is `urn:openproject-org:api:v3:storages:upload_link:no_link_provided`.
-
-
-                  **Resource**: UploadLink'
-            destination:
-              allOf:
-              - $ref: '#/components/schemas/Link'
-              - description: 'The direct upload link.
-
-
-                  **Resource**: N/A'
     StorageWriteModel:
       type: object
       properties:
@@ -2357,43 +2374,122 @@ components:
             href: https://nextcloud.deathstar.rocks
           type:
             href: urn:openproject-org:api:v3:storages:Nextcloud
-    StorageFileModel:
-      allOf:
-      - $ref: '#/components/schemas/FileLinkOriginDataModel'
-      - type: object
-        required:
-        - _type
-        - location
-        - _links
-        properties:
-          _type:
-            type: string
-            enum:
-            - StorageFile
-          location:
-            type: string
-            description: Location identification for file in storage
-          _links:
-            type: object
-            required:
-            - self
-            properties:
-              self:
-                allOf:
-                - $ref: '#/components/schemas/Link'
-                - description: 'Not provided
+    StorageFileUploadPreparationModel:
+      type: object
+      required:
+      - projectId
+      - fileName
+      - parent
+      properties:
+        projectId:
+          type: integer
+          description: The project identifier, from where a user starts uploading a file.
+          minimum: 1
+        fileName:
+          type: string
+          description: The file name.
+        parent:
+          type: string
+          description: 'The directory to which the file is to be uploaded. For root directories, the value `/` must
 
-
-                    **Resource**: urn:openproject-org:api:v3:storages:storage_file:no_link_provided'
-      example:
-        id: '42'
-        name: readme.md
-        _type: StorageFile
-        location: /readme.md
+            be provided.'
+  examples:
+    StorageOneDriveIncompleteResponse:
+      value:
+        _type: Storage
+        id: 1337
+        name: It's no moon
+        tenantId: e36f1dbc-fdae-427e-b61b-0d96ddfb81a4
+        driveId: null
+        createdAt: '2021-12-20T13:37:00.211Z'
+        updatedAt: '2021-12-20T13:37:00.211Z'
+        configured: false
         _links:
           self:
-            href: urn:openproject-org:api:v3:storages:storage_file:no_link_provided
-  examples:
+            href: /api/v3/storages/1337
+            title: It's no moon
+          type:
+            href: urn:openproject-org:api:v3:storages:OneDrive
+            title: OneDrive/SharePoint
+          prepareUpload: []
+          open:
+            href: /api/v3/storages/1337/open
+          authorizationState:
+            href: urn:openproject-org:api:v3:storages:authorization:FailedAuthorization
+            title: Authorization failed
+          projectStorages:
+            href: /api/v3/project_storages?filters=[{"storageId":{"operator":"=","values":["1337"]}}]
+          oauthClientCredentials:
+            href: /api/v3/oauth_client_credentials/42
+    StorageNextcloudUnauthorizedResponse:
+      value:
+        _type: Storage
+        id: 1337
+        name: It's no moon
+        hasApplicationPassword: false
+        createdAt: '2021-12-20T13:37:00.211Z'
+        updatedAt: '2021-12-20T13:37:00.211Z'
+        configured: true
+        _embedded:
+          oauthApplication:
+            id: 42
+            _type: OAuthApplication
+            name: It's no moon (Nextcloud)
+            clientId: O5h6WObhMg1Z8IcLHRE3_LMh4jJYmmca2V6OTFSv8DA
+            confidential: true
+            createdAt: '2022-12-07T12:56:42.626Z'
+            updatedAt: '2022-12-07T12:56:42.626Z'
+            scopes:
+            - api_v3
+            _links:
+              self:
+                href: /api/v3/oauth_applications/42
+              owner:
+                href: /api/v3/users/13
+                title: Darth Vader
+              integration:
+                href: /api/v3/storages/1337
+                title: It's no moon
+              redirectUri:
+              - href: https://nextcloud.deathstar.rocks/index.php/apps/integration_openproject/oauth-redirect
+          oauthClientCredentials:
+            _type: OAuthClientCredentials
+            id: 42
+            clientId: fGEFWxIpROrpci25TW6qWCZozDFEAKSkonMBkrf3LYvBXRljBbLajBf2vD2fjePm
+            confidential: true
+            createdAt: '2023-12-08T09:49:24.397Z'
+            updatedAt: '2023-12-08T09:49:24.397Z'
+            _links:
+              self:
+                href: /api/v3/oauth_client_credentials/42
+              integration:
+                href: /api/v3/storages/1337
+                title: It's no moon
+        _links:
+          self:
+            href: /api/v3/storages/1337
+            title: It's no moon
+          type:
+            href: urn:openproject-org:api:v3:storages:Nextcloud
+            title: Nextcloud
+          origin:
+            href: https://nextcloud.deathstar.rocks/
+          prepareUpload: []
+          open:
+            href: /api/v3/storages/1337/open
+          authorizationState:
+            href: urn:openproject-org:api:v3:storages:authorization:FailedAuthorization
+            title: Authorization failed
+          authorize:
+            href: https://nextcloud25.local/index.php/apps/oauth2/authorize?client_id=fnrIeJZqqAKGQlejuDaGhSQfCAVtoayHLACWCYcPJ0w17Pp6daPPUktkM9QaGxca&redirect_uri=https://openproject.local/oauth_clients/fnrIeJZqqAKGQlejuDaGhSQfCAVtoayHLACWCYcPJ0w17Pp6daPPUktkM9QaGxca/callback&response_type=code
+            title: Authorize
+          projectStorages:
+            href: /api/v3/project_storages?filters=[{"storageId":{"operator":"=","values":["1337"]}}]
+          oauthApplication:
+            href: /api/v3/oauth_application/42
+            title: It's no moon (Nextcloud)
+          oauthClientCredentials:
+            href: /api/v3/oauth_client_credentials/42
     StorageNextcloudResponseForCreation:
       value:
         _type: Storage
@@ -2448,60 +2544,6 @@ components:
             title: My New DeathStar (Nextcloud)
           oauthClientCredentials:
             href: null
-    StorageOneDriveResponse:
-      value:
-        _type: Storage
-        id: 1337
-        name: It's no moon
-        tenantId: e36f1dbc-fdae-427e-b61b-0d96ddfb81a4
-        driveId: b!FeOZEMfQx0eGQKqVBLcP__BG8mq-4-9FuRqOyk3MXY8Qconfm2i6SKEoCmuGYqQK
-        createdAt: '2021-12-20T13:37:00.211Z'
-        updatedAt: '2021-12-20T13:37:00.211Z'
-        configured: true
-        _embedded:
-          oauthClientCredentials:
-            _type: OAuthClientCredentials
-            id: 42
-            clientId: b8a5bb54-5fb2-4e0e-9427-9d24dbac32ff
-            confidential: true
-            createdAt: '2023-12-08T09:49:24.397Z'
-            updatedAt: '2023-12-08T09:49:24.397Z'
-            _links:
-              self:
-                href: /api/v3/oauth_client_credentials/42
-              integration:
-                href: /api/v3/storages/1337
-                title: It's no moon
-        _links:
-          self:
-            href: /api/v3/storages/1337
-            title: It's no moon
-          type:
-            href: urn:openproject-org:api:v3:storages:OneDrive
-            title: OneDrive
-          prepareUpload:
-          - href: /api/v3/storages/1337/files/prepare_upload
-            method: post
-            title: Upload file
-            payload:
-              projectId: 33
-              fileName: '{fileName}'
-              parent: '{parent}'
-            templated: true
-          open:
-            href: /api/v3/storages/1337/open
-          authorizationState:
-            href: urn:openproject-org:api:v3:storages:authorization:Connected
-            title: Connected
-          projectStorages:
-            href: /api/v3/project_storages?filters=[{"storageId":{"operator":"=","values":["1337"]}}]
-          oauthClientCredentials:
-            href: /api/v3/oauth_client_credentials/42
-    StorageCreateFolderRequestBody:
-      description: A valid request body to create a new folder on a external storage
-      value:
-        name: Uploads
-        parentId: '200'
     StoragesSimpleCollectionModel:
       value:
         _type: Collection
@@ -2659,68 +2701,26 @@ components:
             title: It's no moon (Nextcloud)
           oauthClientCredentials:
             href: /api/v3/oauth_client_credentials/42
-    StorageOneDriveIncompleteResponse:
+    StorageCreateFolderRequestBody:
+      description: A valid request body to create a new folder on a external storage
+      value:
+        name: Uploads
+        parentId: '200'
+    StorageOneDriveResponse:
       value:
         _type: Storage
         id: 1337
         name: It's no moon
         tenantId: e36f1dbc-fdae-427e-b61b-0d96ddfb81a4
-        driveId: null
-        createdAt: '2021-12-20T13:37:00.211Z'
-        updatedAt: '2021-12-20T13:37:00.211Z'
-        configured: false
-        _links:
-          self:
-            href: /api/v3/storages/1337
-            title: It's no moon
-          type:
-            href: urn:openproject-org:api:v3:storages:OneDrive
-            title: OneDrive/SharePoint
-          prepareUpload: []
-          open:
-            href: /api/v3/storages/1337/open
-          authorizationState:
-            href: urn:openproject-org:api:v3:storages:authorization:FailedAuthorization
-            title: Authorization failed
-          projectStorages:
-            href: /api/v3/project_storages?filters=[{"storageId":{"operator":"=","values":["1337"]}}]
-          oauthClientCredentials:
-            href: /api/v3/oauth_client_credentials/42
-    StorageNextcloudUnauthorizedResponse:
-      value:
-        _type: Storage
-        id: 1337
-        name: It's no moon
-        hasApplicationPassword: false
+        driveId: b!FeOZEMfQx0eGQKqVBLcP__BG8mq-4-9FuRqOyk3MXY8Qconfm2i6SKEoCmuGYqQK
         createdAt: '2021-12-20T13:37:00.211Z'
         updatedAt: '2021-12-20T13:37:00.211Z'
         configured: true
         _embedded:
-          oauthApplication:
-            id: 42
-            _type: OAuthApplication
-            name: It's no moon (Nextcloud)
-            clientId: O5h6WObhMg1Z8IcLHRE3_LMh4jJYmmca2V6OTFSv8DA
-            confidential: true
-            createdAt: '2022-12-07T12:56:42.626Z'
-            updatedAt: '2022-12-07T12:56:42.626Z'
-            scopes:
-            - api_v3
-            _links:
-              self:
-                href: /api/v3/oauth_applications/42
-              owner:
-                href: /api/v3/users/13
-                title: Darth Vader
-              integration:
-                href: /api/v3/storages/1337
-                title: It's no moon
-              redirectUri:
-              - href: https://nextcloud.deathstar.rocks/index.php/apps/integration_openproject/oauth-redirect
           oauthClientCredentials:
             _type: OAuthClientCredentials
             id: 42
-            clientId: fGEFWxIpROrpci25TW6qWCZozDFEAKSkonMBkrf3LYvBXRljBbLajBf2vD2fjePm
+            clientId: b8a5bb54-5fb2-4e0e-9427-9d24dbac32ff
             confidential: true
             createdAt: '2023-12-08T09:49:24.397Z'
             updatedAt: '2023-12-08T09:49:24.397Z'
@@ -2735,37 +2735,34 @@ components:
             href: /api/v3/storages/1337
             title: It's no moon
           type:
-            href: urn:openproject-org:api:v3:storages:Nextcloud
-            title: Nextcloud
-          origin:
-            href: https://nextcloud.deathstar.rocks/
-          prepareUpload: []
+            href: urn:openproject-org:api:v3:storages:OneDrive
+            title: OneDrive
+          prepareUpload:
+          - href: /api/v3/storages/1337/files/prepare_upload
+            method: post
+            title: Upload file
+            payload:
+              projectId: 33
+              fileName: '{fileName}'
+              parent: '{parent}'
+            templated: true
           open:
             href: /api/v3/storages/1337/open
           authorizationState:
-            href: urn:openproject-org:api:v3:storages:authorization:FailedAuthorization
-            title: Authorization failed
-          authorize:
-            href: https://nextcloud25.local/index.php/apps/oauth2/authorize?client_id=fnrIeJZqqAKGQlejuDaGhSQfCAVtoayHLACWCYcPJ0w17Pp6daPPUktkM9QaGxca&redirect_uri=https://openproject.local/oauth_clients/fnrIeJZqqAKGQlejuDaGhSQfCAVtoayHLACWCYcPJ0w17Pp6daPPUktkM9QaGxca/callback&response_type=code
-            title: Authorize
+            href: urn:openproject-org:api:v3:storages:authorization:Connected
+            title: Connected
           projectStorages:
             href: /api/v3/project_storages?filters=[{"storageId":{"operator":"=","values":["1337"]}}]
-          oauthApplication:
-            href: /api/v3/oauth_application/42
-            title: It's no moon (Nextcloud)
           oauthClientCredentials:
             href: /api/v3/oauth_client_credentials/42
   responses:
-    InvalidRequestBody:
-      description: Occurs when the client did not send a valid JSON object in the request body.
+    MissingContentType:
+      description: Occurs when the client did not send a Content-Type header
       content:
-        application/hal+json:
+        text/plain:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            _type: Error
-            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
-            message: The request body was not a single JSON object.
+            type: string
+          example: Missing content-type header
     UnsupportedMediaType:
       description: Occurs when the client sends an unsupported Content-Type header.
       content:
@@ -2776,13 +2773,16 @@ components:
             _type: Error
             errorIdentifier: urn:openproject-org:api:v3:errors:TypeNotSupported
             message: Expected CONTENT-TYPE to be (expected value) but got (actual value).
-    MissingContentType:
-      description: Occurs when the client did not send a Content-Type header
+    InvalidRequestBody:
+      description: Occurs when the client did not send a valid JSON object in the request body.
       content:
-        text/plain:
+        application/hal+json:
           schema:
-            type: string
-          example: Missing content-type header
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            _type: Error
+            errorIdentifier: urn:openproject-org:api:v3:errors:InvalidRequestBody
+            message: The request body was not a single JSON object.
   securitySchemes:
     BasicAuth:
       type: http
